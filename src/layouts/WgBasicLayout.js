@@ -67,7 +67,7 @@ class WgBasicLayout extends React.PureComponent {
     this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual);
     let { location: { pathname } } = props;
     // 首次进入界面默认加载标签页
-    this.defaultPath = "/dashboard/monitor";
+    this.defaultPath = "/dashboard/analysis";
 
     const panes = [];
     this.state = {
@@ -142,14 +142,15 @@ class WgBasicLayout extends React.PureComponent {
     const currRouterData = this.matchParamsPath(pathname, breadcrumbNameMap);
 
     if (!currRouterData) {
-      return 'WGMes';
+      return '望果制造执行系统';
     }
+    alert('todo：获取路由页面信息');
     const pageName = formatMessage({
       id: currRouterData.locale || currRouterData.name,
       defaultMessage: currRouterData.name,
     });
 
-    return `${pageName} - WGMes`;
+    return `${pageName} - 望果制造执行系统`;
   };
 
   getLayoutStyle = () => {

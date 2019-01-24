@@ -35,4 +35,8 @@ export default {
   'menu.account.settings': '个人设置',
   'menu.account.trigger': '触发报错',
   'menu.account.logout': '退出登录',
+
+  // 望果菜单
+  'menu.sysConfig': '系统设置',
+  'menu.sysConfig.user': '用户管理',
 };

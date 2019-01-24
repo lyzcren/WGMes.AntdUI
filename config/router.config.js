@@ -258,6 +258,25 @@ export default [
       {
         component: '404',
       },
+      // sysConfig
+      { path: '/', redirect: '/sysConfig/user' },
+      {
+        path: '/sysConfig',
+        name: 'sysConfig',
+        icon: 'sysConfig',
+        routes: [
+          {
+            path: '/sysConfig/user',
+            name: 'user',
+            component: './SysConfig/User/List',
+          },
+          // {
+          //   path: '/sysConfig/role',
+          //   name: 'role',
+          //   component: './SysConfig/Role',
+          // },
+        ],
+      },
     ],
   },
 ];

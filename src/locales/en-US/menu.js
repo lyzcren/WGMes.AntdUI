@@ -35,4 +35,7 @@ export default {
   'menu.account.settings': 'Account Settings',
   'menu.account.trigger': 'Trigger Error',
   'menu.account.logout': 'Logout',
+
+  // 望果菜单
+  'menu.sysConfig.user': 'User',
 };
