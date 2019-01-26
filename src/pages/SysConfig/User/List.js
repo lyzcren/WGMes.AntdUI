@@ -1,3 +1,4 @@
+
 import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
@@ -19,8 +20,9 @@ import {
   Badge,
   Divider,
   Steps,
-  Radio,
+  Radio, Popover, Switch, Progress
 } from 'antd';
+import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 
@@ -35,30 +37,181 @@ const getValue = obj =>
   Object.keys(obj)
     .map(key => obj[key])
     .join(',');
-const sexMap = [0, 1, 2,];
+// const sexMap = ['default', 'processing', 'success',];
 const sex = ['保密', '男', '女',];
+const activeData = ['启用', '禁用',];
+
+const validatorPhone = (rule, value, callback) => {
+  var reg = /^1[3|4|5|6|7|8|9]\d{9}$/;
+  if (value && !reg.test(value)) {
+    callback('请输入正确的手机号码!');
+  }
+  callback();
+};
+
+const passwordStatusMap = {
+  ok: (
+    <div className={styles.success}>
+      <FormattedMessage id="validation.password.strength.strong" />
+    </div>
+  ),
+  pass: (
+    <div className={styles.warning}>
+      <FormattedMessage id="validation.password.strength.medium" />
+    </div>
+  ),
+  poor: (
+    <div className={styles.error}>
+      <FormattedMessage id="validation.password.strength.short" />
+    </div>
+  ),
+};
+
+const passwordProgressMap = {
+  ok: 'success',
+  pass: 'normal',
+  poor: 'exception',
+};
 
 const CreateForm = Form.create()(props => {
   const { modalVisible, form, handleAdd, handleModalVisible } = props;
   const okHandle = () => {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-      form.resetFields();
+      // form.resetFields();
       handleAdd(fieldsValue);
     });
+  };
+  const getPasswordStatus = () => {
+    const value = form.getFieldValue('fPwd');
+    if (value && value.length > 9) {
+      return 'ok';
+    }
+    if (value && value.length > 5) {
+      return 'pass';
+    }
+    return 'poor';
+  };
+  const renderPasswordProgress = () => {
+    const value = form.getFieldValue('fPwd');
+    const passwordStatus = getPasswordStatus();
+    return value && value.length ? (
+      <div className={styles[`progress-${passwordStatus}`]}>
+        <Progress
+          status={passwordProgressMap[passwordStatus]}
+          className={styles.progress}
+          strokeWidth={6}
+          percent={value.length * 10 > 100 ? 100 : value.length * 10}
+          showInfo={false}
+        />
+      </div>
+    ) : null;
+  };
+  const checkConfirm = (rule, value, callback) => {
+    if (value && value !== form.getFieldValue('fPwd')) {
+      callback(formatMessage({ id: 'validation.password.twice' }));
+    } else {
+      callback();
+    }
+  };
+  const checkPassword = (rule, value, callback) => {
+    if (!value) {
+      callback('密码不符合要求');
+    } else {
+      if (value.length < 6) {
+        callback('密码不符合要求');
+      } else {
+        if (value) {
+          form.validateFields(['fConfirmPwd'], { force: true });
+        }
+        callback();
+      }
+    }
   };
   return (
     <Modal
       destroyOnClose
-      title="新建规则"
+      title="新建用户"
       visible={modalVisible}
       onOk={okHandle}
       onCancel={() => handleModalVisible()}
     >
-      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="描述">
-        {form.getFieldDecorator('desc', {
-          rules: [{ required: true, message: '请输入至少五个字符的规则描述！', min: 5 }],
+      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="用户名">
+        {form.getFieldDecorator('fNumber', {
+          rules: [{ required: true, message: '请输入至少五个字符的用户名！', min: 5 }],
         })(<Input placeholder="请输入" />)}
+      </FormItem>
+      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="姓名">
+        {form.getFieldDecorator('fName', {
+          rules: [{ required: true, message: '请输入至少五个字符的姓名！', min: 2 }],
+        })(<Input placeholder="请输入" />)}
+      </FormItem>
+      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="手机号码">
+        {form.getFieldDecorator('fPhone', {
+          rules: [
+            { required: false, message: '请输入手机号码！' },
+            { validator: validatorPhone }
+          ]
+        })(<Input placeholder="请输入" />)}
+      </FormItem>
+      <FormItem key="fSex" labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="性别">
+        {form.getFieldDecorator('fSex', {
+        })(
+          <RadioGroup>
+            <Radio value="1">男</Radio>
+            <Radio value="2">女</Radio>
+          </RadioGroup>
+        )}
+      </FormItem>
+      <FormItem key="fPwd" labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="密码">
+        <Popover
+          getPopupContainer={node => node.parentNode}
+          content={
+            <div style={{ padding: '4px 0' }}>
+              {passwordStatusMap[getPasswordStatus()]}
+              {renderPasswordProgress()}
+              <div style={{ marginTop: 10 }}>
+                <FormattedMessage id="validation.password.strength.msg" />
+              </div>
+            </div>
+          }
+          overlayStyle={{ width: 240 }}
+          placement="right"
+        >
+          {form.getFieldDecorator('fPwd', {
+            rules: [
+              {
+                required: true,
+                validator: checkPassword,
+              },
+            ],
+          })(
+            <Input
+              size="large"
+              type="password"
+              placeholder={formatMessage({ id: 'form.password.placeholder' })}
+            />
+          )}
+        </Popover>
+      </FormItem>
+      <FormItem key="fConfirmPwd" labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="确认密码">
+        {form.getFieldDecorator('fConfirmPwd', {
+          rules: [
+            {
+              required: true,
+              message: formatMessage({ id: 'validation.confirm-password.required' }),
+            },
+            {
+              validator: checkConfirm,
+            },
+          ],
+        })(
+          <Input
+            size="large"
+            type="password"
+            placeholder={formatMessage({ id: 'form.confirm-password.placeholder' })}
+          />
+        )}
       </FormItem>
     </Modal>
   );
@@ -292,6 +445,7 @@ class TableList extends PureComponent {
     {
       title: '用户名',
       dataIndex: 'fNumber',
+      sorter: true,
     },
     {
       title: '姓名',
@@ -321,6 +475,23 @@ class TableList extends PureComponent {
       ],
       render(val) {
         return sex[val];
+      },
+    },
+    {
+      title: '启用',
+      dataIndex: 'fIsActive',
+      filters: [
+        {
+          text: activeData[0],
+          value: 0,
+        },
+        {
+          text: activeData[1],
+          value: 1,
+        },
+      ],
+      render(val) {
+        return <Switch disabled checked={val} />;
       },
     },
     // {
@@ -495,16 +666,28 @@ class TableList extends PureComponent {
   };
 
   handleAdd = fields => {
-    const { dispatch } = this.props;
+    const { dispatch, form } = this.props;
     dispatch({
       type: 'userManage/add',
       payload: {
-        desc: fields.desc,
-      },
+        fNumber: fields.fNumber,
+        fName: fields.fName,
+        fPhone: fields.fPhone,
+        fSex: fields.fSex,
+        fPwd: fields.fPwd,
+      }
+    }).then(() => {
+      const { userManage } = this.props;
+      console.log(userManage);
+      if (userManage.data.status === 'ok') {
+        // form.resetFields();
+        // if (res.code == 200) {
+        message.success('添加成功');
+        this.handleModalVisible();
+      } else {
+        message.warning(userManage.data.message);
+      }
     });
-
-    message.success('添加成功');
-    this.handleModalVisible();
   };
 
   handleUpdate = fields => {
@@ -531,14 +714,14 @@ class TableList extends PureComponent {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
             <FormItem label="姓名">
-              {getFieldDecorator('fName')(<Input placeholder="请输入" />)}
+              {getFieldDecorator('fName1')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
             <FormItem label="状态">
               {getFieldDecorator('fIsActive')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">未启用</Option>
+                  <Option value="0">禁用</Option>
                   <Option value="1">启用</Option>
                 </Select>
               )}

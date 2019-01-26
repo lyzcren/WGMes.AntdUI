@@ -263,7 +263,7 @@ export default [
       {
         path: '/sysConfig',
         name: 'sysConfig',
-        icon: 'sysConfig',
+        icon: 'setting',
         routes: [
           {
             path: '/sysConfig/user',

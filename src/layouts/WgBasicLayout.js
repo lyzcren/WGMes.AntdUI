@@ -67,7 +67,7 @@ class WgBasicLayout extends React.PureComponent {
     this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual);
     let { location: { pathname } } = props;
     // 首次进入界面默认加载标签页
-    this.defaultPath = "/dashboard/analysis";
+    this.defaultPath = "/sysConfig/user";
 
     const panes = [];
     this.state = {
@@ -141,6 +141,7 @@ class WgBasicLayout extends React.PureComponent {
   getPageTitle = (pathname, breadcrumbNameMap) => {
     const currRouterData = this.matchParamsPath(pathname, breadcrumbNameMap);
 
+    return '望果制造执行系统';
     if (!currRouterData) {
       return '望果制造执行系统';
     }
