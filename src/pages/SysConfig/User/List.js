@@ -19,7 +19,7 @@ import {
   Badge,
   Divider,
   Steps,
-  Radio, Popover, Switch, Progress, notification,
+  Radio, Popover, Switch, Progress, notification, Popconfirm,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
@@ -263,7 +263,7 @@ class UpdateForm extends PureComponent {
         </FormItem>
         <FormItem key="fSex" labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="性别">
           {form.getFieldDecorator('fSex', {
-            initialValue: formVals.fSex,
+            initialValue: formVals.fSex.toString(),
           })(
             <RadioGroup>
               <Radio value="1">男</Radio>
@@ -426,6 +426,14 @@ class TableList extends PureComponent {
     updatePwdFormValues: {},
   };
 
+  // 列表查询参数
+  pagination = {
+    currentPage: 1,
+    pageSize: 10,
+  };
+  filtersArg = [];
+  sorter = {};
+
   columns = [
     {
       title: '用户名',
@@ -486,6 +494,10 @@ class TableList extends PureComponent {
           <a onClick={() => this.handleUpdateModalVisible(true, record)}>修改</a>
           <Divider type="vertical" />
           <a onClick={() => this.handleUpdatePwdModalVisible(true, record)}>修改密码</a>
+          <Divider type="vertical" />
+          <Popconfirm title="是否要删除此行？" onConfirm={() => this.batchDelete(record)}>
+            <a>删除</a>
+          </Popconfirm>
         </Fragment>
       ),
     },
@@ -508,7 +520,7 @@ class TableList extends PureComponent {
       return newObj;
     }, {});
 
-    const params = {
+    var params = {
       currentPage: pagination.current,
       pageSize: pagination.pageSize,
       ...formValues,
@@ -517,6 +529,10 @@ class TableList extends PureComponent {
     if (sorter.field) {
       params.sorter = `${sorter.field}_${sorter.order}`;
     }
+    console.log(params);
+    this.pagination = pagination;
+    this.filtersArg = filtersArg;
+    this.sorter = sorter;
 
     dispatch({
       type: 'userManage/fetch',
@@ -550,27 +566,7 @@ class TableList extends PureComponent {
     if (selectedRows.length === 0) return;
     switch (e.key) {
       case 'remove':
-        dispatch({
-          type: 'userManage/remove',
-          payload: {
-            fItemID: selectedRows.map(row => row.fItemID),
-          },
-          callback: () => {
-            this.setState({
-              selectedRows: [],
-            });
-            const { userManage } = this.props;
-            if (userManage.status === 'ok') {
-              if (userManage.message) {
-                userManage.message.map(m => notification.error({
-                  message: m,
-                }));
-              }
-              // 成功后再次刷新列表
-              this.search();
-            }
-          },
-        });
+        this.handleBatchDeleteClick();
         break;
       default:
         break;
@@ -603,10 +599,13 @@ class TableList extends PureComponent {
         formValues: values,
       });
 
-      dispatch({
-        type: 'userManage/fetch',
-        payload: values,
-      });
+      // dispatch({
+      //   type: 'userManage/fetch',
+      //   payload: values,
+      // });
+      // 查询时返回第一页
+      this.pagination.current = 1;
+      this.handleStandardTableChange(this.pagination, this.filtersArg, this.sorter);
     });
   }
 
@@ -670,6 +669,29 @@ class TableList extends PureComponent {
       if (userManage.status === 'ok') {
         message.success('修改成功');
         this.handleUpdateModalVisible();
+        // 成功后再次刷新列表
+        this.search();
+      } else if (userManage.status === 'warning') {
+        message.warning(userManage.message);
+      }
+      else {
+        message.error(userManage.message);
+      }
+    });
+  };
+
+  handleUpdatePwd = fields => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'userManage/update',
+      payload: {
+        fItemID: fields.fItemID,
+        fPwd: fields.fPwd,
+      },
+    }).then(() => {
+      const { userManage } = this.props;
+      if (userManage.status === 'ok') {
+        message.success('修改成功');
         this.handleUpdatePwdModalVisible();
         // 成功后再次刷新列表
         this.search();
@@ -679,40 +701,27 @@ class TableList extends PureComponent {
       else {
         message.error(userManage.message);
       }
-    });;
-
+    });
   };
 
-  // handleUpdatePwd = fields => {
-  //   const { dispatch } = this.props;
-  //   dispatch({
-  //     type: 'userManage/update',
-  //     payload: {
-  //       fItemID: fields.fItemID,
-  //       fPwd: fields.fNumber,
-  //     },
-  //   }).then(() => {
-  //     const { userManage } = this.props;
-  //     if (userManage.status === 'ok') {
-  //       message.success('修改成功');
-  //       this.handleUpdateModalVisible();
-  //       // 成功后再次刷新列表
-  //       this.search();
-  //     } else if (userManage.status === 'warning') {
-  //       message.warning(userManage.message);
-  //     }
-  //     else {
-  //       message.error(userManage.message);
-  //     }
-  //   });;
-
-  // };
-
   handleBatchDeleteClick = () => {
-    const { dispatch } = this.props;
     const { selectedRows } = this.state;
 
     if (selectedRows.length === 0) return;
+    Modal.confirm({
+      title: '删除用户',
+      content: '确定批量删除用户吗？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => this.batchDelete(selectedRows),
+    });
+  };
+
+  batchDelete = (selectedRows) => {
+    const { dispatch } = this.props;
+    if (typeof selectedRows === 'object' && !Array.isArray(selectedRows)) {
+      selectedRows = [selectedRows];
+    }
     dispatch({
       type: 'userManage/remove',
       payload: {
@@ -745,7 +754,7 @@ class TableList extends PureComponent {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
             <FormItem label="姓名">
-              {getFieldDecorator('fName1')(<Input placeholder="请输入" />)}
+              {getFieldDecorator('fName')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
@@ -878,7 +887,7 @@ class TableList extends PureComponent {
     };
     const updatePwdMethods = {
       handleUpdatePwdModalVisible: this.handleUpdatePwdModalVisible,
-      handleUpdatePwd: this.handleUpdate,
+      handleUpdatePwd: this.handleUpdatePwd,
     };
     return (
       <GridContent>

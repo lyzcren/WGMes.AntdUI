@@ -4,7 +4,8 @@ import { Spin, Tag, Menu, Icon, Avatar, Tooltip } from 'antd';
 import moment from 'moment';
 import groupBy from 'lodash/groupBy';
 import NoticeIcon from '../NoticeIcon';
-import HeaderSearch from '../HeaderSearch';
+// import HeaderSearch from '../HeaderSearch';
+import HeaderScan from '../HeaderScan';
 import HeaderDropdown from '../HeaderDropdown';
 import SelectLang from '../SelectLang';
 import styles from './index.less';
@@ -123,14 +124,9 @@ export default class GlobalHeaderRight extends PureComponent {
     }
     return (
       <div className={className}>
-        <HeaderSearch
+        <HeaderScan
           className={`${styles.action} ${styles.search}`}
-          placeholder={formatMessage({ id: 'component.globalHeader.search' })}
-          dataSource={[
-            formatMessage({ id: 'component.globalHeader.search.example1' }),
-            formatMessage({ id: 'component.globalHeader.search.example2' }),
-            formatMessage({ id: 'component.globalHeader.search.example3' }),
-          ]}
+          placeholder={formatMessage({ id: 'component.globalHeader.scan' })}
           onSearch={value => {
             console.log('input', value); // eslint-disable-line
           }}
@@ -141,7 +137,7 @@ export default class GlobalHeaderRight extends PureComponent {
         <Tooltip title={formatMessage({ id: 'component.globalHeader.help' })}>
           <a
             target="_blank"
-            href="https://pro.ant.design/docs/getting-started"
+            href="http://www.wgyun.com.cn/Html/Train.asp?ID=40"
             rel="noopener noreferrer"
             className={styles.action}
           >
@@ -208,8 +204,8 @@ export default class GlobalHeaderRight extends PureComponent {
             </span>
           </HeaderDropdown>
         ) : (
-          <Spin size="small" style={{ marginLeft: 8, marginRight: 8 }} />
-        )}
+            <Spin size="small" style={{ marginLeft: 8, marginRight: 8 }} />
+          )}
         <SelectLang className={styles.action} />
       </div>
     );
