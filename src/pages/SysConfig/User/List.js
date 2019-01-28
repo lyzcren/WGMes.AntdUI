@@ -1,4 +1,3 @@
-
 import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
@@ -20,11 +19,12 @@ import {
   Badge,
   Divider,
   Steps,
-  Radio, Popover, Switch, Progress
+  Radio, Popover, Switch, Progress, notification,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
+import { validatorPhone, validatePassword, getPasswordStatus } from '@/utils/validators';
 
 import styles from './List.less';
 
@@ -40,15 +40,6 @@ const getValue = obj =>
 // const sexMap = ['default', 'processing', 'success',];
 const sex = ['保密', '男', '女',];
 const activeData = ['启用', '禁用',];
-
-const validatorPhone = (rule, value, callback) => {
-  var reg = /^1[3|4|5|6|7|8|9]\d{9}$/;
-  if (value && !reg.test(value)) {
-    callback('请输入正确的手机号码!');
-  }
-  callback();
-};
-
 const passwordStatusMap = {
   ok: (
     <div className={styles.success}>
@@ -66,46 +57,37 @@ const passwordStatusMap = {
     </div>
   ),
 };
-
 const passwordProgressMap = {
   ok: 'success',
   pass: 'normal',
   poor: 'exception',
 };
+const renderPasswordProgress = (value) => {
+  // const value = form.getFieldValue('fPwd');
+  const passwordStatus = getPasswordStatus(value);
+  return value && value.length ? (
+    <div className={styles[`progress-${passwordStatus}`]}>
+      <Progress
+        status={passwordProgressMap[passwordStatus]}
+        className={styles.progress}
+        strokeWidth={6}
+        percent={value.length * 10 > 100 ? 100 : value.length * 10}
+        showInfo={false}
+      />
+    </div>
+  ) : null;
+};
+
 
 const CreateForm = Form.create()(props => {
   const { modalVisible, form, handleAdd, handleModalVisible } = props;
+
   const okHandle = () => {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       // form.resetFields();
       handleAdd(fieldsValue);
     });
-  };
-  const getPasswordStatus = () => {
-    const value = form.getFieldValue('fPwd');
-    if (value && value.length > 9) {
-      return 'ok';
-    }
-    if (value && value.length > 5) {
-      return 'pass';
-    }
-    return 'poor';
-  };
-  const renderPasswordProgress = () => {
-    const value = form.getFieldValue('fPwd');
-    const passwordStatus = getPasswordStatus();
-    return value && value.length ? (
-      <div className={styles[`progress-${passwordStatus}`]}>
-        <Progress
-          status={passwordProgressMap[passwordStatus]}
-          className={styles.progress}
-          strokeWidth={6}
-          percent={value.length * 10 > 100 ? 100 : value.length * 10}
-          showInfo={false}
-        />
-      </div>
-    ) : null;
   };
   const checkConfirm = (rule, value, callback) => {
     if (value && value !== form.getFieldValue('fPwd')) {
@@ -115,18 +97,10 @@ const CreateForm = Form.create()(props => {
     }
   };
   const checkPassword = (rule, value, callback) => {
-    if (!value) {
-      callback('密码不符合要求');
-    } else {
-      if (value.length < 6) {
-        callback('密码不符合要求');
-      } else {
-        if (value) {
-          form.validateFields(['fConfirmPwd'], { force: true });
-        }
-        callback();
-      }
+    if (value) {
+      form.validateFields(['fConfirmPwd'], { force: true });
     }
+    callback();
   };
   return (
     <Modal
@@ -143,7 +117,7 @@ const CreateForm = Form.create()(props => {
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="姓名">
         {form.getFieldDecorator('fName', {
-          rules: [{ required: true, message: '请输入至少五个字符的姓名！', min: 2 }],
+          rules: [{ required: true, message: '请输入姓名', min: 1 }],
         })(<Input placeholder="请输入" />)}
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="手机号码">
@@ -169,7 +143,7 @@ const CreateForm = Form.create()(props => {
           content={
             <div style={{ padding: '4px 0' }}>
               {passwordStatusMap[getPasswordStatus()]}
-              {renderPasswordProgress()}
+              {renderPasswordProgress(form.getFieldValue('fPwd'))}
               <div style={{ marginTop: 10 }}>
                 <FormattedMessage id="validation.password.strength.msg" />
               </div>
@@ -183,6 +157,9 @@ const CreateForm = Form.create()(props => {
               {
                 required: true,
                 validator: checkPassword,
+              },
+              {
+                validator: validatePassword,
               },
             ],
           })(
@@ -230,196 +207,202 @@ class UpdateForm extends PureComponent {
 
     this.state = {
       formVals: {
-        name: props.values.name,
-        desc: props.values.desc,
-        key: props.values.key,
-        target: '0',
-        template: '0',
-        type: '1',
-        time: '',
-        frequency: 'month',
+        fItemID: props.values.fItemID,
+        fNumber: props.values.fNumber,
+        fName: props.values.fName,
+        fPhone: props.values.fPhone,
+        fSex: props.values.fSex,
       },
-      currentStep: 0,
-    };
-
-    this.formLayout = {
-      labelCol: { span: 7 },
-      wrapperCol: { span: 13 },
     };
   }
 
-  handleNext = currentStep => {
+  okHandle = () => {
     const { form, handleUpdate } = this.props;
-    const { formVals: oldValue } = this.state;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-      const formVals = { ...oldValue, ...fieldsValue };
-      this.setState(
-        {
-          formVals,
-        },
-        () => {
-          if (currentStep < 2) {
-            this.forward();
-          } else {
-            handleUpdate(formVals);
-          }
-        }
-      );
+      // form.resetFields();
+      // 设置fItemId
+      fieldsValue.fItemID = this.state.formVals.fItemID;
+      handleUpdate(fieldsValue);
     });
-  };
-
-  backward = () => {
-    const { currentStep } = this.state;
-    this.setState({
-      currentStep: currentStep - 1,
-    });
-  };
-
-  forward = () => {
-    const { currentStep } = this.state;
-    this.setState({
-      currentStep: currentStep + 1,
-    });
-  };
-
-  renderContent = (currentStep, formVals) => {
-    const { form } = this.props;
-    if (currentStep === 1) {
-      return [
-        <FormItem key="target" {...this.formLayout} label="监控对象">
-          {form.getFieldDecorator('target', {
-            initialValue: formVals.target,
-          })(
-            <Select style={{ width: '100%' }}>
-              <Option value="0">表一</Option>
-              <Option value="1">表二</Option>
-            </Select>
-          )}
-        </FormItem>,
-        <FormItem key="template" {...this.formLayout} label="规则模板">
-          {form.getFieldDecorator('template', {
-            initialValue: formVals.template,
-          })(
-            <Select style={{ width: '100%' }}>
-              <Option value="0">规则模板一</Option>
-              <Option value="1">规则模板二</Option>
-            </Select>
-          )}
-        </FormItem>,
-        <FormItem key="type" {...this.formLayout} label="规则类型">
-          {form.getFieldDecorator('type', {
-            initialValue: formVals.type,
-          })(
-            <RadioGroup>
-              <Radio value="0">强</Radio>
-              <Radio value="1">弱</Radio>
-            </RadioGroup>
-          )}
-        </FormItem>,
-      ];
-    }
-    if (currentStep === 2) {
-      return [
-        <FormItem key="time" {...this.formLayout} label="开始时间">
-          {form.getFieldDecorator('time', {
-            rules: [{ required: true, message: '请选择开始时间！' }],
-          })(
-            <DatePicker
-              style={{ width: '100%' }}
-              showTime
-              format="YYYY-MM-DD HH:mm:ss"
-              placeholder="选择开始时间"
-            />
-          )}
-        </FormItem>,
-        <FormItem key="frequency" {...this.formLayout} label="调度周期">
-          {form.getFieldDecorator('frequency', {
-            initialValue: formVals.frequency,
-          })(
-            <Select style={{ width: '100%' }}>
-              <Option value="month">月</Option>
-              <Option value="week">周</Option>
-            </Select>
-          )}
-        </FormItem>,
-      ];
-    }
-    return [
-      <FormItem key="name" {...this.formLayout} label="规则名称">
-        {form.getFieldDecorator('name', {
-          rules: [{ required: true, message: '请输入规则名称！' }],
-          initialValue: formVals.name,
-        })(<Input placeholder="请输入" />)}
-      </FormItem>,
-      <FormItem key="desc" {...this.formLayout} label="规则描述">
-        {form.getFieldDecorator('desc', {
-          rules: [{ required: true, message: '请输入至少五个字符的规则描述！', min: 5 }],
-          initialValue: formVals.desc,
-        })(<TextArea rows={4} placeholder="请输入至少五个字符" />)}
-      </FormItem>,
-    ];
-  };
-
-  renderFooter = currentStep => {
-    const { handleUpdateModalVisible, values } = this.props;
-    if (currentStep === 1) {
-      return [
-        <Button key="back" style={{ float: 'left' }} onClick={this.backward}>
-          上一步
-        </Button>,
-        <Button key="cancel" onClick={() => handleUpdateModalVisible(false, values)}>
-          取消
-        </Button>,
-        <Button key="forward" type="primary" onClick={() => this.handleNext(currentStep)}>
-          下一步
-        </Button>,
-      ];
-    }
-    if (currentStep === 2) {
-      return [
-        <Button key="back" style={{ float: 'left' }} onClick={this.backward}>
-          上一步
-        </Button>,
-        <Button key="cancel" onClick={() => handleUpdateModalVisible(false, values)}>
-          取消
-        </Button>,
-        <Button key="submit" type="primary" onClick={() => this.handleNext(currentStep)}>
-          完成
-        </Button>,
-      ];
-    }
-    return [
-      <Button key="cancel" onClick={() => handleUpdateModalVisible(false, values)}>
-        取消
-      </Button>,
-      <Button key="forward" type="primary" onClick={() => this.handleNext(currentStep)}>
-        下一步
-      </Button>,
-    ];
   };
 
   render() {
-    const { updateModalVisible, handleUpdateModalVisible, values } = this.props;
-    const { currentStep, formVals } = this.state;
+    const { form, updateModalVisible, handleUpdateModalVisible, values } = this.props;
+    const { formVals } = this.state;
 
     return (
       <Modal
-        width={640}
-        bodyStyle={{ padding: '32px 40px 48px' }}
         destroyOnClose
-        title="规则配置"
+        title="修改用户"
         visible={updateModalVisible}
-        footer={this.renderFooter(currentStep)}
+        onOk={this.okHandle}
         onCancel={() => handleUpdateModalVisible(false, values)}
         afterClose={() => handleUpdateModalVisible()}
       >
-        <Steps style={{ marginBottom: 28 }} size="small" current={currentStep}>
-          <Step title="基本信息" />
-          <Step title="配置规则属性" />
-          <Step title="设定调度周期" />
-        </Steps>
-        {this.renderContent(currentStep, formVals)}
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="用户名">
+          {form.getFieldDecorator('fNumber', {
+            initialValue: formVals.fNumber,
+            rules: [{ required: true, message: '请输入至少五个字符的用户名！', min: 5 }],
+          })(<Input placeholder="请输入" />)}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="姓名">
+          {form.getFieldDecorator('fName', {
+            initialValue: formVals.fName,
+            rules: [{ required: true, message: '请输入姓名', min: 1 }],
+          })(<Input placeholder="请输入" />)}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="手机号码">
+          {form.getFieldDecorator('fPhone', {
+            initialValue: formVals.fPhone,
+            rules: [
+              { required: false, message: '请输入手机号码！' },
+              { validator: validatorPhone }
+            ]
+          })(<Input placeholder="请输入" />)}
+        </FormItem>
+        <FormItem key="fSex" labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="性别">
+          {form.getFieldDecorator('fSex', {
+            initialValue: formVals.fSex,
+          })(
+            <RadioGroup>
+              <Radio value="1">男</Radio>
+              <Radio value="2">女</Radio>
+            </RadioGroup>
+          )}
+        </FormItem>
+      </Modal>
+    );
+  }
+}
+
+@Form.create()
+class UpdatePwdForm extends PureComponent {
+  static defaultProps = {
+    handleUpdatePwd: () => { },
+    handleUpdatePwdModalVisible: () => { },
+    values: {},
+  };
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      formVals: {
+        fItemID: props.values.fItemID,
+        fNumber: props.values.fNumber,
+        fName: props.values.fName,
+        fPhone: props.values.fPhone,
+        fSex: props.values.fSex,
+        fPwd: props.values.fPwd,
+      },
+    };
+  }
+
+  okHandle = () => {
+    const { form, handleUpdatePwd } = this.props;
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+      // form.resetFields();
+      // 设置fItemId
+      fieldsValue.fItemID = this.state.formVals.fItemID;
+      handleUpdatePwd(fieldsValue);
+    });
+  };
+  checkConfirm = (rule, value, callback) => {
+    const { form } = this.props;
+    if (value && value !== form.getFieldValue('fPwd')) {
+      callback(formatMessage({ id: 'validation.password.twice' }));
+    } else {
+      callback();
+    }
+  };
+  checkPassword = (rule, value, callback) => {
+    const { form } = this.props;
+    if (value) {
+      form.validateFields(['fConfirmPwd'], { force: true });
+    }
+    callback();
+  };
+
+  render() {
+    const { form, updatePwdModalVisible, handleUpdatePwdModalVisible, values } = this.props;
+    const { formVals } = this.state;
+
+    return (
+      <Modal
+        destroyOnClose
+        title="修改密码"
+        visible={updatePwdModalVisible}
+        onOk={this.okHandle}
+        onCancel={() => handleUpdatePwdModalVisible(false, values)}
+        afterClose={() => handleUpdatePwdModalVisible()}
+      >
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="用户名" >
+          {form.getFieldDecorator('fNumber', {
+            initialValue: formVals.fNumber,
+            rules: [{ required: false, message: '请输入至少五个字符的用户名！', min: 5 }],
+          })(<Input placeholder="请输入" readOnly />)}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="姓名">
+          {form.getFieldDecorator('fName', {
+            initialValue: formVals.fName,
+            rules: [{ required: false, message: '请输入姓名', min: 1 }],
+          })(<Input placeholder="请输入" readOnly />)}
+        </FormItem>
+        <FormItem key="fPwd" labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="密码">
+          <Popover
+            getPopupContainer={node => node.parentNode}
+            content={
+              <div style={{ padding: '4px 0' }}>
+                {passwordStatusMap[getPasswordStatus()]}
+                {renderPasswordProgress(form.getFieldValue('fPwd'))}
+                <div style={{ marginTop: 10 }}>
+                  <FormattedMessage id="validation.password.strength.msg" />
+                </div>
+              </div>
+            }
+            overlayStyle={{ width: 240 }}
+            placement="right"
+          >
+            {form.getFieldDecorator('fPwd', {
+              rules: [
+                {
+                  required: true,
+                  validator: this.checkPassword,
+                },
+                {
+                  validator: validatePassword,
+                },
+              ],
+            })(
+              <Input
+                size="large"
+                type="password"
+                placeholder={formatMessage({ id: 'form.password.placeholder' })}
+              />
+            )}
+          </Popover>
+        </FormItem>
+        <FormItem key="fConfirmPwd" labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="确认密码">
+          {form.getFieldDecorator('fConfirmPwd', {
+            rules: [
+              {
+                required: true,
+                message: formatMessage({ id: 'validation.confirm-password.required' }),
+              },
+              {
+                validator: this.checkConfirm,
+              },
+            ],
+          })(
+            <Input
+              size="large"
+              type="password"
+              placeholder={formatMessage({ id: 'form.confirm-password.placeholder' })}
+            />
+          )}
+        </FormItem>
       </Modal>
     );
   }
@@ -435,10 +418,12 @@ class TableList extends PureComponent {
   state = {
     modalVisible: false,
     updateModalVisible: false,
+    updatePwdModalVisible: false,
     expandForm: false,
     selectedRows: [],
     formValues: {},
-    stepFormValues: {},
+    updateFormValues: {},
+    updatePwdFormValues: {},
   };
 
   columns = [
@@ -494,53 +479,13 @@ class TableList extends PureComponent {
         return <Switch disabled checked={val} />;
       },
     },
-    // {
-    //   title: '服务调用次数',
-    //   dataIndex: 'callNo',
-    //   sorter: true,
-    //   align: 'right',
-    //   render: val => `${val} 万`,
-    //   // mark to display a total number
-    //   needTotal: true,
-    // },
-    // {
-    //   title: '状态',
-    //   dataIndex: 'status',
-    //   filters: [
-    //     {
-    //       text: status[0],
-    //       value: 0,
-    //     },
-    //     {
-    //       text: status[1],
-    //       value: 1,
-    //     },
-    //     {
-    //       text: status[2],
-    //       value: 2,
-    //     },
-    //     {
-    //       text: status[3],
-    //       value: 3,
-    //     },
-    //   ],
-    //   render(val) {
-    //     return <Badge status={statusMap[val]} text={status[val]} />;
-    //   },
-    // },
-    // {
-    //   title: '上次调度时间',
-    //   dataIndex: 'updatedAt',
-    //   sorter: true,
-    //   render: val => <span>{moment(val).format('YYYY-MM-DD HH:mm:ss')}</span>,
-    // },
     {
       title: '操作',
       render: (text, record) => (
         <Fragment>
-          <a onClick={() => this.handleUpdateModalVisible(true, record)}>配置</a>
+          <a onClick={() => this.handleUpdateModalVisible(true, record)}>修改</a>
           <Divider type="vertical" />
-          <a href="">订阅警报</a>
+          <a onClick={() => this.handleUpdatePwdModalVisible(true, record)}>修改密码</a>
         </Fragment>
       ),
     },
@@ -608,12 +553,22 @@ class TableList extends PureComponent {
         dispatch({
           type: 'userManage/remove',
           payload: {
-            key: selectedRows.map(row => row.key),
+            fItemID: selectedRows.map(row => row.fItemID),
           },
           callback: () => {
             this.setState({
               selectedRows: [],
             });
+            const { userManage } = this.props;
+            if (userManage.status === 'ok') {
+              if (userManage.message) {
+                userManage.message.map(m => notification.error({
+                  message: m,
+                }));
+              }
+              // 成功后再次刷新列表
+              this.search();
+            }
           },
         });
         break;
@@ -630,7 +585,10 @@ class TableList extends PureComponent {
 
   handleSearch = e => {
     e.preventDefault();
+    this.search();
+  };
 
+  search = () => {
     const { dispatch, form } = this.props;
 
     form.validateFields((err, fieldsValue) => {
@@ -650,7 +608,7 @@ class TableList extends PureComponent {
         payload: values,
       });
     });
-  };
+  }
 
   handleModalVisible = flag => {
     this.setState({
@@ -661,7 +619,14 @@ class TableList extends PureComponent {
   handleUpdateModalVisible = (flag, record) => {
     this.setState({
       updateModalVisible: !!flag,
-      stepFormValues: record || {},
+      updateFormValues: record || {},
+    });
+  };
+
+  handleUpdatePwdModalVisible = (flag, record) => {
+    this.setState({
+      updatePwdModalVisible: !!flag,
+      updatePwdFormValues: record || {},
     });
   };
 
@@ -678,14 +643,13 @@ class TableList extends PureComponent {
       }
     }).then(() => {
       const { userManage } = this.props;
-      console.log(userManage);
-      if (userManage.data.status === 'ok') {
-        // form.resetFields();
-        // if (res.code == 200) {
+      if (userManage.status === 'ok') {
         message.success('添加成功');
         this.handleModalVisible();
+        // 成功后再次刷新列表
+        this.search();
       } else {
-        message.warning(userManage.data.message);
+        message.warning(userManage.message);
       }
     });
   };
@@ -695,14 +659,81 @@ class TableList extends PureComponent {
     dispatch({
       type: 'userManage/update',
       payload: {
-        name: fields.name,
-        desc: fields.desc,
-        key: fields.key,
+        fItemID: fields.fItemID,
+        fNumber: fields.fNumber,
+        fName: fields.fName,
+        fPhone: fields.fPhone,
+        fSex: fields.fSex,
+      },
+    }).then(() => {
+      const { userManage } = this.props;
+      if (userManage.status === 'ok') {
+        message.success('修改成功');
+        this.handleUpdateModalVisible();
+        this.handleUpdatePwdModalVisible();
+        // 成功后再次刷新列表
+        this.search();
+      } else if (userManage.status === 'warning') {
+        message.warning(userManage.message);
+      }
+      else {
+        message.error(userManage.message);
+      }
+    });;
+
+  };
+
+  // handleUpdatePwd = fields => {
+  //   const { dispatch } = this.props;
+  //   dispatch({
+  //     type: 'userManage/update',
+  //     payload: {
+  //       fItemID: fields.fItemID,
+  //       fPwd: fields.fNumber,
+  //     },
+  //   }).then(() => {
+  //     const { userManage } = this.props;
+  //     if (userManage.status === 'ok') {
+  //       message.success('修改成功');
+  //       this.handleUpdateModalVisible();
+  //       // 成功后再次刷新列表
+  //       this.search();
+  //     } else if (userManage.status === 'warning') {
+  //       message.warning(userManage.message);
+  //     }
+  //     else {
+  //       message.error(userManage.message);
+  //     }
+  //   });;
+
+  // };
+
+  handleBatchDeleteClick = () => {
+    const { dispatch } = this.props;
+    const { selectedRows } = this.state;
+
+    if (selectedRows.length === 0) return;
+    dispatch({
+      type: 'userManage/remove',
+      payload: {
+        fItemID: selectedRows.map(row => row.fItemID),
+      },
+      callback: () => {
+        this.setState({
+          selectedRows: [],
+        });
+        const { userManage } = this.props;
+        if (userManage.status === 'ok') {
+          if (userManage.message) {
+            userManage.message.map(m => notification.error({
+              message: m,
+            }));
+          }
+          // 成功后再次刷新列表
+          this.search();
+        }
       },
     });
-
-    message.success('配置成功');
-    this.handleUpdateModalVisible();
   };
 
   renderSimpleForm() {
@@ -829,7 +860,7 @@ class TableList extends PureComponent {
       userManage: { data },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, stepFormValues } = this.state;
+    const { selectedRows, modalVisible, updateModalVisible, updateFormValues, updatePwdModalVisible, updatePwdFormValues, } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove">删除</Menu.Item>
@@ -845,6 +876,10 @@ class TableList extends PureComponent {
       handleUpdateModalVisible: this.handleUpdateModalVisible,
       handleUpdate: this.handleUpdate,
     };
+    const updatePwdMethods = {
+      handleUpdatePwdModalVisible: this.handleUpdatePwdModalVisible,
+      handleUpdatePwd: this.handleUpdate,
+    };
     return (
       <GridContent>
         <Card bordered={false}>
@@ -856,7 +891,7 @@ class TableList extends PureComponent {
               </Button>
               {selectedRows.length > 0 && (
                 <span>
-                  <Button>批量操作</Button>
+                  <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
                   <Dropdown overlay={menu}>
                     <Button>
                       更多操作 <Icon type="down" />
@@ -877,11 +912,18 @@ class TableList extends PureComponent {
           </div>
         </Card>
         <CreateForm {...parentMethods} modalVisible={modalVisible} />
-        {stepFormValues && Object.keys(stepFormValues).length ? (
+        {updateFormValues && Object.keys(updateFormValues).length ? (
           <UpdateForm
             {...updateMethods}
             updateModalVisible={updateModalVisible}
-            values={stepFormValues}
+            values={updateFormValues}
+          />
+        ) : null}
+        {updatePwdFormValues && Object.keys(updatePwdFormValues).length ? (
+          <UpdatePwdForm
+            {...updatePwdMethods}
+            updatePwdModalVisible={updatePwdModalVisible}
+            values={updatePwdFormValues}
           />
         ) : null}
       </GridContent>

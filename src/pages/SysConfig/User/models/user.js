@@ -8,20 +8,22 @@ export default {
       list: [],
       pagination: {},
     },
+    status: 'ok',
+    message: '',
   },
 
   effects: {
     *fetch({ payload }, { call, put }) {
       const response = yield call(queryUser, payload);
       yield put({
-        type: 'save',
+        type: 'query',
         payload: response,
       });
     },
     *add({ payload, callback }, { call, put }) {
       const response = yield call(addUser, payload);
       yield put({
-        type: 'save',
+        type: 'updateData',
         payload: response,
       });
       if (callback) callback();
@@ -29,7 +31,7 @@ export default {
     *remove({ payload, callback }, { call, put }) {
       const response = yield call(removeUser, payload);
       yield put({
-        type: 'save',
+        type: 'updateData',
         payload: response,
       });
       if (callback) callback();
@@ -37,7 +39,7 @@ export default {
     *update({ payload, callback }, { call, put }) {
       const response = yield call(updateUser, payload);
       yield put({
-        type: 'save',
+        type: 'updateData',
         payload: response,
       });
       if (callback) callback();
@@ -45,10 +47,17 @@ export default {
   },
 
   reducers: {
-    save(state, action) {
+    query(state, action) {
       return {
         ...state,
         data: action.payload,
+      };
+    },
+    updateData(state, action) {
+      return {
+        ...state,
+        status: action.payload.status,
+        message: action.payload.message,
       };
     },
   },

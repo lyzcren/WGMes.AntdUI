@@ -70,7 +70,7 @@ export default class WgSiderMenu extends PureComponent {
         <div className={styles.logo} id="logo">
           <Link to="/">
             <img src={logo} alt="logo" />
-            <h1>Ant Design Pro</h1>
+            <h1>望果制造执行系统</h1>
           </Link>
         </div>
         <Suspense fallback={<PageLoading />}>

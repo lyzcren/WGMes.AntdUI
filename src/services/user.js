@@ -15,7 +15,7 @@ export async function queryUser(params) {
 }
 
 export async function removeUser(params) {
-  return request('/api/user', {
+  return request('/api/user/delete', {
     method: 'POST',
     body: {
       ...params,
@@ -35,7 +35,7 @@ export async function addUser(params) {
 }
 
 export async function updateUser(params) {
-  return request('/api/user', {
+  return request('/api/user/update', {
     method: 'POST',
     body: {
       ...params,

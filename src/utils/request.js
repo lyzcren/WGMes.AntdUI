@@ -27,10 +27,17 @@ const checkStatus = response => {
     return response;
   }
   const errortext = codeMessage[response.status] || response.statusText;
-  notification.error({
-    message: `请求错误 ${response.status}: ${response.url}`,
-    description: errortext,
-  });
+  // 添加对401状态码的具体提示判断 by:ywlin 2018-01-26
+  if (response.status == 401) {
+    notification.error({
+      message: `登录信息过期，请重新登录`,
+    });
+  } else {
+    notification.error({
+      message: `请求错误 ${response.status}: ${response.url}`,
+      description: errortext,
+    });
+  }
   const error = new Error(errortext);
   error.name = response.status;
   error.response = response;
