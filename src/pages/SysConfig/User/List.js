@@ -55,17 +55,16 @@ class TableList extends PureComponent {
     expandForm: false,
     selectedRows: [],
     formValues: {},
+    queryFilters: [],
     updateFormValues: {},
     updatePwdFormValues: {},
   };
 
   // 列表查询参数
-  pagination = {
-    currentPage: 1,
+  currentPagination = {
+    current: 1,
     pageSize: 10,
   };
-  filtersArg = [];
-  sorter = {};
 
   columns = [
     {
@@ -109,11 +108,11 @@ class TableList extends PureComponent {
       filters: [
         {
           text: activeData[0],
-          value: 0,
+          value: 1,
         },
         {
           text: activeData[1],
-          value: 1,
+          value: 0,
         },
       ],
       render(val) {
@@ -151,34 +150,39 @@ class TableList extends PureComponent {
 
   componentDidMount() {
     const { dispatch } = this.props;
+    var params = { pagination: this.currentPagination };
     dispatch({
       type: 'userManage/fetch',
+      payload: params,
     });
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
     const { dispatch } = this.props;
-    const { formValues } = this.state;
+    const { formValues, queryFilters } = this.state;
 
     const filters = Object.keys(filtersArg).reduce((obj, key) => {
       const newObj = { ...obj };
+      // newObj[key] = getValue(filtersArg[key]);
       newObj[key] = getValue(filtersArg[key]);
       return newObj;
     }, {});
 
-    var params = {
-      currentPage: pagination.current,
-      pageSize: pagination.pageSize,
+    const { current, pageSize } = pagination;
+    this.currentPagination = {
+      current,
+      pageSize,
+      filters,
       ...formValues,
-      ...filters,
+      queryFilters,
     };
     if (sorter.field) {
-      params.sorter = `${sorter.field}_${sorter.order}`;
+      this.currentPagination.sorter = {};
+      this.currentPagination.sorter[sorter.field] = sorter.order.replace('end', '');
     }
+
+    var params = { pagination: this.currentPagination };
     console.log(params);
-    this.pagination = pagination;
-    this.filtersArg = filtersArg;
-    this.sorter = sorter;
 
     dispatch({
       type: 'userManage/fetch',
@@ -186,15 +190,66 @@ class TableList extends PureComponent {
     });
   };
 
+  handleSearch = e => {
+    e.preventDefault();
+    this.search();
+  };
+
+  search = () => {
+    const { dispatch, form } = this.props;
+
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+
+      const values = {
+        ...fieldsValue,
+        updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
+      };
+      // 查询条件处理
+      const queryFilters = [];
+      if (fieldsValue.queryName) queryFilters.push({ name: "fName", compare: "%*%", value: fieldsValue.queryName });
+
+      this.setState({
+        formValues: values,
+        queryFilters: queryFilters,
+      });
+
+      const { pageSize, filters, sorter } = this.currentPagination;
+      this.currentPagination = {
+        ...this.currentPagination,
+        current: 1,
+        queryFilters,
+      };
+      console.log(this.currentPagination);
+      var params = { pagination: this.currentPagination };
+
+      dispatch({
+        type: 'userManage/fetch',
+        payload: params,
+      });
+    });
+  }
+
   handleFormReset = () => {
     const { form, dispatch } = this.props;
     form.resetFields();
     this.setState({
       formValues: {},
+      queryFilters: [],
     });
+
+    const { pageSize, filters, sorter } = this.currentPagination;
+    this.currentPagination = {
+      ...this.currentPagination,
+      current: 1,
+      queryFilters: [],
+    };
+    var params = { pagination: this.currentPagination };
+
+    console.log(params);
     dispatch({
       type: 'userManage/fetch',
-      payload: {},
+      payload: params,
     });
   };
 
@@ -239,37 +294,6 @@ class TableList extends PureComponent {
       selectedRows: rows,
     });
   };
-
-  handleSearch = e => {
-    e.preventDefault();
-    this.search();
-  };
-
-  search = () => {
-    const { dispatch, form } = this.props;
-
-    form.validateFields((err, fieldsValue) => {
-      if (err) return;
-      console.log(fieldsValue);
-
-      const values = {
-        ...fieldsValue,
-        updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
-      };
-
-      this.setState({
-        formValues: values,
-      });
-
-      // dispatch({
-      //   type: 'userManage/fetch',
-      //   payload: values,
-      // });
-      // 查询时返回第一页
-      this.pagination.current = 1;
-      this.handleStandardTableChange(this.pagination, this.filtersArg, this.sorter);
-    });
-  }
 
   handleModalVisible = flag => {
     this.setState({
@@ -438,13 +462,13 @@ class TableList extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem label="姓名">
-              {getFieldDecorator('fName')(<Input placeholder="请输入" />)}
+            <FormItem id="queryName" label="姓名">
+              {getFieldDecorator('queryName')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
             <FormItem label="状态">
-              {getFieldDecorator('fIsActive')(
+              {getFieldDecorator('queryIsActive')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Option value="0">禁用</Option>
                   <Option value="1">启用</Option>

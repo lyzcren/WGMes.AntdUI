@@ -6,12 +6,19 @@ export async function query() {
 }
 
 export async function queryCurrent() {
-  return request('/api/currentUser');
+  return request('/api/user/currentUser');
 }
 
 
 export async function queryUser(params) {
-  return request(`/api/user?${stringify(params)}`);
+  return request('/api/user/getList', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'getList',
+    },
+  });
+  // return request(`/api/user?${stringify(params)}`);
 }
 
 export async function removeUser(params) {
