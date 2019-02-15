@@ -72,7 +72,10 @@ export default {
   },
   proxy: {
     '/api/': {
-      target: 'https://localhost:44328/',
+      // 1、IIS express
+      // target: 'https://localhost:44328/',
+      // 2、docker
+      target: 'https://172.26.66.219/',
       changeOrigin: true,
       "secure": false,
       // pathRewrite: { '^/api/': '/api/' },

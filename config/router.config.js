@@ -53,11 +53,11 @@ export default [
             name: 'user',
             component: './SysConfig/User/List',
           },
-          // {
-          //   path: '/sysConfig/role',
-          //   name: 'role',
-          //   component: './SysConfig/Role',
-          // },
+          {
+            path: '/sysConfig/role',
+            name: 'role',
+            component: './SysConfig/Role/List',
+          },
         ],
       },
     ],

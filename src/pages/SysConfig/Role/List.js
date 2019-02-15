@@ -25,8 +25,8 @@ import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { UpdateForm } from './UpdateForm';
-import { UpdatePwdForm } from './UpdatePwdForm';
 import { CreateForm } from './CreateForm';
+import { AuthorityForm } from './AuthorityForm';
 
 import styles from './List.less';
 
@@ -37,27 +37,28 @@ const getValue = obj =>
   Object.keys(obj)
     .map(key => obj[key])
     .join(',');
-// const sexMap = ['default', 'processing', 'success',];
-const sex = ['保密', '男', '女',];
 const activeData = ['启用', '禁用',];
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ userManage, loading }) => ({
-  userManage,
-  loading: loading.models.userManage,
+@connect(({ roleManage, loading }) => ({
+  roleManage,
+  loading: loading.models.roleManage,
 }))
 @Form.create()
 class TableList extends PureComponent {
   state = {
+    // 新增界面
     modalVisible: false,
+    formValues: {},
+    // 修改界面
     updateModalVisible: false,
-    updatePwdModalVisible: false,
+    updateFormValues: {},
+    // 权限界面
+    authorityModalVisible: false,
+    // 其他
     expandForm: false,
     selectedRows: [],
-    formValues: {},
     queryFilters: [],
-    updateFormValues: {},
-    updatePwdFormValues: {},
   };
 
   // 列表查询参数
@@ -68,39 +69,9 @@ class TableList extends PureComponent {
 
   columns = [
     {
-      title: '用户名',
-      dataIndex: 'fNumber',
-      sorter: true,
-    },
-    {
-      title: '姓名',
+      title: '角色',
       dataIndex: 'fName',
       sorter: true,
-    },
-    {
-      title: '移动电话',
-      dataIndex: 'fPhone',
-    },
-    {
-      title: '性别',
-      dataIndex: 'fSex',
-      filters: [
-        {
-          text: sex[0],
-          value: 0,
-        },
-        {
-          text: sex[1],
-          value: 1,
-        },
-        {
-          text: sex[2],
-          value: 2,
-        },
-      ],
-      render(val) {
-        return sex[val];
-      },
     },
     {
       title: '启用',
@@ -115,7 +86,7 @@ class TableList extends PureComponent {
           value: 0,
         },
       ],
-      render(val) {
+      render (val) {
         return <Switch disabled checked={val} />;
       },
     },
@@ -125,34 +96,23 @@ class TableList extends PureComponent {
         <Fragment>
           <a onClick={() => this.handleUpdateModalVisible(true, record)}>修改</a>
           <Divider type="vertical" />
-          <a onClick={() => this.handleUpdatePwdModalVisible(true, record)}>修改密码</a>
-          <Divider type="vertical" />
           <Popconfirm title="是否要删除此行？" onConfirm={() => this.batchDelete(record)}>
             <a>删除</a>
           </Popconfirm>
           <Divider type="vertical" />
-          <Dropdown
-            overlay={
-              <Menu onClick={({ key }) => this.handleRowMenuClick(key, record)}>
-                <Menu.Item key="active">{record.fIsActive ? '禁用' : '启用'}</Menu.Item>
-                <Menu.Item key="delete">删除</Menu.Item>
-              </Menu>
-            }
-          >
-            <a>
-              更多 <Icon type="down" />
-            </a>
-          </Dropdown>
+          <a onClick={() => this.handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
+          <Divider type="vertical" />
+          <a onClick={() => this.handleAuthorityModalVisible(true, record)}>权限</a>
         </Fragment>
       ),
     },
   ];
 
-  componentDidMount() {
+  componentDidMount () {
     const { dispatch } = this.props;
     var params = { pagination: this.currentPagination };
     dispatch({
-      type: 'userManage/fetch',
+      type: 'roleManage/fetch',
       payload: params,
     });
   }
@@ -182,10 +142,9 @@ class TableList extends PureComponent {
     }
 
     var params = { pagination: this.currentPagination };
-    console.log(params);
 
     dispatch({
-      type: 'userManage/fetch',
+      type: 'roleManage/fetch',
       payload: params,
     });
   };
@@ -221,11 +180,10 @@ class TableList extends PureComponent {
         current: 1,
         queryFilters,
       };
-      console.log(this.currentPagination);
       var params = { pagination: this.currentPagination };
 
       dispatch({
-        type: 'userManage/fetch',
+        type: 'roleManage/fetch',
         payload: params,
       });
     });
@@ -247,9 +205,8 @@ class TableList extends PureComponent {
     };
     var params = { pagination: this.currentPagination };
 
-    console.log(params);
     dispatch({
-      type: 'userManage/fetch',
+      type: 'roleManage/fetch',
       payload: params,
     });
   };
@@ -270,20 +227,11 @@ class TableList extends PureComponent {
       case 'remove':
         this.handleBatchDeleteClick();
         break;
-      default:
-        break;
-    }
-  };
-
-  handleRowMenuClick = (key, record) => {
-    const { dispatch } = this.props;
-
-    switch (key) {
-      case 'delete':
-        this.batchDelete(record);
-        break;
       case 'active':
-        this.handleActive(record);
+        this.handleBatchActiveClick();
+        break;
+      case 'deactive':
+        this.handleBatchDeactiveClick();
         break;
       default:
         break;
@@ -309,33 +257,49 @@ class TableList extends PureComponent {
     });
   };
 
-  handleUpdatePwdModalVisible = (flag, record) => {
+  handleAuthorityModalVisible = (flag, record) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'roleManage/getAuthority',
+      payload: {
+        id: record.fItemID,
+      },
+    }).then(() => {
+      const { roleManage } = this.props;
+      console.log(roleManage);
+      if (roleManage.status === 'ok') {
+        
+      } else if (roleManage.status === 'warning') {
+        message.warning(roleManage.message);
+      }
+      else {
+        message.error(roleManage.message);
+      }
+    });
+
     this.setState({
-      updatePwdModalVisible: !!flag,
-      updatePwdFormValues: record || {},
+      authorityModalVisible: !!flag,
+      updateFormValues: record || {},
     });
   };
 
   handleAdd = fields => {
     const { dispatch, form } = this.props;
     dispatch({
-      type: 'userManage/add',
+      type: 'roleManage/add',
       payload: {
-        fNumber: fields.fNumber,
         fName: fields.fName,
-        fPhone: fields.fPhone,
-        fSex: fields.fSex,
-        fPwd: fields.fPwd,
+        fIsActive: fields.fIsActive,
       }
     }).then(() => {
-      const { userManage } = this.props;
-      if (userManage.status === 'ok') {
+      const { roleManage } = this.props;
+      if (roleManage.status === 'ok') {
         message.success('添加成功');
         this.handleModalVisible();
         // 成功后再次刷新列表
         this.search();
       } else {
-        message.warning(userManage.message);
+        message.warning(roleManage.message);
       }
     });
   };
@@ -343,50 +307,73 @@ class TableList extends PureComponent {
   handleUpdate = fields => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'userManage/update',
+      type: 'roleManage/update',
       payload: {
         fItemID: fields.fItemID,
-        fNumber: fields.fNumber,
         fName: fields.fName,
-        fPhone: fields.fPhone,
-        fSex: fields.fSex,
+        fIsActive: fields.fIsActive,
       },
     }).then(() => {
-      const { userManage } = this.props;
-      if (userManage.status === 'ok') {
+      const { roleManage } = this.props;
+      if (roleManage.status === 'ok') {
         message.success('修改成功');
         this.handleUpdateModalVisible();
         // 成功后再次刷新列表
         this.search();
-      } else if (userManage.status === 'warning') {
-        message.warning(userManage.message);
+      } else if (roleManage.status === 'warning') {
+        message.warning(roleManage.message);
       }
       else {
-        message.error(userManage.message);
+        message.error(roleManage.message);
       }
     });
   };
 
-  handleUpdatePwd = fields => {
+  handleActive = (record) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'userManage/update',
+      type: 'roleManage/update',
       payload: {
-        fItemID: fields.fItemID,
-        fPwd: fields.fPwd,
+        fItemID: record.fItemID,
+        fIsActive: !record.fIsActive,
       },
     }).then(() => {
-      const { userManage } = this.props;
-      if (userManage.status === 'ok') {
-        message.success('修改成功');
-        this.handleUpdatePwdModalVisible();
+      const { roleManage } = this.props;
+      if (roleManage.status === 'ok') {
+        message.success((record.fIsActive ? '禁用' : '启用') + '成功');
         // 成功后再次刷新列表
         this.search();
-      } else if (userManage.status === 'warning') {
-        message.warning(userManage.message);
+      } else if (roleManage.status === 'warning') {
+        message.warning(roleManage.message);
       }
       else {
-        message.error(userManage.message);
+        message.error(roleManage.message);
+      }
+    });
+  };
+
+  handleAuthority = fields => {
+    const { dispatch } = this.props;
+    alert("handleAuthority");
+    return;
+    dispatch({
+      type: 'roleManage/authority',
+      payload: {
+        fItemID: fields.fItemID,
+        fName: fields.fName,
+      },
+    }).then(() => {
+      const { roleManage } = this.props;
+      if (roleManage.status === 'ok') {
+        message.success('修改成功');
+        this.handleUpdateModalVisible();
+        // 成功后再次刷新列表
+        this.search();
+      } else if (roleManage.status === 'warning') {
+        message.warning(roleManage.message);
+      }
+      else {
+        message.error(roleManage.message);
       }
     });
   };
@@ -396,8 +383,8 @@ class TableList extends PureComponent {
 
     if (selectedRows.length === 0) return;
     Modal.confirm({
-      title: '删除用户',
-      content: '确定批量删除用户吗？',
+      title: '删除角色',
+      content: '确定批量删除角色吗？',
       okText: '确认',
       cancelText: '取消',
       onOk: () => this.batchDelete(selectedRows),
@@ -410,7 +397,7 @@ class TableList extends PureComponent {
       selectedRows = [selectedRows];
     }
     dispatch({
-      type: 'userManage/remove',
+      type: 'roleManage/remove',
       payload: {
         fItemID: selectedRows.map(row => row.fItemID),
       },
@@ -418,10 +405,10 @@ class TableList extends PureComponent {
         this.setState({
           selectedRows: [],
         });
-        const { userManage } = this.props;
-        if (userManage.status === 'ok') {
-          if (userManage.message) {
-            userManage.message.map(m => notification.error({
+        const { roleManage } = this.props;
+        if (roleManage.status === 'ok') {
+          if (roleManage.message) {
+            roleManage.message.map(m => notification.error({
               message: m,
             }));
           }
@@ -432,30 +419,62 @@ class TableList extends PureComponent {
     });
   };
 
-  handleActive = (record) => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'userManage/update',
-      payload: {
-        fItemID: record.fItemID,
-        fIsActive: !record.fIsActive,
-      },
-    }).then(() => {
-      const { userManage } = this.props;
-      if (userManage.status === 'ok') {
-        message.success((record.fIsActive ? '禁用' : '启用') + '成功');
-        // 成功后再次刷新列表
-        this.search();
-      } else if (userManage.status === 'warning') {
-        message.warning(userManage.message);
-      }
-      else {
-        message.error(userManage.message);
-      }
+  handleBatchActiveClick = () => {
+    const { selectedRows } = this.state;
+
+    if (selectedRows.length === 0) return;
+    Modal.confirm({
+      title: '启用角色',
+      content: '确定批量启用角色吗？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => this.batchActive(selectedRows, true),
     });
   };
 
-  renderSimpleForm() {
+  handleBatchDeactiveClick = () => {
+    const { selectedRows } = this.state;
+
+    if (selectedRows.length === 0) return;
+    Modal.confirm({
+      title: '禁用角色',
+      content: '确定批量禁用角色吗？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => this.batchActive(selectedRows, false),
+    });
+  };
+
+  batchActive = (selectedRows, fIsActive) => {
+    const { dispatch } = this.props;
+    if (typeof selectedRows === 'object' && !Array.isArray(selectedRows)) {
+      selectedRows = [selectedRows];
+    }
+    dispatch({
+      type: 'roleManage/active',
+      payload: {
+        fItemID: selectedRows.map(row => row.fItemID),
+        fIsActive: fIsActive,
+      },
+      callback: () => {
+        this.setState({
+          selectedRows: [],
+        });
+        const { roleManage } = this.props;
+        if (roleManage.status === 'ok') {
+          if (roleManage.message) {
+            roleManage.message.map(m => notification.error({
+              message: m,
+            }));
+          }
+          // 成功后再次刷新列表
+          this.search();
+        }
+      },
+    });
+  };
+
+  renderSimpleForm () {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -463,7 +482,7 @@ class TableList extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem id="queryName" label="姓名">
+            <FormItem id="queryName" label="角色名">
               {getFieldDecorator('queryName')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
@@ -471,8 +490,8 @@ class TableList extends PureComponent {
             <FormItem label="状态">
               {getFieldDecorator('queryIsActive')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">禁用</Option>
                   <Option value="1">启用</Option>
+                  <Option value="0">禁用</Option>
                 </Select>
               )}
             </FormItem>
@@ -485,7 +504,7 @@ class TableList extends PureComponent {
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
               </Button>
-              <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
+              <a style={{ marginLeft: 8 }} onClick={this.toggleForm} hidden>
                 展开 <Icon type="down" />
               </a>
             </span>
@@ -495,95 +514,26 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm() {
-    const {
-      form: { getFieldDecorator },
-    } = this.props;
-    return (
-      <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={8} sm={24}>
-            <FormItem label="规则名称">
-              {getFieldDecorator('name')(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>
-              )}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="调用次数">
-              {getFieldDecorator('number')(<InputNumber style={{ width: '100%' }} />)}
-            </FormItem>
-          </Col>
-        </Row>
-        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={8} sm={24}>
-            <FormItem label="更新日期">
-              {getFieldDecorator('date')(
-                <DatePicker style={{ width: '100%' }} placeholder="请输入更新日期" />
-              )}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status3')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>
-              )}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status4')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>
-              )}
-            </FormItem>
-          </Col>
-        </Row>
-        <div style={{ overflow: 'hidden' }}>
-          <div style={{ float: 'right', marginBottom: 24 }}>
-            <Button type="primary" htmlType="submit">
-              查询
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              重置
-            </Button>
-            <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-              收起 <Icon type="up" />
-            </a>
-          </div>
-        </div>
-      </Form>
-    );
+  renderAdvancedForm () {
+    return renderSimpleForm;
   }
 
-  renderForm() {
+  renderForm () {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  render() {
+  render () {
     const {
-      userManage: { data },
+      roleManage: { data },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, updateFormValues, updatePwdModalVisible, updatePwdFormValues, } = this.state;
+    const { selectedRows, modalVisible, updateModalVisible, updateFormValues, authorityModalVisible } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove">删除</Menu.Item>
-        <Menu.Item key="approval">批量审批</Menu.Item>
+        <Menu.Item key="active">批量启用</Menu.Item>
+        <Menu.Item key="deactive">批量禁用</Menu.Item>
       </Menu>
     );
 
@@ -595,9 +545,9 @@ class TableList extends PureComponent {
       handleUpdateModalVisible: this.handleUpdateModalVisible,
       handleUpdate: this.handleUpdate,
     };
-    const updatePwdMethods = {
-      handleUpdatePwdModalVisible: this.handleUpdatePwdModalVisible,
-      handleUpdatePwd: this.handleUpdatePwd,
+    const authorityMethods = {
+      handleModalVisible: this.handleAuthorityModalVisible,
+      handleUpdate: this.handleAuthority,
     };
     return (
       <GridContent>
@@ -640,11 +590,11 @@ class TableList extends PureComponent {
             values={updateFormValues}
           />
         ) : null}
-        {updatePwdFormValues && Object.keys(updatePwdFormValues).length ? (
-          <UpdatePwdForm
-            {...updatePwdMethods}
-            updatePwdModalVisible={updatePwdModalVisible}
-            values={updatePwdFormValues}
+        {updateFormValues && Object.keys(updateFormValues).length ? (
+          <AuthorityForm
+            {...authorityMethods}
+            authorityModalVisible={authorityModalVisible}
+            values={updateFormValues}
           />
         ) : null}
       </GridContent>

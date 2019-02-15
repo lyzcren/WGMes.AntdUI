@@ -67,7 +67,7 @@ class WgBasicLayout extends React.PureComponent {
     this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual);
     let { location: { pathname } } = props;
     // 首次进入界面默认加载标签页
-    this.defaultPath = "/sysConfig/user";
+    this.defaultPath = "/sysConfig/role";
 
     const panes = [];
     this.state = {
@@ -77,7 +77,7 @@ class WgBasicLayout extends React.PureComponent {
     }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     const {
       dispatch,
       route: { routes, authority },
@@ -96,7 +96,7 @@ class WgBasicLayout extends React.PureComponent {
     });
   }
 
-  componentDidUpdate(preProps) {
+  componentDidUpdate (preProps) {
     // After changing to phone mode,
     // if collapsed is true, you need to click twice to display
     const { collapsed, isMobile } = this.props;
@@ -109,7 +109,7 @@ class WgBasicLayout extends React.PureComponent {
     }
   }
 
-  getContext() {
+  getContext () {
     const { location, breadcrumbNameMap } = this.props;
     return {
       location,
@@ -230,7 +230,7 @@ class WgBasicLayout extends React.PureComponent {
     });
   }
 
-  render() {
+  render () {
     const {
       navTheme,
       layout: PropsLayout,
