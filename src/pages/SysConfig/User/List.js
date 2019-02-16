@@ -98,7 +98,7 @@ class TableList extends PureComponent {
           value: 2,
         },
       ],
-      render(val) {
+      render (val) {
         return sex[val];
       },
     },
@@ -115,7 +115,7 @@ class TableList extends PureComponent {
           value: 0,
         },
       ],
-      render(val) {
+      render (val) {
         return <Switch disabled checked={val} />;
       },
     },
@@ -148,7 +148,7 @@ class TableList extends PureComponent {
     },
   ];
 
-  componentDidMount() {
+  componentDidMount () {
     const { dispatch } = this.props;
     var params = { pagination: this.currentPagination };
     dispatch({
@@ -455,7 +455,7 @@ class TableList extends PureComponent {
     });
   };
 
-  renderSimpleForm() {
+  renderSimpleForm () {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -495,7 +495,7 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm() {
+  renderAdvancedForm () {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -569,12 +569,12 @@ class TableList extends PureComponent {
     );
   }
 
-  renderForm() {
+  renderForm () {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  render() {
+  render () {
     const {
       userManage: { data },
       loading,
@@ -605,12 +605,14 @@ class TableList extends PureComponent {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
-                新建
+              <Authorized authority="User_Create">
+                <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+                  新建
               </Button>
+              </Authorized>
               {selectedRows.length > 0 && (
                 <span>
-                  <Authorized authority="admin">
+                  <Authorized authority="User_Delete">
                     <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
                   </Authorized>
                   <Dropdown overlay={menu}>

@@ -56,6 +56,20 @@ export async function active (params) {
   });
 }
 
-export async function getAuthority (params) {
+export async function getAuth (params) {
   return request(`/api/role/authority?${stringify(params)}`);
+}
+
+export async function setAuth (params) {
+  return request('/api/role/authorize', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'authorize',
+    },
+  });
+}
+
+export async function getCurrentAuth (params) {
+  return request(`/api/role/currentAuthority?${stringify(params)}`);
 }

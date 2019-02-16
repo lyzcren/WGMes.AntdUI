@@ -1,4 +1,4 @@
-import { queryRole, removeRole, addRole, updateRole, activeRole, getAuthority } from '@/services/role';
+import { queryRole, removeRole, addRole, updateRole, activeRole, getAuth, setAuth, getCurrentAuth } from '@/services/role';
 
 export default {
   namespace: 'roleManage',
@@ -53,9 +53,25 @@ export default {
       if (callback) callback();
     },
     *getAuthority ({ payload, callback }, { call, put }) {
-      const response = yield call(getAuthority, payload);
+      const response = yield call(getAuth, payload);
       yield put({
-        type: 'updateData',
+        type: 'updateAuthority',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    *getCurrentAuthority ({ payload, callback }, { call, put }) {
+      const response = yield call(getCurrentAuth, payload);
+      yield put({
+        type: 'updateCurrentAuthority',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    *setAuthority ({ payload, callback }, { call, put }) {
+      const response = yield call(setAuth, payload);
+      yield put({
+        type: 'updateCurrentAuthority',
         payload: response,
       });
       if (callback) callback();
@@ -70,11 +86,23 @@ export default {
       };
     },
     updateData (state, action) {
-      console.log(state);
       return {
         ...state,
         status: action.payload.status,
         message: action.payload.message,
+        authority: action.payload.authority,
+      };
+    },
+    updateAuthority (state, action) {
+      return {
+        ...state,
+        authority: action.payload.authority,
+      };
+    },
+    updateCurrentAuthority (state, action) {
+      return {
+        ...state,
+        currentAuthority: action.payload.currentAuthority,
       };
     },
   },

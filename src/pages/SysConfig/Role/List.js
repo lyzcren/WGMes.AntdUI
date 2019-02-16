@@ -115,6 +115,11 @@ class TableList extends PureComponent {
       type: 'roleManage/fetch',
       payload: params,
     });
+
+    dispatch({
+      type: 'roleManage/getAuthority',
+      payload: {},
+    });
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -259,28 +264,24 @@ class TableList extends PureComponent {
 
   handleAuthorityModalVisible = (flag, record) => {
     const { dispatch } = this.props;
-    dispatch({
-      type: 'roleManage/getAuthority',
-      payload: {
-        id: record.fItemID,
-      },
-    }).then(() => {
-      const { roleManage } = this.props;
-      console.log(roleManage);
-      if (roleManage.status === 'ok') {
-        
-      } else if (roleManage.status === 'warning') {
-        message.warning(roleManage.message);
-      }
-      else {
-        message.error(roleManage.message);
-      }
-    });
 
-    this.setState({
-      authorityModalVisible: !!flag,
-      updateFormValues: record || {},
-    });
+    if (!!flag) {
+      // 获取当前角色已分配的权限
+      dispatch({
+        type: 'roleManage/getCurrentAuthority',
+        payload: { id: record.fItemID },
+      }).then(() => {
+        this.setState({
+          authorityModalVisible: !!flag,
+          updateFormValues: record || {},
+        });
+      });
+    } else {
+      this.setState({
+        authorityModalVisible: !!flag,
+        updateFormValues: record || {},
+      });
+    }
   };
 
   handleAdd = fields => {
@@ -352,15 +353,13 @@ class TableList extends PureComponent {
     });
   };
 
-  handleAuthority = fields => {
+  handleAuthority = (roleId, checkedAuthority) => {
     const { dispatch } = this.props;
-    alert("handleAuthority");
-    return;
     dispatch({
-      type: 'roleManage/authority',
+      type: 'roleManage/setAuthority',
       payload: {
-        fItemID: fields.fItemID,
-        fName: fields.fName,
+        roleId,
+        checkedAuthority,
       },
     }).then(() => {
       const { roleManage } = this.props;
@@ -555,12 +554,14 @@ class TableList extends PureComponent {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
-                新建
+              <Authorized authority="Role_Create">
+                <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+                  新建
               </Button>
+              </Authorized>
               {selectedRows.length > 0 && (
                 <span>
-                  <Authorized authority="admin">
+                  <Authorized authority="Role_Delete">
                     <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
                   </Authorized>
                   <Dropdown overlay={menu}>
@@ -595,6 +596,8 @@ class TableList extends PureComponent {
             {...authorityMethods}
             authorityModalVisible={authorityModalVisible}
             values={updateFormValues}
+            authority={this.props.roleManage.authority}
+            currentAuthority={this.props.roleManage.currentAuthority}
           />
         ) : null}
       </GridContent>

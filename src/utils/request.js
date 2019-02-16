@@ -33,7 +33,10 @@ const checkStatus = response => {
     notification.error({
       message: `登录信息过期，请重新登录`,
     });
-  } else {
+  }
+  else if (response.status == 403) {// 403状态码需进一步做判断
+  }
+  else {
     notification.error({
       message: `请求错误 ${response.status}: ${response.url}`,
       description: errortext,
@@ -71,7 +74,7 @@ const cachedSave = (response, hashcode) => {
  * @param  {object} [option] The options we want to pass to "fetch"
  * @return {object}           An object containing either "data" or "err"
  */
-export default function request(url, option) {
+export default function request (url, option) {
   const options = {
     expirys: isAntdPro(),
     ...option,
@@ -112,7 +115,7 @@ export default function request(url, option) {
   }
   // 给header添加token用户身份验证
   const token = getToken();
-  if(token){
+  if (token) {
     newOptions.headers = {
       wgToken: token,
       ...newOptions.headers,
@@ -156,17 +159,43 @@ export default function request(url, option) {
         });
         return;
       }
-      // environment should not be used
       if (status === 403) {
-        router.push('/exception/403');
-        return;
+        // 当出现403代码时，检查token
+        fetch("/api/account/checkToken", {
+          method: "POST",
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json; charset=utf-8',
+          },
+          body: JSON.stringify({ token })
+        }).then(response => {
+          if (response.status == 401) {
+            notification.error({
+              message: `登录信息过期，请重新登录`,
+            });
+            window.g_app._store.dispatch({
+              type: 'login/logout',
+            });
+          } else {
+            notification.error({
+              message: `当前用户无对应的操作权限。`,
+            });
+          }
+
+          return;
+        });
       }
-      if (status <= 504 && status >= 500) {
-        router.push('/exception/500');
-        return;
-      }
-      if (status >= 404 && status < 422) {
-        router.push('/exception/404');
-      }
+      // // environment should not be used
+      // if (status === 403) {
+      //   router.push('/exception/403');
+      //   return;
+      // }
+      // if (status <= 504 && status >= 500) {
+      //   router.push('/exception/500');
+      //   return;
+      // }
+      // if (status >= 404 && status < 422) {
+      //   router.push('/exception/404');
+      // }
     });
 }

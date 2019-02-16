@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { Layout, Tabs } from 'antd';
+import { Layout, Tabs, notification } from 'antd';
 import DocumentTitle from 'react-document-title';
 import isEqual from 'lodash/isEqual';
 import memoizeOne from 'memoize-one';
@@ -198,10 +198,18 @@ class WgBasicLayout extends React.PureComponent {
       var componentMaps = getComponentMaps(this.props.menuData);
       var componentMap = componentMaps.find(com => com.path == selectedPath);
       // const component = asyncComponent(() => import('@/pages/Forms/AdvancedForm'));
-
-      panes.push({ title: componentMap.name, content: componentMap.component, key: activeKey, closable: closable });
+      if (componentMap) {// 打开默认首页
+        panes.push({ title: componentMap.name, content: componentMap.component, key: activeKey, closable: closable });
+        this.changeTabActiveKey({ panes, activeKey });
+      } else {
+        // TODO:若当前用户没有设定的首页权限，进入默认首页
+        notification.error({
+          message: "当前用户无权限",
+        });
+      }
+    } else {
+      this.changeTabActiveKey({ panes, activeKey });
     }
-    this.changeTabActiveKey({ panes, activeKey });
   }
 
   remove = (targetKey) => {

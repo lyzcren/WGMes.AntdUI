@@ -15,7 +15,6 @@ export default [
     path: '/',
     component: '../layouts/WgBasicLayout',
     Routes: ['src/pages/Authorized'],
-    authority: ['admin', 'user'],
     routes: [
       // dashboard
       { path: '/', redirect: '/dashboard/analysis' },
@@ -42,21 +41,41 @@ export default [
         ],
       },
       // sysConfig
-      { path: '/', redirect: '/sysConfig/user' },
       {
         path: '/sysConfig',
         name: 'sysConfig',
         icon: 'setting',
+        authority: ['SystemMng'],
         routes: [
           {
             path: '/sysConfig/user',
             name: 'user',
             component: './SysConfig/User/List',
+            authority: ['User'],
           },
           {
             path: '/sysConfig/role',
             name: 'role',
             component: './SysConfig/Role/List',
+            authority: ['Role'],
+          },
+        ],
+      },
+      // account
+      {
+        path: '/account',
+        name: 'account',
+        icon: 'setting',
+        routes: [
+          {
+            path: '/account/center',
+            name: 'center',
+            component: './Account/Center/Center',
+          },
+          {
+            path: '/account/settings',
+            name: 'settings',
+            component: './Account/Settings/BaseView',
           },
         ],
       },

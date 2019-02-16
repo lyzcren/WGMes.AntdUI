@@ -140,18 +140,18 @@ class Center extends PureComponent {
                       <i className={styles.group} />
                       {currentUser.group}
                     </p>
-                    <p>
+                    {/* <p>
                       <i className={styles.address} />
                       {currentUser.geographic.province.label}
                       {currentUser.geographic.city.label}
-                    </p>
+                    </p> */}
                   </div>
                   <Divider dashed />
                   <div className={styles.tags}>
                     <div className={styles.tagsTitle}>标签</div>
-                    {currentUser.tags.concat(newTags).map(item => (
+                    {/* {currentUser.tags.concat(newTags).map(item => (
                       <Tag key={item.key}>{item.label}</Tag>
-                    ))}
+                    ))} */}
                     {inputVisible && (
                       <Input
                         ref={this.saveInputRef}
@@ -200,7 +200,7 @@ class Center extends PureComponent {
               className={styles.tabsCard}
               bordered={false}
               tabList={operationTabList}
-              activeTabKey={location.pathname.replace(`${match.path}/`, '')}
+              // activeTabKey={location.pathname.replace(`${match.path}/`, '')}
               onTabChange={this.onTabChange}
               loading={listLoading}
             >
