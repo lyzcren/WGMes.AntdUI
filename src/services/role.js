@@ -73,3 +73,33 @@ export async function setAuth (params) {
 export async function getCurrentAuth (params) {
   return request(`/api/role/currentAuthority?${stringify(params)}`);
 }
+
+export async function fakeGetAuthorizeUser (params) {
+  return request('/api/role/getAuthorizedUser', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'getAuthorizedUser',
+    },
+  });
+}
+
+export async function fakeAuthorizeUser (params) {
+  return request('/api/role/AuthorizeUser', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'AuthorizeUser',
+    },
+  })
+
+}
+export async function fakeUnAuthorizeUser (params) {
+  return request('/api/role/UnAuthorizeUser', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'UnAuthorizeUser',
+    },
+  });
+}

@@ -57,7 +57,6 @@ class HeaderView extends PureComponent {
   handleMenuClick = ({ key }) => {
     const { dispatch } = this.props;
     if (key === 'userCenter') {
-      const { dispatch } = this.props;
       dispatch({
         type: 'menu/getSelected',
         payload: { selectedPath: '/account/center', menuData: this.props.menuData },
@@ -70,6 +69,10 @@ class HeaderView extends PureComponent {
       return;
     }
     if (key === 'userinfo') {
+      dispatch({
+        type: 'menu/getSelected',
+        payload: { selectedPath: '/account/settings', menuData: this.props.menuData },
+      });
       // router.push('/account/settings/base');
       return;
     }

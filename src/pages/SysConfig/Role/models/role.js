@@ -1,4 +1,7 @@
-import { queryRole, removeRole, addRole, updateRole, activeRole, getAuth, setAuth, getCurrentAuth } from '@/services/role';
+import {
+  queryRole, removeRole, addRole, updateRole, activeRole, getAuth, setAuth, getCurrentAuth,
+  fakeGetAuthorizeUser, fakeAuthorizeUser, fakeUnAuthorizeUser
+} from '@/services/role';
 
 export default {
   namespace: 'roleManage',
@@ -8,22 +11,26 @@ export default {
       list: [],
       pagination: {},
     },
-    status: 'ok',
-    message: '',
+    queryResult: {
+      status: 'ok',
+      message: '',
+    },
+    authority: [],
+    currentAuthority: [],
   },
 
   effects: {
     *fetch ({ payload }, { call, put }) {
       const response = yield call(queryRole, payload);
       yield put({
-        type: 'query',
+        type: 'saveQueryData',
         payload: response,
       });
     },
     *add ({ payload, callback }, { call, put }) {
       const response = yield call(addRole, payload);
       yield put({
-        type: 'updateData',
+        type: 'saveData',
         payload: response,
       });
       if (callback) callback();
@@ -31,7 +38,7 @@ export default {
     *remove ({ payload, callback }, { call, put }) {
       const response = yield call(removeRole, payload);
       yield put({
-        type: 'updateData',
+        type: 'saveData',
         payload: response,
       });
       if (callback) callback();
@@ -39,7 +46,7 @@ export default {
     *update ({ payload, callback }, { call, put }) {
       const response = yield call(updateRole, payload);
       yield put({
-        type: 'updateData',
+        type: 'saveData',
         payload: response,
       });
       if (callback) callback();
@@ -47,7 +54,7 @@ export default {
     *active ({ payload, callback }, { call, put }) {
       const response = yield call(activeRole, payload);
       yield put({
-        type: 'updateData',
+        type: 'saveData',
         payload: response,
       });
       if (callback) callback();
@@ -55,7 +62,7 @@ export default {
     *getAuthority ({ payload, callback }, { call, put }) {
       const response = yield call(getAuth, payload);
       yield put({
-        type: 'updateAuthority',
+        type: 'saveAuthority',
         payload: response,
       });
       if (callback) callback();
@@ -63,7 +70,7 @@ export default {
     *getCurrentAuthority ({ payload, callback }, { call, put }) {
       const response = yield call(getCurrentAuth, payload);
       yield put({
-        type: 'updateCurrentAuthority',
+        type: 'saveCurrentAuthority',
         payload: response,
       });
       if (callback) callback();
@@ -71,7 +78,32 @@ export default {
     *setAuthority ({ payload, callback }, { call, put }) {
       const response = yield call(setAuth, payload);
       yield put({
-        type: 'updateCurrentAuthority',
+        type: 'saveCurrentAuthority',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    // 角色绑定用户
+    *getAuthorizeUser ({ payload, callback }, { call, put }) {
+      const response = yield call(fakeGetAuthorizeUser, payload);
+      yield put({
+        type: 'saveAuthorizeUser',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    *authorizeUser ({ payload, callback }, { call, put }) {
+      const response = yield call(fakeAuthorizeUser, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    *unAuthorizeUser ({ payload, callback }, { call, put }) {
+      const response = yield call(fakeUnAuthorizeUser, payload);
+      yield put({
+        type: 'saveData',
         payload: response,
       });
       if (callback) callback();
@@ -79,30 +111,37 @@ export default {
   },
 
   reducers: {
-    query (state, action) {
+    saveQueryData (state, action) {
       return {
         ...state,
         data: action.payload,
       };
     },
-    updateData (state, action) {
+    saveData (state, action) {
       return {
         ...state,
-        status: action.payload.status,
-        message: action.payload.message,
+        queryResult: action.payload ? action.payload : {},
+        // status: action.payload.status,
+        // message: action.payload.message,
+        // authority: action.payload.authority,
+      };
+    },
+    saveAuthority (state, action) {
+      return {
+        ...state,
         authority: action.payload.authority,
       };
     },
-    updateAuthority (state, action) {
-      return {
-        ...state,
-        authority: action.payload.authority,
-      };
-    },
-    updateCurrentAuthority (state, action) {
+    saveCurrentAuthority (state, action) {
       return {
         ...state,
         currentAuthority: action.payload.currentAuthority,
+      };
+    },
+    saveAuthorizeUser (state, action) {
+      return {
+        ...state,
+        authorizeUser: action.payload,
       };
     },
   },

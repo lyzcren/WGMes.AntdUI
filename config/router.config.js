@@ -45,19 +45,19 @@ export default [
         path: '/sysConfig',
         name: 'sysConfig',
         icon: 'setting',
-        authority: ['SystemMng'],
+        authority: ['User_Read', 'Role_Read',],
         routes: [
           {
             path: '/sysConfig/user',
             name: 'user',
             component: './SysConfig/User/List',
-            authority: ['User'],
+            authority: ['User_Read'],
           },
           {
             path: '/sysConfig/role',
             name: 'role',
             component: './SysConfig/Role/List',
-            authority: ['Role'],
+            authority: ['Role_Read'],
           },
         ],
       },

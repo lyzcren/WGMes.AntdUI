@@ -27,6 +27,7 @@ import Authorized from '@/utils/Authorized';
 import { UpdateForm } from './UpdateForm';
 import { UpdatePwdForm } from './UpdatePwdForm';
 import { CreateForm } from './CreateForm';
+import { AuthorizeRoleForm } from './AuthorizeRoleForm';
 
 import styles from './List.less';
 
@@ -52,12 +53,14 @@ class TableList extends PureComponent {
     modalVisible: false,
     updateModalVisible: false,
     updatePwdModalVisible: false,
+    updateRoleModalVisible: false,
     expandForm: false,
     selectedRows: [],
     formValues: {},
     queryFilters: [],
     updateFormValues: {},
     updatePwdFormValues: {},
+    updateRoleFormValues: {},
   };
 
   // 列表查询参数
@@ -127,9 +130,7 @@ class TableList extends PureComponent {
           <Divider type="vertical" />
           <a onClick={() => this.handleUpdatePwdModalVisible(true, record)}>修改密码</a>
           <Divider type="vertical" />
-          <Popconfirm title="是否要删除此行？" onConfirm={() => this.batchDelete(record)}>
-            <a>删除</a>
-          </Popconfirm>
+          <a onClick={() => this.handleRoleModalVisible(true, record)}>角色</a>
           <Divider type="vertical" />
           <Dropdown
             overlay={
@@ -182,7 +183,7 @@ class TableList extends PureComponent {
     }
 
     var params = { pagination: this.currentPagination };
-    console.log(params);
+    // console.log(params);
 
     dispatch({
       type: 'userManage/fetch',
@@ -221,7 +222,7 @@ class TableList extends PureComponent {
         current: 1,
         queryFilters,
       };
-      console.log(this.currentPagination);
+      // console.log(this.currentPagination);
       var params = { pagination: this.currentPagination };
 
       dispatch({
@@ -247,7 +248,7 @@ class TableList extends PureComponent {
     };
     var params = { pagination: this.currentPagination };
 
-    console.log(params);
+    // console.log(params);
     dispatch({
       type: 'userManage/fetch',
       payload: params,
@@ -280,7 +281,13 @@ class TableList extends PureComponent {
 
     switch (key) {
       case 'delete':
-        this.batchDelete(record);
+        Modal.confirm({
+          title: '删除用户',
+          content: '确定删除用户吗？',
+          okText: '确认',
+          cancelText: '取消',
+          onOk: () => this.batchDelete(record),
+        });
         break;
       case 'active':
         this.handleActive(record);
@@ -316,6 +323,28 @@ class TableList extends PureComponent {
     });
   };
 
+  handleRoleModalVisible = (flag, record) => {
+    const { dispatch } = this.props;
+
+    if (!!flag) {
+      // 获取当前角色已关联的角色列表
+      dispatch({
+        type: 'userManage/getAuthorizeRole',
+        payload: { fItemID: record.fItemID },
+      }).then(() => {
+        this.setState({
+          updateRoleModalVisible: !!flag,
+          updateRoleFormValues: record || {},
+        });
+      });
+    } else {
+      this.setState({
+        updateRoleModalVisible: !!flag,
+        updateRoleFormValues: record || {},
+      });
+    }
+  };
+
   handleAdd = fields => {
     const { dispatch, form } = this.props;
     dispatch({
@@ -329,13 +358,13 @@ class TableList extends PureComponent {
       }
     }).then(() => {
       const { userManage } = this.props;
-      if (userManage.status === 'ok') {
+      if (userManage.result.status === 'ok') {
         message.success('添加成功');
         this.handleModalVisible();
         // 成功后再次刷新列表
         this.search();
       } else {
-        message.warning(userManage.message);
+        message.warning(userManage.result.message);
       }
     });
   };
@@ -353,16 +382,13 @@ class TableList extends PureComponent {
       },
     }).then(() => {
       const { userManage } = this.props;
-      if (userManage.status === 'ok') {
+      if (userManage.result.status === 'ok') {
         message.success('修改成功');
         this.handleUpdateModalVisible();
         // 成功后再次刷新列表
         this.search();
-      } else if (userManage.status === 'warning') {
-        message.warning(userManage.message);
-      }
-      else {
-        message.error(userManage.message);
+      } else if (userManage.result.status === 'warning') {
+        message.warning(userManage.result.message);
       }
     });
   };
@@ -377,16 +403,13 @@ class TableList extends PureComponent {
       },
     }).then(() => {
       const { userManage } = this.props;
-      if (userManage.status === 'ok') {
+      if (userManage.result.status === 'ok') {
         message.success('修改成功');
         this.handleUpdatePwdModalVisible();
         // 成功后再次刷新列表
         this.search();
-      } else if (userManage.status === 'warning') {
-        message.warning(userManage.message);
-      }
-      else {
-        message.error(userManage.message);
+      } else if (userManage.result.status === 'warning') {
+        message.warning(userManage.result.message);
       }
     });
   };
@@ -419,9 +442,9 @@ class TableList extends PureComponent {
           selectedRows: [],
         });
         const { userManage } = this.props;
-        if (userManage.status === 'ok') {
-          if (userManage.message) {
-            userManage.message.map(m => notification.error({
+        if (userManage.result.status === 'ok') {
+          if (userManage.result.message) {
+            userManage.result.message.map(m => notification.error({
               message: m,
             }));
           }
@@ -442,15 +465,12 @@ class TableList extends PureComponent {
       },
     }).then(() => {
       const { userManage } = this.props;
-      if (userManage.status === 'ok') {
+      if (userManage.result.status === 'ok') {
         message.success((record.fIsActive ? '禁用' : '启用') + '成功');
         // 成功后再次刷新列表
         this.search();
-      } else if (userManage.status === 'warning') {
-        message.warning(userManage.message);
-      }
-      else {
-        message.error(userManage.message);
+      } else if (userManage.result.status === 'warning') {
+        message.warning(userManage.result.message);
       }
     });
   };
@@ -579,7 +599,8 @@ class TableList extends PureComponent {
       userManage: { data },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, updateFormValues, updatePwdModalVisible, updatePwdFormValues, } = this.state;
+    const { selectedRows, modalVisible, updateModalVisible, updateFormValues, updatePwdModalVisible, updatePwdFormValues,
+      updateRoleModalVisible, updateRoleFormValues } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove">删除</Menu.Item>
@@ -598,6 +619,9 @@ class TableList extends PureComponent {
     const updatePwdMethods = {
       handleUpdatePwdModalVisible: this.handleUpdatePwdModalVisible,
       handleUpdatePwd: this.handleUpdatePwd,
+    };
+    const updateRoleMethods = {
+      handleModalVisible: this.handleRoleModalVisible,
     };
     return (
       <GridContent>
@@ -647,6 +671,16 @@ class TableList extends PureComponent {
             {...updatePwdMethods}
             updatePwdModalVisible={updatePwdModalVisible}
             values={updatePwdFormValues}
+          />
+        ) : null}
+        {updateRoleFormValues && Object.keys(updateRoleFormValues).length ? (
+          <AuthorizeRoleForm
+            {...updateRoleMethods}
+            modalVisible={updateRoleModalVisible}
+            authorizeRole={this.props.userManage.authorizeRole}
+            values={updateRoleFormValues}
+            queryResult={this.props.userManage.result}
+            dispatch={this.props.dispatch}
           />
         ) : null}
       </GridContent>

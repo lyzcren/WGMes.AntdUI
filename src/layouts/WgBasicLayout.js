@@ -20,7 +20,6 @@ import WgSiderMenu from '@/components/WgSiderMenu';
 import { urlToList } from '@/components/_utils/pathTools';
 import { getFlatMenuKeys } from '@/components/WgSiderMenu/SiderMenuUtils';
 import { Route, Switch } from 'react-router-dom'
-import asyncComponent from './AsyncComponent';
 import { ComposeApplicator } from 'lodash-decorators/applicators';
 import { getComponentMaps } from '@/utils/utils'
 
@@ -67,7 +66,7 @@ class WgBasicLayout extends React.PureComponent {
     this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual);
     let { location: { pathname } } = props;
     // 首次进入界面默认加载标签页
-    this.defaultPath = "/sysConfig/role";
+    this.defaultPath = "/sysConfig/user";
 
     const panes = [];
     this.state = {
@@ -197,7 +196,6 @@ class WgBasicLayout extends React.PureComponent {
     if (!pane) {
       var componentMaps = getComponentMaps(this.props.menuData);
       var componentMap = componentMaps.find(com => com.path == selectedPath);
-      // const component = asyncComponent(() => import('@/pages/Forms/AdvancedForm'));
       if (componentMap) {// 打开默认首页
         panes.push({ title: componentMap.name, content: componentMap.component, key: activeKey, closable: closable });
         this.changeTabActiveKey({ panes, activeKey });

@@ -27,6 +27,7 @@ import Authorized from '@/utils/Authorized';
 import { UpdateForm } from './UpdateForm';
 import { CreateForm } from './CreateForm';
 import { AuthorityForm } from './AuthorityForm';
+import { AuthorizeUserForm } from './AuthorizeUserForm';
 
 import styles from './List.less';
 
@@ -55,6 +56,8 @@ class TableList extends PureComponent {
     updateFormValues: {},
     // 权限界面
     authorityModalVisible: false,
+    // 授权用户界面
+    authorizeUserModalVisible: false,
     // 其他
     expandForm: false,
     selectedRows: [],
@@ -103,6 +106,8 @@ class TableList extends PureComponent {
           <a onClick={() => this.handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
           <Divider type="vertical" />
           <a onClick={() => this.handleAuthorityModalVisible(true, record)}>权限</a>
+          <Divider type="vertical" />
+          <a onClick={() => this.handleAuthorizeUserModalVisible(true, record)}>用户</a>
         </Fragment>
       ),
     },
@@ -284,6 +289,28 @@ class TableList extends PureComponent {
     }
   };
 
+  handleAuthorizeUserModalVisible = (flag, record) => {
+    const { dispatch } = this.props;
+
+    if (!!flag) {
+      // 获取当前角色已关联的用户列表
+      dispatch({
+        type: 'roleManage/getAuthorizeUser',
+        payload: { fItemID: record.fItemID },
+      }).then(() => {
+        this.setState({
+          authorizeUserModalVisible: !!flag,
+          updateFormValues: record || {},
+        });
+      });
+    } else {
+      this.setState({
+        authorizeUserModalVisible: !!flag,
+        updateFormValues: record || {},
+      });
+    }
+  };
+
   handleAdd = fields => {
     const { dispatch, form } = this.props;
     dispatch({
@@ -293,14 +320,14 @@ class TableList extends PureComponent {
         fIsActive: fields.fIsActive,
       }
     }).then(() => {
-      const { roleManage } = this.props;
-      if (roleManage.status === 'ok') {
+      const { roleManage: { queryResult } } = this.props;
+      if (queryResult.status === 'ok') {
         message.success('添加成功');
         this.handleModalVisible();
         // 成功后再次刷新列表
         this.search();
       } else {
-        message.warning(roleManage.message);
+        message.warning(queryResult.message);
       }
     });
   };
@@ -315,17 +342,17 @@ class TableList extends PureComponent {
         fIsActive: fields.fIsActive,
       },
     }).then(() => {
-      const { roleManage } = this.props;
-      if (roleManage.status === 'ok') {
+      const { roleManage: { queryResult } } = this.props;
+      if (queryResult.status === 'ok') {
         message.success('修改成功');
         this.handleUpdateModalVisible();
         // 成功后再次刷新列表
         this.search();
-      } else if (roleManage.status === 'warning') {
-        message.warning(roleManage.message);
+      } else if (queryResult.status === 'warning') {
+        message.warning(queryResult.message);
       }
       else {
-        message.error(roleManage.message);
+        message.error(queryResult.message);
       }
     });
   };
@@ -339,16 +366,16 @@ class TableList extends PureComponent {
         fIsActive: !record.fIsActive,
       },
     }).then(() => {
-      const { roleManage } = this.props;
-      if (roleManage.status === 'ok') {
+      const { roleManage: { queryResult } } = this.props;
+      if (queryResult.status === 'ok') {
         message.success((record.fIsActive ? '禁用' : '启用') + '成功');
         // 成功后再次刷新列表
         this.search();
-      } else if (roleManage.status === 'warning') {
-        message.warning(roleManage.message);
+      } else if (queryResult.status === 'warning') {
+        message.warning(queryResult.message);
       }
       else {
-        message.error(roleManage.message);
+        message.error(queryResult.message);
       }
     });
   };
@@ -362,17 +389,17 @@ class TableList extends PureComponent {
         checkedAuthority,
       },
     }).then(() => {
-      const { roleManage } = this.props;
-      if (roleManage.status === 'ok') {
+      const { roleManage: { queryResult } } = this.props;
+      if (queryResult.status === 'ok') {
         message.success('修改成功');
         this.handleUpdateModalVisible();
         // 成功后再次刷新列表
         this.search();
-      } else if (roleManage.status === 'warning') {
-        message.warning(roleManage.message);
+      } else if (queryResult.status === 'warning') {
+        message.warning(queryResult.message);
       }
       else {
-        message.error(roleManage.message);
+        message.error(queryResult.message);
       }
     });
   };
@@ -404,12 +431,10 @@ class TableList extends PureComponent {
         this.setState({
           selectedRows: [],
         });
-        const { roleManage } = this.props;
-        if (roleManage.status === 'ok') {
-          if (roleManage.message) {
-            roleManage.message.map(m => notification.error({
-              message: m,
-            }));
+        const { roleManage: { queryResult } } = this.props;
+        if (queryResult.status === 'ok') {
+          if (queryResult.message) {
+            queryResult.message.map(m => message.warning(m));
           }
           // 成功后再次刷新列表
           this.search();
@@ -459,10 +484,10 @@ class TableList extends PureComponent {
         this.setState({
           selectedRows: [],
         });
-        const { roleManage } = this.props;
-        if (roleManage.status === 'ok') {
-          if (roleManage.message) {
-            roleManage.message.map(m => notification.error({
+        const { roleManage: { queryResult } } = this.props;
+        if (queryResult.status === 'ok') {
+          if (queryResult.message) {
+            queryResult.message.map(m => notification.error({
               message: m,
             }));
           }
@@ -524,10 +549,10 @@ class TableList extends PureComponent {
 
   render () {
     const {
-      roleManage: { data },
+      roleManage: { data, queryResult },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, updateFormValues, authorityModalVisible } = this.state;
+    const { selectedRows, modalVisible, updateModalVisible, updateFormValues, authorityModalVisible, authorizeUserModalVisible } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove">删除</Menu.Item>
@@ -547,6 +572,9 @@ class TableList extends PureComponent {
     const authorityMethods = {
       handleModalVisible: this.handleAuthorityModalVisible,
       handleUpdate: this.handleAuthority,
+    };
+    const authorizeUserMethods = {
+      handleModalVisible: this.handleAuthorizeUserModalVisible,
     };
     return (
       <GridContent>
@@ -598,6 +626,16 @@ class TableList extends PureComponent {
             values={updateFormValues}
             authority={this.props.roleManage.authority}
             currentAuthority={this.props.roleManage.currentAuthority}
+          />
+        ) : null}
+        {updateFormValues && Object.keys(updateFormValues).length ? (
+          <AuthorizeUserForm
+            {...authorizeUserMethods}
+            authorizeUserModalVisible={authorizeUserModalVisible}
+            values={updateFormValues}
+            authorizeUser={this.props.roleManage.authorizeUser}
+            queryResult={this.props.roleManage.queryResult}
+            dispatch={this.props.dispatch}
           />
         ) : null}
       </GridContent>

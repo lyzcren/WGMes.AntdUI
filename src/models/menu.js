@@ -158,7 +158,6 @@ export default {
       };
     },
     selected(state, action) {
-      console.log(action.payload);
       return {
         ...state,
         ...action.payload,

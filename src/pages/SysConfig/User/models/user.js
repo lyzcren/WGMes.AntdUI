@@ -1,4 +1,7 @@
-import { queryUser, removeUser, addUser, updateUser } from '@/services/user';
+import {
+  queryUser, removeUser, addUser, updateUser,
+  fakeGetAuthorizeRole, fakeAuthorizeRole, fakeUnAuthorizeRole
+} from '@/services/user';
 
 export default {
   namespace: 'userManage',
@@ -8,19 +11,21 @@ export default {
       list: [],
       pagination: {},
     },
-    status: 'ok',
-    message: '',
+    result: {
+      status: 'ok',
+      message: '',
+    }
   },
 
   effects: {
-    *fetch({ payload }, { call, put }) {
+    *fetch ({ payload }, { call, put }) {
       const response = yield call(queryUser, payload);
       yield put({
         type: 'query',
         payload: response,
       });
     },
-    *add({ payload, callback }, { call, put }) {
+    *add ({ payload, callback }, { call, put }) {
       const response = yield call(addUser, payload);
       yield put({
         type: 'updateData',
@@ -28,7 +33,7 @@ export default {
       });
       if (callback) callback();
     },
-    *remove({ payload, callback }, { call, put }) {
+    *remove ({ payload, callback }, { call, put }) {
       const response = yield call(removeUser, payload);
       yield put({
         type: 'updateData',
@@ -36,7 +41,7 @@ export default {
       });
       if (callback) callback();
     },
-    *update({ payload, callback }, { call, put }) {
+    *update ({ payload, callback }, { call, put }) {
       const response = yield call(updateUser, payload);
       yield put({
         type: 'updateData',
@@ -44,20 +49,49 @@ export default {
       });
       if (callback) callback();
     },
+    *getAuthorizeRole ({ payload, callback }, { call, put }) {
+      const response = yield call(fakeGetAuthorizeRole, payload);
+      yield put({
+        type: 'saveAuthorizeRole',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    *authorizeRole ({ payload, callback }, { call, put }) {
+      const response = yield call(fakeAuthorizeRole, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    *unAuthorizeRole ({ payload, callback }, { call, put }) {
+      const response = yield call(fakeUnAuthorizeRole, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
+      });
+      if (callback) callback();
+    },
   },
 
   reducers: {
-    query(state, action) {
+    query (state, action) {
       return {
         ...state,
         data: action.payload,
       };
     },
-    updateData(state, action) {
+    updateData (state, action) {
       return {
         ...state,
-        status: action.payload.status,
-        message: action.payload.message,
+        result: action.payload ? action.payload : {},
+      };
+    },
+    saveAuthorizeRole (state, action) {
+      return {
+        ...state,
+        authorizeRole: action.payload,
       };
     },
   },
