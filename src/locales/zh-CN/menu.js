@@ -37,6 +37,10 @@ export default {
   'menu.account.logout': '退出登录',
 
   // 望果菜单
+  // 基础资料
+  'menu.basic': '基础资料',
+  'menu.basic.dept': '部门',
+  // 系统设置
   'menu.sysConfig': '系统设置',
   'menu.sysConfig.user': '用户管理',
   'menu.sysConfig.role': '角色管理',

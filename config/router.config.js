@@ -40,6 +40,20 @@ export default [
           },
         ],
       },
+      {
+        path: '/basic',
+        name: 'basic',
+        icon: 'cluster',
+        authority: ['Dept_Read', 'Role_Read',],
+        routes: [
+          {
+            path: '/basic/dept',
+            name: 'dept',
+            component: './Basic/Dept/List',
+            authority: ['Dept_Read'],
+          },
+        ],
+      },
       // sysConfig
       {
         path: '/sysConfig',
