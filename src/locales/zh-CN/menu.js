@@ -40,6 +40,9 @@ export default {
   // 基础资料
   'menu.basic': '基础资料',
   'menu.basic.dept': '部门',
+  'menu.basic.unit': '单位',
+  'menu.basic.machine': '机台',
+  'menu.basic.emp': '职员',
   // 系统设置
   'menu.sysConfig': '系统设置',
   'menu.sysConfig.user': '用户管理',

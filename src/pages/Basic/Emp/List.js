@@ -39,9 +39,9 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ deptManage, loading }) => ({
-  deptManage,
-  loading: loading.models.deptManage,
+@connect(({ empManage, loading }) => ({
+  empManage,
+  loading: loading.models.empManage,
 }))
 @Form.create()
 class TableList extends PureComponent {
@@ -69,13 +69,13 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     var params = { pagination: this.currentPagination };
     dispatch({
-      type: 'deptManage/fetch',
+      type: 'empManage/fetch',
       payload: params,
     });
     // 列配置相关方法
     ColumnConfig.UpdateModalVisibleCallback = (record) => this.handleUpdateModalVisible(true, record);
     ColumnConfig.DeleteCallback = (record) => this.handleDelete(record);
-    ColumnConfig.ActiveCallback = (record) => this.handleActive(record, !record.fIsActive);
+    ColumnConfig.ActiveCallback = (record) => this.handleActive(record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -104,7 +104,7 @@ class TableList extends PureComponent {
     var params = { pagination: this.currentPagination };
 
     dispatch({
-      type: 'deptManage/fetch',
+      type: 'empManage/fetch',
       payload: params,
     });
   };
@@ -143,7 +143,7 @@ class TableList extends PureComponent {
       var params = { pagination: this.currentPagination };
 
       dispatch({
-        type: 'deptManage/fetch',
+        type: 'empManage/fetch',
         payload: params,
       });
     });
@@ -166,7 +166,7 @@ class TableList extends PureComponent {
     var params = { pagination: this.currentPagination };
 
     dispatch({
-      type: 'deptManage/fetch',
+      type: 'empManage/fetch',
       payload: params,
     });
   };
@@ -220,10 +220,10 @@ class TableList extends PureComponent {
   handleAdd = fields => {
     const { dispatch, form } = this.props;
     dispatch({
-      type: 'deptManage/add',
+      type: 'empManage/add',
       payload: fields
     }).then(() => {
-      const { deptManage: { queryResult } } = this.props;
+      const { empManage: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
         message.success('添加成功');
         this.handleModalVisible();
@@ -238,10 +238,10 @@ class TableList extends PureComponent {
   handleUpdate = fields => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'deptManage/update',
+      type: 'empManage/update',
       payload: fields,
     }).then(() => {
-      const { deptManage: { queryResult } } = this.props;
+      const { empManage: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
         message.success('修改成功');
         this.handleUpdateModalVisible();
@@ -259,15 +259,15 @@ class TableList extends PureComponent {
   handleActive = (record, fIsActive) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'deptManage/active',
+      type: 'empManage/active',
       payload: {
         fItemID: record.fItemID,
-        fIsActive: fIsActive,
+        fIsActive,
       },
     }).then(() => {
-      const { deptManage: { queryResult } } = this.props;
+      const { empManage: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
-        message.success('【' + record.fName + '】' + (fIsActive ? '禁用' : '启用') + '成功');
+        message.success(record.fName + (fIsActive ? '禁用' : '启用') + '成功');
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
@@ -282,7 +282,7 @@ class TableList extends PureComponent {
   handleDelete = (record) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'deptManage/remove',
+      type: 'empManage/remove',
       payload: {
         fItemID: record.fItemID,
       },
@@ -290,9 +290,9 @@ class TableList extends PureComponent {
         this.setState({
           selectedRows: [],
         });
-        const { deptManage: { queryResult } } = this.props;
+        const { empManage: { queryResult } } = this.props;
         if (queryResult.status === 'ok') {
-          message.success('【' + record.fName + '】' + '删除成功');
+          message.success(record.fName + '删除成功');
           // 成功后再次刷新列表
           this.search();
         } else if (queryResult.status === 'warning') {
@@ -415,7 +415,7 @@ class TableList extends PureComponent {
 
   render () {
     const {
-      deptManage: { data, queryResult },
+      empManage: { data, queryResult },
       loading,
     } = this.props;
     const { selectedRows, modalVisible, updateModalVisible, updateFormValues, authorityModalVisible, authorizeUserModalVisible } = this.state;
@@ -459,27 +459,23 @@ class TableList extends PureComponent {
                 </span>
               )}
             </div>
-            {/* defaultExpandAllRows在Table首次初始化有数据时才会起作用，若不是会导致无法展开问题
-            详见 https://github.com/ant-design/ant-design/issues/4145 */}
-            {data && data.list.length ? <StandardTable
+            <StandardTable
               rowKey="fItemID"
-              defaultExpandAllRows={true}
               selectedRows={selectedRows}
               loading={loading}
               data={data}
               columns={ColumnConfig.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
-            /> : '暂无数据'}
-
+            />
           </div>
         </Card>
-        <CreateForm {...parentMethods} modalVisible={modalVisible} treeData={data.list} />
+        <CreateForm {...parentMethods} modalVisible={modalVisible} />
         {updateFormValues && Object.keys(updateFormValues).length ? (
           <UpdateForm
             {...updateMethods}
             updateModalVisible={updateModalVisible}
-            values={updateFormValues} treeData={data.list}
+            values={updateFormValues}
           />
         ) : null}
       </GridContent>

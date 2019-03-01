@@ -44,13 +44,31 @@ export default [
         path: '/basic',
         name: 'basic',
         icon: 'cluster',
-        authority: ['Dept_Read', 'Role_Read',],
+        authority: ['Dept_Read', 'Unit_Read', 'Machine_Read', 'Emp_Read',],
         routes: [
           {
             path: '/basic/dept',
             name: 'dept',
             component: './Basic/Dept/List',
             authority: ['Dept_Read'],
+          },
+          {
+            path: '/basic/unit',
+            name: 'unit',
+            component: './Basic/Unit/List',
+            authority: ['Unit_Read'],
+          },
+          {
+            path: '/basic/machine',
+            name: 'machine',
+            component: './Basic/Machine/List',
+            authority: ['Machine_Read'],
+          },
+          {
+            path: '/basic/emp',
+            name: 'emp',
+            component: './Basic/Emp/List',
+            authority: ['Emp_Read'],
           },
         ],
       },
