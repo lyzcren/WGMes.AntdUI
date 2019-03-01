@@ -6,6 +6,7 @@ import {
     Modal,
     Switch,
     Tag,
+    TreeSelect,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import { validatorPhone, validatePassword, getPasswordStatus, passwordProgressMap } from '@/utils/validators';
@@ -28,6 +29,8 @@ export class UpdateForm extends PureComponent {
             formVals: {
                 fItemID: props.values.fItemID,
                 fName: props.values.fName,
+                fEnName: props.values.fEnName,
+                fParentID: props.values.fParentID,
                 fIsActive: props.values.fIsActive,
             },
         };
@@ -45,7 +48,7 @@ export class UpdateForm extends PureComponent {
     };
 
     render () {
-        const { form, updateModalVisible, handleModalVisible, values } = this.props;
+        const { form, treeData, updateModalVisible, handleModalVisible, values } = this.props;
         const { formVals } = this.state;
 
         return (
@@ -62,6 +65,18 @@ export class UpdateForm extends PureComponent {
                         initialValue: formVals.fName,
                         rules: [{ required: true, message: '请输入名称', min: 1 }],
                     })(<Input placeholder="请输入" />)}
+                </FormItem>
+                <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="英文名称">
+                    {form.getFieldDecorator('fEnName', {
+                        rules: [{ required: false, message: '请输入英文名称' }],
+                        initialValue: formVals.fEnName,
+                    })(<Input placeholder="请输入" />)}
+                </FormItem>
+                <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="所属部门">
+                    {form.getFieldDecorator('fParentID', {
+                        rules: [{ required: true, message: '请输入所属部门' }],
+                        initialValue: formVals.fParentID,
+                    })(<TreeSelect placeholder="请选择" style={{ width: 300 }} treeData={treeData} />)}
                 </FormItem>
                 <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="启用">
                     {form.getFieldDecorator('fIsActive', {

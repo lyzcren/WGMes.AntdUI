@@ -1,4 +1,4 @@
-import { fakeQuery, fakeRemove, fakeAdd, fakeUpdate, fakeActive } from '@/services/dept';
+import { fakeQuery, fakeRemove, fakeAdd, fakeUpdate, fakeActive } from '@/services/Basic/Dept';
 
 export default {
   namespace: 'deptManage',
@@ -60,7 +60,7 @@ export default {
     saveQueryData (state, action) {
       return {
         ...state,
-        data: action.payload,
+        data: { list: action.payload },
       };
     },
     saveData (state, action) {

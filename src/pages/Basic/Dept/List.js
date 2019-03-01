@@ -26,6 +26,7 @@ import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { UpdateForm } from './UpdateForm';
 import { CreateForm } from './CreateForm';
+import { default as ColumnConfig } from './ColumnConfig';
 
 import styles from './List.less';
 
@@ -36,7 +37,6 @@ const getValue = obj =>
   Object.keys(obj)
     .map(key => obj[key])
     .join(',');
-const activeData = ['启用', '禁用',];
 
 /* eslint react/no-multi-comp:0 */
 @connect(({ deptManage, loading }) => ({
@@ -64,44 +64,6 @@ class TableList extends PureComponent {
     pageSize: 10,
   };
 
-  columns = [
-    {
-      title: '名称',
-      dataIndex: 'fName',
-      sorter: true,
-    },
-    {
-      title: '启用',
-      dataIndex: 'fIsActive',
-      filters: [
-        {
-          text: activeData[0],
-          value: 1,
-        },
-        {
-          text: activeData[1],
-          value: 0,
-        },
-      ],
-      render (val) {
-        return <Switch disabled checked={val} />;
-      },
-    },
-    {
-      title: '操作',
-      render: (text, record) => (
-        <Fragment>
-          <a onClick={() => this.handleUpdateModalVisible(true, record)}>修改</a>
-          <Divider type="vertical" />
-          <Popconfirm title="是否要删除此行？" onConfirm={() => this.batchDelete(record)}>
-            <a>删除</a>
-          </Popconfirm>
-          <Divider type="vertical" />
-          <a onClick={() => this.handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
-        </Fragment>
-      ),
-    },
-  ];
 
   componentDidMount () {
     const { dispatch } = this.props;
@@ -110,6 +72,10 @@ class TableList extends PureComponent {
       type: 'deptManage/fetch',
       payload: params,
     });
+    // 列配置相关方法
+    ColumnConfig.UpdateModalVisibleCallback = (record) => this.handleUpdateModalVisible(true, record);
+    ColumnConfig.DeleteCallback = (record) => this.handleDelete(record);
+    ColumnConfig.ActiveCallback = (record) => this.handleActive(record, !record.fIsActive);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -118,7 +84,6 @@ class TableList extends PureComponent {
 
     const filters = Object.keys(filtersArg).reduce((obj, key) => {
       const newObj = { ...obj };
-      // newObj[key] = getValue(filtersArg[key]);
       newObj[key] = getValue(filtersArg[key]);
       return newObj;
     }, {});
@@ -256,10 +221,7 @@ class TableList extends PureComponent {
     const { dispatch, form } = this.props;
     dispatch({
       type: 'deptManage/add',
-      payload: {
-        fName: fields.fName,
-        fIsActive: fields.fIsActive,
-      }
+      payload: fields
     }).then(() => {
       const { deptManage: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
@@ -277,11 +239,7 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'deptManage/update',
-      payload: {
-        fItemID: fields.fItemID,
-        fName: fields.fName,
-        fIsActive: fields.fIsActive,
-      },
+      payload: fields,
     }).then(() => {
       const { deptManage: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
@@ -298,18 +256,18 @@ class TableList extends PureComponent {
     });
   };
 
-  handleActive = (record) => {
+  handleActive = (record, fIsActive) => {
     const { dispatch } = this.props;
     dispatch({
       type: 'deptManage/active',
       payload: {
         fItemID: record.fItemID,
-        fIsActive: !record.fIsActive,
+        fIsActive,
       },
     }).then(() => {
       const { deptManage: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
-        message.success((record.fIsActive ? '禁用' : '启用') + '成功');
+        message.success(record.fName + (fIsActive ? '禁用' : '启用') + '成功');
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
@@ -318,6 +276,32 @@ class TableList extends PureComponent {
       else {
         message.error(queryResult.message);
       }
+    });
+  };
+
+  handleDelete = (record) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'deptManage/remove',
+      payload: {
+        fItemID: record.fItemID,
+      },
+      callback: () => {
+        this.setState({
+          selectedRows: [],
+        });
+        const { deptManage: { queryResult } } = this.props;
+        if (queryResult.status === 'ok') {
+          message.success(record.fName + '删除成功');
+          // 成功后再次刷新列表
+          this.search();
+        } else if (queryResult.status === 'warning') {
+          message.warning(queryResult.message);
+        }
+        else {
+          message.error(queryResult.message);
+        }
+      },
     });
   };
 
@@ -339,24 +323,8 @@ class TableList extends PureComponent {
     if (typeof selectedRows === 'object' && !Array.isArray(selectedRows)) {
       selectedRows = [selectedRows];
     }
-    dispatch({
-      type: 'deptManage/remove',
-      payload: {
-        fItemID: selectedRows.map(row => row.fItemID),
-      },
-      callback: () => {
-        this.setState({
-          selectedRows: [],
-        });
-        const { deptManage: { queryResult } } = this.props;
-        if (queryResult.status === 'ok') {
-          if (queryResult.message) {
-            queryResult.message.map(m => message.warning(m));
-          }
-          // 成功后再次刷新列表
-          this.search();
-        }
-      },
+    selectedRows.forEach(selectedRow => {
+      this.handleDelete(selectedRow);
     });
   };
 
@@ -391,27 +359,8 @@ class TableList extends PureComponent {
     if (typeof selectedRows === 'object' && !Array.isArray(selectedRows)) {
       selectedRows = [selectedRows];
     }
-    dispatch({
-      type: 'deptManage/active',
-      payload: {
-        fItemID: selectedRows.map(row => row.fItemID),
-        fIsActive: fIsActive,
-      },
-      callback: () => {
-        this.setState({
-          selectedRows: [],
-        });
-        const { deptManage: { queryResult } } = this.props;
-        if (queryResult.status === 'ok') {
-          if (queryResult.message) {
-            queryResult.message.map(m => notification.error({
-              message: m,
-            }));
-          }
-          // 成功后再次刷新列表
-          this.search();
-        }
-      },
+    selectedRows.forEach(selectedRow => {
+      this.handleActive(selectedRow, fIsActive);
     });
   };
 
@@ -510,23 +459,27 @@ class TableList extends PureComponent {
                 </span>
               )}
             </div>
-            <StandardTable
+            {/* defaultExpandAllRows在Table首次初始化有数据时才会起作用，若不是会导致无法展开问题
+            详见 https://github.com/ant-design/ant-design/issues/4145 */}
+            {data && data.list.length ? <StandardTable
               rowKey="fItemID"
+              defaultExpandAllRows={true}
               selectedRows={selectedRows}
               loading={loading}
               data={data}
-              columns={this.columns}
+              columns={ColumnConfig.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
-            />
+            /> : '暂无数据'}
+
           </div>
         </Card>
-        <CreateForm {...parentMethods} modalVisible={modalVisible} />
+        <CreateForm {...parentMethods} modalVisible={modalVisible} treeData={data.list} />
         {updateFormValues && Object.keys(updateFormValues).length ? (
           <UpdateForm
             {...updateMethods}
             updateModalVisible={updateModalVisible}
-            values={updateFormValues}
+            values={updateFormValues} treeData={data.list}
           />
         ) : null}
       </GridContent>
