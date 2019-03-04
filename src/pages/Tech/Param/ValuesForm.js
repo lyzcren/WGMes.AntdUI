@@ -34,6 +34,7 @@ export class ValuesForm extends PureComponent {
 
     this.state = {
       data: props.data,
+      loading: false,
       /* eslint-disable-next-line react/no-unused-state */
       value: props.value,
       formVals: props.values,
@@ -61,20 +62,49 @@ export class ValuesForm extends PureComponent {
     });
   };
 
-  handleAdd = (records) => {
-    const { dispatch, queryResult } = this.props;
-    records.forEach(record => {
-      dispatch({
-        type: 'paramManage/addValue',
-        payload: {
-          fValue: record.fValue, fItemID: this.state.formVals.fItemID
-        },
-      }).then(() => {
-        if (queryResult.status && queryResult.status == 'ok') {
-        } else {
-          message.warning(queryResult.message);
-        }
+  handleAdd = (record) => {
+    const { dispatch, } = this.props;
+    this.setState({
+      loading: true,
+    });
+    dispatch({
+      type: 'paramManage/addValue',
+      payload: {
+        fValue: record.fValue, fItemID: this.state.formVals.fItemID
+      },
+    }).then(() => {
+      const { queryResult } = this.props;
+      this.setState({
+        loading: false,
       });
+      if (queryResult.status && queryResult.status == 'ok') {
+        this.reloadData();
+      } else {
+        message.warning(queryResult.message);
+      }
+    });
+  };
+
+  handleUpdate = (record) => {
+    const { dispatch, } = this.props;
+    this.setState({
+      loading: true,
+    });
+    dispatch({
+      type: 'paramManage/updateValue',
+      payload: {
+        fValue: record.fValue, guid: record.guid
+      },
+    }).then(() => {
+      const { queryResult } = this.props;
+      this.setState({
+        loading: false,
+      });
+      if (queryResult.status && queryResult.status == 'ok') {
+        this.reloadData();
+      } else {
+        message.warning(queryResult.message);
+      }
     });
   };
 
@@ -127,13 +157,20 @@ export class ValuesForm extends PureComponent {
   };
 
   remove (guid) {
-    const { dispatch, queryResult } = this.props;
+    const { dispatch, } = this.props;
+    this.setState({
+      loading: true,
+    });
     dispatch({
       type: 'paramManage/removeValue',
       payload: {
         guid: guid
       },
     }).then(() => {
+      const { queryResult } = this.props;
+      this.setState({
+        loading: false,
+      });
       if (queryResult.status && queryResult.status == 'ok') {
         this.reloadData();
       } else {
@@ -170,10 +207,13 @@ export class ValuesForm extends PureComponent {
       e.target.focus();
       return;
     }
-    delete target.isNew;
-    this.toggleEditable(e, guid);
-    const { data } = this.state;
-    this.handleAdd(data);
+    if (target.isNew) {
+      this.handleAdd(target);
+    } else {
+      this.handleUpdate(target);
+    }
+    // delete target.isNew;
+    // this.toggleEditable(e, guid);
   }
 
   cancel (e, guid) {
@@ -193,8 +233,8 @@ export class ValuesForm extends PureComponent {
 
 
   render () {
-    const { loading, form, modalVisible, handleModalVisible, values } = this.props;
-    const { data, formVals } = this.state;
+    const { form, modalVisible, handleModalVisible, values } = this.props;
+    const { loading, data, formVals } = this.state;
     const columns = [
       {
         title: '参数值',
@@ -208,7 +248,7 @@ export class ValuesForm extends PureComponent {
                 autoFocus
                 onChange={e => this.handleFieldChange(e, 'fValue', record.guid)}
                 onKeyPress={e => this.handleKeyPress(e, record.guid)}
-                placeholder="成员姓名"
+                placeholder="参数值"
               />
             );
           }
@@ -224,10 +264,10 @@ export class ValuesForm extends PureComponent {
               return (
                 <span>
                   <a onClick={e => this.saveRow(e, record.guid)}>添加</a>
-                  <Divider type="vertical" />
+                  {/* <Divider type="vertical" />
                   <Popconfirm title="是否要删除此行？" onConfirm={() => this.remove(record.guid)}>
                     <a>删除</a>
-                  </Popconfirm>
+                  </Popconfirm> */}
                 </span>
               );
             }

@@ -107,13 +107,14 @@ export class AuthorizeUserForm extends PureComponent {
     };
 
     handleAuthorize = (record) => {
-        const { dispatch, form, queryResult } = this.props;
+        const { dispatch, form, } = this.props;
         dispatch({
             type: 'roleManage/authorizeUser',
             payload: {
                 fUserID: record.fItemID, fRoleID: this.state.formVals.fItemID
             },
         }).then(() => {
+            const { queryResult } = this.props;
             if (queryResult.status && queryResult.status == 'ok') {
                 form.validateFields((err, fieldsValue) => {
                     // 设置fItemId
@@ -127,13 +128,14 @@ export class AuthorizeUserForm extends PureComponent {
     };
 
     handleUnAuthorize = (record) => {
-        const { dispatch, form, queryResult } = this.props;
+        const { dispatch, form, } = this.props;
         dispatch({
             type: 'roleManage/unAuthorizeUser',
             payload: {
                 fUserID: record.fItemID, fRoleID: this.state.formVals.fItemID
             },
         }).then(() => {
+            const { queryResult } = this.props;
             if (queryResult.status && queryResult.status == 'ok') {
                 form.validateFields((err, fieldsValue) => {
                     // 设置fItemId

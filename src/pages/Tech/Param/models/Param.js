@@ -1,6 +1,6 @@
 import {
   fakeQuery, fakeRemove, fakeAdd, fakeUpdate, fakeActive,
-  fakeQueryValue, fakeAddValue, fakeRemoveValue,
+  fakeQueryValue, fakeAddValue, fakeUpdateValue, fakeRemoveValue,
 } from '@/services/Tech/Param';
 
 export default {
@@ -67,6 +67,14 @@ export default {
     },
     *addValue ({ payload, callback }, { call, put }) {
       const response = yield call(fakeAddValue, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    *updateValue ({ payload, callback }, { call, put }) {
+      const response = yield call(fakeUpdateValue, payload);
       yield put({
         type: 'saveData',
         payload: response,

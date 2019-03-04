@@ -72,6 +72,16 @@ export async function fakeAddValue (params) {
   });
 }
 
+export async function fakeUpdateValue (params) {
+  return request('/api/Param/UpdateValue', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'UpdateValue',
+    },
+  });
+}
+
 export async function fakeRemoveValue (params) {
   return request('/api/Param/deleteValue', {
     method: 'POST',
