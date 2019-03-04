@@ -41,6 +41,26 @@ export default [
         ],
       },
       {
+        path: '/techStd',
+        name: 'techStd',
+        icon: 'cluster',
+        authority: ['Defect_Read', 'Param_Read',],
+        routes: [
+          {
+            path: '/techStd/defect',
+            name: 'defect',
+            component: './Tech/Defect/List',
+            authority: ['Defect_Read'],
+          },
+          {
+            path: '/techStd/param',
+            name: 'param',
+            component: './Tech/Param/List',
+            authority: ['Param_Read'],
+          },
+        ],
+      },
+      {
         path: '/basic',
         name: 'basic',
         icon: 'cluster',

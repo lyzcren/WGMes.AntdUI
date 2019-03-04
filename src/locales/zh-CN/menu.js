@@ -37,6 +37,10 @@ export default {
   'menu.account.logout': '退出登录',
 
   // 望果菜单
+  // 生产基础资料
+  'menu.techStd': '工艺标准',
+  'menu.techStd.defect': '不良信息',
+  'menu.techStd.param': '工艺参数',
   // 基础资料
   'menu.basic': '基础资料',
   'menu.basic.dept': '部门',
