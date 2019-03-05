@@ -163,13 +163,21 @@ export class AuthorizeRoleForm extends PureComponent {
         const { loading, form, modalVisible, handleModalVisible, values, authorizeRole } = this.props;
         const { formVals, selectedRows } = this.state;
 
+        const footer = <div><Button
+            loading={false}
+            onClick={() => handleModalVisible(false, values)}
+            prefixCls="ant-btn"
+            ghost={false}
+            block={false}>关闭</Button></div>;
+
         return (
             <Modal
                 destroyOnClose
                 title={<div>授权 <Tag color="blue">{formVals.fName}</Tag>角色</div>}
                 visible={modalVisible}
                 width="760px"
-                okButtonProps={{ disabled: true }}
+                footer={footer}
+                // okButtonProps={{ disabled: true }}
                 // onOk={this.okHandle}
                 onCancel={() => handleModalVisible(false, values)}
                 afterClose={() => handleModalVisible()}

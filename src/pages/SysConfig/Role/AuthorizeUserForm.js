@@ -174,13 +174,21 @@ export class AuthorizeUserForm extends PureComponent {
         const { loading, form, authorizeUserModalVisible, handleModalVisible, values, authorizeUser } = this.props;
         const { formVals, selectedRows } = this.state;
 
+        const footer = <div><Button
+            loading={false}
+            onClick={() => handleModalVisible(false, values)}
+            prefixCls="ant-btn"
+            ghost={false}
+            block={false}>关闭</Button></div>;
+
         return (
             <Modal
                 destroyOnClose
                 title={<div>绑定 <Tag color="blue">{formVals.fName}</Tag>用户</div>}
                 visible={authorizeUserModalVisible}
                 width="760px"
-                okButtonProps={{ disabled: true }}
+                footer={footer}
+                // okButtonProps={{ disabled: true }}
                 // onOk={this.okHandle}
                 onCancel={() => handleModalVisible(false, values)}
                 afterClose={() => handleModalVisible()}

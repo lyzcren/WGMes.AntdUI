@@ -267,7 +267,7 @@ class TableList extends PureComponent {
     }).then(() => {
       const { defectManage: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
-        message.success('【' + record.fName + '】' + (fIsActive ? '禁用' : '启用') + '成功');
+        message.success('【' + record.fName + '】' + (fIsActive ?'启用' : '禁用' ) + '成功');
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {

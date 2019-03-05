@@ -292,13 +292,21 @@ export class ValuesForm extends PureComponent {
       },
     ];
 
+    const footer = <div><Button
+      loading={false}
+      onClick={() => handleModalVisible(false, values)}
+      prefixCls="ant-btn"
+      ghost={false}
+      block={false}>关闭</Button></div>;
+
     return (
       <Modal
         destroyOnClose
-        title={<div>修改 <Tag color="blue">{formVals.fName}</Tag> 参数值</div>}
+        title={< div > 修改 < Tag color="blue" > {formVals.fName}</Tag> 参数值</div >}
         visible={modalVisible}
-        okButtonProps={{ disabled: true }}
-        onOk={this.okHandle}
+        footer={footer}
+        // okButtonProps={{ disabled: true }}
+        // onOk={this.okHandle}
         onCancel={() => handleModalVisible(false, values)}
         afterClose={() => handleModalVisible()}
       >
@@ -318,7 +326,7 @@ export class ValuesForm extends PureComponent {
         >
           新增参数值
         </Button>
-      </Modal>
+      </Modal >
     );
   }
 };
