@@ -47,7 +47,7 @@ export const CreateForm = Form.create()(props => {
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="所属部门">
         {form.getFieldDecorator('fParentID', {
           rules: [{ required: true, message: '请输入所属部门' }],
-        })(<TreeSelect placeholder="请选择" style={{ width: 300 }} treeData={treeData} />)}
+        })(<TreeSelect placeholder="请选择" style={{ width: 300 }} treeData={treeData} treeDefaultExpandAll />)}
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="启用">
         {form.getFieldDecorator('fIsActive', {

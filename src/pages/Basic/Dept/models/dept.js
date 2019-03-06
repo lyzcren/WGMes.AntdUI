@@ -1,4 +1,4 @@
-import { fakeQuery, fakeRemove, fakeAdd, fakeUpdate, fakeActive } from '@/services/Basic/Dept';
+import { fakeQuery, fakeRemove, fakeAdd, fakeUpdate, fakeActive, fakeGetTreeData } from '@/services/Basic/Dept';
 
 export default {
   namespace: 'deptManage',
@@ -12,6 +12,7 @@ export default {
       status: 'ok',
       message: '',
     },
+    treeData: [],
   },
 
   effects: {
@@ -54,6 +55,14 @@ export default {
       });
       if (callback) callback();
     },
+    *getTreeData ({ payload }, { call, put }) {
+      alert('getTreeData');
+      const response = yield call(fakeGetTreeData, payload);
+      yield put({
+        type: 'saveTreeData',
+        payload: response,
+      });
+    },
   },
 
   reducers: {
@@ -67,6 +76,12 @@ export default {
       return {
         ...state,
         queryResult: action.payload ? action.payload : {},
+      };
+    },
+    saveTreeData (state, action) {
+      return {
+        ...state,
+        treeData: action.payload.list,
       };
     },
   },

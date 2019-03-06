@@ -77,7 +77,7 @@ class TableList extends PureComponent {
     // 列配置相关方法
     ColumnConfig.UpdateModalVisibleCallback = (record) => this.handleUpdateModalVisible(true, record);
     ColumnConfig.DeleteCallback = (record) => this.handleDelete(record);
-    ColumnConfig.ActiveCallback = (record) => this.handleActive(record);
+    ColumnConfig.ActiveCallback = (record) => this.handleActive(record, !record.fIsActive);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {

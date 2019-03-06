@@ -41,8 +41,9 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ defectManage, loading }) => ({
+@connect(({ defectManage, basicData, loading }) => ({
   defectManage,
+  basicData,
   loading: loading.models.defectManage,
 }))
 @Form.create()
@@ -274,7 +275,7 @@ class TableList extends PureComponent {
     }).then(() => {
       const { defectManage: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
-        message.success('【' + record.fName + '】' + (fIsActive ?'启用' : '禁用' ) + '成功');
+        message.success('【' + record.fName + '】' + (fIsActive ? '启用' : '禁用') + '成功');
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
@@ -491,7 +492,7 @@ class TableList extends PureComponent {
             />
           </div>
         </Card>
-        <CreateForm {...parentMethods} modalVisible={modalVisible} />
+        <CreateForm {...parentMethods} modalVisible={modalVisible} dispatch={this.props.dispatch} basicData={this.props.basicData} />
         {updateFormValues && Object.keys(updateFormValues).length ? (
           <UpdateForm
             {...updateMethods}

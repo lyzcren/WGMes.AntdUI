@@ -76,7 +76,7 @@ export class UpdateForm extends PureComponent {
                     {form.getFieldDecorator('fParentID', {
                         rules: [{ required: true, message: '请输入所属部门' }],
                         initialValue: formVals.fParentID,
-                    })(<TreeSelect placeholder="请选择" style={{ width: 300 }} treeData={treeData} />)}
+                    })(<TreeSelect placeholder="请选择" style={{ width: 300 }} treeData={treeData} treeDefaultExpandAll />)}
                 </FormItem>
                 <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="启用">
                     {form.getFieldDecorator('fIsActive', {
