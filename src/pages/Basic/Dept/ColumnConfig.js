@@ -1,5 +1,6 @@
 import React, { PureComponent, Fragment } from 'react';
 import { Switch, Popconfirm, Divider } from 'antd';
+import Authorized from '@/utils/Authorized';
 
 const activeData = ['启用', '禁用',];
 
@@ -36,13 +37,19 @@ class ColumnConfig {
       title: '操作',
       render: (text, record) => (
         <Fragment>
-          <a onClick={() => this._updateModalVisible(record)}>修改</a>
-          <Divider type="vertical" />
-          <Popconfirm title="是否要删除此行？" onConfirm={() => this._delete(record)}>
-            <a>删除</a>
-          </Popconfirm>
-          <Divider type="vertical" />
-          <a onClick={() => this._handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
+          <Authorized authority="Dept_Update">
+            <a onClick={() => this._updateModalVisible(record)}>修改</a>
+            <Divider type="vertical" />
+          </Authorized>
+          <Authorized authority="Dept_Delete">
+            <Popconfirm title="是否要删除此行？" onConfirm={() => this._delete(record)}>
+              <a>删除</a>
+            </Popconfirm>
+            <Divider type="vertical" />
+          </Authorized>
+          <Authorized authority="Dept_Active">
+            <a onClick={() => this._handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
+          </Authorized>
         </Fragment>
       ),
     },

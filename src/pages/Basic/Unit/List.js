@@ -27,6 +27,8 @@ import Authorized from '@/utils/Authorized';
 import { UpdateForm } from './UpdateForm';
 import { CreateForm } from './CreateForm';
 import { default as ColumnConfig } from './ColumnConfig';
+import { exportExcel } from '@/utils/getExcel';
+import { hasAuthority } from '@/utils/authority';
 
 import styles from './List.less';
 
@@ -114,34 +116,38 @@ class TableList extends PureComponent {
     this.search();
   };
 
+  getSearchParam = (fieldsValue) => {
+    const values = {
+      ...fieldsValue,
+    };
+    // 查询条件处理
+    const queryFilters = [];
+    if (fieldsValue.queryName) queryFilters.push({ name: "fName", compare: "%*%", value: fieldsValue.queryName });
+    if (fieldsValue.queryIsActive) queryFilters.push({ name: "fIsActive", compare: "=", value: fieldsValue.queryIsActive });
+
+    this.setState({
+      formValues: values,
+      queryFilters: queryFilters,
+    });
+
+    const { pageSize, filters, sorter } = this.currentPagination;
+    this.currentPagination = {
+      ...this.currentPagination,
+      current: 1,
+      queryFilters,
+    };
+    var params = { pagination: this.currentPagination };
+
+    return params;
+  }
+
   search = () => {
     const { dispatch, form } = this.props;
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      const values = {
-        ...fieldsValue,
-        updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
-      };
-      // 查询条件处理
-      const queryFilters = [];
-      if (fieldsValue.queryName) queryFilters.push({ name: "fName", compare: "%*%", value: fieldsValue.queryName });
-      if (fieldsValue.queryIsActive) queryFilters.push({ name: "fIsActive", compare: "=", value: fieldsValue.queryIsActive });
-
-      this.setState({
-        formValues: values,
-        queryFilters: queryFilters,
-      });
-
-      const { pageSize, filters, sorter } = this.currentPagination;
-      this.currentPagination = {
-        ...this.currentPagination,
-        current: 1,
-        queryFilters,
-      };
-      var params = { pagination: this.currentPagination };
-
+      var params = this.getSearchParam(fieldsValue);
       dispatch({
         type: 'unitManage/fetch',
         payload: params,
@@ -168,6 +174,29 @@ class TableList extends PureComponent {
     dispatch({
       type: 'unitManage/fetch',
       payload: params,
+    });
+  };
+
+  handleExport = (e) => {
+    const { dispatch, form } = this.props;
+
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+
+      var params = this.getSearchParam(fieldsValue);
+      var fileName = '单位.xls';
+      switch (e.key) {
+        case 'currentPage':
+          params = { ...params, exportPage: true }
+          fileName = '单位-第' + params.pagination.current + '页.xls';
+          break;
+        case 'allPage':
+          params = { ...params, exportAll: true }
+          break;
+        default:
+          break;
+      }
+      exportExcel('/api/unit/export', params, fileName)
     });
   };
 
@@ -267,7 +296,7 @@ class TableList extends PureComponent {
     }).then(() => {
       const { unitManage: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
-        message.success('【' + record.fName + '】' + (fIsActive ?'启用' : '禁用' ) + '成功');
+        message.success('【' + record.fName + '】' + (fIsActive ? '启用' : '禁用') + '成功');
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
@@ -421,9 +450,9 @@ class TableList extends PureComponent {
     const { selectedRows, modalVisible, updateModalVisible, updateFormValues, authorityModalVisible, authorizeUserModalVisible } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-        <Menu.Item key="remove">删除</Menu.Item>
-        <Menu.Item key="active">批量启用</Menu.Item>
-        <Menu.Item key="deactive">批量禁用</Menu.Item>
+        <Menu.Item key="remove" disabled={!hasAuthority('Unit_Delete')}>删除</Menu.Item>
+        <Menu.Item key="active" disabled={!hasAuthority('Unit_Active')}>批量启用</Menu.Item>
+        <Menu.Item key="deactive" disabled={!hasAuthority('Unit_Active')}>批量禁用</Menu.Item>
       </Menu>
     );
 
@@ -441,21 +470,35 @@ class TableList extends PureComponent {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             <div className={styles.tableListOperator}>
-              <Authorized authority="Role_Create">
+              <Authorized authority="Unit_Create">
                 <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
                   新建
               </Button>
               </Authorized>
+              <Authorized authority="Unit_Export">
+                <Dropdown overlay={
+                  <Menu onClick={this.handleExport} selectedKeys={[]}>
+                    <Menu.Item key="currentPage">当前页</Menu.Item>
+                    <Menu.Item key="allPage">所有页</Menu.Item>
+                  </Menu>
+                }>
+                  <Button>
+                    导出 <Icon type="down" />
+                  </Button>
+                </Dropdown>
+              </Authorized>
               {selectedRows.length > 0 && (
                 <span>
-                  <Authorized authority="Role_Delete">
+                  <Authorized authority="Unit_Delete">
                     <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
                   </Authorized>
-                  <Dropdown overlay={menu}>
-                    <Button>
-                      更多操作 <Icon type="down" />
-                    </Button>
-                  </Dropdown>
+                  <Authorized authority={["Unit_Delete", "Unit_Active"]}>
+                    <Dropdown overlay={menu}>
+                      <Button>
+                        更多操作 <Icon type="down" />
+                      </Button>
+                    </Dropdown>
+                  </Authorized>
                 </span>
               )}
             </div>

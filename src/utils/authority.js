@@ -21,3 +21,12 @@ export function setAuthority (authority) {
   // console.log(proAuthority);
   return localStorage.setItem('antd-pro-authority', JSON.stringify(proAuthority));
 }
+
+export function hasAuthority (currentAuthority) {
+  const authority = getAuthority();
+  if (authority.indexOf(currentAuthority) >= 0) {
+    return true;
+  }
+
+  return false;
+}
