@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import { connect } from 'dva';
 import moment from 'moment';
 import {
     Form,
@@ -6,7 +7,8 @@ import {
     Modal,
     Switch,
     Tag,
-    Select
+    Select,
+    TreeSelect,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import { validatorPhone, validatePassword, getPasswordStatus, passwordProgressMap } from '@/utils/validators';
@@ -17,6 +19,10 @@ const FormItem = Form.Item;
 const Option = Select.Option;
 const TypeData = GlobalConst.DefectTypeData;
 
+/* eslint react/no-multi-comp:0 */
+@connect(({ basicData }) => ({
+    basicData,
+}))
 @Form.create()
 export class UpdateForm extends PureComponent {
     static defaultProps = {
@@ -33,6 +39,13 @@ export class UpdateForm extends PureComponent {
         };
     }
 
+    componentDidMount () {
+        const { dispatch } = this.props;
+        dispatch({
+            type: 'basicData/getDeptTreeData',
+        });
+    }
+
     okHandle = () => {
         const { form, handleSubmit } = this.props;
         form.validateFields((err, fieldsValue) => {
@@ -45,7 +58,7 @@ export class UpdateForm extends PureComponent {
     };
 
     render () {
-        const { form, updateModalVisible, handleModalVisible, values } = this.props;
+        const { form, updateModalVisible, handleModalVisible, values, basicData } = this.props;
         const { formVals } = this.state;
 
         return (
@@ -76,6 +89,17 @@ export class UpdateForm extends PureComponent {
                     })(<Select style={{ width: 120 }}>
                         {TypeData.map(t => <Option key={t.value}>{t.text}</Option>)}
                     </Select>)}
+                </FormItem>
+                <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="部门">
+                    {form.getFieldDecorator('fDeptID', {
+                        rules: [{ required: true, message: '请选择部门' }],
+                        initialValue: formVals.fDeptID,
+                    })(<TreeSelect
+                        style={{ width: 300 }}
+                        dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                        treeData={basicData.deptTreeData}
+                        treeDefaultExpandAll
+                    />)}
                 </FormItem>
                 <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="启用">
                     {form.getFieldDecorator('fIsActive', {

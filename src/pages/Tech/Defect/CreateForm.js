@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import { connect } from 'dva';
 import {
   Form,
   Input,
@@ -18,18 +19,20 @@ const Option = Select.Option;
 const TypeData = GlobalConst.DefectTypeData;
 
 
+/* eslint react/no-multi-comp:0 */
+@connect(({ basicData }) => ({
+  basicData,
+}))
 // export const CreateForm = Form.create()(props => {
 @Form.create()
 export class CreateForm extends PureComponent {
   static defaultProps = {
-    basicData: {},
   };
 
   constructor(props) {
     super(props);
 
     this.state = {
-      basicData: props.basicData,
     };
   }
 
@@ -50,7 +53,7 @@ export class CreateForm extends PureComponent {
   };
 
   render () {
-    const { modalVisible, form, handleSubmit, handleModalVisible } = this.props;
+    const { modalVisible, form, handleSubmit, handleModalVisible, basicData } = this.props;
 
     return (
       <Modal
@@ -82,9 +85,8 @@ export class CreateForm extends PureComponent {
             rules: [{ required: true, message: '请选择部门' }],
           })(<TreeSelect
             style={{ width: 300 }}
-            // value={this.state.value}
             dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-            treeData={this.state.basicData.deptTreeData}
+            treeData={basicData.deptTreeData}
             treeDefaultExpandAll
           />)}
         </FormItem>

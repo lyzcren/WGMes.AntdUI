@@ -41,9 +41,8 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ defectManage, basicData, loading }) => ({
+@connect(({ defectManage, loading }) => ({
   defectManage,
-  basicData,
   loading: loading.models.defectManage,
 }))
 @Form.create()
@@ -492,7 +491,7 @@ class TableList extends PureComponent {
             />
           </div>
         </Card>
-        <CreateForm {...parentMethods} modalVisible={modalVisible} dispatch={this.props.dispatch} basicData={this.props.basicData} />
+        <CreateForm {...parentMethods} modalVisible={modalVisible} dispatch={this.props.dispatch} />
         {updateFormValues && Object.keys(updateFormValues).length ? (
           <UpdateForm
             {...updateMethods}
