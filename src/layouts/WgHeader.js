@@ -15,7 +15,7 @@ class HeaderView extends PureComponent {
     visible: true,
   };
 
-  static getDerivedStateFromProps(props, state) {
+  static getDerivedStateFromProps (props, state) {
     if (!props.autoHideHeader && !state.visible) {
       return {
         visible: true,
@@ -24,11 +24,11 @@ class HeaderView extends PureComponent {
     return null;
   }
 
-  componentDidMount() {
+  componentDidMount () {
     document.addEventListener('scroll', this.handScroll, { passive: true });
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     document.removeEventListener('scroll', this.handScroll);
   }
 
@@ -58,8 +58,8 @@ class HeaderView extends PureComponent {
     const { dispatch } = this.props;
     if (key === 'userCenter') {
       dispatch({
-        type: 'menu/getSelected',
-        payload: { selectedPath: '/account/center', menuData: this.props.menuData },
+        type: 'menu/setSelected',
+        payload: { selectedPath: '/account/center' },
       });
       // router.push('/account/center');
       return;
@@ -70,8 +70,8 @@ class HeaderView extends PureComponent {
     }
     if (key === 'userinfo') {
       dispatch({
-        type: 'menu/getSelected',
-        payload: { selectedPath: '/account/settings', menuData: this.props.menuData },
+        type: 'menu/setSelected',
+        payload: { selectedPath: '/account/settings' },
       });
       // router.push('/account/settings/base');
       return;
@@ -124,7 +124,7 @@ class HeaderView extends PureComponent {
     }
   };
 
-  render() {
+  render () {
     const { isMobile, handleMenuCollapse, setting } = this.props;
     const { navTheme, layout, fixedHeader } = setting;
     const { visible } = this.state;

@@ -68,6 +68,7 @@ export default [
                 path: '/techStd/route/detail',
                 name: 'routeDetail',
                 component: './Tech/Route/Detail',
+                authority: ['Route_Read'],
                 hideInMenu: true,
               },
             ],

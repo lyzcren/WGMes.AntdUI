@@ -9,7 +9,7 @@ import { getFlatMenuKeys } from '@/components/WgSiderMenu/SiderMenuUtils';
 const { check } = Authorized;
 
 // Conversion router to menu.
-function formatter(data, parentAuthority, parentName) {
+function formatter (data, parentAuthority, parentName) {
   return data
     .map(item => {
       if (!item.name || !item.path) {
@@ -68,6 +68,32 @@ const filterMenuData = menuData => {
     .map(item => check(item.authority, getSubMenu(item)))
     .filter(item => item);
 };
+
+
+const getSubRoute = item => {
+  // doc: add hideChildrenInMenu
+  if (item.children && item.children.some(child => child.name)) {
+    return {
+      ...item,
+      children: filterRouteData(item.children), // eslint-disable-line
+    };
+  }
+  return item;
+};
+
+/**
+ * filter routeData
+ */
+const filterRouteData = menuData => {
+  if (!menuData) {
+    return [];
+  }
+  return menuData
+    .filter(item => item.name)
+    .map(item => check(item.authority, getSubRoute(item)))
+    .filter(item => item);
+};
+
 /**
  * 获取面包屑映射
  * @param {Object} menuData 菜单配置
@@ -107,6 +133,20 @@ const matchParamsPath = (pathname, breadcrumbNameMap) => {
   return breadcrumbNameMap[pathKey];
 };
 
+// 传参处理
+const appendRouteParam = (routeItems, path, params) => {
+  return routeItems.map(routeItem => {
+    if (routeItem && routeItem.children) {
+      routeItem.children = appendRouteParam(routeItem.children, path, params);
+    }
+    if (routeItem.path == path) {
+      return { ...routeItem, ...params };
+    } else {
+      return routeItem;
+    }
+  });
+};
+
 const memoizeOneGetBreadcrumbNameMap = memoizeOne(getBreadcrumbNameMap, isEqual);
 
 export default {
@@ -114,50 +154,50 @@ export default {
 
   state: {
     menuData: [],
+    routeData: [],
     breadcrumbNameMap: {},
     selectedPath: '',
     selectedKeys: [],
   },
 
   effects: {
-    *getMenuData({ payload }, { put }) {
+    *getMenuData ({ payload }, { put }) {
       const { routes, authority, defaultPath } = payload;
       const menuData = filterMenuData(memoizeOneFormatter(routes, authority));
+      const routeData = filterRouteData(memoizeOneFormatter(routes, authority));
       const breadcrumbNameMap = memoizeOneGetBreadcrumbNameMap(menuData);
       // 加载默认页面
       const selectedPath = defaultPath;
       let selectedKeys = getSelectedMenuKeys(selectedPath, menuData);
       yield put({
         type: 'save',
-        payload: { menuData, breadcrumbNameMap, selectedPath, selectedKeys },
+        payload: { menuData, routeData, breadcrumbNameMap, selectedPath, selectedKeys },
       });
     },
-    *getSelected({ payload }, { put }) {
-      const { selectedPath, menuData } = payload;
+    *setSelected ({ payload }, { put, call, select }) {
+      const { selectedPath } = payload;
+      const menu = yield select(state => state.menu);
+      const { menuData, routeData } = menu;
+      let routeDataWithParam = appendRouteParam(routeData, selectedPath, payload);
+
       let selectedKeys = getSelectedMenuKeys(selectedPath, menuData);
       yield put({
-        type: 'selected',
-        payload: { selectedPath, selectedKeys },
+        type: 'save',
+        payload: { ...payload, selectedKeys, routeData: routeDataWithParam },
       });
     },
-    *closeMenu({ payload }, { put }) {
+    *closeMenu ({ payload }, { put }) {
       const selectedPath = "";
       const selectedKeys = [];
       yield put({
-        type: 'selected',
+        type: 'save',
         payload: { selectedPath, selectedKeys },
       });
     },
   },
 
   reducers: {
-    save(state, action) {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    },
-    selected(state, action) {
+    save (state, action) {
       return {
         ...state,
         ...action.payload,

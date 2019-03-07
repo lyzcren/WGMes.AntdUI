@@ -41,9 +41,10 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ routeManage, loading }) => ({
+@connect(({ routeManage, loading, menu }) => ({
   routeManage,
   loading: loading.models.routeManage,
+  menu,
 }))
 @Form.create()
 class TableList extends PureComponent {
@@ -209,7 +210,6 @@ class TableList extends PureComponent {
   };
 
   handleMenuClick = e => {
-    const { dispatch } = this.props;
     const { selectedRows } = this.state;
 
     if (selectedRows.length === 0) return;
@@ -248,7 +248,12 @@ class TableList extends PureComponent {
   };
 
   handleRouteModalVisible = (flag, record) => {
-    console.log(record);
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/setSelected',
+      payload: { selectedPath: '/techStd/route/detail', data: record },
+    });
+    // console.log(record);
   };
 
   handleAdd = fields => {
@@ -270,7 +275,6 @@ class TableList extends PureComponent {
   };
 
   handleUpdate = fields => {
-    console.log(fields);
     const { dispatch } = this.props;
     dispatch({
       type: 'routeManage/update',

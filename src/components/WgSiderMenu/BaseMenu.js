@@ -119,8 +119,8 @@ export default class BaseMenu extends PureComponent {
               const { dispatch } = this.props;
               // 使用state的selectedKeys绑定，不使用antd默认路由方式
               dispatch({
-                type: 'menu/getSelected',
-                payload: { ...this.props, selectedPath: itemPath, menuData: this.props.menuData },
+                type: 'menu/setSelected',
+                payload: { selectedPath: itemPath },
               });
             }
         }
@@ -138,7 +138,7 @@ export default class BaseMenu extends PureComponent {
     return `/${path || ''}`.replace(/\/+/g, '/');
   };
 
-  render() {
+  render () {
     const {
       openKeys,
       theme,

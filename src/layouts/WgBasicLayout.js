@@ -66,7 +66,7 @@ class WgBasicLayout extends React.PureComponent {
     this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual);
     let { location: { pathname } } = props;
     // 首次进入界面默认加载标签页
-    this.defaultPath = "/sysConfig/user";
+    this.defaultPath = "/techStd/route";
 
     const panes = [];
     this.state = {
@@ -81,6 +81,7 @@ class WgBasicLayout extends React.PureComponent {
       dispatch,
       route: { routes, authority },
       menuData,
+      routeData,
     } = this.props;
 
     dispatch({
@@ -121,7 +122,7 @@ class WgBasicLayout extends React.PureComponent {
     return breadcrumbNameMap[pathKey];
   };
 
-  getRouterAuthority = (pathname, routeData) => {
+  getRouterAuthority = (pathname, routes) => {
     let routeAuthority = ['noAuthority'];
     const getAuthority = (key, routes) => {
       routes.map(route => {
@@ -134,7 +135,7 @@ class WgBasicLayout extends React.PureComponent {
       });
       return routeAuthority;
     };
-    return getAuthority(pathname, routeData);
+    return getAuthority(pathname, routes);
   };
 
   getPageTitle = (pathname, breadcrumbNameMap) => {
@@ -194,8 +195,9 @@ class WgBasicLayout extends React.PureComponent {
     const closable = selectedPath === this.defaultPath ? false : true;
     const pane = panes.find(p => p.key === activeKey);
     if (!pane) {
-      var componentMaps = getComponentMaps(this.props.menuData);
+      var componentMaps = getComponentMaps(this.props.routeData);
       var componentMap = componentMaps.find(com => com.path == selectedPath);
+      // console.log(componentMap);
       if (componentMap) {// 打开默认首页
         panes.push({ title: componentMap.name, content: componentMap.component, key: activeKey, closable: closable });
         this.changeTabActiveKey({ panes, activeKey });
@@ -231,8 +233,8 @@ class WgBasicLayout extends React.PureComponent {
     this.setState(state);
     const { dispatch } = this.props;
     dispatch({
-      type: 'menu/getSelected',
-      payload: { ...this.props, selectedPath: activeKey, menuData: this.props.menuData },
+      type: 'menu/setSelected',
+      payload: { selectedPath: activeKey },
     });
   }
 
@@ -282,9 +284,10 @@ class WgBasicLayout extends React.PureComponent {
             onChange={this.onChange} onEdit={this.onEdit}
             hideAdd type="editable-card">
             {
-              this.state.panes.map(pane => <TabPane tab={pane.title} className={styles.tabContent} key={pane.key} closable={pane.closable}>
-                <Route>{<pane.content />}</Route>
-              </TabPane>)
+              this.state.panes.map(pane =>
+                <TabPane tab={pane.title} className={styles.tabContent} key={pane.key} closable={pane.closable}>
+                  <Route>{<pane.content />}</Route>
+                </TabPane>)
             }
           </Tabs>
           <Footer />
@@ -312,6 +315,7 @@ export default connect(({ global, setting, menu }) => ({
   collapsed: global.collapsed,
   layout: setting.layout,
   menuData: menu.menuData,
+  routeData: menu.routeData,
   selectedPath: menu.selectedPath,
   selectedKeys: menu.selectedKeys,
   breadcrumbNameMap: menu.breadcrumbNameMap,
