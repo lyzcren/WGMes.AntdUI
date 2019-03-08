@@ -5,6 +5,7 @@ import Authorized from '@/utils/Authorized';
 import pathToRegexp from 'path-to-regexp';
 import { urlToList } from '@/components/_utils/pathTools';
 import { getFlatMenuKeys } from '@/components/WgSiderMenu/SiderMenuUtils';
+import { getComponentMaps } from '@/utils/utils'
 
 const { check } = Authorized;
 
@@ -155,44 +156,89 @@ export default {
   state: {
     menuData: [],
     routeData: [],
+    panes: [],
     breadcrumbNameMap: {},
-    selectedPath: '',
+    activeKey: '',
+    path: '',
     selectedKeys: [],
   },
 
   effects: {
     *getMenuData ({ payload }, { put }) {
-      const { routes, authority, defaultPath } = payload;
+      const { routes, authority } = payload;
       const menuData = filterMenuData(memoizeOneFormatter(routes, authority));
       const routeData = filterRouteData(memoizeOneFormatter(routes, authority));
       const breadcrumbNameMap = memoizeOneGetBreadcrumbNameMap(menuData);
-      // 加载默认页面
-      const selectedPath = defaultPath;
-      let selectedKeys = getSelectedMenuKeys(selectedPath, menuData);
       yield put({
         type: 'save',
-        payload: { menuData, routeData, breadcrumbNameMap, selectedPath, selectedKeys },
+        payload: { menuData, routeData, breadcrumbNameMap },
       });
     },
-    *setSelected ({ payload }, { put, call, select }) {
-      const { selectedPath } = payload;
-      const menu = yield select(state => state.menu);
-      const { menuData, routeData } = menu;
-      delete payload.selectedPath;
-      let routeDataWithParam = appendRouteParam(routeData, selectedPath, payload);
+    *openMenu ({ payload }, { put, call, select }) {
+      const { name, path, closable } = payload;
+      const { menuData, routeData, panes } = yield select(state => state.menu);
+      const activeKey = path;
+      const selectedKeys = getSelectedMenuKeys(activeKey, routeData);
+      const pane = panes.find(p => p.key === activeKey);
+      const componentMap = getComponentMaps(routeData).find(com => com.path == path);
+      if (!pane) {
+        if (componentMap) {// 打开Tab页
+          panes.push({ ...componentMap, key: activeKey, closable });
+        } else {
+          // TODO: 未找到路由时进行特殊处理
+          // notification.error({
+          //   message: "未找到路由.",
+          // });
+        }
+      }
 
-      let selectedKeys = getSelectedMenuKeys(selectedPath, menuData);
+      delete payload.path;
+      // 主要用于修改Tab页传入附加参数
+      const newPanes = panes.map((p) => {
+        if (p.key === activeKey) {
+          return { ...p, ...payload, key: activeKey };
+        } else {
+          return p;
+        }
+      });
+
       yield put({
         type: 'save',
-        payload: { ...payload, selectedPath, selectedKeys, routeData: routeDataWithParam },
+        payload: { ...payload, path, activeKey, selectedKeys, panes: newPanes },
       });
     },
-    *closeMenu ({ payload }, { put }) {
-      const selectedPath = "";
-      const selectedKeys = [];
+    *closeMenu ({ payload }, { put, call, select }) {
+      const { path, closable } = payload;
+      const { menuData, routeData, panes, activeKey } = yield select(state => state.menu);
+      let newActiveKey = activeKey;
+      const newPanes = panes.filter(pane => pane.key !== path);
+      if (activeKey === path) {
+        panes.forEach((pane, i) => {
+          if (pane.key === path) {
+            const lastIndex = i > 0 ? (i - 1) : 0;
+            newActiveKey = newPanes[lastIndex].key;
+          }
+        });
+      }
+      const selectedKeys = getSelectedMenuKeys(newActiveKey, routeData);
+
       yield put({
         type: 'save',
-        payload: { selectedPath, selectedKeys },
+        payload: { ...payload, path: newActiveKey, activeKey: newActiveKey, selectedKeys, panes: newPanes },
+      });
+    },
+    *disposeMenu ({ payload }, { put }) {
+      yield put({
+        type: 'save',
+        payload: {
+          menuData: [],
+          routeData: [],
+          panes: [],
+          breadcrumbNameMap: {},
+          activeKey: '',
+          path: '',
+          selectedKeys: [],
+        },
       });
     },
   },

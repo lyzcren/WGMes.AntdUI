@@ -242,8 +242,8 @@ class TableList extends PureComponent {
   handleProfileModalVisible = (flag, record) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'menu/setSelected',
-      payload: { selectedPath: '/techStd/route/profile', data: record },
+      type: 'menu/openMenu',
+      payload: { path: '/techStd/route/profile', data: record },
     });
   };
 

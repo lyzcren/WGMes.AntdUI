@@ -30,10 +30,10 @@ export const getMenuMatches = (flatMenuKeys, path) =>
  */
 export const getDefaultCollapsedSubMenus = props => {
   const {
-    selectedPath,
+    path,
     flatMenuKeys,
   } = props;
-  const pathname = selectedPath;
+  const pathname = path;
   return urlToList(pathname)
     .map(item => getMenuMatches(flatMenuKeys, item)[0])
     .filter(item => item);

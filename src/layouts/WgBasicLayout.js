@@ -21,7 +21,6 @@ import { urlToList } from '@/components/_utils/pathTools';
 import { getFlatMenuKeys } from '@/components/WgSiderMenu/SiderMenuUtils';
 import { Route, Switch } from 'react-router-dom'
 import { ComposeApplicator } from 'lodash-decorators/applicators';
-import { getComponentMaps } from '@/utils/utils'
 
 import styles from './BasicLayout.less';
 
@@ -68,10 +67,7 @@ class WgBasicLayout extends React.PureComponent {
     // 首次进入界面默认加载标签页
     this.defaultPath = "/techStd/route";
 
-    const panes = [];
     this.state = {
-      panes,
-      activeKey: props.selectedPath,
       selectedKeys: props.selectedKeys
     }
   }
@@ -81,7 +77,6 @@ class WgBasicLayout extends React.PureComponent {
       dispatch,
       route: { routes, authority },
       menuData,
-      routeData,
     } = this.props;
 
     dispatch({
@@ -92,7 +87,11 @@ class WgBasicLayout extends React.PureComponent {
     });
     dispatch({
       type: 'menu/getMenuData',
-      payload: { routes, authority, defaultPath: this.defaultPath },
+      payload: { routes, authority },
+    });
+    dispatch({
+      type: 'menu/openMenu',
+      payload: { path: this.defaultPath, closable: false },
     });
   }
 
@@ -102,11 +101,6 @@ class WgBasicLayout extends React.PureComponent {
     const { collapsed, isMobile } = this.props;
     if (isMobile && !preProps.isMobile && !collapsed) {
       this.handleMenuCollapse(false);
-    }
-    // 默认加载首页
-    if (this.props.selectedPath !== preProps.selectedPath) {
-      const { selectedPath } = this.props;
-      this.add({ selectedPath });
     }
   }
 
@@ -121,22 +115,6 @@ class WgBasicLayout extends React.PureComponent {
   matchParamsPath = (pathname, breadcrumbNameMap) => {
     const pathKey = Object.keys(breadcrumbNameMap).find(key => pathToRegexp(key).test(pathname));
     return breadcrumbNameMap[pathKey];
-  };
-
-  getRouterAuthority = (pathname, routes) => {
-    let routeAuthority = ['noAuthority'];
-    const getAuthority = (key, routes) => {
-      routes.map(route => {
-        if (route.path && pathToRegexp(route.path).test(key)) {
-          routeAuthority = route.authority;
-        } else if (route.routes) {
-          routeAuthority = getAuthority(key, route.routes);
-        }
-        return route;
-      });
-      return routeAuthority;
-    };
-    return getAuthority(pathname, routes);
   };
 
   getPageTitle = (pathname, breadcrumbNameMap) => {
@@ -183,67 +161,33 @@ class WgBasicLayout extends React.PureComponent {
   };
 
   onChange = (activeKey) => {
-    this.changeTabActiveKey({ activeKey });
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/openMenu',
+      payload: { path: activeKey },
+    });
   }
 
   onEdit = (targetKey, action) => {
     this[action](targetKey);
   }
 
-  add = ({ selectedPath }) => {
-    const { panes } = this.state;
-    const activeKey = selectedPath;
-    const pane = panes.find(p => p.key === activeKey);
-    const componentMap = getComponentMaps(this.props.routeData).find(com => com.path == selectedPath);
-    if (!pane) {
-      if (componentMap) {// 打开Tab页
-        componentMap.closable = selectedPath === this.defaultPath ? false : true;
-        panes.push({ ...componentMap, key: activeKey });
-        this.changeTabActiveKey({ panes, activeKey });
-      } else {
-        // TODO: 未找到路由时进行特殊处理
-        notification.error({
-          message: "未找到路由.",
-        });
-      }
-    } else {
-      // 主要用于修改Tab页传入附加参数
-      const newPanes = panes.map((p) => {
-        if (p.key === activeKey) {
-          return { ...componentMap, key: activeKey };
-        } else {
-          return p;
-        }
-      });
-      this.changeTabActiveKey({ panes: newPanes, activeKey });
-    }
+  add = ({ path }) => {
+    const { dispatch, panes } = this.props;
+    dispatch({
+      type: 'menu/openMenu',
+      payload: { path },
+    });
   }
 
   remove = (targetKey) => {
     const { dispatch } = this.props;
-    let activeKey = this.state.activeKey;
-    let lastIndex;
-    this.state.panes.forEach((pane, i) => {
-      if (pane.key === targetKey) {
-        lastIndex = i > 0 ? (i - 1) : 0;
-      }
+    dispatch({
+      type: 'menu/closeMenu',
+      payload: { path: targetKey },
     });
-    const panes = this.state.panes.filter(pane => pane.key !== targetKey);
-    if (lastIndex >= 0 && activeKey === targetKey) {
-      activeKey = panes[lastIndex].key;
-    }
-    this.changeTabActiveKey({ panes, activeKey });
   }
 
-  changeTabActiveKey = (state) => {
-    const { dispatch } = this.props;
-    const { activeKey } = state;
-    dispatch({
-      type: 'menu/setSelected',
-      payload: { selectedPath: activeKey },
-    });
-    this.setState(state);
-  }
 
   render () {
     const {
@@ -259,8 +203,6 @@ class WgBasicLayout extends React.PureComponent {
     } = this.props;
 
     const isTop = PropsLayout === 'topmenu';
-    const routerConfig = this.getRouterAuthority(pathname, routes);
-    const contentStyle = !fixedHeader ? { paddingTop: 0 } : {};
 
     const layout = (
       <Layout>
@@ -287,13 +229,13 @@ class WgBasicLayout extends React.PureComponent {
             isMobile={isMobile}
             {...this.props}
           />
-          <Tabs className={styles.tabMenu} activeKey={this.state.activeKey}
+          <Tabs className={styles.tabMenu} activeKey={this.props.activeKey}
             onChange={this.onChange} onEdit={this.onEdit}
             // TODO: Tabs标签页右键菜单
             // tabBarExtraContent={<Button type="primary">主操作</Button>}
             hideAdd type="editable-card">
             {
-              this.state.panes.map(pane =>
+              this.props.panes.map(pane =>
                 <TabPane tab={pane.name} className={styles.tabContent} key={pane.key} closable={pane.closable}>
                   <Route>{<pane.component {...pane} />}</Route>
                 </TabPane>)
@@ -324,8 +266,9 @@ export default connect(({ global, setting, menu }) => ({
   collapsed: global.collapsed,
   layout: setting.layout,
   menuData: menu.menuData,
-  routeData: menu.routeData,
-  selectedPath: menu.selectedPath,
+  panes: menu.panes,
+  activeKey: menu.activeKey,
+  path: menu.path,
   selectedKeys: menu.selectedKeys,
   breadcrumbNameMap: menu.breadcrumbNameMap,
   ...setting,

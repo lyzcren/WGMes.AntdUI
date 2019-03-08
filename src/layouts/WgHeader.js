@@ -58,8 +58,8 @@ class HeaderView extends PureComponent {
     const { dispatch } = this.props;
     if (key === 'userCenter') {
       dispatch({
-        type: 'menu/setSelected',
-        payload: { selectedPath: '/account/center' },
+        type: 'menu/openMenu',
+        payload: { path: '/account/center' },
       });
       // router.push('/account/center');
       return;
@@ -70,8 +70,8 @@ class HeaderView extends PureComponent {
     }
     if (key === 'userinfo') {
       dispatch({
-        type: 'menu/setSelected',
-        payload: { selectedPath: '/account/settings' },
+        type: 'menu/openMenu',
+        payload: { path: '/account/settings' },
       });
       // router.push('/account/settings/base');
       return;
@@ -81,7 +81,7 @@ class HeaderView extends PureComponent {
         type: 'login/logout',
       });
       dispatch({
-        type: 'menu/closeMenu',
+        type: 'menu/disposeMenu',
       });
     }
   };

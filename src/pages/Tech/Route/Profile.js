@@ -41,15 +41,24 @@ const ButtonGroup = Button.Group;
 
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ routeManage, loading }) => ({
+@connect(({ routeManage, loading, menu, }) => ({
   routeManage,
   loading: loading.models.routeManage,
+  menu,
 }))
 @Form.create()
 class TableList extends PureComponent {
   state = {
     currentStep: 0,
   };
+
+  close () {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/closeMenu',
+      payload: { path: '/techStd/route/profile' },
+    });
+  }
 
   next () {
     const currentStep = this.state.currentStep + 1;
@@ -97,7 +106,8 @@ class TableList extends PureComponent {
             </Button>
           </Dropdown>
         </ButtonGroup>
-        <Button type="primary">主操作</Button>
+        <Button type="primary">保存</Button>
+        <Button onClick={() => this.close()}>关闭</Button>
       </Fragment>
     );
 

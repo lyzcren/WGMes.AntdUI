@@ -19,9 +19,9 @@ export default class WgSiderMenu extends PureComponent {
 
   static getDerivedStateFromProps(props, state) {
     const { pathname } = state;
-    if (props.selectedPath !== pathname) {
+    if (props.path !== pathname) {
       return {
-        pathname: props.selectedPath,
+        pathname: props.path,
         openKeys: getDefaultCollapsedSubMenus(props),
       };
     }
