@@ -48,8 +48,18 @@ const ButtonGroup = Button.Group;
 @Form.create()
 class TableList extends PureComponent {
   state = {
-    formValues: {},
+    currentStep: 0,
   };
+
+  next () {
+    const currentStep = this.state.currentStep + 1;
+    this.setState({ currentStep });
+  }
+
+  prev () {
+    const currentStep = this.state.currentStep - 1;
+    this.setState({ currentStep });
+  }
 
   render () {
     console.log(this.props);
@@ -58,10 +68,11 @@ class TableList extends PureComponent {
       data,
       loading,
     } = this.props;
+    const { currentStep } = this.state;
 
     const description = (
       <DescriptionList className={styles.headerList} size="small" col="2">
-        {/* <Description term="名称">{data.fName}</Description> */}
+        <Description term="名称">{data.fName}</Description>
         <Description term="编码">{data.fNumber}</Description>
         <Description term="创建时间">{data.fCreateDate}</Description>
         <Description term="备注">{data.fComments}</Description>
@@ -96,12 +107,23 @@ class TableList extends PureComponent {
           <div className={styles.textSecondary}>状态</div>
           <div className={styles.heading}>待审批</div>
         </Col>
-        <Col xs={24} sm={12}>
+        {/* <Col xs={24} sm={12}>
           <div className={styles.textSecondary}>订单金额</div>
           <div className={styles.heading}>¥ 568.08</div>
-        </Col>
+        </Col> */}
       </Row>
     );
+
+    const steps = [{
+      title: 'First',
+      content: 'First-content',
+    }, {
+      title: 'Second',
+      content: 'Second-content',
+    }, {
+      title: 'Last',
+      content: 'Last-content',
+    }];
 
     return (
       <Layout>
@@ -120,49 +142,35 @@ class TableList extends PureComponent {
 
         <Content style={{ margin: '24px 0' }}>
           <Layout style={{ backgroundColor: '#ffffff' }}>
-            <Sider>
-              <GridContent>
-                <Card bordered={false}>
-                  <Steps direction="vertical" current={1}>
-                    <Step title="Finished" description="This is a description." />
-                    <Step title="In Progress" description="This is a description." />
-                    <Step title="Waiting" description="This is a description." />
-                    <Step title="Finished" description="This is a description." />
-                    <Step title="In Progress" description="This is a description." />
-                    <Step title="Waiting" description="This is a description." />
-                    <Step title="Finished" description="This is a description." />
-                    <Step title="In Progress" description="This is a description." />
-                    <Step title="Waiting" description="This is a description." />
-                    <Step title="Finished" description="This is a description." />
-                    <Step title="In Progress" description="This is a description." />
-                    <Step title="Waiting" description="This is a description." />
-                  </Steps>
-                </Card>
-              </GridContent>
+            <Sider style={{ backgroundColor: '#ffffff' }}>
+              <Card bordered={false}>
+                <Steps direction="vertical" current={currentStep}>
+                  {steps.map(item => <Step key={item.title} title={item.title} />)}
+                </Steps>
+              </Card>
             </Sider>
             <Content>
               <GridContent>
-                <Card bordered={false}>
-                  <Steps direction="vertical" current={1}>
-                    <Step title="Finished" description="This is a description." />
-                    <Step title="In Progress" description="This is a description." />
-                    <Step title="Waiting" description="This is a description." />
-                    <Step title="Finished" description="This is a description." />
-                    <Step title="In Progress" description="This is a description." />
-                    <Step title="Waiting" description="This is a description." />
-                    <Step title="Finished" description="This is a description." />
-                    <Step title="In Progress" description="This is a description." />
-                    <Step title="Waiting" description="This is a description." />
-                    <Step title="Finished" description="This is a description." />
-                    <Step title="In Progress" description="This is a description." />
-                    <Step title="Waiting" description="This is a description." />
-                  </Steps>
-                </Card>
+                <div className="steps-content">{steps[currentStep].content}</div>
+                <div className="steps-action">
+                  {
+                    currentStep < steps.length - 1
+                    && <Button type="primary" onClick={() => this.next()}>下一步</Button>
+                  }
+                  {
+                    currentStep === steps.length - 1
+                    && <Button type="primary" onClick={() => message.success('Processing complete!')}>完成</Button>
+                  }
+                  {
+                    currentStep > 0
+                    && <Button style={{ marginLeft: 8 }} onClick={() => this.prev()}>上一步</Button>
+                  }
+                </div>
               </GridContent>
             </Content>
           </Layout>
         </Content>
-      </Layout>
+      </Layout >
     );
   }
 }

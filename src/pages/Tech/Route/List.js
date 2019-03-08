@@ -70,7 +70,7 @@ class TableList extends PureComponent {
       payload: params,
     });
     // 列配置相关方法
-    ColumnConfig.RouteModalVisibleCallback = (record) => this.handleRouteModalVisible(true, record);
+    ColumnConfig.ProfileModalVisibleCallback = (record) => this.handleProfileModalVisible(true, record);
     ColumnConfig.UpdateModalVisibleCallback = (record) => this.handleUpdateModalVisible(true, record);
     ColumnConfig.DeleteCallback = (record) => this.handleDelete(record);
     ColumnConfig.ActiveCallback = (record) => this.handleActive(record, !record.fIsActive);
@@ -239,7 +239,7 @@ class TableList extends PureComponent {
     });
   };
 
-  handleRouteModalVisible = (flag, record) => {
+  handleProfileModalVisible = (flag, record) => {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/setSelected',

@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { Layout, Tabs, notification } from 'antd';
+import { Layout, Tabs, notification, Button } from 'antd';
 import DocumentTitle from 'react-document-title';
 import isEqual from 'lodash/isEqual';
 import memoizeOne from 'memoize-one';
@@ -103,6 +103,7 @@ class WgBasicLayout extends React.PureComponent {
     if (isMobile && !preProps.isMobile && !collapsed) {
       this.handleMenuCollapse(false);
     }
+    // 默认加载首页
     if (this.props.selectedPath !== preProps.selectedPath) {
       const { selectedPath } = this.props;
       this.add({ selectedPath });
@@ -190,13 +191,13 @@ class WgBasicLayout extends React.PureComponent {
   }
 
   add = ({ selectedPath }) => {
-    const panes = this.state.panes;
+    const { panes } = this.state;
     const activeKey = selectedPath;
-    const closable = selectedPath === this.defaultPath ? false : true;
     const pane = panes.find(p => p.key === activeKey);
     const componentMap = getComponentMaps(this.props.routeData).find(com => com.path == selectedPath);
     if (!pane) {
       if (componentMap) {// 打开Tab页
+        componentMap.closable = selectedPath === this.defaultPath ? false : true;
         panes.push({ ...componentMap, key: activeKey });
         this.changeTabActiveKey({ panes, activeKey });
       } else {
@@ -224,7 +225,7 @@ class WgBasicLayout extends React.PureComponent {
     let lastIndex;
     this.state.panes.forEach((pane, i) => {
       if (pane.key === targetKey) {
-        lastIndex = i - 1;
+        lastIndex = i > 0 ? (i - 1) : 0;
       }
     });
     const panes = this.state.panes.filter(pane => pane.key !== targetKey);
@@ -235,13 +236,13 @@ class WgBasicLayout extends React.PureComponent {
   }
 
   changeTabActiveKey = (state) => {
-    const { activeKey } = state;
-    this.setState(state);
     const { dispatch } = this.props;
+    const { activeKey } = state;
     dispatch({
       type: 'menu/setSelected',
       payload: { selectedPath: activeKey },
     });
+    this.setState(state);
   }
 
   render () {
@@ -288,6 +289,8 @@ class WgBasicLayout extends React.PureComponent {
           />
           <Tabs className={styles.tabMenu} activeKey={this.state.activeKey}
             onChange={this.onChange} onEdit={this.onEdit}
+            // TODO: Tabs标签页右键菜单
+            // tabBarExtraContent={<Button type="primary">主操作</Button>}
             hideAdd type="editable-card">
             {
               this.state.panes.map(pane =>

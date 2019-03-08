@@ -42,7 +42,7 @@ class ColumnConfig {
       render: (text, record) => (
         <Fragment>
           <Authorized authority="Route_Update">
-            <a onClick={() => this._routeModalVisible(record)}>路线</a>
+            <a onClick={() => this._profileModalVisible(record)}>详情</a>
             <Divider type="vertical" />
           </Authorized>
           <Authorized authority="Route_Update">
@@ -64,9 +64,9 @@ class ColumnConfig {
   ];
 
   // 路线方法
-  RouteModalVisibleCallback = (record) => { };
-  _routeModalVisible = (record) => {
-    this.RouteModalVisibleCallback(record);
+  ProfileModalVisibleCallback = (record) => { };
+  _profileModalVisible = (record) => {
+    this.ProfileModalVisibleCallback(record);
   };
 
   // 修改方法
