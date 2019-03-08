@@ -194,21 +194,27 @@ class WgBasicLayout extends React.PureComponent {
     const activeKey = selectedPath;
     const closable = selectedPath === this.defaultPath ? false : true;
     const pane = panes.find(p => p.key === activeKey);
+    const componentMap = getComponentMaps(this.props.routeData).find(com => com.path == selectedPath);
     if (!pane) {
-      var componentMaps = getComponentMaps(this.props.routeData);
-      var componentMap = componentMaps.find(com => com.path == selectedPath);
-      // console.log(componentMap);
-      if (componentMap) {// 打开默认首页
-        panes.push({ title: componentMap.name, content: componentMap.component, key: activeKey, closable: closable });
+      if (componentMap) {// 打开Tab页
+        panes.push({ ...componentMap, key: activeKey });
         this.changeTabActiveKey({ panes, activeKey });
       } else {
-        // TODO:若当前用户没有设定的首页权限，进入默认首页
+        // TODO: 未找到路由时进行特殊处理
         notification.error({
-          message: "当前用户无权限",
+          message: "未找到路由.",
         });
       }
     } else {
-      this.changeTabActiveKey({ panes, activeKey });
+      // 主要用于修改Tab页传入附加参数
+      const newPanes = panes.map((p) => {
+        if (p.key === activeKey) {
+          return { ...componentMap, key: activeKey };
+        } else {
+          return p;
+        }
+      });
+      this.changeTabActiveKey({ panes: newPanes, activeKey });
     }
   }
 
@@ -285,8 +291,8 @@ class WgBasicLayout extends React.PureComponent {
             hideAdd type="editable-card">
             {
               this.state.panes.map(pane =>
-                <TabPane tab={pane.title} className={styles.tabContent} key={pane.key} closable={pane.closable}>
-                  <Route>{<pane.content />}</Route>
+                <TabPane tab={pane.name} className={styles.tabContent} key={pane.key} closable={pane.closable}>
+                  <Route>{<pane.component {...pane} />}</Route>
                 </TabPane>)
             }
           </Tabs>

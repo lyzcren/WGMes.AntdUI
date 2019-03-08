@@ -178,12 +178,13 @@ export default {
       const { selectedPath } = payload;
       const menu = yield select(state => state.menu);
       const { menuData, routeData } = menu;
+      delete payload.selectedPath;
       let routeDataWithParam = appendRouteParam(routeData, selectedPath, payload);
 
       let selectedKeys = getSelectedMenuKeys(selectedPath, menuData);
       yield put({
         type: 'save',
-        payload: { ...payload, selectedKeys, routeData: routeDataWithParam },
+        payload: { ...payload, selectedPath, selectedKeys, routeData: routeDataWithParam },
       });
     },
     *closeMenu ({ payload }, { put }) {

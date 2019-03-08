@@ -2,6 +2,7 @@ import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
 import {
+  Layout,
   Row,
   Col,
   Card,
@@ -321,7 +322,7 @@ class TableList extends PureComponent {
     }).then(() => {
       const { paramManage: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
-        message.success('【' + record.fName + '】' + (fIsActive ?'启用' : '禁用' ) + '成功');
+        message.success('【' + record.fName + '】' + (fIsActive ? '启用' : '禁用') + '成功');
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
@@ -493,73 +494,75 @@ class TableList extends PureComponent {
       handleModalVisible: this.handleValuesModalVisible,
     };
     return (
-      <GridContent>
-        <Card bordered={false}>
-          <div className={styles.tableList}>
-            <div className={styles.tableListForm}>{this.renderForm()}</div>
-            <div className={styles.tableListOperator}>
-              <Authorized authority="Param_Create">
-                <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
-                  新建
+      <div style={{ margin: '-24px -24px 0' }}>
+        <GridContent>
+          <Card bordered={false}>
+            <div className={styles.tableList}>
+              <div className={styles.tableListForm}>{this.renderForm()}</div>
+              <div className={styles.tableListOperator}>
+                <Authorized authority="Param_Create">
+                  <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+                    新建
               </Button>
-              </Authorized>
-              <Authorized authority="Param_Export">
-                <Dropdown overlay={
-                  <Menu onClick={this.handleExport} selectedKeys={[]}>
-                    <Menu.Item key="currentPage">当前页</Menu.Item>
-                    <Menu.Item key="allPage">所有页</Menu.Item>
-                  </Menu>
-                }>
-                  <Button>
-                    导出 <Icon type="down" />
-                  </Button>
-                </Dropdown>
-              </Authorized>
-              {selectedRows.length > 0 && (
-                <span>
-                  <Authorized authority="Param_Delete">
-                    <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
-                  </Authorized>
-                  <Authorized authority={["Param_Delete", "Param_Active"]}>
-                    <Dropdown overlay={menu}>
-                      <Button>
-                        更多操作 <Icon type="down" />
-                      </Button>
-                    </Dropdown>
-                  </Authorized>
-                </span>
-              )}
+                </Authorized>
+                <Authorized authority="Param_Export">
+                  <Dropdown overlay={
+                    <Menu onClick={this.handleExport} selectedKeys={[]}>
+                      <Menu.Item key="currentPage">当前页</Menu.Item>
+                      <Menu.Item key="allPage">所有页</Menu.Item>
+                    </Menu>
+                  }>
+                    <Button>
+                      导出 <Icon type="down" />
+                    </Button>
+                  </Dropdown>
+                </Authorized>
+                {selectedRows.length > 0 && (
+                  <span>
+                    <Authorized authority="Param_Delete">
+                      <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
+                    </Authorized>
+                    <Authorized authority={["Param_Delete", "Param_Active"]}>
+                      <Dropdown overlay={menu}>
+                        <Button>
+                          更多操作 <Icon type="down" />
+                        </Button>
+                      </Dropdown>
+                    </Authorized>
+                  </span>
+                )}
+              </div>
+              <StandardTable
+                rowKey="fItemID"
+                selectedRows={selectedRows}
+                loading={loading}
+                data={data}
+                columns={ColumnConfig.columns}
+                onSelectRow={this.handleSelectRows}
+                onChange={this.handleStandardTableChange}
+              />
             </div>
-            <StandardTable
-              rowKey="fItemID"
-              selectedRows={selectedRows}
-              loading={loading}
-              data={data}
-              columns={ColumnConfig.columns}
-              onSelectRow={this.handleSelectRows}
-              onChange={this.handleStandardTableChange}
+          </Card>
+          <CreateForm {...parentMethods} modalVisible={modalVisible} />
+          {updateFormValues && Object.keys(updateFormValues).length ? (
+            <UpdateForm
+              {...updateMethods}
+              updateModalVisible={updateModalVisible}
+              values={updateFormValues}
             />
-          </div>
-        </Card>
-        <CreateForm {...parentMethods} modalVisible={modalVisible} />
-        {updateFormValues && Object.keys(updateFormValues).length ? (
-          <UpdateForm
-            {...updateMethods}
-            updateModalVisible={updateModalVisible}
-            values={updateFormValues}
-          />
-        ) : null}
-        {updateFormValues && Object.keys(updateFormValues).length ? (
-          <ValuesForm
-            {...valuesMethods}
-            modalVisible={valuesModalVisible}
-            values={updateFormValues}
-            data={this.props.paramManage.paramValues}
-            queryResult={this.props.paramManage.queryResult}
-            dispatch={this.props.dispatch}
-          />
-        ) : null}
-      </GridContent>
+          ) : null}
+          {updateFormValues && Object.keys(updateFormValues).length ? (
+            <ValuesForm
+              {...valuesMethods}
+              modalVisible={valuesModalVisible}
+              values={updateFormValues}
+              data={this.props.paramManage.paramValues}
+              queryResult={this.props.paramManage.queryResult}
+              dispatch={this.props.dispatch}
+            />
+          ) : null}
+        </GridContent>
+      </div>
     );
   }
 }

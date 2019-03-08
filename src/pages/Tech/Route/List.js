@@ -1,7 +1,7 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import moment from 'moment';
 import {
+  Layout,
   Row,
   Col,
   Card,
@@ -12,15 +12,9 @@ import {
   Button,
   Dropdown,
   Menu,
-  InputNumber,
-  DatePicker,
   Modal,
   message,
-  Badge,
-  Divider,
-  Radio, Popover, Switch, Progress, notification, Popconfirm,
 } from 'antd';
-import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
@@ -132,7 +126,6 @@ class TableList extends PureComponent {
       queryFilters: queryFilters,
     });
 
-    const { pageSize, filters, sorter } = this.currentPagination;
     this.currentPagination = {
       ...this.currentPagination,
       current: 1,
@@ -165,7 +158,6 @@ class TableList extends PureComponent {
       queryFilters: [],
     });
 
-    const { pageSize, filters, sorter } = this.currentPagination;
     this.currentPagination = {
       ...this.currentPagination,
       current: 1,
@@ -180,7 +172,7 @@ class TableList extends PureComponent {
   };
 
   handleExport = (e) => {
-    const { dispatch, form } = this.props;
+    const { form } = this.props;
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
@@ -251,13 +243,12 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/setSelected',
-      payload: { selectedPath: '/techStd/route/detail', data: record },
+      payload: { selectedPath: '/techStd/route/profile', data: record },
     });
-    // console.log(record);
   };
 
   handleAdd = fields => {
-    const { dispatch, form } = this.props;
+    const { dispatch } = this.props;
     dispatch({
       type: 'routeManage/add',
       payload: fields
@@ -358,7 +349,6 @@ class TableList extends PureComponent {
   };
 
   batchDelete = (selectedRows) => {
-    const { dispatch } = this.props;
     if (typeof selectedRows === 'object' && !Array.isArray(selectedRows)) {
       selectedRows = [selectedRows];
     }
@@ -394,7 +384,6 @@ class TableList extends PureComponent {
   };
 
   batchActive = (selectedRows, fIsActive) => {
-    const { dispatch } = this.props;
     if (typeof selectedRows === 'object' && !Array.isArray(selectedRows)) {
       selectedRows = [selectedRows];
     }
@@ -454,10 +443,10 @@ class TableList extends PureComponent {
 
   render () {
     const {
-      routeManage: { data, queryResult },
+      routeManage: { data },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, updateFormValues, authorityModalVisible, authorizeUserModalVisible } = this.state;
+    const { selectedRows, modalVisible, updateModalVisible, updateFormValues } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove" disabled={!hasAuthority('Route_Delete')}>删除</Menu.Item>
@@ -475,63 +464,65 @@ class TableList extends PureComponent {
       handleSubmit: this.handleUpdate,
     };
     return (
-      <GridContent>
-        <Card bordered={false}>
-          <div className={styles.tableList}>
-            <div className={styles.tableListForm}>{this.renderForm()}</div>
-            <div className={styles.tableListOperator}>
-              <Authorized authority="Route_Create">
-                <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
-                  新建
+      <div style={{ margin: '-24px -24px 0' }}>
+        <GridContent>
+          <Card bordered={false}>
+            <div className={styles.tableList}>
+              <div className={styles.tableListForm}>{this.renderForm()}</div>
+              <div className={styles.tableListOperator}>
+                <Authorized authority="Route_Create">
+                  <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+                    新建
               </Button>
-              </Authorized>
-              <Authorized authority="Route_Export">
-                <Dropdown overlay={
-                  <Menu onClick={this.handleExport} selectedKeys={[]}>
-                    <Menu.Item key="currentPage">当前页</Menu.Item>
-                    <Menu.Item key="allPage">所有页</Menu.Item>
-                  </Menu>
-                }>
-                  <Button>
-                    导出 <Icon type="down" />
-                  </Button>
-                </Dropdown>
-              </Authorized>
-              {selectedRows.length > 0 && (
-                <span>
-                  <Authorized authority="Route_Delete">
-                    <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
-                  </Authorized>
-                  <Authorized authority={["Route_Delete", "Route_Active"]}>
-                    <Dropdown overlay={menu}>
-                      <Button>
-                        更多操作 <Icon type="down" />
-                      </Button>
-                    </Dropdown>
-                  </Authorized>
-                </span>
-              )}
+                </Authorized>
+                <Authorized authority="Route_Export">
+                  <Dropdown overlay={
+                    <Menu onClick={this.handleExport} selectedKeys={[]}>
+                      <Menu.Item key="currentPage">当前页</Menu.Item>
+                      <Menu.Item key="allPage">所有页</Menu.Item>
+                    </Menu>
+                  }>
+                    <Button>
+                      导出 <Icon type="down" />
+                    </Button>
+                  </Dropdown>
+                </Authorized>
+                {selectedRows.length > 0 && (
+                  <span>
+                    <Authorized authority="Route_Delete">
+                      <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
+                    </Authorized>
+                    <Authorized authority={["Route_Delete", "Route_Active"]}>
+                      <Dropdown overlay={menu}>
+                        <Button>
+                          更多操作 <Icon type="down" />
+                        </Button>
+                      </Dropdown>
+                    </Authorized>
+                  </span>
+                )}
+              </div>
+              <StandardTable
+                rowKey="fInterID"
+                selectedRows={selectedRows}
+                loading={loading}
+                data={data}
+                columns={ColumnConfig.columns}
+                onSelectRow={this.handleSelectRows}
+                onChange={this.handleStandardTableChange}
+              />
             </div>
-            <StandardTable
-              rowKey="fInterID"
-              selectedRows={selectedRows}
-              loading={loading}
-              data={data}
-              columns={ColumnConfig.columns}
-              onSelectRow={this.handleSelectRows}
-              onChange={this.handleStandardTableChange}
+          </Card>
+          <CreateForm {...parentMethods} modalVisible={modalVisible} />
+          {updateFormValues && Object.keys(updateFormValues).length ? (
+            <UpdateForm
+              {...updateMethods}
+              updateModalVisible={updateModalVisible}
+              values={updateFormValues}
             />
-          </div>
-        </Card>
-        <CreateForm {...parentMethods} modalVisible={modalVisible} />
-        {updateFormValues && Object.keys(updateFormValues).length ? (
-          <UpdateForm
-            {...updateMethods}
-            updateModalVisible={updateModalVisible}
-            values={updateFormValues}
-          />
-        ) : null}
-      </GridContent>
+          ) : null}
+        </GridContent>
+      </div>
     );
   }
 }

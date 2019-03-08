@@ -65,9 +65,9 @@ export default [
             authority: ['Route_Read'],
             routes: [
               {
-                path: '/techStd/route/detail',
-                name: 'routeDetail',
-                component: './Tech/Route/Detail',
+                path: '/techStd/route/profile',
+                name: 'routeProfile',
+                component: './Tech/Route/Profile',
                 authority: ['Route_Read'],
                 hideInMenu: true,
               },

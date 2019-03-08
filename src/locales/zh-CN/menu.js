@@ -42,7 +42,7 @@ export default {
   'menu.techStd.defect': '不良信息',
   'menu.techStd.param': '工艺参数',
   'menu.techStd.route': '工艺路线',
-  'menu.techStd.route.routeDetail': '工艺路线明细',
+  'menu.techStd.route.routeProfile': '工艺路线详情',
   // 基础资料
   'menu.basic': '基础资料',
   'menu.basic.dept': '部门',

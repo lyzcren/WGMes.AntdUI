@@ -443,63 +443,65 @@ class TableList extends PureComponent {
       handleSubmit: this.handleUpdate,
     };
     return (
-      <GridContent>
-        <Card bordered={false}>
-          <div className={styles.tableList}>
-            <div className={styles.tableListForm}>{this.renderForm()}</div>
-            <div className={styles.tableListOperator}>
-              <Authorized authority="Defect_Create">
-                <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
-                  新建
+      <div style={{ margin: '-24px -24px 0' }}>
+        <GridContent>
+          <Card bordered={false}>
+            <div className={styles.tableList}>
+              <div className={styles.tableListForm}>{this.renderForm()}</div>
+              <div className={styles.tableListOperator}>
+                <Authorized authority="Defect_Create">
+                  <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+                    新建
               </Button>
-              </Authorized>
-              <Authorized authority="Defect_Export">
-                <Dropdown overlay={
-                  <Menu onClick={this.handleExport} selectedKeys={[]}>
-                    <Menu.Item key="currentPage">当前页</Menu.Item>
-                    <Menu.Item key="allPage">所有页</Menu.Item>
-                  </Menu>
-                }>
-                  <Button>
-                    导出 <Icon type="down" />
-                  </Button>
-                </Dropdown>
-              </Authorized>
-              {selectedRows.length > 0 && (
-                <span>
-                  <Authorized authority="Defect_Delete">
-                    <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
-                  </Authorized>
-                  <Authorized authority={["Defect_Delete", "Defect_Active"]}>
-                    <Dropdown overlay={menu}>
-                      <Button>
-                        更多操作 <Icon type="down" />
-                      </Button>
-                    </Dropdown>
-                  </Authorized>
-                </span>
-              )}
+                </Authorized>
+                <Authorized authority="Defect_Export">
+                  <Dropdown overlay={
+                    <Menu onClick={this.handleExport} selectedKeys={[]}>
+                      <Menu.Item key="currentPage">当前页</Menu.Item>
+                      <Menu.Item key="allPage">所有页</Menu.Item>
+                    </Menu>
+                  }>
+                    <Button>
+                      导出 <Icon type="down" />
+                    </Button>
+                  </Dropdown>
+                </Authorized>
+                {selectedRows.length > 0 && (
+                  <span>
+                    <Authorized authority="Defect_Delete">
+                      <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
+                    </Authorized>
+                    <Authorized authority={["Defect_Delete", "Defect_Active"]}>
+                      <Dropdown overlay={menu}>
+                        <Button>
+                          更多操作 <Icon type="down" />
+                        </Button>
+                      </Dropdown>
+                    </Authorized>
+                  </span>
+                )}
+              </div>
+              <StandardTable
+                rowKey="fItemID"
+                selectedRows={selectedRows}
+                loading={loading}
+                data={data}
+                columns={ColumnConfig.columns}
+                onSelectRow={this.handleSelectRows}
+                onChange={this.handleStandardTableChange}
+              />
             </div>
-            <StandardTable
-              rowKey="fItemID"
-              selectedRows={selectedRows}
-              loading={loading}
-              data={data}
-              columns={ColumnConfig.columns}
-              onSelectRow={this.handleSelectRows}
-              onChange={this.handleStandardTableChange}
+          </Card>
+          <CreateForm {...parentMethods} modalVisible={modalVisible} dispatch={this.props.dispatch} />
+          {updateFormValues && Object.keys(updateFormValues).length ? (
+            <UpdateForm
+              {...updateMethods}
+              updateModalVisible={updateModalVisible}
+              values={updateFormValues}
             />
-          </div>
-        </Card>
-        <CreateForm {...parentMethods} modalVisible={modalVisible} dispatch={this.props.dispatch} />
-        {updateFormValues && Object.keys(updateFormValues).length ? (
-          <UpdateForm
-            {...updateMethods}
-            updateModalVisible={updateModalVisible}
-            values={updateFormValues}
-          />
-        ) : null}
-      </GridContent>
+          ) : null}
+        </GridContent>
+      </div >
     );
   }
 }

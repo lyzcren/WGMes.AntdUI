@@ -624,66 +624,68 @@ class TableList extends PureComponent {
       handleModalVisible: this.handleRoleModalVisible,
     };
     return (
-      <GridContent>
-        <Card bordered={false}>
-          <div className={styles.tableList}>
-            <div className={styles.tableListForm}>{this.renderForm()}</div>
-            <div className={styles.tableListOperator}>
-              <Authorized authority="User_Create">
-                <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
-                  新建
+      <div style={{ margin: '-24px -24px 0' }}>
+        <GridContent>
+          <Card bordered={false}>
+            <div className={styles.tableList}>
+              <div className={styles.tableListForm}>{this.renderForm()}</div>
+              <div className={styles.tableListOperator}>
+                <Authorized authority="User_Create">
+                  <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+                    新建
               </Button>
-              </Authorized>
-              {selectedRows.length > 0 && (
-                <span>
-                  <Authorized authority="User_Delete">
-                    <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
-                  </Authorized>
-                  <Dropdown overlay={menu}>
-                    <Button>
-                      更多操作 <Icon type="down" />
-                    </Button>
-                  </Dropdown>
-                </span>
-              )}
+                </Authorized>
+                {selectedRows.length > 0 && (
+                  <span>
+                    <Authorized authority="User_Delete">
+                      <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
+                    </Authorized>
+                    <Dropdown overlay={menu}>
+                      <Button>
+                        更多操作 <Icon type="down" />
+                      </Button>
+                    </Dropdown>
+                  </span>
+                )}
+              </div>
+              <StandardTable
+                rowKey="fItemID"
+                selectedRows={selectedRows}
+                loading={loading}
+                data={data}
+                columns={this.columns}
+                onSelectRow={this.handleSelectRows}
+                onChange={this.handleStandardTableChange}
+              />
             </div>
-            <StandardTable
-              rowKey="fItemID"
-              selectedRows={selectedRows}
-              loading={loading}
-              data={data}
-              columns={this.columns}
-              onSelectRow={this.handleSelectRows}
-              onChange={this.handleStandardTableChange}
+          </Card>
+          <CreateForm {...parentMethods} modalVisible={modalVisible} />
+          {updateFormValues && Object.keys(updateFormValues).length ? (
+            <UpdateForm
+              {...updateMethods}
+              updateModalVisible={updateModalVisible}
+              values={updateFormValues}
             />
-          </div>
-        </Card>
-        <CreateForm {...parentMethods} modalVisible={modalVisible} />
-        {updateFormValues && Object.keys(updateFormValues).length ? (
-          <UpdateForm
-            {...updateMethods}
-            updateModalVisible={updateModalVisible}
-            values={updateFormValues}
-          />
-        ) : null}
-        {updatePwdFormValues && Object.keys(updatePwdFormValues).length ? (
-          <UpdatePwdForm
-            {...updatePwdMethods}
-            updatePwdModalVisible={updatePwdModalVisible}
-            values={updatePwdFormValues}
-          />
-        ) : null}
-        {updateRoleFormValues && Object.keys(updateRoleFormValues).length ? (
-          <AuthorizeRoleForm
-            {...updateRoleMethods}
-            modalVisible={updateRoleModalVisible}
-            authorizeRole={this.props.userManage.authorizeRole}
-            values={updateRoleFormValues}
-            queryResult={this.props.userManage.result}
-            dispatch={this.props.dispatch}
-          />
-        ) : null}
-      </GridContent>
+          ) : null}
+          {updatePwdFormValues && Object.keys(updatePwdFormValues).length ? (
+            <UpdatePwdForm
+              {...updatePwdMethods}
+              updatePwdModalVisible={updatePwdModalVisible}
+              values={updatePwdFormValues}
+            />
+          ) : null}
+          {updateRoleFormValues && Object.keys(updateRoleFormValues).length ? (
+            <AuthorizeRoleForm
+              {...updateRoleMethods}
+              modalVisible={updateRoleModalVisible}
+              authorizeRole={this.props.userManage.authorizeRole}
+              values={updateRoleFormValues}
+              queryResult={this.props.userManage.result}
+              dispatch={this.props.dispatch}
+            />
+          ) : null}
+        </GridContent>
+      </div>
     );
   }
 }
