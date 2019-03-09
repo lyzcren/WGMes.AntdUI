@@ -35,8 +35,9 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ routeManage, loading, menu }) => ({
+@connect(({ routeManage, routeProfile, loading, menu }) => ({
   routeManage,
+  routeProfile,
   loading: loading.models.routeManage,
   menu,
 }))
@@ -242,8 +243,13 @@ class TableList extends PureComponent {
   handleProfileModalVisible = (flag, record) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'menu/openMenu',
-      payload: { path: '/techStd/route/profile', data: record },
+      type: 'routeProfile/initModel',
+      payload: { fInterID: record.fInterID },
+    }).then(() => {
+      dispatch({
+        type: 'menu/openMenu',
+        payload: { path: '/techStd/route/profile', data: record },
+      });
     });
   };
 

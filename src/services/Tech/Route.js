@@ -51,3 +51,23 @@ export async function fakeActive (params) {
     },
   });
 }
+
+export async function fakeQuerySteps (params) {
+  return request('/api/Route/getSteps', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'getSteps',
+    },
+  });
+}
+
+export async function fakeSaveSteps (params) {
+  return request('/api/Route/setSteps', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'setSteps',
+    },
+  });
+}

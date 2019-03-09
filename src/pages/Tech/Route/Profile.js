@@ -49,6 +49,22 @@ class TableList extends PureComponent {
   state = {
   };
 
+  // componentdiMount () {
+  //   const { dispatch, data: { fInterID } } = this.props;
+  //   dispatch({
+  //     type: 'routeProfile/initModel',
+  //     payload: { fInterID },
+  //   });
+  // }
+
+  save () {
+    const { dispatch, data: { fInterID } } = this.props;
+    dispatch({
+      type: 'routeProfile/saveStep',
+      payload: { fInterID },
+    });
+  }
+
   close () {
     const { dispatch } = this.props;
     dispatch({
@@ -85,7 +101,6 @@ class TableList extends PureComponent {
       loading,
       form: { getFieldDecorator },
     } = this.props;
-    console.log(steps);
 
     const description = (
       <DescriptionList className={styles.headerList} size="small" col="2">
@@ -95,17 +110,17 @@ class TableList extends PureComponent {
         <Description term="备注">{data.fComments}</Description>
       </DescriptionList>
     );
-    const menu = (
-      <Menu>
-        <Menu.Item key="1">选项一</Menu.Item>
-        <Menu.Item key="2">选项二</Menu.Item>
-        <Menu.Item key="3">选项三</Menu.Item>
-      </Menu>
-    );
+    // const menu = (
+    //   <Menu>
+    //     <Menu.Item key="1">选项一</Menu.Item>
+    //     <Menu.Item key="2">选项二</Menu.Item>
+    //     <Menu.Item key="3">选项三</Menu.Item>
+    //   </Menu>
+    // );
 
     const action = (
       <Fragment>
-        <ButtonGroup>
+        {/* <ButtonGroup>
           <Button>操作</Button>
           <Button>操作</Button>
           <Dropdown overlay={menu} placement="bottomRight">
@@ -113,8 +128,8 @@ class TableList extends PureComponent {
               <Icon type="ellipsis" />
             </Button>
           </Dropdown>
-        </ButtonGroup>
-        <Button type="primary">保存</Button>
+        </ButtonGroup> */}
+        <Button type="primary" onClick={() => this.save()}>保存</Button>
         <Button onClick={() => this.close()}>关闭</Button>
       </Fragment>
     );
@@ -151,14 +166,15 @@ class TableList extends PureComponent {
               <Steps direction="vertical" current={currentStep}>
                 {steps.map(step => <Step key={step.fGroupID} title={step.fName}
                   description={
-                    <div>
-                      {step.depts.map(dept => <div>{dept.fDeptName}</div>)}
-                    </div>} />
+                    <div key={"desc_" + step.fGroupID}>
+                      {step.depts.map(dept => <div key={"dept_" + dept.fEntryID}>{dept.fDeptName}</div>)}
+                    </div>}
+                />
                 )}
               </Steps>
             </Card>
           </Sider>
-          <Content>
+          {(steps && steps[currentStep] && <Content>
             <GridContent style={{ marginLeft: '10px' }}>
               <Card title={'操作'} bordered={true}>
                 <div className="steps-action" style={{ margin: '10px' }}>
@@ -180,6 +196,7 @@ class TableList extends PureComponent {
               </div>
             </GridContent>
           </Content>
+          )}
         </Layout>
       </div >
     );

@@ -145,6 +145,9 @@ export class DeptForm extends PureComponent {
       if (!target.fDeptID) {
         message.error('请选择部门');
         e.target.focus();
+        this.setState({
+          loading: false,
+        });
         return;
       }
       const { depts } = this.state;
