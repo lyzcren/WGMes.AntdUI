@@ -75,7 +75,7 @@ export default {
       // 1、IIS express
       // target: 'https://localhost:44328/',
       // 2、docker
-      target: 'https://172.19.194.91/',
+      target: 'https://172.19.193.98/',
       changeOrigin: true,
       "secure": false,
       // pathRewrite: { '^/api/': '/api/' },

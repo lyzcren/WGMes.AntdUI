@@ -15,23 +15,21 @@ import {
   Modal,
   message,
   Steps,
+  Table,
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import WgPageHeaderWrapper from '@/components/WgPageHeaderWrapper';
 import DescriptionList from '@/components/DescriptionList';
 import Authorized from '@/utils/Authorized';
-import { UpdateForm } from './UpdateForm';
-import { CreateForm } from './CreateForm';
-import { default as ColumnConfig } from './ColumnConfig';
-import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
+import { DeptForm } from './DeptForm';
 
 import styles from './List.less';
 
 
-const FormItem = Form.Item;
-const { Option } = Select;
+// const FormItem = Form.Item;
+// const { Option } = Select;
 const {
   Header, Footer, Sider, Content,
 } = Layout;
@@ -41,15 +39,14 @@ const ButtonGroup = Button.Group;
 
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ routeManage, loading, menu, }) => ({
-  routeManage,
+@connect(({ routeProfile, loading, menu, }) => ({
+  routeProfile,
   loading: loading.models.routeManage,
   menu,
 }))
 @Form.create()
 class TableList extends PureComponent {
   state = {
-    currentStep: 0,
   };
 
   close () {
@@ -60,24 +57,35 @@ class TableList extends PureComponent {
     });
   }
 
-  next () {
-    const currentStep = this.state.currentStep + 1;
-    this.setState({ currentStep });
+  nextStep () {
+    const { dispatch, } = this.props;
+    dispatch({
+      type: 'routeProfile/nextStep',
+    });
   }
 
-  prev () {
-    const currentStep = this.state.currentStep - 1;
-    this.setState({ currentStep });
+  prevStep () {
+    const { dispatch, } = this.props;
+    dispatch({
+      type: 'routeProfile/prevStep',
+    });
+  }
+
+  deleteStep () {
+    const { dispatch, } = this.props;
+    dispatch({
+      type: 'routeProfile/deleteStep',
+    });
   }
 
   render () {
-    console.log(this.props);
     const {
-      routeManage,
+      routeProfile: { steps, currentStep, },
       data,
       loading,
+      form: { getFieldDecorator },
     } = this.props;
-    const { currentStep } = this.state;
+    console.log(steps);
 
     const description = (
       <DescriptionList className={styles.headerList} size="small" col="2">
@@ -124,19 +132,8 @@ class TableList extends PureComponent {
       </Row>
     );
 
-    const steps = [{
-      title: 'First',
-      content: 'First-content',
-    }, {
-      title: 'Second',
-      content: 'Second-content',
-    }, {
-      title: 'Last',
-      content: 'Last-content',
-    }];
-
     return (
-      <Layout>
+      <div>
         <WgPageHeaderWrapper
           title={data.fName}
           logo={
@@ -147,40 +144,44 @@ class TableList extends PureComponent {
           extraContent={extra}
           // tabList={tabList}
           wrapperClassName={styles.advancedForm}
-        >
-        </WgPageHeaderWrapper>
-
-        <Content style={{ margin: '24px 0' }}>
-          <Layout style={{ backgroundColor: '#ffffff' }}>
-            <Sider style={{ backgroundColor: '#ffffff' }}>
-              <Card bordered={false}>
-                <Steps direction="vertical" current={currentStep}>
-                  {steps.map(item => <Step key={item.title} title={item.title} />)}
-                </Steps>
-              </Card>
-            </Sider>
-            <Content>
-              <GridContent>
-                <div className="steps-content">{steps[currentStep].content}</div>
-                <div className="steps-action">
+        />
+        <Layout style={{ backgroundColor: '#ffffff', margin: '24px 0' }}>
+          <Sider style={{ backgroundColor: '#ffffff' }}>
+            <Card bordered={false}>
+              <Steps direction="vertical" current={currentStep}>
+                {steps.map(step => <Step key={step.fGroupID} title={step.fName}
+                  description={
+                    <div>
+                      {step.depts.map(dept => <div>{dept.fDeptName}</div>)}
+                    </div>} />
+                )}
+              </Steps>
+            </Card>
+          </Sider>
+          <Content>
+            <GridContent style={{ marginLeft: '10px' }}>
+              <Card title={'操作'} bordered={true}>
+                <div className="steps-action" style={{ margin: '10px' }}>
+                  <Button type="primary" onClick={() => this.nextStep()}>下一步</Button>
                   {
-                    currentStep < steps.length - 1
-                    && <Button type="primary" onClick={() => this.next()}>下一步</Button>
-                  }
-                  {
-                    currentStep === steps.length - 1
-                    && <Button type="primary" onClick={() => message.success('Processing complete!')}>完成</Button>
+                    currentStep > 0
+                    && <Button style={{ marginLeft: 8 }} onClick={() => this.prevStep()}>上一步</Button>
                   }
                   {
                     currentStep > 0
-                    && <Button style={{ marginLeft: 8 }} onClick={() => this.prev()}>上一步</Button>
+                    && <Button type="danger" style={{ marginLeft: 8 }} onClick={() => this.deleteStep()}>删除</Button>
                   }
                 </div>
-              </GridContent>
-            </Content>
-          </Layout>
-        </Content>
-      </Layout >
+              </Card>
+              <div>
+                <Card title={'第 ' + (currentStep + 1) + ' 步'} bordered={true}>
+                  <DeptForm depts={steps[currentStep].depts} currentStep={currentStep} />
+                </Card>
+              </div>
+            </GridContent>
+          </Content>
+        </Layout>
+      </div >
     );
   }
 }
