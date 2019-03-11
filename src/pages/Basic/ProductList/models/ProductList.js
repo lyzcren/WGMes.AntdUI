@@ -1,10 +1,7 @@
-import {
-  fakeQuery, fakeRemove, fakeAdd, fakeUpdate, fakeActive,
-  fakeCheck,
-} from '@/services/Tech/Route';
+import { fakeQuery, fakeRemove, fakeAdd, fakeUpdate, fakeActive } from '@/services/Basic/ProductList';
 
 export default {
-  namespace: 'routeManage',
+  namespace: 'productManage',
 
   state: {
     data: {
@@ -51,22 +48,6 @@ export default {
     },
     *active ({ payload, callback }, { call, put }) {
       const response = yield call(fakeActive, payload);
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
-      if (callback) callback();
-    },
-    *check ({ payload, callback }, { call, put }) {
-      const response = yield call(fakeCheck, { ...payload, fStatus: 1, });
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
-      if (callback) callback();
-    },
-    *uncheck ({ payload, callback }, { call, put }) {
-      const response = yield call(fakeCheck, { ...payload, fStatus: 0, });
       yield put({
         type: 'saveData',
         payload: response,

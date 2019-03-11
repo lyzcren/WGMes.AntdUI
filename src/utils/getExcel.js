@@ -33,7 +33,7 @@ export async function exportExcel (url, params, fileName) {
       document.body.removeChild(elink);
     }
   };
-  oReq.send(JSON.stringify(params));
+  await oReq.send(JSON.stringify(params));
 };
 
 function checkStatus (request) {

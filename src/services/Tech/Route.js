@@ -12,6 +12,16 @@ export async function fakeQuery (params) {
   });
 }
 
+export async function fakeGet (params) {
+  return request('/api/Route/get', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'get',
+    },
+  });
+}
+
 export async function fakeRemove (params) {
   return request('/api/Route/delete', {
     method: 'POST',
@@ -48,6 +58,16 @@ export async function fakeActive (params) {
     body: {
       ...params,
       method: 'active',
+    },
+  });
+}
+
+export async function fakeCheck (params) {
+  return request('/api/Route/check', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'check',
     },
   });
 }

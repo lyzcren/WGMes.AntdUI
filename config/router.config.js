@@ -79,8 +79,14 @@ export default [
         path: '/basic',
         name: 'basic',
         icon: 'cluster',
-        authority: ['Dept_Read', 'Unit_Read', 'Machine_Read', 'Emp_Read',],
+        authority: ['Product_Read', 'Dept_Read', 'Unit_Read', 'Machine_Read', 'Emp_Read',],
         routes: [
+          {
+            path: '/basic/product',
+            name: 'product',
+            component: './Basic/ProductList/List',
+            authority: ['Product_Read'],
+          },
           {
             path: '/basic/dept',
             name: 'dept',

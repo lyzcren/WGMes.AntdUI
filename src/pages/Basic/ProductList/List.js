@@ -1,7 +1,7 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
+import moment from 'moment';
 import {
-  Layout,
   Row,
   Col,
   Card,
@@ -12,9 +12,15 @@ import {
   Button,
   Dropdown,
   Menu,
+  InputNumber,
+  DatePicker,
   Modal,
   message,
+  Badge,
+  Divider,
+  Radio, Popover, Switch, Progress, notification, Popconfirm,
 } from 'antd';
+import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
@@ -35,15 +41,13 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ routeManage, routeProfile, loading, menu }) => ({
-  routeManage,
-  loading: loading.models.routeManage,
-  menu,
+@connect(({ productManage, loading }) => ({
+  productManage,
+  loading: loading.models.productManage,
 }))
 @Form.create()
 class TableList extends PureComponent {
   state = {
-    exporting: false,
     // 新增界面
     modalVisible: false,
     formValues: {},
@@ -67,15 +71,13 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     var params = { pagination: this.currentPagination };
     dispatch({
-      type: 'routeManage/fetch',
+      type: 'productManage/fetch',
       payload: params,
     });
     // 列配置相关方法
-    ColumnConfig.ProfileModalVisibleCallback = (record) => this.handleProfileModalVisible(true, record);
     ColumnConfig.UpdateModalVisibleCallback = (record) => this.handleUpdateModalVisible(true, record);
     ColumnConfig.DeleteCallback = (record) => this.handleDelete(record);
     ColumnConfig.ActiveCallback = (record) => this.handleActive(record, !record.fIsActive);
-    ColumnConfig.CheckCallback = (record) => this.handleCheck(record, record.fStatusNumber === "Created");
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -104,7 +106,7 @@ class TableList extends PureComponent {
     var params = { pagination: this.currentPagination };
 
     dispatch({
-      type: 'routeManage/fetch',
+      type: 'productManage/fetch',
       payload: params,
     });
   };
@@ -128,6 +130,7 @@ class TableList extends PureComponent {
       queryFilters: queryFilters,
     });
 
+    const { pageSize, filters, sorter } = this.currentPagination;
     this.currentPagination = {
       ...this.currentPagination,
       current: 1,
@@ -146,7 +149,7 @@ class TableList extends PureComponent {
 
       var params = this.getSearchParam(fieldsValue);
       dispatch({
-        type: 'routeManage/fetch',
+        type: 'productManage/fetch',
         payload: params,
       });
     });
@@ -160,6 +163,7 @@ class TableList extends PureComponent {
       queryFilters: [],
     });
 
+    const { pageSize, filters, sorter } = this.currentPagination;
     this.currentPagination = {
       ...this.currentPagination,
       current: 1,
@@ -168,23 +172,23 @@ class TableList extends PureComponent {
     var params = { pagination: this.currentPagination };
 
     dispatch({
-      type: 'routeManage/fetch',
+      type: 'productManage/fetch',
       payload: params,
     });
   };
 
   handleExport = (e) => {
-    const { form } = this.props;
+    const { dispatch, form } = this.props;
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
       var params = this.getSearchParam(fieldsValue);
-      var fileName = '导出.xls';
+	  var fileName = '导出.xls';
       switch (e.key) {
         case 'currentPage':
           params = { ...params, exportPage: true }
-          fileName = '导出-第' + params.pagination.current + '页.xls';
+		  fileName = '导出-第' + params.pagination.current + '页.xls';
           break;
         case 'allPage':
           params = { ...params, exportAll: true }
@@ -192,8 +196,7 @@ class TableList extends PureComponent {
         default:
           break;
       }
-
-      exportExcel('/api/route/export', params, fileName);
+      exportExcel('/api/productList/export', params, fileName)
     });
   };
 
@@ -205,6 +208,7 @@ class TableList extends PureComponent {
   };
 
   handleMenuClick = e => {
+    const { dispatch } = this.props;
     const { selectedRows } = this.state;
 
     if (selectedRows.length === 0) return;
@@ -217,12 +221,6 @@ class TableList extends PureComponent {
         break;
       case 'deactive':
         this.handleBatchDeactiveClick();
-        break;
-      case 'check':
-        this.handleBatchCheckClick();
-        break;
-      case 'uncheck':
-        this.handleBatchUncheckClick();
         break;
       default:
         break;
@@ -248,21 +246,13 @@ class TableList extends PureComponent {
     });
   };
 
-  handleProfileModalVisible = (flag, record) => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'menu/openMenu',
-      payload: { path: '/techStd/route/profile', data: record },
-    });
-  };
-
   handleAdd = fields => {
-    const { dispatch } = this.props;
+    const { dispatch, form } = this.props;
     dispatch({
-      type: 'routeManage/add',
+      type: 'productManage/add',
       payload: fields
     }).then(() => {
-      const { routeManage: { queryResult } } = this.props;
+      const { productManage: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
         message.success('添加成功');
         this.handleModalVisible();
@@ -277,10 +267,10 @@ class TableList extends PureComponent {
   handleUpdate = fields => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'routeManage/update',
+      type: 'productManage/update',
       payload: fields,
     }).then(() => {
-      const { routeManage: { queryResult } } = this.props;
+      const { productManage: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
         message.success('修改成功');
         this.handleUpdateModalVisible();
@@ -298,13 +288,13 @@ class TableList extends PureComponent {
   handleActive = (record, fIsActive) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'routeManage/active',
+      type: 'productManage/active',
       payload: {
-        fInterID: record.fInterID,
+        fItemID: record.fItemID,
         fIsActive,
       },
     }).then(() => {
-      const { routeManage: { queryResult } } = this.props;
+      const { productManage: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
         message.success('【' + record.fName + '】' + (fIsActive ? '启用' : '禁用') + '成功');
         // 成功后再次刷新列表
@@ -321,15 +311,15 @@ class TableList extends PureComponent {
   handleDelete = (record) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'routeManage/remove',
+      type: 'productManage/remove',
       payload: {
-        fInterID: record.fInterID,
+        fItemID: record.fItemID,
       },
       callback: () => {
         this.setState({
           selectedRows: [],
         });
-        const { routeManage: { queryResult } } = this.props;
+        const { productManage: { queryResult } } = this.props;
         if (queryResult.status === 'ok') {
           message.success('【' + record.fName + '】' + '删除成功');
           // 成功后再次刷新列表
@@ -343,25 +333,6 @@ class TableList extends PureComponent {
       },
     });
   };
-
-  handleCheck (record, isCheck = true) {
-    const { dispatch, } = this.props;
-    const { fInterID } = record;
-    const checkType = 'routeManage/' + (isCheck ? 'check' : 'uncheck');
-    dispatch({
-      type: checkType,
-      payload: { fInterID },
-    }).then(() => {
-      const { routeManage: { queryResult } } = this.props;
-      if (queryResult.status === 'ok') {
-        message.success((isCheck ? '审批' : '反审批') + '成功');
-        // 成功后再次刷新列表
-        this.search();
-      } else {
-        message.warning(queryResult.message);
-      }
-    });
-  }
 
   handleBatchDeleteClick = () => {
     const { selectedRows } = this.state;
@@ -377,6 +348,7 @@ class TableList extends PureComponent {
   };
 
   batchDelete = (selectedRows) => {
+    const { dispatch } = this.props;
     if (typeof selectedRows === 'object' && !Array.isArray(selectedRows)) {
       selectedRows = [selectedRows];
     }
@@ -411,47 +383,13 @@ class TableList extends PureComponent {
     });
   };
 
-  handleBatchCheckClick = () => {
-    const { selectedRows } = this.state;
-
-    if (selectedRows.length === 0) return;
-    Modal.confirm({
-      title: '审批',
-      content: '确定批量审批吗？',
-      okText: '确认',
-      cancelText: '取消',
-      onOk: () => this.batchCheck(selectedRows, true),
-    });
-  };
-
-  handleBatchUncheckClick = () => {
-    const { selectedRows } = this.state;
-
-    if (selectedRows.length === 0) return;
-    Modal.confirm({
-      title: '反审批',
-      content: '确定批量反审批吗？',
-      okText: '确认',
-      cancelText: '取消',
-      onOk: () => this.batchCheck(selectedRows, false),
-    });
-  };
-
   batchActive = (selectedRows, fIsActive) => {
+    const { dispatch } = this.props;
     if (typeof selectedRows === 'object' && !Array.isArray(selectedRows)) {
       selectedRows = [selectedRows];
     }
     selectedRows.forEach(selectedRow => {
       this.handleActive(selectedRow, fIsActive);
-    });
-  };
-
-  batchCheck = (selectedRows, isCheck) => {
-    if (typeof selectedRows === 'object' && !Array.isArray(selectedRows)) {
-      selectedRows = [selectedRows];
-    }
-    selectedRows.forEach(selectedRow => {
-      this.handleCheck(selectedRow, isCheck);
     });
   };
 
@@ -506,17 +444,15 @@ class TableList extends PureComponent {
 
   render () {
     const {
-      routeManage: { data },
+      productManage: { data, queryResult },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, updateFormValues, exporting, } = this.state;
+    const { selectedRows, modalVisible, updateModalVisible, updateFormValues, authorityModalVisible, authorizeUserModalVisible } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-        <Menu.Item key="remove" disabled={!hasAuthority('Route_Delete')}>删除</Menu.Item>
-        <Menu.Item key="active" disabled={!hasAuthority('Route_Active')}>批量启用</Menu.Item>
-        <Menu.Item key="deactive" disabled={!hasAuthority('Route_Active')}>批量禁用</Menu.Item>
-        <Menu.Item key="check" disabled={!hasAuthority('Route_Check')}>批量审批</Menu.Item>
-        <Menu.Item key="uncheck" disabled={!hasAuthority('Route_Check')}>批量反审批</Menu.Item>
+        <Menu.Item key="remove" disabled={!hasAuthority('ProductDelete')}>删除</Menu.Item>
+        <Menu.Item key="active" disabled={!hasAuthority('ProductActive')}>批量启用</Menu.Item>
+        <Menu.Item key="deactive" disabled={!hasAuthority('ProductActive')}>批量禁用</Menu.Item>
       </Menu>
     );
 
@@ -535,29 +471,29 @@ class TableList extends PureComponent {
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
               <div className={styles.tableListOperator}>
-                <Authorized authority="Route_Create">
+                <Authorized authority="Product_Create">
                   <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
-                    新建
-              </Button>
+                    从ERP导入
+                </Button>
                 </Authorized>
-                <Authorized authority="Route_Export">
+                <Authorized authority="Product_Export">
                   <Dropdown overlay={
                     <Menu onClick={this.handleExport} selectedKeys={[]}>
                       <Menu.Item key="currentPage">当前页</Menu.Item>
                       <Menu.Item key="allPage">所有页</Menu.Item>
                     </Menu>
                   }>
-                    <Button loading={exporting}>
+                    <Button>
                       导出 <Icon type="down" />
                     </Button>
                   </Dropdown>
                 </Authorized>
                 {selectedRows.length > 0 && (
                   <span>
-                    <Authorized authority="Route_Delete">
+                    <Authorized authority="Product_Delete">
                       <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
                     </Authorized>
-                    <Authorized authority={["Route_Delete", "Route_Active"]}>
+                    <Authorized authority={["Product_Delete", "Product_Active"]}>
                       <Dropdown overlay={menu}>
                         <Button>
                           更多操作 <Icon type="down" />
@@ -568,7 +504,7 @@ class TableList extends PureComponent {
                 )}
               </div>
               <StandardTable
-                rowKey="fInterID"
+                rowKey="fItemID"
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}

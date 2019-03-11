@@ -1,4 +1,5 @@
 import React, { PureComponent, Fragment } from 'react';
+import moment from 'moment';
 import { connect } from 'dva';
 import {
   Layout,
@@ -24,6 +25,7 @@ import DescriptionList from '@/components/DescriptionList';
 import Authorized from '@/utils/Authorized';
 import { hasAuthority } from '@/utils/authority';
 import { DeptForm } from './DeptForm';
+import { RouteSteps } from './RouteSteps';
 
 import styles from './List.less';
 
@@ -39,9 +41,10 @@ const ButtonGroup = Button.Group;
 
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ routeProfile, loading, menu, }) => ({
+@connect(({ routeManage, routeProfile, loading, menu, }) => ({
+  routeManage,
   routeProfile,
-  loading: loading.models.routeManage,
+  loading: loading.models.routeProfile,
   menu,
 }))
 @Form.create()
@@ -49,19 +52,58 @@ class TableList extends PureComponent {
   state = {
   };
 
-  // componentdiMount () {
-  //   const { dispatch, data: { fInterID } } = this.props;
-  //   dispatch({
-  //     type: 'routeProfile/initModel',
-  //     payload: { fInterID },
-  //   });
-  // }
+  componentDidMount () {
+    const { data: { fInterID } } = this.props;
+    this.loadData(fInterID);
+  }
+
+  componentDidUpdate (preProps) {
+    const { dispatch, data: { fInterID } } = this.props;
+    if (fInterID !== preProps.data.fInterID) {
+      this.loadData(fInterID);
+    }
+  }
+
+  loadData (fInterID) {
+    const { dispatch, } = this.props;
+    dispatch({
+      type: 'routeProfile/initModel',
+      payload: { fInterID },
+    });
+  }
 
   save () {
     const { dispatch, data: { fInterID } } = this.props;
     dispatch({
       type: 'routeProfile/saveStep',
       payload: { fInterID },
+    }).then(() => {
+      const { routeProfile: { queryResult } } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success('保存成功');
+        // 成功后关闭界面
+        this.close();
+      } else {
+        message.warning(queryResult.message);
+      }
+    });
+  }
+
+  check (isCheck = true) {
+    const { dispatch, data: { fInterID } } = this.props;
+    const checkType = 'routeManage/' + (isCheck ? 'check' : 'uncheck');
+    dispatch({
+      type: checkType,
+      payload: { fInterID },
+    }).then(() => {
+      const { routeManage: { queryResult } } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success((isCheck ? '审批' : '反审批') + '成功');
+        // 成功后关闭界面
+        this.close();
+      } else {
+        message.warning(queryResult.message);
+      }
     });
   }
 
@@ -96,8 +138,7 @@ class TableList extends PureComponent {
 
   render () {
     const {
-      routeProfile: { steps, currentStep, },
-      data,
+      routeProfile: { data, steps, currentStep, },
       loading,
       form: { getFieldDecorator },
     } = this.props;
@@ -106,7 +147,8 @@ class TableList extends PureComponent {
       <DescriptionList className={styles.headerList} size="small" col="2">
         <Description term="名称">{data.fName}</Description>
         <Description term="编码">{data.fNumber}</Description>
-        <Description term="创建时间">{data.fCreateDate}</Description>
+        <Description term="创建人">{data.fCreatorName}</Description>
+        <Description term="创建时间">{moment(data.fCreateDate).format('YYYY-MM-DD HH:mm:ss')}</Description>
         <Description term="备注">{data.fComments}</Description>
       </DescriptionList>
     );
@@ -120,15 +162,15 @@ class TableList extends PureComponent {
 
     const action = (
       <Fragment>
-        {/* <ButtonGroup>
-          <Button>操作</Button>
-          <Button>操作</Button>
-          <Dropdown overlay={menu} placement="bottomRight">
+        <ButtonGroup>
+          {data.fStatusNumber === "Created" && <Button onClick={() => this.check()}>审批</Button>}
+          {data.fStatusNumber === "Checked" && <Button onClick={() => this.check(false)}>反审批</Button>}
+          {/* <Dropdown overlay={menu} placement="bottomRight">
             <Button>
               <Icon type="ellipsis" />
             </Button>
-          </Dropdown>
-        </ButtonGroup> */}
+          </Dropdown> */}
+        </ButtonGroup>
         <Button type="primary" onClick={() => this.save()}>保存</Button>
         <Button onClick={() => this.close()}>关闭</Button>
       </Fragment>
@@ -138,7 +180,7 @@ class TableList extends PureComponent {
       <Row>
         <Col xs={24} sm={12}>
           <div className={styles.textSecondary}>状态</div>
-          <div className={styles.heading}>待审批</div>
+          <div className={styles.heading}>{data.fStatusName}</div>
         </Col>
         {/* <Col xs={24} sm={12}>
           <div className={styles.textSecondary}>订单金额</div>
@@ -159,19 +201,12 @@ class TableList extends PureComponent {
           extraContent={extra}
           // tabList={tabList}
           wrapperClassName={styles.advancedForm}
+          loading={loading}
         />
         <Layout style={{ backgroundColor: '#ffffff', margin: '24px 0' }}>
           <Sider style={{ backgroundColor: '#ffffff' }}>
             <Card bordered={false}>
-              <Steps direction="vertical" current={currentStep}>
-                {steps.map(step => <Step key={step.fGroupID} title={step.fName}
-                  description={
-                    <div key={"desc_" + step.fGroupID}>
-                      {step.depts.map(dept => <div key={"dept_" + dept.fEntryID}>{dept.fDeptName}</div>)}
-                    </div>}
-                />
-                )}
-              </Steps>
+              <RouteSteps loading={loading} steps={steps} currentStep={currentStep} />
             </Card>
           </Sider>
           {(steps && steps[currentStep] && <Content>
@@ -191,7 +226,7 @@ class TableList extends PureComponent {
               </Card>
               <div>
                 <Card title={'第 ' + (currentStep + 1) + ' 步'} bordered={true}>
-                  <DeptForm depts={steps[currentStep].depts} currentStep={currentStep} />
+                  <DeptForm route={data} depts={steps[currentStep].depts} currentStep={currentStep} />
                 </Card>
               </div>
             </GridContent>

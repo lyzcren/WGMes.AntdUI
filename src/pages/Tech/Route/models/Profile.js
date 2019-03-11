@@ -1,5 +1,5 @@
 
-import { fakeQuerySteps, fakeSaveSteps, } from '@/services/Tech/Route';
+import { fakeGet, fakeQuerySteps, fakeSaveSteps, } from '@/services/Tech/Route';
 
 export default {
   namespace: 'routeProfile',
@@ -18,6 +18,7 @@ export default {
     //   fName: '',
     //   depts: [{ fEntryID: 4, fDeptID: 1, fDeptName: '部门1' },],
     // }],
+    data: {},
     steps: [],
     currentStep: 0,
     maxGroupID: 1,
@@ -31,10 +32,10 @@ export default {
   effects: {
     *initModel ({ payload, callback }, { call, put }) {
       const response = yield call(fakeQuerySteps, payload);
+      // 查询工艺路线步骤
       let steps = [];
       response.forEach(dept => {
         let findGroup = steps.find(step => step.fGroupID === dept.fGroupID);
-        console.log(findGroup);
         if (!findGroup) {
           findGroup = { fGroupID: dept.fGroupID, depts: [], };
           steps.push(findGroup);
@@ -45,9 +46,13 @@ export default {
       if (steps.length <= 0) {
         steps.push({ fGroupID: 1, depts: [], })
       }
+      // 查询工艺路线表头数据
+      const data = yield call(fakeGet, payload);
+
       yield put({
         type: 'save',
         payload: {
+          data,
           steps,
           currentStep: 0,
           maxGroupID: steps.length + 1,
@@ -107,7 +112,7 @@ export default {
         payload: { steps, currentStep, },
       });
     },
-    *saveStep ({ payload }, { call, put, select }) {
+    *saveStep ({ payload, callback }, { call, put, select }) {
       const { steps, currentStep, maxGroupID, } = yield select(state => state.routeProfile);
       const submitSteps = [];
       let fEntryID = 1;
@@ -122,6 +127,7 @@ export default {
         type: 'saveData',
         payload: response,
       });
+      if (callback) callback();
     },
   },
 

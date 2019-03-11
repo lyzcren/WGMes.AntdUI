@@ -28,22 +28,23 @@ const TypeData = GlobalConst.DefectTypeData;
 }))
 @Form.create()
 export class DeptForm extends PureComponent {
-  static defaultProps = {
-    handleSubmit: () => { },
-    handleModalVisible: () => { },
-    depts: [],
-    currentStep: 0,
-  };
+  // static defaultProps = {
+  //   handleSubmit: () => { },
+  //   handleModalVisible: () => { },
+  //   depts: [],
+  //   currentStep: 0,
+  // };
 
-  index = 0;
+  MaxEntryID = 0;
   cacheOriginData = {};
 
   constructor(props) {
     super(props);
-    this.index = props.depts.length;
+
+    this.MaxEntryID = props.depts.length;
 
     this.state = {
-      loading: false,
+      loading: props.loading,
       /* eslint-disable-next-line react/no-unused-state */
       depts: props.depts,
       currentStep: props.currentStep
@@ -57,10 +58,11 @@ export class DeptForm extends PureComponent {
     });
   }
 
-  componentDidUpdate (props) {
-    const { depts, currentStep } = this.props;
-    if (currentStep !== props.currentStep) {
-      this.setState({ depts, currentStep });
+  componentDidUpdate (preProps) {
+    const { route: { fInterID }, depts, currentStep } = this.props;
+    if (fInterID !== preProps.route.fInterID || currentStep !== preProps.currentStep) {
+      this.setState({ fInterID, depts, currentStep });
+      this.MaxEntryID = Math.max(...(depts.map(d => d.fEntryID)));
     }
   }
 
@@ -89,7 +91,7 @@ export class DeptForm extends PureComponent {
     const { depts } = this.state;
     const newData = depts.map(item => ({ ...item }));
     newData.push({
-      fEntryID: ++this.index,
+      fEntryID: ++this.MaxEntryID,
       fDeptID: 0,
       fDeptName: '',
       editable: true,
@@ -137,6 +139,7 @@ export class DeptForm extends PureComponent {
       loading: true,
     });
     setTimeout(() => {
+      const { depts } = this.state;
       if (this.clickedCancel) {
         this.clickedCancel = false;
         return;
@@ -149,8 +152,13 @@ export class DeptForm extends PureComponent {
           loading: false,
         });
         return;
+      } else if (depts.filter(d => !d.isNew && d.fDeptID === target.fDeptID).length > 0) {
+        message.error('部门重复');
+        this.setState({
+          loading: false,
+        });
+        return;
       }
-      const { depts } = this.state;
       depts.forEach(v => {
         if (v.fEntryID === fEntryID) { delete v.isNew; delete v.editable; }
       });
