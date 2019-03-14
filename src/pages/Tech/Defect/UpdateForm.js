@@ -85,9 +85,9 @@ export class UpdateForm extends PureComponent {
                 <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="类型">
                     {form.getFieldDecorator('fTypeID', {
                         rules: [{ required: true, message: '请输入类型' }],
-                        initialValue: TypeData.find((type, index) => type.value == formVals.fTypeID).text,
+                        initialValue: formVals.fTypeID,
                     })(<Select style={{ width: 120 }}>
-                        {TypeData.map(t => <Option key={t.value}>{t.text}</Option>)}
+                        {TypeData.map(t => <Option key={t.value} value={t.value}>{t.text}</Option>)}
                     </Select>)}
                 </FormItem>
                 <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="部门">

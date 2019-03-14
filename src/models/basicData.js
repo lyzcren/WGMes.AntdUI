@@ -1,10 +1,11 @@
-import { fakeDeptTreeData } from '@/services/basicData';
+import { fakeDeptTreeData, fakeGetRouteData } from '@/services/basicData';
 
 export default {
   namespace: 'basicData',
 
   state: {
     deptTreeData: [],
+    routeData: [],
   },
 
   effects: {
@@ -15,6 +16,13 @@ export default {
         payload: response,
       });
     },
+    *getRouteData ({ payload }, { call, put }) {
+      const response = yield call(fakeGetRouteData, payload);
+      yield put({
+        type: 'saveRouteData',
+        payload: response,
+      });
+    },
   },
 
   reducers: {
@@ -22,6 +30,12 @@ export default {
       return {
         ...state,
         deptTreeData: action.payload,
+      };
+    },
+    saveRouteData (state, action) {
+      return {
+        ...state,
+        routeData: action.payload,
       };
     },
   },

@@ -250,6 +250,11 @@ class TableList extends PureComponent {
       loading,
     } = this.props;
     const { selectedRows, } = this.state;
+    const scrollX = ColumnConfig.columns
+      .map(c => { return c.width; })
+      .reduce(function (sum, width, index) {
+        return sum + width;
+      });
 
     return (
       <div style={{ margin: '-24px -24px 0' }}>
@@ -274,7 +279,7 @@ class TableList extends PureComponent {
                 columns={ColumnConfig.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
-                scroll={{ x: 1300 }}
+                scroll={{ x: scrollX }}
               />
             </div>
           </Card>

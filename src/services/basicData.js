@@ -10,3 +10,13 @@ export async function fakeDeptTreeData (params) {
     },
   });
 }
+
+export async function fakeGetRouteData (params) {
+  return request('/api/Route/GetData', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'GetData',
+    },
+  });
+}

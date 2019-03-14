@@ -49,6 +49,12 @@ class ColumnConfig {
       },
     },
     {
+      title: '工艺路线',
+      dataIndex: 'fRouteName',
+      width: 150,
+      sorter: true,
+    },
+    {
       title: '物料属性',
       dataIndex: 'fErpClsName',
       width: 150,
@@ -71,17 +77,17 @@ class ColumnConfig {
       render: (text, record) => (
         <Fragment>
           <Authorized authority="Product_Update">
-            <a onClick={() => this._updateModalVisible(record)}>修改</a>
+            <a onClick={() => this._updateModalVisible(record)}>路线</a>
+          </Authorized>
+          <Authorized authority="Product_Active">
+            <Divider type="vertical" />
+            <a onClick={() => this._handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
           </Authorized>
           <Authorized authority="Product_Delete">
             <Divider type="vertical" />
             <Popconfirm title="是否要删除此行？" onConfirm={() => this._delete(record)}>
               <a>删除</a>
             </Popconfirm>
-          </Authorized>
-          <Authorized authority="Product_Active">
-            <Divider type="vertical" />
-            <a onClick={() => this._handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
           </Authorized>
         </Fragment>
       ),

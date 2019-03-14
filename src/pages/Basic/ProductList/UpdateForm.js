@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import { connect } from 'dva';
 import moment from 'moment';
 import {
     Form,
@@ -6,13 +7,19 @@ import {
     Modal,
     Switch,
     Tag,
+    Select,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import { validatorPhone, validatePassword, getPasswordStatus, passwordProgressMap } from '@/utils/validators';
 
 
 const FormItem = Form.Item;
+const Option = Select.Option;
 
+/* eslint react/no-multi-comp:0 */
+@connect(({ basicData }) => ({
+    basicData,
+}))
 @Form.create()
 export class UpdateForm extends PureComponent {
     static defaultProps = {
@@ -29,6 +36,13 @@ export class UpdateForm extends PureComponent {
         };
     }
 
+    componentDidMount = () => {
+        const { dispatch } = this.props;
+        dispatch({
+            type: 'basicData/getRouteData',
+        });
+    };
+
     okHandle = () => {
         const { form, handleSubmit } = this.props;
         form.validateFields((err, fieldsValue) => {
@@ -41,7 +55,7 @@ export class UpdateForm extends PureComponent {
     };
 
     render () {
-        const { form, updateModalVisible, handleModalVisible, values } = this.props;
+        const { form, basicData, updateModalVisible, handleModalVisible, values } = this.props;
         const { formVals } = this.state;
 
         return (
@@ -55,16 +69,16 @@ export class UpdateForm extends PureComponent {
             >
                 <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="名称">
                     {form.getFieldDecorator('fName', {
-                        rules: [{ required: true, message: '请输入名称', min: 1 }],
                         initialValue: formVals.fName,
-                    })(<Input placeholder="请输入" />)}
+                    })(<Input placeholder="请输入" readOnly />)}
                 </FormItem>
-                <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="启用">
-                    {form.getFieldDecorator('fIsActive', {
-                        rules: [{ required: false }],
-                        valuePropName: 'checked',
-                        initialValue: formVals.fIsActive,
-                    })(<Switch />)}
+                <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="工艺路线">
+                    {form.getFieldDecorator('fRouteID', {
+                        rules: [{ required: true, message: '请选择工艺路线' }],
+                        initialValue: formVals.fRouteID > 0 ? formVals.fRouteID : null,
+                    })(<Select style={{ width: 300 }}>
+                        {basicData.routeData.map(t => <Option key={t.fInterID} value={t.fInterID}>{t.fName}</Option>)}
+                    </Select>)}
                 </FormItem>
             </Modal>
         );

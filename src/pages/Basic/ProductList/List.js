@@ -453,6 +453,7 @@ class TableList extends PureComponent {
 
   render () {
     const {
+      dispatch,
       productManage: { data, queryResult },
       loading,
     } = this.props;
@@ -470,9 +471,16 @@ class TableList extends PureComponent {
       handleModalVisible: this.handleModalVisible,
     };
     const updateMethods = {
+      dispatch,
       handleModalVisible: this.handleUpdateModalVisible,
       handleSubmit: this.handleUpdate,
     };
+    const scrollX = ColumnConfig.columns
+      .map(c => { return c.width; })
+      .reduce(function (sum, width, index) {
+        return sum + width;
+      });
+
     return (
       <div style={{ margin: '-24px -24px 0' }}>
         <GridContent>
@@ -520,7 +528,7 @@ class TableList extends PureComponent {
                 columns={ColumnConfig.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
-                scroll={{ x: 1500 }}
+                scroll={{ x: scrollX }}
               />
             </div>
           </Card>
