@@ -226,7 +226,7 @@ class TableList extends PureComponent {
               </Card>
               <div>
                 <Card title={'第 ' + (currentStep + 1) + ' 步'} bordered={true}>
-                  <DeptForm route={data} depts={steps[currentStep].depts} currentStep={currentStep} />
+                  <DeptForm loading={loading} route={data} depts={steps[currentStep].depts} currentStep={currentStep} />
                 </Card>
               </div>
             </GridContent>

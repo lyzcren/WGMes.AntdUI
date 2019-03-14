@@ -9,11 +9,31 @@ class ColumnConfig {
     {
       title: '名称',
       dataIndex: 'fName',
+      width: 200,
+      sorter: true,
+    },
+    {
+      title: '全称',
+      dataIndex: 'fFullName',
+      width: 300,
+      sorter: true,
+    },
+    {
+      title: '编码',
+      dataIndex: 'fNumber',
+      width: 200,
+      sorter: true,
+    },
+    {
+      title: '规格',
+      dataIndex: 'fModel',
+      width: 300,
       sorter: true,
     },
     {
       title: '启用',
       dataIndex: 'fIsActive',
+      width: 100,
       filters: [
         {
           text: activeData[0],
@@ -29,20 +49,38 @@ class ColumnConfig {
       },
     },
     {
+      title: '物料属性',
+      dataIndex: 'fErpClsName',
+      width: 150,
+      sorter: true,
+    },
+    {
+      title: '单位',
+      dataIndex: 'fUnitName',
+      width: 100,
+    },
+    {
+      title: '副单位',
+      dataIndex: 'fUnitName2',
+      width: 100,
+    },
+    {
       title: '操作',
+      fixed: 'right',
+      width: 200,
       render: (text, record) => (
         <Fragment>
           <Authorized authority="Product_Update">
             <a onClick={() => this._updateModalVisible(record)}>修改</a>
-            <Divider type="vertical" />
           </Authorized>
           <Authorized authority="Product_Delete">
+            <Divider type="vertical" />
             <Popconfirm title="是否要删除此行？" onConfirm={() => this._delete(record)}>
               <a>删除</a>
             </Popconfirm>
-            <Divider type="vertical" />
           </Authorized>
           <Authorized authority="Product_Active">
+            <Divider type="vertical" />
             <a onClick={() => this._handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
           </Authorized>
         </Fragment>
@@ -70,5 +108,5 @@ class ColumnConfig {
 
 }
 
-let columnConfig = new ColumnConfig();
+const columnConfig = new ColumnConfig();
 export default columnConfig;

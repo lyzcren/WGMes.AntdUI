@@ -185,6 +185,7 @@ export default {
         if (componentMap) {// 打开Tab页
           panes.push({ ...componentMap, key: activeKey, closable });
         } else {
+          return;
           // TODO: 未找到路由时进行特殊处理
           // notification.error({
           //   message: "未找到路由.",

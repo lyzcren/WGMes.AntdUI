@@ -86,6 +86,15 @@ export default [
             name: 'product',
             component: './Basic/ProductList/List',
             authority: ['Product_Read'],
+            routes: [
+              {
+                path: '/basic/product/import',
+                name: 'productImport',
+                component: './Basic/ProductList/Import',
+                authority: ['Product_Create'],
+                hideInMenu: true,
+              },
+            ],
           },
           {
             path: '/basic/dept',

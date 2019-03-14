@@ -44,7 +44,7 @@ export class DeptForm extends PureComponent {
     this.MaxEntryID = props.depts.length;
 
     this.state = {
-      loading: props.loading,
+      loading: false,
       /* eslint-disable-next-line react/no-unused-state */
       depts: props.depts,
       currentStep: props.currentStep
@@ -152,7 +152,8 @@ export class DeptForm extends PureComponent {
           loading: false,
         });
         return;
-      } else if (depts.filter(d => !d.isNew && d.fDeptID === target.fDeptID).length > 0) {
+      } else if (depts.filter(d => !d.isNew && !d.editable && d.fDeptID === target.fDeptID).length > 0) {
+        console.log(depts.filter(d => !d.isNew && !d.editable && d.fDeptID === target.fDeptID));
         message.error('部门重复');
         this.setState({
           loading: false,
@@ -194,6 +195,7 @@ export class DeptForm extends PureComponent {
 
   render () {
     const { form, modalVisible, handleModalVisible, basicData, } = this.props;
+    const profileLoading = this.props.loading;
     const { loading, depts, } = this.state;
     const columns = [
       {
@@ -257,7 +259,7 @@ export class DeptForm extends PureComponent {
       <div>
         <Table
           rowKey="fEntryID"
-          loading={loading}
+          loading={loading || profileLoading}
           columns={columns}
           dataSource={depts}
           pagination={false}

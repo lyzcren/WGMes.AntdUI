@@ -9,9 +9,16 @@ import HeaderScan from '../HeaderScan';
 import HeaderDropdown from '../HeaderDropdown';
 import SelectLang from '../SelectLang';
 import styles from './index.less';
+import screenfull from 'screenfull';
 
 export default class GlobalHeaderRight extends PureComponent {
-  getNoticeData() {
+
+  componentDidMount = () => {
+    // 监听全屏事件
+    this.watchFullScreen();
+  }
+
+  getNoticeData () {
     const { notices = [] } = this.props;
     if (notices.length === 0) {
       return {};
@@ -78,7 +85,64 @@ export default class GlobalHeaderRight extends PureComponent {
     });
   };
 
-  render() {
+  changeFullScreen = () => {
+    const { dispatch, } = this.props;
+    if (screenfull.isFullscreen) {
+      screenfull.exit();
+    } else {
+      screenfull.request();
+    }
+  };
+
+  //监听fullscreenchange事件
+  watchFullScreen = () => {
+    const { dispatch, } = this.props;
+    const screenChange =
+      () => {
+        dispatch({
+          type: 'global/fullScreen',
+          payload: {
+            isFullScreen: screenfull.isFullscreen
+          }
+        });
+      };
+
+    if (screenfull.enabled) {
+      screenfull.on('change', screenChange);
+    }
+
+    // // IE 11, chrome
+    // window.addEventListener("resize", screenChange);
+    // // firefox
+    // document.addEventListener(
+    //   "fullscreenchange",
+    //   screenChange,
+    //   false
+    // );
+    // document.addEventListener(
+    //   "mozfullscreenchange",
+    //   function () {
+    //     alert('mozfullscreenchange');
+    //   },
+    //   false
+    // );
+    // document.addEventListener(
+    //   "msfullscreenchange",
+    //   function () {
+    //     alert('msfullscreenchange');
+    //   },
+    //   false
+    // );
+    // document.addEventListener(
+    //   "webkitfullscreenChange",
+    //   function () {
+    //     alert('webkitfullscreenChange');
+    //   },
+    //   false
+    // );
+  };
+
+  render () {
     const {
       currentUser,
       fetchingMoreNotices,
@@ -89,6 +153,7 @@ export default class GlobalHeaderRight extends PureComponent {
       onNoticeClear,
       skeletonCount,
       theme,
+      isFullScreen,
     } = this.props;
     const menu = (
       <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
@@ -206,7 +271,18 @@ export default class GlobalHeaderRight extends PureComponent {
         ) : (
             <Spin size="small" style={{ marginLeft: 8, marginRight: 8 }} />
           )}
-        <SelectLang className={styles.action} />
+        {/* <SelectLang className={styles.action} /> */}
+        {screenfull.enabled &&
+          <Tooltip title={formatMessage({ id: 'component.globalHeader.fullScreen' })}>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={this.changeFullScreen}
+              className={styles.action}
+            >
+              <Icon type="border" style={isFullScreen ? { fontSize: 20, color: '#52c41a' } : {}} />
+            </a>
+          </Tooltip>}
       </div>
     );
   }

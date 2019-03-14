@@ -1,10 +1,14 @@
-import { fakeQuery, fakeRemove, fakeAdd, fakeUpdate, fakeActive } from '@/services/Basic/ProductList';
+import { fakeQuery, fakeQueryErp, fakeRemove, fakeAdd, fakeUpdate, fakeActive } from '@/services/Basic/ProductList';
 
 export default {
   namespace: 'productManage',
 
   state: {
     data: {
+      list: [],
+      pagination: {},
+    },
+    dataErp: {
       list: [],
       pagination: {},
     },
@@ -19,6 +23,13 @@ export default {
       const response = yield call(fakeQuery, payload);
       yield put({
         type: 'saveQueryData',
+        payload: response,
+      });
+    },
+    *fetchErp ({ payload }, { call, put }) {
+      const response = yield call(fakeQueryErp, payload);
+      yield put({
+        type: 'saveDataErp',
         payload: response,
       });
     },
@@ -61,6 +72,12 @@ export default {
       return {
         ...state,
         data: action.payload,
+      };
+    },
+    saveDataErp (state, action) {
+      return {
+        ...state,
+        dataErp: action.payload,
       };
     },
     saveData (state, action) {

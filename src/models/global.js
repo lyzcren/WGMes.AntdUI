@@ -7,10 +7,11 @@ export default {
     collapsed: false,
     notices: [],
     loadedAllNotices: false,
+    isFullScreen: false,
   },
 
   effects: {
-    *fetchNotices(_, { call, put, select }) {
+    *fetchNotices (_, { call, put, select }) {
       const data = yield call(queryNotices);
       const loadedAllNotices = data && data.length && data[data.length - 1] === null;
       yield put({
@@ -32,7 +33,7 @@ export default {
         },
       });
     },
-    *fetchMoreNotices({ payload }, { call, put, select }) {
+    *fetchMoreNotices ({ payload }, { call, put, select }) {
       const data = yield call(queryNotices, payload);
       const loadedAllNotices = data && data.length && data[data.length - 1] === null;
       yield put({
@@ -54,7 +55,7 @@ export default {
         },
       });
     },
-    *clearNotices({ payload }, { put, select }) {
+    *clearNotices ({ payload }, { put, select }) {
       yield put({
         type: 'saveClearedNotices',
         payload,
@@ -71,7 +72,7 @@ export default {
         },
       });
     },
-    *changeNoticeReadState({ payload }, { put, select }) {
+    *changeNoticeReadState ({ payload }, { put, select }) {
       const notices = yield select(state =>
         state.global.notices.map(item => {
           const notice = { ...item };
@@ -93,43 +94,56 @@ export default {
         },
       });
     },
+    *fullScreen ({ payload }, { call, put, select }) {
+      const { isFullScreen } = payload;
+      yield put({
+        type: 'changeFullScreen',
+        payload: { isFullScreen, }
+      });
+    },
   },
 
   reducers: {
-    changeLayoutCollapsed(state, { payload }) {
+    changeLayoutCollapsed (state, { payload }) {
       return {
         ...state,
         collapsed: payload,
       };
     },
-    saveNotices(state, { payload }) {
+    saveNotices (state, { payload }) {
       return {
         ...state,
         notices: payload,
       };
     },
-    saveClearedNotices(state, { payload }) {
+    saveClearedNotices (state, { payload }) {
       return {
         ...state,
         notices: state.notices.filter(item => item.type !== payload),
       };
     },
-    pushNotices(state, { payload }) {
+    pushNotices (state, { payload }) {
       return {
         ...state,
         notices: [...state.notices, ...payload],
       };
     },
-    setLoadedStatus(state, { payload }) {
+    setLoadedStatus (state, { payload }) {
       return {
         ...state,
         loadedAllNotices: payload,
       };
     },
+    changeFullScreen (state, { payload }) {
+      return {
+        ...state,
+        ...payload,
+      };
+    },
   },
 
   subscriptions: {
-    setup({ history }) {
+    setup ({ history }) {
       // Subscribe history(url) change, trigger `load` action if pathname is `/`
       return history.listen(({ pathname, search }) => {
         if (typeof window.ga !== 'undefined') {

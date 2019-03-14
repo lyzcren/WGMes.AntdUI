@@ -12,6 +12,16 @@ export async function fakeQuery (params) {
   });
 }
 
+export async function fakeQueryErp (params) {
+  return request('/api/ProductList/getErpList', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'getErpList',
+    },
+  });
+}
+
 export async function fakeRemove (params) {
   return request('/api/ProductList/delete', {
     method: 'POST',

@@ -46,6 +46,7 @@ export default {
   // 基础资料
   'menu.basic': '基础资料',
   'menu.basic.product': '物料',
+  'menu.basic.product.productImport': '导入物料',
   'menu.basic.dept': '部门',
   'menu.basic.unit': '单位',
   'menu.basic.machine': '机台',

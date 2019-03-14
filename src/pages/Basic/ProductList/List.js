@@ -41,8 +41,9 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ productManage, loading }) => ({
+@connect(({ productManage, menu, loading }) => ({
   productManage,
+  menu,
   loading: loading.models.productManage,
 }))
 @Form.create()
@@ -184,11 +185,11 @@ class TableList extends PureComponent {
       if (err) return;
 
       var params = this.getSearchParam(fieldsValue);
-	  var fileName = '导出.xls';
+      var fileName = '导出.xls';
       switch (e.key) {
         case 'currentPage':
           params = { ...params, exportPage: true }
-		  fileName = '导出-第' + params.pagination.current + '页.xls';
+          fileName = '导出-第' + params.pagination.current + '页.xls';
           break;
         case 'allPage':
           params = { ...params, exportAll: true }
@@ -238,13 +239,21 @@ class TableList extends PureComponent {
       modalVisible: !!flag,
     });
   };
-
   handleUpdateModalVisible = (flag, record) => {
     this.setState({
       updateModalVisible: !!flag,
       updateFormValues: record || {},
     });
   };
+
+  handleImport = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/openMenu',
+      payload: { path: '/basic/product/import', data: {} },
+    });
+  };
+
 
   handleAdd = fields => {
     const { dispatch, form } = this.props;
@@ -450,9 +459,9 @@ class TableList extends PureComponent {
     const { selectedRows, modalVisible, updateModalVisible, updateFormValues, authorityModalVisible, authorizeUserModalVisible } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-        <Menu.Item key="remove" disabled={!hasAuthority('ProductDelete')}>删除</Menu.Item>
-        <Menu.Item key="active" disabled={!hasAuthority('ProductActive')}>批量启用</Menu.Item>
-        <Menu.Item key="deactive" disabled={!hasAuthority('ProductActive')}>批量禁用</Menu.Item>
+        <Menu.Item key="remove" disabled={!hasAuthority('Product_Delete')}>删除</Menu.Item>
+        <Menu.Item key="active" disabled={!hasAuthority('Product_Active')}>批量启用</Menu.Item>
+        <Menu.Item key="deactive" disabled={!hasAuthority('Product_Active')}>批量禁用</Menu.Item>
       </Menu>
     );
 
@@ -472,7 +481,7 @@ class TableList extends PureComponent {
               <div className={styles.tableListForm}>{this.renderForm()}</div>
               <div className={styles.tableListOperator}>
                 <Authorized authority="Product_Create">
-                  <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+                  <Button icon="plus" type="primary" onClick={() => this.handleImport(true)}>
                     从ERP导入
                 </Button>
                 </Authorized>
@@ -511,6 +520,7 @@ class TableList extends PureComponent {
                 columns={ColumnConfig.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
+                scroll={{ x: 1500 }}
               />
             </div>
           </Card>
