@@ -55,4 +55,5 @@ export default {
   'menu.sysConfig': '系统设置',
   'menu.sysConfig.user': '用户管理',
   'menu.sysConfig.role': '角色管理',
+  'menu.sysConfig.billNoRule': '编码规则',
 };

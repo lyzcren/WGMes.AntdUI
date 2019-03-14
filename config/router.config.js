@@ -127,7 +127,7 @@ export default [
         path: '/sysConfig',
         name: 'sysConfig',
         icon: 'setting',
-        authority: ['User_Read', 'Role_Read',],
+        authority: ['User_Read', 'Role_Read', 'BillNoRule_Read',],
         routes: [
           {
             path: '/sysConfig/user',
@@ -140,6 +140,12 @@ export default [
             name: 'role',
             component: './SysConfig/Role/List',
             authority: ['Role_Read'],
+          },
+          {
+            path: '/sysConfig/billNoRule',
+            name: 'billNoRule',
+            component: './SysConfig/BillNoRule/List',
+            authority: ['BillNoRule_Read'],
           },
         ],
       },
