@@ -256,7 +256,12 @@ class TableList extends PureComponent {
       billNoRuleManage: { data, queryResult },
       loading,
     } = this.props;
-    const { selectedRows, updateModalVisible, updateFormValues,  } = this.state;
+    const { selectedRows, updateModalVisible, updateFormValues, } = this.state;
+    const scrollX = ColumnConfig.columns
+      .map(c => { return c.width; })
+      .reduce(function (sum, width, index) {
+        return sum + width;
+      });
 
     const updateMethods = {
       handleModalVisible: this.handleUpdateModalVisible,
@@ -278,6 +283,7 @@ class TableList extends PureComponent {
                 columns={ColumnConfig.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
+                scroll={{ x: scrollX }}
               />
             </div>
           </Card>

@@ -43,7 +43,8 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ paramManage, loading }) => ({
+@connect(({ basicData, paramManage, loading }) => ({
+  basicData,
   paramManage,
   loading: loading.models.paramManage,
 }))
@@ -238,6 +239,11 @@ class TableList extends PureComponent {
   };
 
   handleModalVisible = flag => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'basicData/getBillNo',
+      payload: { fNumber: "TechnicalParam" }
+    });
     this.setState({
       modalVisible: !!flag,
     });
@@ -470,6 +476,7 @@ class TableList extends PureComponent {
 
   render () {
     const {
+      dispatch,
       paramManage: { data, queryResult },
       loading,
     } = this.props;
@@ -485,6 +492,7 @@ class TableList extends PureComponent {
     const parentMethods = {
       handleSubmit: this.handleAdd,
       handleModalVisible: this.handleModalVisible,
+      dispatch,
     };
     const updateMethods = {
       handleModalVisible: this.handleUpdateModalVisible,

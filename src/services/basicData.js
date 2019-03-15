@@ -20,3 +20,13 @@ export async function fakeGetRouteData (params) {
     },
   });
 }
+
+export async function fakeGetBillNo (params) {
+  return request('/api/billNoRule/Get', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'GetData',
+    },
+  });
+}

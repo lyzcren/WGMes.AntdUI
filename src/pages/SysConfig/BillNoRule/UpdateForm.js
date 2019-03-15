@@ -12,6 +12,7 @@ import {
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import { validatorPhone, } from '@/utils/validators';
+// import { getBillNoByRule } from '@/utils/utils';
 
 
 const FormItem = Form.Item;
@@ -34,11 +35,12 @@ export class UpdateForm extends PureComponent {
 
     okHandle = () => {
         const { form, handleSubmit } = this.props;
+        const { formVals } = this.state;
         form.validateFields((err, fieldsValue) => {
             if (err) return;
             // form.resetFields();
             // 设置fItemId
-            fieldsValue.fItemID = this.state.formVals.fItemID;
+            fieldsValue.fItemID = formVals.fItemID;
             handleSubmit(fieldsValue);
         });
     };
@@ -80,10 +82,10 @@ export class UpdateForm extends PureComponent {
                     </Col>
                     <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="4位年">
-                            {form.getFieldDecorator('FLongYear', {
+                            {form.getFieldDecorator('fLongYear', {
                                 rules: [{ required: false }],
                                 valuePropName: 'checked',
-                                initialValue: formVals.FLongYear,
+                                initialValue: formVals.fLongYear,
                             })(<Switch />)}
                         </FormItem>
                     </Col>
@@ -108,11 +110,14 @@ export class UpdateForm extends PureComponent {
                         </FormItem>
                     </Col>
                 </Row>
-                <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="编码长度">
+                <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="流水号长度">
                     {form.getFieldDecorator('fNoLength', {
-                        rules: [{ required: true, message: '请输入编码长度', }],
+                        rules: [{ required: true, message: '请输入流水号长度', }],
                         initialValue: formVals.fNoLength,
-                    })(<InputNumber min={1} max={5} placeholder="请输入编码长度" />)}
+                    })(<InputNumber min={1} max={6} placeholder="请输入流水号长度" />)}
+                </FormItem>
+                <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="当前编码">
+                    <Input disabled value={formVals.fCurrentNo} />
                 </FormItem>
             </Modal>
         );

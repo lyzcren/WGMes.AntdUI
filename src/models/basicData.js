@@ -1,4 +1,4 @@
-import { fakeDeptTreeData, fakeGetRouteData } from '@/services/basicData';
+import { fakeDeptTreeData, fakeGetRouteData, fakeGetBillNo } from '@/services/basicData';
 
 export default {
   namespace: 'basicData',
@@ -6,6 +6,7 @@ export default {
   state: {
     deptTreeData: [],
     routeData: [],
+    billNo: {},
   },
 
   effects: {
@@ -23,6 +24,13 @@ export default {
         payload: response,
       });
     },
+    *getBillNo ({ payload }, { call, put }) {
+      const response = yield call(fakeGetBillNo, payload);
+      yield put({
+        type: 'saveBillNoData',
+        payload: response,
+      });
+    },
   },
 
   reducers: {
@@ -36,6 +44,15 @@ export default {
       return {
         ...state,
         routeData: action.payload,
+      };
+    },
+    saveBillNoData (state, action) {
+      const billNoRule = action.payload;
+      const newBillNo = { ...state.billNo };
+      newBillNo[billNoRule.fNumber] = billNoRule.fCurrentNo;
+      return {
+        ...state,
+        billNo: newBillNo,
       };
     },
   },
