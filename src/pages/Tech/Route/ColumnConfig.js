@@ -12,6 +12,9 @@ class ColumnConfig {
       title: '名称',
       dataIndex: 'fName',
       sorter: true,
+      render: (val, record) => {
+        return <a onClick={() => this._profileModalVisible(record)}>{val}</a>;
+      },
     },
     {
       title: '编码',
@@ -31,7 +34,7 @@ class ColumnConfig {
           value: 0,
         },
       ],
-      render (val) {
+      render: (val) => {
         return <Switch disabled checked={val} />;
       },
     },
@@ -49,7 +52,7 @@ class ColumnConfig {
       title: '创建日期',
       dataIndex: 'fCreateDate',
       sorter: true,
-      render (val) {
+      render: (val) => {
         return moment(val).format('YYYY-MM-DD');
       },
     },
@@ -61,10 +64,10 @@ class ColumnConfig {
       title: '操作',
       render: (text, record) => (
         <Fragment>
-          <Authorized authority="Route_Update">
+          {/* <Authorized authority="Route_Update">
             <a onClick={() => this._profileModalVisible(record)}>详情</a>
             <Divider type="vertical" />
-          </Authorized>
+          </Authorized> */}
           <Authorized authority="Route_Update">
             <a onClick={() => this._updateModalVisible(record)}>修改</a>
             <Divider type="vertical" />
