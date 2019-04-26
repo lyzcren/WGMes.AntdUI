@@ -37,6 +37,9 @@ export default {
   'menu.account.logout': '退出登录',
 
   // 望果菜单
+  // 生产管理
+  'menu.prod': '生产管理',
+  'menu.prod.MOPlan': '生产任务',
   // 生产基础资料
   'menu.techStd': '工艺标准',
   'menu.techStd.defect': '不良信息',

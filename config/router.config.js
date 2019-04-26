@@ -48,6 +48,20 @@ export default [
         ],
       },
       {
+        path: '/prod',
+        name: 'prod',
+        icon: 'cluster',
+        authority: ['MOPlan_Read',],
+        routes: [
+          {
+            path: '/prod/MOPlan',
+            name: 'MOPlan',
+            component: './Prod/MOPlan/List',
+            authority: ['MOPlan_Read'],
+          },
+        ],
+      },
+      {
         path: '/techStd',
         name: 'techStd',
         icon: 'cluster',
