@@ -40,9 +40,9 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ productManage, loading }) => ({
-  productManage,
-  loading: loading.models.productManage,
+@connect(({ syncProductManage, loading }) => ({
+  syncProductManage,
+  loading: loading.models.syncProductManage,
 }))
 @Form.create()
 class TableList extends PureComponent {
@@ -69,7 +69,7 @@ class TableList extends PureComponent {
   getList = (params) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'productManage/fetchErp',
+      type: 'syncProductManage/fetch',
       payload: params,
     });
   }
@@ -191,10 +191,10 @@ class TableList extends PureComponent {
   handleImport = (record) => {
     const { dispatch, form } = this.props;
     dispatch({
-      type: 'productManage/add',
-      payload: record
+      type: 'syncProductManage/add',
+      payload: { product: record }
     }).then(() => {
-      const { productManage: { queryResult } } = this.props;
+      const { syncProductManage: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
         message.success('添加成功');
         // 成功后再次刷新列表
@@ -246,7 +246,7 @@ class TableList extends PureComponent {
 
   render () {
     const {
-      productManage: { dataErp, queryResult },
+      syncProductManage: { data, queryResult },
       loading,
     } = this.props;
     const { selectedRows, } = this.state;
@@ -275,7 +275,7 @@ class TableList extends PureComponent {
                 rowKey="fItemID"
                 selectedRows={selectedRows}
                 loading={loading}
-                data={dataErp}
+                data={data}
                 columns={ColumnConfig.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}

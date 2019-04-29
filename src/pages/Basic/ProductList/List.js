@@ -41,8 +41,9 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ productManage, menu, loading }) => ({
+@connect(({ productManage, syncProductManage, menu, loading }) => ({
   productManage,
+  syncProductManage,
   menu,
   loading: loading.models.productManage,
 }))
@@ -59,6 +60,7 @@ class TableList extends PureComponent {
     expandForm: false,
     selectedRows: [],
     queryFilters: [],
+    isSyncing: false,
   };
 
   // 列表查询参数
@@ -75,6 +77,7 @@ class TableList extends PureComponent {
       type: 'productManage/fetch',
       payload: params,
     });
+    this.Checkk3Syncing();
     // 列配置相关方法
     ColumnConfig.UpdateModalVisibleCallback = (record) => this.handleUpdateModalVisible(true, record);
     ColumnConfig.DeleteCallback = (record) => this.handleDelete(record);
@@ -257,27 +260,46 @@ class TableList extends PureComponent {
   handleSync = () => {
     Modal.confirm({
       title: '同步物料',
-      content: '从ERP同步物料会等待较长时间，确定同步物料吗？',
+      content: '从 K3 一键同步物料会等待较长时间，确定同步物料吗？',
       okText: '确认',
       cancelText: '取消',
       onOk: () => {
         const { dispatch, form } = this.props;
         dispatch({
-          type: 'productManage/sync',
-        }).then(() => {
-          const { productManage: { queryResult } } = this.props;
-          if (queryResult.status === 'ok') {
-            message.success('同步物料成功');
-            // 成功后再次刷新列表
-            this.search();
-          } else {
-            message.warning(queryResult.message);
-          }
-        });
+          type: 'syncProductManage/sync',
+        })
+        // .then(() => {
+        //   const { syncProductManage: { queryResult } } = this.props;
+        //   if (queryResult.status === 'ok') {
+        //     message.success('同步物料成功');
+        //     // // 成功后再次刷新列表
+        //     // this.search();
+        //   } else {
+        //     message.warning(queryResult.message);
+        //   }
+        // });
+        // 检查同步状态
+        this.Checkk3Syncing();
       }
     });
   };
 
+  Checkk3Syncing = () => {
+    const { dispatch, form } = this.props;
+    dispatch({
+      type: 'syncProductManage/isSyncing',
+    }).then(() => {
+      const { syncProductManage: { isSyncing } } = this.props;
+      this.setState({
+        isSyncing: isSyncing,
+      });
+      if (isSyncing) {
+        setTimeout(() => {
+          this.Checkk3Syncing();
+        }, 3000);
+      }
+    });
+  }
 
   handleAdd = fields => {
     const { dispatch, form } = this.props;
@@ -481,7 +503,8 @@ class TableList extends PureComponent {
       productManage: { data, queryResult },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, updateFormValues, authorityModalVisible, authorizeUserModalVisible } = this.state;
+    const { selectedRows, modalVisible, updateModalVisible, updateFormValues, authorityModalVisible, authorizeUserModalVisible,
+      isSyncing, } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove" disabled={!hasAuthority('Product_Delete')}>删除</Menu.Item>
@@ -514,10 +537,10 @@ class TableList extends PureComponent {
               <div className={styles.tableListOperator}>
                 <Authorized authority="Product_Create">
                   <Button icon="plus" type="primary" onClick={() => this.handleImport(true)}>
-                    从ERP导入
+                    从 K3 手动导入
                 </Button>
-                  <Button icon="plus" type="primary" onClick={() => this.handleSync()}>
-                    从ERP同步
+                  <Button icon="plus" type="primary" loading={isSyncing} onClick={() => this.handleSync()}>
+                    从 K3 一键同步
                 </Button>
                 </Authorized>
                 <Authorized authority="Product_Export">

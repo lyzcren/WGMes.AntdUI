@@ -1,14 +1,10 @@
-import { fakeQuery, fakeQueryErp, fakeRemove, fakeAdd, fakeUpdate, fakeActive, fakeSync, fakeIsSyncing, } from '@/services/Basic/ProductList';
+import { fakeQueryErp, fakeAdd, fakeSync, fakeIsSyncing, } from '@/services/Basic/ProductList';
 
 export default {
-  namespace: 'productManage',
+  namespace: 'syncProductManage',
 
   state: {
     data: {
-      list: [],
-      pagination: {},
-    },
-    dataErp: {
       list: [],
       pagination: {},
     },
@@ -21,16 +17,9 @@ export default {
 
   effects: {
     *fetch ({ payload }, { call, put }) {
-      const response = yield call(fakeQuery, payload);
-      yield put({
-        type: 'saveQueryData',
-        payload: response,
-      });
-    },
-    *fetchErp ({ payload }, { call, put }) {
       const response = yield call(fakeQueryErp, payload);
       yield put({
-        type: 'saveDataErp',
+        type: 'saveQueryData',
         payload: response,
       });
     },
@@ -58,30 +47,6 @@ export default {
       });
       if (callback) callback();
     },
-    *remove ({ payload, callback }, { call, put }) {
-      const response = yield call(fakeRemove, payload);
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
-      if (callback) callback();
-    },
-    *update ({ payload, callback }, { call, put }) {
-      const response = yield call(fakeUpdate, payload);
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
-      if (callback) callback();
-    },
-    *active ({ payload, callback }, { call, put }) {
-      const response = yield call(fakeActive, payload);
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
-      if (callback) callback();
-    },
   },
 
   reducers: {
@@ -89,12 +54,6 @@ export default {
       return {
         ...state,
         data: action.payload,
-      };
-    },
-    saveDataErp (state, action) {
-      return {
-        ...state,
-        dataErp: action.payload,
       };
     },
     saveData (state, action) {
@@ -106,7 +65,7 @@ export default {
     saveSyncing (state, action) {
       return {
         ...state,
-        isSyncing: action.payload ? action.payload.isSyncing : {},
+        isSyncing: action.payload ? action.payload : false,
       };
     },
   },

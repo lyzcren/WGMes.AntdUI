@@ -42,6 +42,17 @@ export async function fakeSync (params) {
   });
 }
 
+export async function fakeIsSyncing (params) {
+  return request('/api/ProductList/isSyncing', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'isSyncing',
+    },
+  });
+  // return request(`/api/ProductList/isSyncing?${stringify(params)}`);
+}
+
 export async function fakeAdd (params) {
   return request('/api/ProductList', {
     method: 'POST',

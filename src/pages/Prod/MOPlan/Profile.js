@@ -53,7 +53,6 @@ class Profile extends PureComponent {
 
   componentDidMount () {
     const { data: { guid } } = this.props;
-    this.loadData(guid);
   }
 
   componentDidUpdate (preProps) {
