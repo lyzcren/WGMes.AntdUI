@@ -1,4 +1,4 @@
-import { fakeQuery, fakeSync } from '@/services/Prod/MOPlan';
+import { fakeQuery, fakeGet, fakeSync } from '@/services/Prod/MOPlan';
 
 export default {
   namespace: 'mOPlanManage',
@@ -19,6 +19,13 @@ export default {
       const response = yield call(fakeQuery, payload);
       yield put({
         type: 'saveQueryData',
+        payload: response,
+      });
+    },
+    *get ({ payload }, { call, put }) {
+      const response = yield call(fakeGet, payload);
+      yield put({
+        type: 'saveData',
         payload: response,
       });
     },

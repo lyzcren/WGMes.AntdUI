@@ -1,4 +1,4 @@
-import { fakeQuery, fakeQueryErp, fakeRemove, fakeAdd, fakeUpdate, fakeActive } from '@/services/Basic/ProductList';
+import { fakeQuery, fakeQueryErp, fakeRemove, fakeAdd, fakeUpdate, fakeActive, fakeSync, } from '@/services/Basic/ProductList';
 
 export default {
   namespace: 'productManage',
@@ -35,6 +35,14 @@ export default {
     },
     *add ({ payload, callback }, { call, put }) {
       const response = yield call(fakeAdd, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    *sync ({ payload, callback }, { call, put }) {
+      const response = yield call(fakeSync, payload);
       yield put({
         type: 'saveData',
         payload: response,

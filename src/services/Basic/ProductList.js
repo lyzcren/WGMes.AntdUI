@@ -32,6 +32,16 @@ export async function fakeRemove (params) {
   });
 }
 
+export async function fakeSync (params) {
+  return request('/api/ProductList/sync', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'sync',
+    },
+  });
+}
+
 export async function fakeAdd (params) {
   return request('/api/ProductList', {
     method: 'POST',

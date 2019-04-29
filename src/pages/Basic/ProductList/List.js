@@ -254,6 +254,30 @@ class TableList extends PureComponent {
     });
   };
 
+  handleSync = () => {
+    Modal.confirm({
+      title: '同步物料',
+      content: '从ERP同步物料会等待较长时间，确定同步物料吗？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => {
+        const { dispatch, form } = this.props;
+        dispatch({
+          type: 'productManage/sync',
+        }).then(() => {
+          const { productManage: { queryResult } } = this.props;
+          if (queryResult.status === 'ok') {
+            message.success('同步物料成功');
+            // 成功后再次刷新列表
+            this.search();
+          } else {
+            message.warning(queryResult.message);
+          }
+        });
+      }
+    });
+  };
+
 
   handleAdd = fields => {
     const { dispatch, form } = this.props;
@@ -491,6 +515,9 @@ class TableList extends PureComponent {
                 <Authorized authority="Product_Create">
                   <Button icon="plus" type="primary" onClick={() => this.handleImport(true)}>
                     从ERP导入
+                </Button>
+                  <Button icon="plus" type="primary" onClick={() => this.handleSync()}>
+                    从ERP同步
                 </Button>
                 </Authorized>
                 <Authorized authority="Product_Export">

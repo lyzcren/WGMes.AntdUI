@@ -3,7 +3,7 @@ import request from '@/utils/request';
 
 
 export async function fakeQuery (params) {
-  return request('/api/MOPlan/getList', {
+  return request('/api/MOPlan/page', {
     method: 'POST',
     body: {
       ...params,
@@ -12,12 +12,23 @@ export async function fakeQuery (params) {
   });
 }
 
+export async function fakeGet (params) {
+  return request(`/api/MOPlan?${stringify(params)}`);
+  // return request('/api/MOPlan', {
+  //   method: 'GET',
+  //   body: {
+  //     ...params,
+  //     method: 'get',
+  //   },
+  // });
+}
+
 export async function fakeSync (params) {
   return request('/api/MOPlan/sync', {
     method: 'POST',
     body: {
       ...params,
-      method: 'delete',
+      method: 'sync',
     },
   });
 }

@@ -58,6 +58,15 @@ export default [
             name: 'MOPlan',
             component: './Prod/MOPlan/List',
             authority: ['MOPlan_Read'],
+            routes: [
+              {
+                path: '/prod/MOPlan/profile',
+                name: 'profile',
+                component: './Prod/MOPlan/Profile',
+                authority: ['MOPlan_Read'],
+                hideInMenu: true,
+              },
+            ],
           },
         ],
       },
@@ -170,35 +179,35 @@ export default [
           },
         ],
       },
-      {
-        name: 'exception',
-        icon: 'warning',
-        path: '/exception',
-        routes: [
-          // exception
-          {
-            path: '/exception/403',
-            name: 'not-permission',
-            component: './Exception/403',
-          },
-          {
-            path: '/exception/404',
-            name: 'not-find',
-            component: './Exception/404',
-          },
-          {
-            path: '/exception/500',
-            name: 'server-error',
-            component: './Exception/500',
-          },
-          {
-            path: '/exception/trigger',
-            name: 'trigger',
-            hideInMenu: true,
-            component: './Exception/TriggerException',
-          },
-        ],
-      },
+      // {
+      //   name: 'exception',
+      //   icon: 'warning',
+      //   path: '/exception',
+      //   routes: [
+      //     // exception
+      //     {
+      //       path: '/exception/403',
+      //       name: 'not-permission',
+      //       component: './Exception/403',
+      //     },
+      //     {
+      //       path: '/exception/404',
+      //       name: 'not-find',
+      //       component: './Exception/404',
+      //     },
+      //     {
+      //       path: '/exception/500',
+      //       name: 'server-error',
+      //       component: './Exception/500',
+      //     },
+      //     {
+      //       path: '/exception/trigger',
+      //       name: 'trigger',
+      //       hideInMenu: true,
+      //       component: './Exception/TriggerException',
+      //     },
+      //   ],
+      // },
       // account
       {
         name: 'account',

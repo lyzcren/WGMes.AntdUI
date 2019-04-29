@@ -24,8 +24,7 @@ import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
-import { UpdateForm } from './UpdateForm';
-import { CreateForm } from './CreateForm';
+import { FlowForm } from './FlowForm';
 import { default as ColumnConfig } from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
@@ -41,20 +40,22 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ mOPlanManage, loading }) => ({
+@connect(({ mOPlanManage, loading, menu }) => ({
   mOPlanManage,
   loading: loading.models.mOPlanManage,
+  menu,
 }))
 @Form.create()
 class TableList extends PureComponent {
   state = {
-    // 新增界面
-    modalVisible: false,
+    // 界面是否可见
+    modalVisible: {
+      update: false,
+    },
     formValues: {},
-    // 修改界面
-    updateModalVisible: false,
-    updateFormValues: {},
-    // 其他
+    // 当前操作选中列的数据
+    currentFormValues: {},
+    // expandForm: 是否展开更多查询条件
     expandForm: false,
     selectedRows: [],
     queryFilters: [],
@@ -75,7 +76,8 @@ class TableList extends PureComponent {
       payload: params,
     });
     // 列配置相关方法
-    ColumnConfig.UpdateModalVisibleCallback = (record) => this.handleUpdateModalVisible(true, record);
+    ColumnConfig.ProfileModalVisibleCallback = (record) => this.handleProfileModalVisible(true, record);
+    ColumnConfig.FlowModalVisibleCallback = (record) => this.handleFlowModalVisible(true, record);
     ColumnConfig.DeleteCallback = (record) => this.handleDelete(record);
   }
 
@@ -183,7 +185,7 @@ class TableList extends PureComponent {
     }).then(() => {
       const { mOPlanManage: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
-        message.success('同步成功');
+        message.success('同步生产任务成功');
         // 成功后再次刷新列表
         this.search();
       } else {
@@ -215,6 +217,14 @@ class TableList extends PureComponent {
     });
   };
 
+  handleProfileModalVisible = (flag, record) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/openMenu',
+      payload: { path: '/prod/MOPlan/profile', data: record },
+    });
+  };
+
   toggleForm = () => {
     const { expandForm } = this.state;
     this.setState({
@@ -228,38 +238,15 @@ class TableList extends PureComponent {
     });
   };
 
-  handleModalVisible = flag => {
+  handleFlowModalVisible = (flag, record) => {
+    const { modalVisible } = this.state;
     this.setState({
-      modalVisible: !!flag,
+      modalVisible: { ...modalVisible, update: !!flag },
+      currentFormValues: record || {},
     });
   };
 
-  handleUpdateModalVisible = (flag, record) => {
-    this.setState({
-      updateModalVisible: !!flag,
-      updateFormValues: record || {},
-    });
-  };
-
-  handleAdd = fields => {
-    const { dispatch, form } = this.props;
-    dispatch({
-      type: 'mOPlanManage/add',
-      payload: fields
-    }).then(() => {
-      const { mOPlanManage: { queryResult } } = this.props;
-      if (queryResult.status === 'ok') {
-        message.success('添加成功');
-        this.handleModalVisible();
-        // 成功后再次刷新列表
-        this.search();
-      } else {
-        message.warning(queryResult.message);
-      }
-    });
-  };
-
-  handleUpdate = fields => {
+  handleGenFlow = fields => {
     const { dispatch } = this.props;
     dispatch({
       type: 'mOPlanManage/update',
@@ -268,7 +255,7 @@ class TableList extends PureComponent {
       const { mOPlanManage: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
         message.success('修改成功');
-        this.handleUpdateModalVisible();
+        this.handleFlowModalVisible();
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
@@ -329,15 +316,11 @@ class TableList extends PureComponent {
       mOPlanManage: { data, queryResult },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, updateFormValues, authorityModalVisible, authorizeUserModalVisible } = this.state;
+    const { selectedRows, modalVisible, currentFormValues, authorityModalVisible, authorizeUserModalVisible } = this.state;
 
-    const parentMethods = {
-      handleSubmit: this.handleAdd,
-      handleModalVisible: this.handleModalVisible,
-    };
-    const updateMethods = {
-      handleModalVisible: this.handleUpdateModalVisible,
-      handleSubmit: this.handleUpdate,
+    const flowMethods = {
+      handleModalVisible: this.handleFlowModalVisible,
+      handleSubmit: this.handleGenFlow,
     };
     const scrollX = ColumnConfig.columns
       .map(c => { return c.width; })
@@ -353,7 +336,7 @@ class TableList extends PureComponent {
               <div className={styles.tableListOperator}>
                 <Authorized authority="MOPlan_Sync">
                   <Button icon="plus" type="primary" onClick={() => this.handleSync()}>
-                    同步
+                    从 K3 同步
                 </Button>
                 </Authorized>
                 <Authorized authority="MOPlan_Export">
@@ -370,7 +353,7 @@ class TableList extends PureComponent {
                 </Authorized>
               </div>
               <StandardTable
-                rowKey="fItemID"
+                rowKey="guid"
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
@@ -381,12 +364,11 @@ class TableList extends PureComponent {
               />
             </div>
           </Card>
-          <CreateForm {...parentMethods} modalVisible={modalVisible} />
-          {updateFormValues && Object.keys(updateFormValues).length ? (
-            <UpdateForm
-              {...updateMethods}
-              updateModalVisible={updateModalVisible}
-              values={updateFormValues}
+          {currentFormValues && Object.keys(currentFormValues).length ? (
+            <FlowForm
+              {...flowMethods}
+              modalVisible={modalVisible.update}
+              values={currentFormValues}
             />
           ) : null}
         </GridContent>

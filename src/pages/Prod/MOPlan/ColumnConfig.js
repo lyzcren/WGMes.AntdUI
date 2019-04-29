@@ -3,10 +3,17 @@ import { Switch, Popconfirm, Divider } from 'antd';
 import moment from 'moment';
 import Authorized from '@/utils/Authorized';
 
-const activeData = ['启用', '禁用',];
 
 class ColumnConfig {
   columns = [
+    {
+      title: '生产任务单号',
+      dataIndex: 'fMoBillNo',
+      width: 180,
+      render: (val, record) => {
+        return <a onClick={() => this._profileModalVisibleCallback(record)}>{val}</a>;
+      },
+    },
     {
       title: '日期',
       dataIndex: 'fDate',
@@ -27,17 +34,12 @@ class ColumnConfig {
     },
     {
       title: '订单号',
-      dataIndex: 'fSOBillNo',
-      width: 180,
-    },
-    {
-      title: '生产任务单号',
-      dataIndex: 'fMOBillNo',
+      dataIndex: 'fSoBillNo',
       width: 180,
     },
     {
       title: '任务单数量',
-      dataIndex: 'fMOQty',
+      dataIndex: 'fMoQty',
       width: 180,
     },
     {
@@ -69,7 +71,7 @@ class ColumnConfig {
     {
       title: '规格型号',
       dataIndex: 'fModel',
-      width: 180,
+      width: 220,
     },
     {
       title: '工艺路线',
@@ -122,15 +124,6 @@ class ColumnConfig {
       title: '报废数量',
       dataIndex: 'fScrapQty',
       width: 150,
-    },
-    {
-      title: '日期',
-      dataIndex: 'fDate',
-      sorter: true,
-      width: 150,
-      render: (val) => {
-        return moment(val).format('YYYY-MM-DD');
-      },
     },
     {
       title: '单位',
@@ -205,18 +198,25 @@ class ColumnConfig {
       render: (text, record) => (
         <Fragment>
           <Authorized authority="MOPlan_Read">
-            <a onClick={() => this._updateModalVisible(record)}>详情</a>
+            <a onClick={() => this._profileModalVisibleCallback(record)}>详情</a>
             <Divider type="vertical" />
+            <a onClick={() => this._flowModalVisibleCallback(record)}>开流程单</a>
           </Authorized>
         </Fragment>
       ),
     },
   ];
 
-  // 修改方法
-  UpdateModalVisibleCallback = (record) => { };
-  _updateModalVisible = (record) => {
-    this.UpdateModalVisibleCallback(record);
+  // 详情方法
+  ProfileModalVisibleCallback = (record) => { };
+  _profileModalVisibleCallback = (record) => {
+    this.ProfileModalVisibleCallback(record);
+  };
+
+  // 流程单方法
+  FlowModalVisibleCallback = (record) => { };
+  _flowModalVisibleCallback = (record) => {
+    this.FlowModalVisibleCallback(record);
   };
 
 }

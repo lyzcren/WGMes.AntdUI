@@ -39,7 +39,8 @@ export default {
   // 望果菜单
   // 生产管理
   'menu.prod': '生产管理',
-  'menu.prod.MOPlan': '生产任务',
+  'menu.prod.MOPlan': '生产任务单',
+  'menu.prod.MOPlan.profile': '生产任务单详情',
   // 生产基础资料
   'menu.techStd': '工艺标准',
   'menu.techStd.defect': '不良信息',
