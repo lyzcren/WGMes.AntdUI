@@ -35,9 +35,11 @@ export default {
       };
     },
     saveCurrentUser (state, action) {
-      setAuthority(action.payload.currentAuthority);
-      if (action.payload.token) {
-        setToken(action.payload.token);
+      if (action.payload) {
+        setAuthority(action.payload.currentAuthority);
+        if (action.payload.token) {
+          setToken(action.payload.token);
+        }
       }
       return {
         ...state,

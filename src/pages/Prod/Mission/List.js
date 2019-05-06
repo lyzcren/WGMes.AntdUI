@@ -40,9 +40,9 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ mOPlanManage, loading, menu }) => ({
-  mOPlanManage,
-  loading: loading.models.mOPlanManage,
+@connect(({ missionManage, loading, menu }) => ({
+  missionManage,
+  loading: loading.models.missionManage,
   menu,
 }))
 @Form.create()
@@ -72,7 +72,7 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     var params = { pagination: this.currentPagination };
     dispatch({
-      type: 'mOPlanManage/fetch',
+      type: 'missionManage/fetch',
       payload: params,
     });
     // 列配置相关方法
@@ -107,7 +107,7 @@ class TableList extends PureComponent {
     var params = { pagination: this.currentPagination };
 
     dispatch({
-      type: 'mOPlanManage/fetch',
+      type: 'missionManage/fetch',
       payload: params,
     });
   };
@@ -150,7 +150,7 @@ class TableList extends PureComponent {
 
       var params = this.getSearchParam(fieldsValue);
       dispatch({
-        type: 'mOPlanManage/fetch',
+        type: 'missionManage/fetch',
         payload: params,
       });
     });
@@ -173,7 +173,7 @@ class TableList extends PureComponent {
     var params = { pagination: this.currentPagination };
 
     dispatch({
-      type: 'mOPlanManage/fetch',
+      type: 'missionManage/fetch',
       payload: params,
     });
   };
@@ -181,9 +181,9 @@ class TableList extends PureComponent {
   handleSync = () => {
     const { dispatch, form } = this.props;
     dispatch({
-      type: 'mOPlanManage/sync',
+      type: 'missionManage/sync',
     }).then(() => {
-      const { mOPlanManage: { queryResult } } = this.props;
+      const { missionManage: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
         message.success('同步生产任务成功');
         // 成功后再次刷新列表
@@ -213,7 +213,7 @@ class TableList extends PureComponent {
         default:
           break;
       }
-      exportExcel('/api/mOPlan/export', params, fileName)
+      exportExcel('/api/mission/export', params, fileName)
     });
   };
 
@@ -221,7 +221,7 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/MOPlan/profile', data: record },
+      payload: { path: '/prod/mission/profile', data: record },
     });
   };
 
@@ -243,27 +243,6 @@ class TableList extends PureComponent {
     this.setState({
       modalVisible: { ...modalVisible, update: !!flag },
       currentFormValues: record || {},
-    });
-  };
-
-  handleGenFlow = fields => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'mOPlanManage/update',
-      payload: fields,
-    }).then(() => {
-      const { mOPlanManage: { queryResult } } = this.props;
-      if (queryResult.status === 'ok') {
-        message.success('修改成功');
-        this.handleFlowModalVisible();
-        // 成功后再次刷新列表
-        this.search();
-      } else if (queryResult.status === 'warning') {
-        message.warning(queryResult.message);
-      }
-      else {
-        message.error(queryResult.message);
-      }
     });
   };
 
@@ -313,14 +292,15 @@ class TableList extends PureComponent {
 
   render () {
     const {
-      mOPlanManage: { data, queryResult },
+      missionManage: { data, queryResult },
       loading,
     } = this.props;
     const { selectedRows, modalVisible, currentFormValues, authorityModalVisible, authorizeUserModalVisible } = this.state;
 
     const flowMethods = {
       handleModalVisible: this.handleFlowModalVisible,
-      handleSubmit: this.handleGenFlow,
+      dispatch: this.props.dispatch,
+      handleSuccess: this.search,
     };
     const scrollX = ColumnConfig.columns
       .map(c => { return c.width; })
@@ -334,12 +314,12 @@ class TableList extends PureComponent {
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
               <div className={styles.tableListOperator}>
-                <Authorized authority="MOPlan_Sync">
+                <Authorized authority="Mission_Sync">
                   <Button icon="plus" type="primary" onClick={() => this.handleSync()}>
                     从 K3 同步
                 </Button>
                 </Authorized>
-                <Authorized authority="MOPlan_Export">
+                <Authorized authority="Mission_Export">
                   <Dropdown overlay={
                     <Menu onClick={this.handleExport} selectedKeys={[]}>
                       <Menu.Item key="currentPage">当前页</Menu.Item>
@@ -353,7 +333,7 @@ class TableList extends PureComponent {
                 </Authorized>
               </div>
               <StandardTable
-                rowKey="guid"
+                rowKey="fInterID"
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}

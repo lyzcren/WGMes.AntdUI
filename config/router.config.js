@@ -50,23 +50,29 @@ export default [
       {
         path: '/prod',
         name: 'prod',
-        icon: 'cluster',
-        authority: ['MOPlan_Read',],
+        icon: 'tool',
+        authority: ['Mission_Read', 'Flow_Read',],
         routes: [
           {
-            path: '/prod/MOPlan',
-            name: 'MOPlan',
-            component: './Prod/MOPlan/List',
-            authority: ['MOPlan_Read'],
+            path: '/prod/mission',
+            name: 'mission',
+            component: './Prod/Mission/List',
+            authority: ['Mission_Read'],
             routes: [
               {
-                path: '/prod/MOPlan/profile',
+                path: '/prod/mission/profile',
                 name: 'profile',
-                component: './Prod/MOPlan/Profile',
-                authority: ['MOPlan_Read'],
+                component: './Prod/Mission/Profile',
+                authority: ['Mission_Read'],
                 hideInMenu: true,
               },
             ],
+          },
+          {
+            path: '/prod/flow',
+            name: 'flow',
+            component: './Prod/Flow/List',
+            authority: ['Flow_Read'],
           },
         ],
       },
@@ -108,7 +114,7 @@ export default [
       {
         path: '/basic',
         name: 'basic',
-        icon: 'cluster',
+        icon: 'deployment-unit',
         authority: ['Product_Read', 'Dept_Read', 'Unit_Read', 'Machine_Read', 'Emp_Read',],
         routes: [
           {

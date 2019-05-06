@@ -1,9 +1,9 @@
 
-import { fakeGet, } from '@/services/Prod/MOPlan';
+import { fakeGet, } from '@/services/Prod/Mission';
 import GlobalConst from '@/utils/GlobalConst'
 
 export default {
-  namespace: 'moPlanProfile',
+  namespace: 'missionProfile',
 
   state: {
     data: {

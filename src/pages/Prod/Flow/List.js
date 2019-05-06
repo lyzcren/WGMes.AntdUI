@@ -41,11 +41,9 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ productManage, syncProductManage, menu, loading }) => ({
-  productManage,
-  syncProductManage,
-  menu,
-  loading: loading.models.productManage,
+@connect(({ flowManage, loading }) => ({
+  flowManage,
+  loading: loading.models.flowManage,
 }))
 @Form.create()
 class TableList extends PureComponent {
@@ -60,7 +58,6 @@ class TableList extends PureComponent {
     expandForm: false,
     selectedRows: [],
     queryFilters: [],
-    isSyncing: false,
   };
 
   // 列表查询参数
@@ -74,10 +71,9 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     var params = { pagination: this.currentPagination };
     dispatch({
-      type: 'productManage/fetch',
+      type: 'flowManage/fetch',
       payload: params,
     });
-    this.Checkk3Syncing();
     // 列配置相关方法
     ColumnConfig.UpdateModalVisibleCallback = (record) => this.handleUpdateModalVisible(true, record);
     ColumnConfig.DeleteCallback = (record) => this.handleDelete(record);
@@ -110,7 +106,7 @@ class TableList extends PureComponent {
     var params = { pagination: this.currentPagination };
 
     dispatch({
-      type: 'productManage/fetch',
+      type: 'flowManage/fetch',
       payload: params,
     });
   };
@@ -127,10 +123,6 @@ class TableList extends PureComponent {
     // 查询条件处理
     const queryFilters = [];
     if (fieldsValue.queryName) queryFilters.push({ name: "fName", compare: "%*%", value: fieldsValue.queryName });
-    if (fieldsValue.queryNumber) queryFilters.push({ name: "fNumber", compare: "%*%", value: fieldsValue.queryNumber });
-    if (fieldsValue.queryModel) queryFilters.push({ name: "fModel", compare: "%*%", value: fieldsValue.queryModel });
-    if (fieldsValue.queryRouteName) queryFilters.push({ name: "fRouteName", compare: "%*%", value: fieldsValue.queryRouteName });
-    if (fieldsValue.queryClsName) queryFilters.push({ name: "fErpClsName", compare: "%*%", value: fieldsValue.queryClsName });
     if (fieldsValue.queryIsActive) queryFilters.push({ name: "fIsActive", compare: "=", value: fieldsValue.queryIsActive });
 
     this.setState({
@@ -157,7 +149,7 @@ class TableList extends PureComponent {
 
       var params = this.getSearchParam(fieldsValue);
       dispatch({
-        type: 'productManage/fetch',
+        type: 'flowManage/fetch',
         payload: params,
       });
     });
@@ -180,7 +172,7 @@ class TableList extends PureComponent {
     var params = { pagination: this.currentPagination };
 
     dispatch({
-      type: 'productManage/fetch',
+      type: 'flowManage/fetch',
       payload: params,
     });
   };
@@ -192,11 +184,11 @@ class TableList extends PureComponent {
       if (err) return;
 
       var params = this.getSearchParam(fieldsValue);
-      var fileName = '导出.xls';
+	  var fileName = '导出.xls';
       switch (e.key) {
         case 'currentPage':
           params = { ...params, exportPage: true }
-          fileName = '导出-第' + params.pagination.current + '页.xls';
+		  fileName = '导出-第' + params.pagination.current + '页.xls';
           break;
         case 'allPage':
           params = { ...params, exportAll: true }
@@ -204,7 +196,7 @@ class TableList extends PureComponent {
         default:
           break;
       }
-      exportExcel('/api/productList/export', params, fileName)
+      exportExcel('/api/flow/export', params, fileName)
     });
   };
 
@@ -246,6 +238,7 @@ class TableList extends PureComponent {
       modalVisible: !!flag,
     });
   };
+
   handleUpdateModalVisible = (flag, record) => {
     this.setState({
       updateModalVisible: !!flag,
@@ -253,71 +246,13 @@ class TableList extends PureComponent {
     });
   };
 
-  handleImport = () => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'menu/openMenu',
-      payload: { path: '/basic/product/import', data: {} },
-    });
-  };
-
-  handleSync = () => {
-    Modal.confirm({
-      title: '同步物料',
-      content: '从 K3 一键同步物料会等待较长时间，确定同步物料吗？',
-      okText: '确认',
-      cancelText: '取消',
-      onOk: () => {
-        const { dispatch, form } = this.props;
-        this.setState({
-          isSyncing: true,
-        });
-        dispatch({
-          type: 'syncProductManage/sync',
-        })
-        // .then(() => {
-        //   const { syncProductManage: { queryResult } } = this.props;
-        //   if (queryResult.status === 'ok') {
-        //     message.success('同步任务后台运行中');
-        //   } else {
-        //     message.warning(queryResult.message);
-        //   }
-        // });
-        setTimeout(() => {
-          // 检查同步状态
-          this.Checkk3Syncing();
-        }, 3000);
-      }
-    });
-  };
-
-  Checkk3Syncing = () => {
-    const { dispatch, form } = this.props;
-    dispatch({
-      type: 'syncProductManage/isSyncing',
-    }).then(() => {
-      const { syncProductManage: { isSyncing } } = this.props;
-      if (isSyncing) {
-        setTimeout(() => {
-          this.Checkk3Syncing();
-        }, 3000);
-      } else {
-        if (this.state.isSyncing)
-          message.success('从 K3 同步物料已完成');
-      }
-      this.setState({
-        isSyncing: isSyncing,
-      });
-    });
-  }
-
   handleAdd = fields => {
     const { dispatch, form } = this.props;
     dispatch({
-      type: 'productManage/add',
+      type: 'flowManage/add',
       payload: fields
     }).then(() => {
-      const { productManage: { queryResult } } = this.props;
+      const { flowManage: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
         message.success('添加成功');
         this.handleModalVisible();
@@ -332,10 +267,10 @@ class TableList extends PureComponent {
   handleUpdate = fields => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'productManage/update',
+      type: 'flowManage/update',
       payload: fields,
     }).then(() => {
-      const { productManage: { queryResult } } = this.props;
+      const { flowManage: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
         message.success('修改成功');
         this.handleUpdateModalVisible();
@@ -353,13 +288,13 @@ class TableList extends PureComponent {
   handleActive = (record, fIsActive) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'productManage/active',
+      type: 'flowManage/active',
       payload: {
         fItemID: record.fItemID,
         fIsActive,
       },
     }).then(() => {
-      const { productManage: { queryResult } } = this.props;
+      const { flowManage: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
         message.success('【' + record.fName + '】' + (fIsActive ? '启用' : '禁用') + '成功');
         // 成功后再次刷新列表
@@ -376,7 +311,7 @@ class TableList extends PureComponent {
   handleDelete = (record) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'productManage/remove',
+      type: 'flowManage/remove',
       payload: {
         fItemID: record.fItemID,
       },
@@ -384,7 +319,7 @@ class TableList extends PureComponent {
         this.setState({
           selectedRows: [],
         });
-        const { productManage: { queryResult } } = this.props;
+        const { flowManage: { queryResult } } = this.props;
         if (queryResult.status === 'ok') {
           message.success('【' + record.fName + '】' + '删除成功');
           // 成功后再次刷新列表
@@ -488,7 +423,7 @@ class TableList extends PureComponent {
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
               </Button>
-              <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
+              <a style={{ marginLeft: 8 }} onClick={this.toggleForm} hidden>
                 展开 <Icon type="down" />
               </a>
             </span>
@@ -499,65 +434,7 @@ class TableList extends PureComponent {
   }
 
   renderAdvancedForm () {
-    const {
-      form: { getFieldDecorator },
-    } = this.props;
-    return (
-      <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={8} sm={24}>
-            <FormItem id="queryName" label="名称">
-              {getFieldDecorator('queryName')(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="编码">
-              {getFieldDecorator('queryNumber')(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="规格">
-              {getFieldDecorator('queryModel')(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col>
-        </Row>
-        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={8} sm={24}>
-            <FormItem label="工艺路线">
-              {getFieldDecorator('queryRouteName')(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="物料属性">
-              {getFieldDecorator('queryClsName')(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="状态">
-              {getFieldDecorator('queryIsActive')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="1">启用</Option>
-                  <Option value="0">禁用</Option>
-                </Select>
-              )}
-            </FormItem>
-          </Col>
-        </Row>
-        <div style={{ overflow: 'hidden' }}>
-          <div style={{ float: 'right', marginBottom: 24 }}>
-            <Button type="primary" htmlType="submit">
-              查询
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              重置
-            </Button>
-            <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-              收起 <Icon type="up" />
-            </a>
-          </div>
-        </div>
-      </Form>
-    );
+    return renderSimpleForm;
   }
 
   renderForm () {
@@ -567,17 +444,15 @@ class TableList extends PureComponent {
 
   render () {
     const {
-      dispatch,
-      productManage: { data, queryResult },
+      flowManage: { data, queryResult },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, updateFormValues, authorityModalVisible, authorizeUserModalVisible,
-      isSyncing, } = this.state;
+    const { selectedRows, modalVisible, updateModalVisible, updateFormValues, authorityModalVisible, authorizeUserModalVisible } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-        <Menu.Item key="remove" disabled={!hasAuthority('Product_Delete')}>删除</Menu.Item>
-        <Menu.Item key="active" disabled={!hasAuthority('Product_Active')}>批量启用</Menu.Item>
-        <Menu.Item key="deactive" disabled={!hasAuthority('Product_Active')}>批量禁用</Menu.Item>
+        <Menu.Item key="remove" disabled={!hasAuthority('Flow_Delete')}>删除</Menu.Item>
+        <Menu.Item key="active" disabled={!hasAuthority('Flow_Active')}>批量启用</Menu.Item>
+        <Menu.Item key="deactive" disabled={!hasAuthority('Flow_Active')}>批量禁用</Menu.Item>
       </Menu>
     );
 
@@ -586,16 +461,9 @@ class TableList extends PureComponent {
       handleModalVisible: this.handleModalVisible,
     };
     const updateMethods = {
-      dispatch,
       handleModalVisible: this.handleUpdateModalVisible,
       handleSubmit: this.handleUpdate,
     };
-    const scrollX = ColumnConfig.columns
-      .map(c => { return c.width; })
-      .reduce(function (sum, width, index) {
-        return sum + width;
-      });
-
     return (
       <div style={{ margin: '-24px -24px 0' }}>
         <GridContent>
@@ -603,15 +471,12 @@ class TableList extends PureComponent {
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
               <div className={styles.tableListOperator}>
-                <Authorized authority="Product_Create">
-                  <Button icon="plus" type="primary" onClick={() => this.handleImport(true)}>
-                    从 K3 手动导入
-                </Button>
-                  <Button icon="plus" type="primary" loading={isSyncing} onClick={() => this.handleSync()}>
-                    从 K3 一键同步
+                <Authorized authority="Flow_Create">
+                  <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+                    新建
                 </Button>
                 </Authorized>
-                <Authorized authority="Product_Export">
+                <Authorized authority="Flow_Export">
                   <Dropdown overlay={
                     <Menu onClick={this.handleExport} selectedKeys={[]}>
                       <Menu.Item key="currentPage">当前页</Menu.Item>
@@ -625,10 +490,10 @@ class TableList extends PureComponent {
                 </Authorized>
                 {selectedRows.length > 0 && (
                   <span>
-                    <Authorized authority="Product_Delete">
+                    <Authorized authority="Flow_Delete">
                       <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
                     </Authorized>
-                    <Authorized authority={["Product_Delete", "Product_Active"]}>
+                    <Authorized authority={["Flow_Delete", "Flow_Active"]}>
                       <Dropdown overlay={menu}>
                         <Button>
                           更多操作 <Icon type="down" />
@@ -646,7 +511,6 @@ class TableList extends PureComponent {
                 columns={ColumnConfig.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
-                scroll={{ x: scrollX }}
               />
             </div>
           </Card>

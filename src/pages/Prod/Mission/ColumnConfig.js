@@ -195,15 +195,19 @@ class ColumnConfig {
       title: '操作',
       fixed: 'right',
       width: 200,
-      render: (text, record) => (
-        <Fragment>
-          <Authorized authority="MOPlan_Read">
-            <a onClick={() => this._profileModalVisibleCallback(record)}>详情</a>
-            <Divider type="vertical" />
-            <a onClick={() => this._flowModalVisibleCallback(record)}>开流程单</a>
-          </Authorized>
-        </Fragment>
-      ),
+      render: (text, record) => {
+        return (
+          <Fragment>
+            <Authorized authority="Mission_Read">
+              <a onClick={() => this._profileModalVisibleCallback(record)}>详情</a>
+              <Divider type="vertical" />
+              {(record.fAuxInHighLimitQty - record.fInputQty > 0) &&
+                <a onClick={() => this._flowModalVisibleCallback(record)}>开流程单</a>
+              }
+            </Authorized>
+          </Fragment>
+        )
+      },
     },
   ];
 

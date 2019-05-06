@@ -280,7 +280,8 @@ export default class GlobalHeaderRight extends PureComponent {
               onClick={this.changeFullScreen}
               className={styles.action}
             >
-              <Icon type="border" style={isFullScreen ? { fontSize: 20, color: '#52c41a' } : {}} />
+              {/* <Icon type="border" style={isFullScreen ? { fontSize: 20, color: '#52c41a' } : {}} /> */}
+              <Icon type={isFullScreen ? "fullscreen-exit" : "fullscreen"} style={isFullScreen ? { fontSize: 20, color: '#52c41a' } : { fontSize: 20 }} />
             </a>
           </Tooltip>}
       </div>

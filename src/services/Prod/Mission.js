@@ -3,7 +3,7 @@ import request from '@/utils/request';
 
 
 export async function fakeQuery (params) {
-  return request('/api/MOPlan/page', {
+  return request('/api/Mission/page', {
     method: 'POST',
     body: {
       ...params,
@@ -13,8 +13,8 @@ export async function fakeQuery (params) {
 }
 
 export async function fakeGet (params) {
-  return request(`/api/MOPlan?${stringify(params)}`);
-  // return request('/api/MOPlan', {
+  return request(`/api/Mission?${stringify(params)}`);
+  // return request('/api/Mission', {
   //   method: 'GET',
   //   body: {
   //     ...params,
@@ -24,7 +24,7 @@ export async function fakeGet (params) {
 }
 
 export async function fakeSync (params) {
-  return request('/api/MOPlan/sync', {
+  return request('/api/Mission/sync', {
     method: 'POST',
     body: {
       ...params,

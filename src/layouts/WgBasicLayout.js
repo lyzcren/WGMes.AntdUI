@@ -21,6 +21,7 @@ import { urlToList } from '@/components/_utils/pathTools';
 import { getFlatMenuKeys } from '@/components/WgSiderMenu/SiderMenuUtils';
 import { Route, Switch } from 'react-router-dom'
 import { ComposeApplicator } from 'lodash-decorators/applicators';
+import { getToken } from '@/utils/token';
 
 import styles from './BasicLayout.less';
 
@@ -65,7 +66,7 @@ class WgBasicLayout extends React.PureComponent {
     this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual);
     let { location: { pathname } } = props;
     // 首次进入界面默认加载标签页
-    this.defaultPath = "/prod/MOPlan";
+    this.defaultPath = "/prod/mission";
 
     this.state = {
       selectedKeys: props.selectedKeys
@@ -78,21 +79,27 @@ class WgBasicLayout extends React.PureComponent {
       route: { routes, authority },
       menuData,
     } = this.props;
-
-    dispatch({
-      type: 'user/fetchCurrent',
-    });
-    dispatch({
-      type: 'setting/getSetting',
-    });
-    dispatch({
-      type: 'menu/getMenuData',
-      payload: { routes, authority },
-    });
-    dispatch({
-      type: 'menu/openMenu',
-      payload: { path: this.defaultPath, closable: false },
-    });
+    const token = getToken();
+    if (!token) {
+      window.g_app._store.dispatch({
+        type: 'login/logout',
+      });
+    } else {
+      dispatch({
+        type: 'user/fetchCurrent',
+      });
+      dispatch({
+        type: 'setting/getSetting',
+      });
+      dispatch({
+        type: 'menu/getMenuData',
+        payload: { routes, authority },
+      });
+      dispatch({
+        type: 'menu/openMenu',
+        payload: { path: this.defaultPath, closable: false },
+      });
+    }
   }
 
   componentDidUpdate (preProps) {

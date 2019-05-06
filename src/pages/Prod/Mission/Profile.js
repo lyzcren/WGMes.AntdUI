@@ -40,10 +40,10 @@ const ButtonGroup = Button.Group;
 
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ mOPlanManage, moPlanProfile, loading, menu, }) => ({
-  mOPlanManage,
-  moPlanProfile,
-  loading: loading.models.moPlanProfile,
+@connect(({ missionManage, missionProfile, loading, menu, }) => ({
+  missionManage,
+  missionProfile,
+  loading: loading.models.missionProfile,
   menu,
 }))
 @Form.create()
@@ -52,7 +52,8 @@ class Profile extends PureComponent {
   };
 
   componentDidMount () {
-    const { data: { guid } } = this.props;
+    const { data: { fInterID } } = this.props;
+    this.loadData(fInterID);
   }
 
   componentDidUpdate (preProps) {
@@ -62,21 +63,21 @@ class Profile extends PureComponent {
     }
   }
 
-  loadData (guid) {
+  loadData (fInterID) {
     const { dispatch, } = this.props;
     dispatch({
-      type: 'moPlanProfile/initModel',
-      payload: { guid },
+      type: 'missionProfile/initModel',
+      payload: { fInterID },
     });
   }
 
   save () {
     const { dispatch, data: { fInterID } } = this.props;
     dispatch({
-      type: 'moPlanProfile/saveStep',
+      type: 'missionProfile/saveStep',
       payload: { fInterID },
     }).then(() => {
-      const { moPlanProfile: { queryResult } } = this.props;
+      const { missionProfile: { queryResult } } = this.props;
       if (queryResult.status === 'ok') {
         message.success('保存成功');
         // 成功后关闭界面
@@ -109,13 +110,13 @@ class Profile extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
-      payload: { path: '/prod/MOPlan/profile' },
+      payload: { path: '/prod/mission/profile' },
     });
   }
 
   render () {
     const {
-      moPlanProfile: { data, steps, currentStep, },
+      missionProfile: { data, steps, currentStep, },
       loading,
       form: { getFieldDecorator },
     } = this.props;

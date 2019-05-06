@@ -14,12 +14,14 @@ export default {
   },
 
   effects: {
-    *login({ payload }, { call, put }) {
+    *login ({ payload }, { call, put }) {
       const response = yield call(fakeAccountLogin, payload);
-      yield put({
-        type: 'changeLoginStatus',
-        payload: response,
-      });
+      if (response) {
+        yield put({
+          type: 'changeLoginStatus',
+          payload: response,
+        });
+      }
       // Login successfully
       if (response.status === 'ok') {
         reloadAuthorized();
@@ -42,11 +44,11 @@ export default {
       }
     },
 
-    *getCaptcha({ payload }, { call }) {
+    *getCaptcha ({ payload }, { call }) {
       yield call(getFakeCaptcha, payload);
     },
 
-    *logout(_, { put }) {
+    *logout (_, { put }) {
       yield put({
         type: 'changeLoginStatus',
         payload: {
@@ -67,7 +69,7 @@ export default {
   },
 
   reducers: {
-    changeLoginStatus(state, { payload }) {
+    changeLoginStatus (state, { payload }) {
       setAuthority(payload.currentAuthority);
       setToken(payload.token);
       return {
