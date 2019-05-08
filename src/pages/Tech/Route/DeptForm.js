@@ -23,7 +23,8 @@ const Option = Select.Option;
 const TypeData = GlobalConst.DefectTypeData;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ basicData }) => ({
+@connect(({ routeProfile, basicData }) => ({
+  routeProfile,
   basicData,
 }))
 @Form.create()
@@ -104,6 +105,12 @@ export class DeptForm extends PureComponent {
     const { depts } = this.state;
     const newData = depts.filter(v => v.fEntryID !== fEntryID);
     this.setState({ depts: newData });
+
+    const { dispatch, } = this.props;
+    dispatch({
+      type: 'routeProfile/changeStep',
+      payload: { depts: newData, }
+    });
   }
 
   handleKeyPress (e, fEntryID) {

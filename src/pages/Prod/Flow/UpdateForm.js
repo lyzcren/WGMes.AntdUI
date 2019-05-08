@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import { connect } from 'dva';
 import moment from 'moment';
 import {
     Form,
@@ -6,16 +7,22 @@ import {
     Modal,
     Switch,
     Tag,
+  message,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 
 
 const FormItem = Form.Item;
 
+@connect(({ flowManage, loading, basicData }) => ({
+  flowManage,
+  loading: loading.models.flowManage,
+  basicData,
+}))
 @Form.create()
 export class UpdateForm extends PureComponent {
     static defaultProps = {
-        handleSubmit: () => { },
+        handleSuccess: () => { },
         handleModalVisible: () => { },
         values: {},
     };
@@ -29,25 +36,46 @@ export class UpdateForm extends PureComponent {
     }
 
     okHandle = () => {
-        const { form, handleSubmit } = this.props;
+        const { form, } = this.props;
         form.validateFields((err, fieldsValue) => {
             if (err) return;
             // form.resetFields();
             // 设置fItemId
             fieldsValue.fItemID = this.state.formVals.fItemID;
-            handleSubmit(fieldsValue);
+            this.handleSubmit(fieldsValue);
         });
     };
 
+	handleSubmit = fields => {
+		const { dispatch, handleModalVisible, handleSuccess } = this.props;
+		dispatch({
+			type: 'flowManage/update',
+			payload: fields,
+		}).then(() => {
+			const { flowManage: { queryResult } } = this.props;
+			if (queryResult.status === 'ok') {
+				message.success('修改成功');
+				handleModalVisible(false);
+				// 成功后再次刷新列表
+				if (handleSuccess) handleSuccess();
+			} else if (queryResult.status === 'warning') {
+				message.warning(queryResult.message);
+			}
+			else {
+				message.error(queryResult.message);
+			}
+		});
+	};
+
     render () {
-        const { form, updateModalVisible, handleModalVisible, values } = this.props;
+        const { form, modalVisible, handleModalVisible, values } = this.props;
         const { formVals } = this.state;
 
         return (
             <Modal
                 destroyOnClose
                 title={<div>修改 <Tag color="blue">{formVals.fName}</Tag></div>}
-                visible={updateModalVisible}
+                visible={modalVisible}
                 onOk={this.okHandle}
                 onCancel={() => handleModalVisible(false, values)}
                 afterClose={() => handleModalVisible()}

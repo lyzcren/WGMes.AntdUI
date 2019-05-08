@@ -1,8 +1,8 @@
 
-import { fakeGet, fakeQuerySteps, fakeSaveSteps, } from '@/services/Tech/Route';
+import { fakeGet, fakeQuerySteps, } from '@/services/Tech/Route';
 
 export default {
-  namespace: 'routeProfile',
+  namespace: 'viewStep',
 
   state: {
     // steps: [{
@@ -90,45 +90,6 @@ export default {
         payload,
       });
     },
-    *deleteStep ({ }, { call, put, select }) {
-      const { steps, currentStep, maxGroupID, } = yield select(state => state.routeProfile);
-      const newStep = currentStep - 1;
-      const newSteps = steps.filter((s, i) => i !== currentStep);
-
-      const payload = { steps: newSteps, currentStep: newStep, };
-      yield put({
-        type: 'save',
-        payload,
-      });
-    },
-    *changeStep ({ payload }, { call, put, select }) {
-      const { steps, currentStep, } = yield select(state => state.routeProfile);
-      const { depts } = payload;
-      const target = steps[currentStep];
-      target.depts = depts;
-
-      yield put({
-        type: 'save',
-        payload: { steps, currentStep, },
-      });
-    },
-    *saveStep ({ payload, callback }, { call, put, select }) {
-      const { steps, currentStep, maxGroupID, } = yield select(state => state.routeProfile);
-      const submitSteps = [];
-      let fEntryID = 1;
-      steps.map((group, groupId) => {
-        group.depts.map(dept => {
-          submitSteps.push({ fGroupID: groupId, fEntryID: dept.fEntryID, fDeptID: dept.fDeptID });
-        });
-      });
-      const response = yield call(fakeSaveSteps, { ...payload, steps: submitSteps });
-
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
-      if (callback) callback();
-    },
   },
 
   reducers: {
@@ -136,12 +97,6 @@ export default {
       return {
         ...state,
         ...action.payload,
-      };
-    },
-    saveData (state, action) {
-      return {
-        ...state,
-        queryResult: action.payload ? action.payload : {},
       };
     },
   },

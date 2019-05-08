@@ -89,6 +89,7 @@ export class FlowForm extends PureComponent {
     return (
       <Modal
         destroyOnClose
+        maskClosable={false}
         title={<div>开流程单 <Tag color="blue">{formVals.fMoBillNo}</Tag></div>}
         visible={modalVisible}
         onOk={this.okHandle}

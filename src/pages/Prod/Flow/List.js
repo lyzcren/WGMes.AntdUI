@@ -26,11 +26,13 @@ import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { UpdateForm } from './UpdateForm';
 import { CreateForm } from './CreateForm';
+import { ViewStepForm } from './ViewStepForm';
 import { default as ColumnConfig } from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
 
 import styles from './List.less';
+import { tsImportType } from '@babel/types';
 
 
 const FormItem = Form.Item;
@@ -48,13 +50,16 @@ const getValue = obj =>
 @Form.create()
 class TableList extends PureComponent {
   state = {
-    // 新增界面
-    modalVisible: false,
+    // 界面是否可见
+    modalVisible: {
+      add: false,
+      update: false,
+      route: false,
+    },
     formValues: {},
-    // 修改界面
-    updateModalVisible: false,
-    updateFormValues: {},
-    // 其他
+    // 当前操作选中列的数据
+    currentFormValues: {},
+    // expandForm: 是否展开更多查询条件
     expandForm: false,
     selectedRows: [],
     queryFilters: [],
@@ -77,7 +82,8 @@ class TableList extends PureComponent {
     // 列配置相关方法
     ColumnConfig.UpdateModalVisibleCallback = (record) => this.handleUpdateModalVisible(true, record);
     ColumnConfig.DeleteCallback = (record) => this.handleDelete(record);
-    ColumnConfig.ActiveCallback = (record) => this.handleActive(record, !record.fIsActive);
+    ColumnConfig.MissionModalVisibleCallback = (record) => this.handleMissionModalVisible(true, record);
+    ColumnConfig.RouteModalVisibleCallback = (record) => this.handleRouteModalVisible(true, record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -184,11 +190,11 @@ class TableList extends PureComponent {
       if (err) return;
 
       var params = this.getSearchParam(fieldsValue);
-	  var fileName = '导出.xls';
+      var fileName = '导出.xls';
       switch (e.key) {
         case 'currentPage':
           params = { ...params, exportPage: true }
-		  fileName = '导出-第' + params.pagination.current + '页.xls';
+          fileName = '导出-第' + params.pagination.current + '页.xls';
           break;
         case 'allPage':
           params = { ...params, exportAll: true }
@@ -234,77 +240,33 @@ class TableList extends PureComponent {
   };
 
   handleModalVisible = flag => {
+    const { modalVisible } = this.state;
     this.setState({
-      modalVisible: !!flag,
+      modalVisible: { ...modalVisible, add: !!flag },
     });
   };
 
   handleUpdateModalVisible = (flag, record) => {
+    const { modalVisible } = this.state;
     this.setState({
-      updateModalVisible: !!flag,
-      updateFormValues: record || {},
+      modalVisible: { ...modalVisible, update: !!flag },
+      currentFormValues: record || {},
     });
   };
 
-  handleAdd = fields => {
-    const { dispatch, form } = this.props;
-    dispatch({
-      type: 'flowManage/add',
-      payload: fields
-    }).then(() => {
-      const { flowManage: { queryResult } } = this.props;
-      if (queryResult.status === 'ok') {
-        message.success('添加成功');
-        this.handleModalVisible();
-        // 成功后再次刷新列表
-        this.search();
-      } else {
-        message.warning(queryResult.message);
-      }
-    });
-  };
-
-  handleUpdate = fields => {
+  handleMissionModalVisible = (flag, record) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'flowManage/update',
-      payload: fields,
-    }).then(() => {
-      const { flowManage: { queryResult } } = this.props;
-      if (queryResult.status === 'ok') {
-        message.success('修改成功');
-        this.handleUpdateModalVisible();
-        // 成功后再次刷新列表
-        this.search();
-      } else if (queryResult.status === 'warning') {
-        message.warning(queryResult.message);
-      }
-      else {
-        message.error(queryResult.message);
-      }
+      type: 'menu/openMenu',
+      payload: { path: '/prod/mission/profile', data: { fInterID: record.fMoPlanID } },
     });
   };
 
-  handleActive = (record, fIsActive) => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'flowManage/active',
-      payload: {
-        fItemID: record.fItemID,
-        fIsActive,
-      },
-    }).then(() => {
-      const { flowManage: { queryResult } } = this.props;
-      if (queryResult.status === 'ok') {
-        message.success('【' + record.fName + '】' + (fIsActive ? '启用' : '禁用') + '成功');
-        // 成功后再次刷新列表
-        this.search();
-      } else if (queryResult.status === 'warning') {
-        message.warning(queryResult.message);
-      }
-      else {
-        message.error(queryResult.message);
-      }
+  handleRouteModalVisible = (flag, record) => {
+    const { modalVisible } = this.state;
+    this.setState({
+      modalVisible: { ...modalVisible, route: !!flag },
+      currentFormValues: record || {},
     });
   };
 
@@ -447,7 +409,7 @@ class TableList extends PureComponent {
       flowManage: { data, queryResult },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, updateFormValues, authorityModalVisible, authorizeUserModalVisible } = this.state;
+    const { selectedRows, modalVisible, updateModalVisible, currentFormValues, authorityModalVisible, authorizeUserModalVisible } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove" disabled={!hasAuthority('Flow_Delete')}>删除</Menu.Item>
@@ -457,13 +419,24 @@ class TableList extends PureComponent {
     );
 
     const parentMethods = {
-      handleSubmit: this.handleAdd,
+      dispatch: this.props.dispatch,
       handleModalVisible: this.handleModalVisible,
+      handleSuccess: this.search,
     };
     const updateMethods = {
+      dispatch: this.props.dispatch,
       handleModalVisible: this.handleUpdateModalVisible,
-      handleSubmit: this.handleUpdate,
+      handleSuccess: this.search,
     };
+    const routeMethods = {
+      dispatch: this.props.dispatch,
+      handleModalVisible: this.handleRouteModalVisible,
+    };
+    const scrollX = ColumnConfig.columns
+      .map(c => { return c.width; })
+      .reduce(function (sum, width, index) {
+        return sum + width;
+      });
     return (
       <div style={{ margin: '-24px -24px 0' }}>
         <GridContent>
@@ -504,22 +477,30 @@ class TableList extends PureComponent {
                 )}
               </div>
               <StandardTable
-                rowKey="fItemID"
+                rowKey="fInterID"
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
                 columns={ColumnConfig.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
+                scroll={{ x: scrollX }}
               />
             </div>
           </Card>
-          <CreateForm {...parentMethods} modalVisible={modalVisible} />
-          {updateFormValues && Object.keys(updateFormValues).length ? (
+          <CreateForm {...parentMethods} modalVisible={modalVisible.add} />
+          {currentFormValues && Object.keys(currentFormValues).length ? (
             <UpdateForm
               {...updateMethods}
-              updateModalVisible={updateModalVisible}
-              values={updateFormValues}
+              modalVisible={modalVisible.update}
+              values={currentFormValues}
+            />
+          ) : null}
+          {currentFormValues && Object.keys(currentFormValues).length ? (
+            <ViewStepForm
+              {...routeMethods}
+              modalVisible={modalVisible.route}
+              fInterID={currentFormValues.fRouteID}
             />
           ) : null}
         </GridContent>

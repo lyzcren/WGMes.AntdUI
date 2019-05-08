@@ -32,3 +32,13 @@ export async function fakeSync (params) {
     },
   });
 }
+
+export async function fakeGenFlow (params) {
+  return request('/api/Mission/genFlow', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'genFlow',
+    },
+  });
+}

@@ -25,7 +25,7 @@ import DescriptionList from '@/components/DescriptionList';
 import Authorized from '@/utils/Authorized';
 import { hasAuthority } from '@/utils/authority';
 import { DeptForm } from './DeptForm';
-import { RouteSteps } from './RouteSteps';
+import { RouteSteps } from '@/components/WgRouteSteps/RouteSteps';
 
 import styles from './List.less';
 

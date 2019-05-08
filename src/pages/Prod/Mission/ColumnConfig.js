@@ -75,12 +75,12 @@ class ColumnConfig {
     },
     {
       title: '工艺路线',
-      dataIndex: 'fRoutingName',
+      dataIndex: 'fRouteName',
       width: 150,
     },
     {
       title: '工艺路线编码',
-      dataIndex: 'fRoutingNumber',
+      dataIndex: 'fRouteNumber',
       width: 150,
     },
     {

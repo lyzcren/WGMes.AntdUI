@@ -7,6 +7,7 @@ import {
   Radio,
   Switch,
   Select,
+  message,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import GlobalConst from '@/utils/GlobalConst'
@@ -18,7 +19,9 @@ const Option = Select.Option;
 
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ basicData }) => ({
+@connect(({ flowManage, loading, basicData }) => ({
+  flowManage,
+  loading: loading.models.flowManage,
   basicData,
 }))
 // export const CreateForm = Form.create()(props => {
@@ -42,13 +45,34 @@ export class CreateForm extends PureComponent {
   }
 
   okHandle = () => {
-    const { form, handleSubmit, } = this.props;
+    const { form, } = this.props;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       // form.resetFields();
-      handleSubmit(fieldsValue);
+      this.handleSubmit(fieldsValue);
     });
   };
+
+	handleSubmit = fields => {
+		const { dispatch, handleModalVisible, handleSuccess } = this.props;
+		dispatch({
+			type: 'flowManage/add',
+			payload: fields,
+		}).then(() => {
+			const { flowManage: { queryResult } } = this.props;
+			if (queryResult.status === 'ok') {
+				message.success('新增成功');
+				handleModalVisible(false);
+				// 成功后再次刷新列表
+				if (handleSuccess) handleSuccess();
+			} else if (queryResult.status === 'warning') {
+				message.warning(queryResult.message);
+			}
+			else {
+				message.error(queryResult.message);
+			}
+		});
+	};
 
   render () {
     const { modalVisible, form, handleSubmit, handleModalVisible, basicData } = this.props;
