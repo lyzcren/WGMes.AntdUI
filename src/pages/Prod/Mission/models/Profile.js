@@ -1,6 +1,6 @@
 
 import { fakeGet, } from '@/services/Prod/Mission';
-import GlobalConst from '@/utils/GlobalConst'
+import { GlobalConst } from '@/utils/GlobalConst'
 
 export default {
   namespace: 'missionProfile',

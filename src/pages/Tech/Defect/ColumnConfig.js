@@ -1,6 +1,6 @@
 import React, { PureComponent, Fragment } from 'react';
 import { Switch, Popconfirm, Divider } from 'antd';
-import GlobalConst from '@/utils/GlobalConst'
+import { GlobalConst } from '@/utils/GlobalConst'
 import Authorized from '@/utils/Authorized';
 
 const activeData = ['启用', '禁用',];

@@ -1,4 +1,4 @@
-import { fakeQuery, fakeRemove, fakeAdd, fakeUpdate, fakeActive } from '@/services/Prod/Flow';
+import { fakeQuery, fakeSign, fakeRemove, fakeUpdate, fakeActive } from '@/services/Prod/Flow';
 
 export default {
   namespace: 'flowManage',
@@ -22,8 +22,8 @@ export default {
         payload: response,
       });
     },
-    *add ({ payload, callback }, { call, put }) {
-      const response = yield call(fakeAdd, payload);
+    *sign ({ payload, callback }, { call, put }) {
+      const response = yield call(fakeSign, payload);
       yield put({
         type: 'saveData',
         payload: response,

@@ -2,17 +2,12 @@ import React, { PureComponent, Fragment } from 'react';
 import { Switch, Popconfirm, Divider, Badge } from 'antd';
 import Authorized from '@/utils/Authorized';
 import RadioButton from 'antd/lib/radio/radioButton';
+import { GlobalConst, badgeStatusList } from '@/utils/GlobalConst'
 
-const activeData = ['启用', '禁用',];
-const statusMap = { BeforeProduce: 'default', Producing: 'processing', EndProduce: 'success', 'Reported': 'error' };
-const badgeStatus = (val) => {
-  for (var prop in statusMap) {
-    if (prop === val) { return statusMap[prop]; }
-  }
-  return "";
-};
+
 
 class ColumnConfig {
+
   columns = [
     {
       title: '批号',
@@ -36,15 +31,19 @@ class ColumnConfig {
       title: '状态',
       dataIndex: 'fStatusNumber',
       width: 150,
-      sorter: true,
       render: (val, record) => {
-        return <Badge status={badgeStatus(val)} text={record.fStatusName}></Badge>;
+        const find = badgeStatusList(GlobalConst.FlowStatusArray).find(x => x.value == val);
+        if (find) {
+          return find.text;
+        }
+        return "";
       },
+      filters: badgeStatusList(GlobalConst.FlowStatusArray),
     },
     {
-      title: '生产任务单号',
+      title: '任务单号',
       dataIndex: 'fMoBillNo',
-      width: 150,
+      width: 200,
       sorter: true,
       render: (val, record) => {
         return <a onClick={() => this._missionModalVisibleCallback(record)}>{val}</a>;
@@ -105,37 +104,29 @@ class ColumnConfig {
       title: '操作',
       fixed: 'right',
       width: 200,
-      render: (text, record) => (
-        <Fragment>
-          <Authorized authority="Flow_Update">
-            <a onClick={() => this._updateModalVisible(record)}>修改</a>
-            <Divider type="vertical" />
-          </Authorized>
-          <Authorized authority="Flow_Delete">
-            <Popconfirm title="是否要删除此行？" onConfirm={() => this._delete(record)}>
-              <a>删除</a>
-            </Popconfirm>
-            <Divider type="vertical" />
-          </Authorized>
-          <Authorized authority="Flow_Active">
-            <a onClick={() => this._handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
-          </Authorized>
-        </Fragment>
-      ),
+      render: (text, record) => this.renderOperation(text, record),
     },
   ];
 
-  // 修改方法
-  UpdateModalVisibleCallback = (record) => { };
-  _updateModalVisible = (record) => {
-    this.UpdateModalVisibleCallback(record);
-  };
-
-  // 删除方法
-  DeleteCallback = (record) => { };
-  _delete = (record) => {
-    this.DeleteCallback(record);
-  };
+  renderOperation = (text, record) => {
+    return (
+      <Fragment>
+        {/* <Authorized authority="Flow_Update">
+          <a onClick={() => this._updateModalVisible(record)}>修改</a>
+          <Divider type="vertical" />
+        </Authorized>
+        <Authorized authority="Flow_Delete">
+          <Popconfirm title="是否要删除此行？" onConfirm={() => this._delete(record)}>
+            <a>删除</a>
+          </Popconfirm>
+          <Divider type="vertical" />
+        </Authorized>
+        <Authorized authority="Flow_Active">
+          <a onClick={() => this._handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
+        </Authorized> */}
+      </Fragment>
+    );
+  }
 
   // 查看任务单
   MissionModalVisibleCallback = (record) => { };

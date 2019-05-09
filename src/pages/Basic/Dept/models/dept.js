@@ -1,4 +1,4 @@
-import { fakeQuery, fakeRemove, fakeAdd, fakeUpdate, fakeActive, fakeGetTreeData } from '@/services/Basic/Dept';
+import { fakeQuery, fakeRemove, fakeAdd, fakeUpdate, fakeActive, fakeGetTreeData, fakeGetType } from '@/services/Basic/Dept';
 
 export default {
   namespace: 'deptManage',
@@ -13,6 +13,7 @@ export default {
       message: '',
     },
     treeData: [],
+    typeData: [],
   },
 
   effects: {
@@ -63,6 +64,14 @@ export default {
         payload: response,
       });
     },
+    *getType ({ payload, callback }, { call, put }) {
+      const response = yield call(fakeGetType, payload);
+      yield put({
+        type: 'saveTypeData',
+        payload: response,
+      });
+      if (callback) callback();
+    },
   },
 
   reducers: {
@@ -82,6 +91,12 @@ export default {
       return {
         ...state,
         treeData: action.payload.list,
+      };
+    },
+    saveTypeData (state, action) {
+      return {
+        ...state,
+        typeData: action.payload,
       };
     },
   },

@@ -12,7 +12,7 @@ import {
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import { validatorPhone, validatePassword, getPasswordStatus, passwordProgressMap } from '@/utils/validators';
-import GlobalConst from '@/utils/GlobalConst'
+import { GlobalConst } from '@/utils/GlobalConst'
 
 
 const FormItem = Form.Item;

@@ -22,12 +22,12 @@ export async function fakeRemove (params) {
   });
 }
 
-export async function fakeAdd (params) {
-  return request('/api/Flow', {
+export async function fakeSign (params) {
+  return request('/api/Flow/sign', {
     method: 'POST',
     body: {
       ...params,
-      method: 'post',
+      method: 'sign',
     },
   });
 }

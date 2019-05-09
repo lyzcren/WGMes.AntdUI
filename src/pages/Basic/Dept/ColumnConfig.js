@@ -17,6 +17,11 @@ class ColumnConfig {
       sorter: true,
     },
     {
+      title: '类型',
+      dataIndex: 'fTypeName',
+      sorter: true,
+    },
+    {
       title: '启用',
       dataIndex: 'fIsActive',
       filters: [

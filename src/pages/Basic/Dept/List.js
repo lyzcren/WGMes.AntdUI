@@ -68,11 +68,14 @@ class TableList extends PureComponent {
 
 
   componentDidMount () {
-    const { dispatch } = this.props;
+    const { dispatch, } = this.props;
     var params = { pagination: this.currentPagination };
     dispatch({
       type: 'deptManage/fetch',
       payload: params,
+    });
+    dispatch({
+      type: 'deptManage/getType',
     });
     // 列配置相关方法
     ColumnConfig.UpdateModalVisibleCallback = (record) => this.handleUpdateModalVisible(true, record);
@@ -444,7 +447,7 @@ class TableList extends PureComponent {
 
   render () {
     const {
-      deptManage: { data, queryResult },
+      deptManage: { data, queryResult, typeData },
       loading,
     } = this.props;
     const { selectedRows, modalVisible, updateModalVisible, updateFormValues, authorityModalVisible, authorizeUserModalVisible } = this.state;
@@ -518,12 +521,12 @@ class TableList extends PureComponent {
 
             </div>
           </Card>
-          <CreateForm {...parentMethods} modalVisible={modalVisible} treeData={data.list} />
+          <CreateForm {...parentMethods} modalVisible={modalVisible} treeData={data.list} typeData={typeData} />
           {updateFormValues && Object.keys(updateFormValues).length ? (
             <UpdateForm
               {...updateMethods}
               updateModalVisible={updateModalVisible}
-              values={updateFormValues} treeData={data.list}
+              values={updateFormValues} treeData={data.list} typeData={typeData}
             />
           ) : null}
         </GridContent>

@@ -12,6 +12,16 @@ export async function fakeQuery (params) {
   });
 }
 
+export async function fakeGetType (params) {
+  return request('/api/Dept/GetType', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'GetType',
+    },
+  });
+}
+
 export async function fakeRemove (params) {
   return request('/api/Dept/delete', {
     method: 'POST',

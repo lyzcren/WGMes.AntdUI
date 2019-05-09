@@ -9,7 +9,7 @@ import {
   Select,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import GlobalConst from '@/utils/GlobalConst'
+import { GlobalConst } from '@/utils/GlobalConst'
 
 import styles from './List.less';
 
