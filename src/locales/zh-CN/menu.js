@@ -43,6 +43,7 @@ export default {
   'menu.prod.mission.profile': '生产任务单详情',
   'menu.prod.flow': '流程单',
   'menu.prod.flow.profile': '流程单详情',
+  'menu.prod.flow.transfer': '流程单转序',
   // 生产基础资料
   'menu.techStd': '工艺标准',
   'menu.techStd.defect': '不良信息',

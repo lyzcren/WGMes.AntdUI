@@ -26,7 +26,6 @@ import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { UpdateForm } from './UpdateForm';
-import { CreateForm } from './CreateForm';
 import { ViewStepForm } from './ViewStepForm';
 import { default as ColumnConfig } from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
@@ -86,7 +85,7 @@ class TableList extends PureComponent {
       payload: params,
     });
     dispatch({
-      type: 'basicData/getDeptTreeData',
+      type: 'basicData/getProcessDeptTree',
     });
     // 列配置相关方法
     ColumnConfig.UpdateModalVisibleCallback = (record) => this.handleUpdateModalVisible(true, record);
@@ -143,6 +142,8 @@ class TableList extends PureComponent {
     else if (fieldsValue.queryDept && fieldsValue.queryStatusNumber === "ManufProducing") queryFilters.push({ name: "fCurrentDeptID", compare: "=", value: fieldsValue.queryDept });
     // 当前工序已完成
     else if (fieldsValue.queryDept && fieldsValue.queryStatusNumber === "ManufEndProduce") queryFilters.push({ name: "fFullBatchNo", compare: "%*%", value: fieldsValue.queryDept });
+    // 只选择部门，未选择状态，该部门在工艺路线内即可
+    else if (fieldsValue.queryDept) queryFilters.push({ name: "fAllDeptIDs", compare: "%*%", value: fieldsValue.queryDept });
     // 无工序时查询流程单状态
     else if (fieldsValue.queryStatusNumber) queryFilters.push({ name: "fStatusNumber", compare: "=", value: fieldsValue.queryStatusNumber });
     if (fieldsValue.queryBatchNo) queryFilters.push({ name: "fFullBatchNo", compare: "%*%", value: fieldsValue.queryBatchNo });
@@ -289,6 +290,14 @@ class TableList extends PureComponent {
     });
   };
 
+  transferModalVisible = (record) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/openMenu',
+      payload: { path: '/prod/flow/transfer', data: record },
+    });
+  };
+
   handleSign = (record) => {
     const { dispatch } = this.props;
     dispatch({
@@ -341,7 +350,26 @@ class TableList extends PureComponent {
         </Fragment>
       );
     } else {
-
+      return (
+        <Fragment>
+          <Authorized authority="Flow_Transfer">
+            <a onClick={() => this.transferModalVisible(record)}>转序</a>
+            <Divider type="vertical" />
+          </Authorized>
+          <Dropdown
+            overlay={
+              <Menu onClick={({ key }) => editAndDelete(key, props.current)}>
+                <Menu.Item key="edit">编辑</Menu.Item>
+                <Menu.Item key="delete">删除</Menu.Item>
+              </Menu>
+            }
+          >
+            <a>
+              更多 <Icon type="down" />
+            </a>
+          </Dropdown>
+        </Fragment>
+      );
     }
   }
 
@@ -356,8 +384,10 @@ class TableList extends PureComponent {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6} sm={24}>
             <FormItem id="queryDept" label="部门">
-              {getFieldDecorator('queryDept')
-                (<TreeSelect style={{ width: '100%' }} treeData={basicData.deptTreeData} treeDefaultExpandAll
+              {getFieldDecorator('queryDept', {
+                rules: [{ required: true, message: '请选择部门' }]
+              })
+                (<TreeSelect style={{ width: '100%' }} treeData={basicData.processDeptTree} treeDefaultExpandAll
                 />)}
             </FormItem>
           </Col>

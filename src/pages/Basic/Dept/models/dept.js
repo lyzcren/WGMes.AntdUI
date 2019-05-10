@@ -1,4 +1,4 @@
-import { fakeQuery, fakeRemove, fakeAdd, fakeUpdate, fakeActive, fakeGetTreeData, fakeGetType } from '@/services/Basic/Dept';
+import { fakeQuery, fakeRemove, fakeAdd, fakeUpdate, fakeActive, fakeAddParams, fakeGetTreeData, fakeGetType } from '@/services/Basic/Dept';
 
 export default {
   namespace: 'deptManage',
@@ -50,6 +50,14 @@ export default {
     },
     *active ({ payload, callback }, { call, put }) {
       const response = yield call(fakeActive, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    *addParams ({ payload, callback }, { call, put }) {
+      const response = yield call(fakeAddParams, payload);
       yield put({
         type: 'saveData',
         payload: response,

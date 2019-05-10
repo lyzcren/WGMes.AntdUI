@@ -55,7 +55,7 @@ export class DeptForm extends PureComponent {
   componentDidMount () {
     const { dispatch } = this.props;
     dispatch({
-      type: 'basicData/getDeptTreeData',
+      type: 'basicData/getProcessDeptTree',
     });
   }
 
@@ -215,7 +215,7 @@ export class DeptForm extends PureComponent {
               <TreeSelect
                 style={{ width: '100%' }}
                 dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                treeData={basicData.deptTreeData}
+                treeData={basicData.processDeptTree}
                 // defaultValue={record.fDeptName}
                 treeDefaultExpandAll
                 onChange={(depts, label) => this.handleDeptChange(depts, label[0], record.fEntryID)}

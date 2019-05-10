@@ -19,6 +19,11 @@ class ColumnConfig {
       sorter: true,
     },
     {
+      title: '部门',
+      dataIndex: 'fDeptName',
+      sorter: true,
+    },
+    {
       title: '启用',
       dataIndex: 'fIsActive',
       filters: [

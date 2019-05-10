@@ -71,41 +71,6 @@ class Profile extends PureComponent {
     });
   }
 
-  save () {
-    const { dispatch, data: { fInterID } } = this.props;
-    dispatch({
-      type: 'missionProfile/saveStep',
-      payload: { fInterID },
-    }).then(() => {
-      const { missionProfile: { queryResult } } = this.props;
-      if (queryResult.status === 'ok') {
-        message.success('保存成功');
-        // 成功后关闭界面
-        this.close();
-      } else {
-        message.warning(queryResult.message);
-      }
-    });
-  }
-
-  check (isCheck = true) {
-    const { dispatch, data: { fInterID } } = this.props;
-    const checkType = 'routeManage/' + (isCheck ? 'check' : 'uncheck');
-    dispatch({
-      type: checkType,
-      payload: { fInterID },
-    }).then(() => {
-      const { routeManage: { queryResult } } = this.props;
-      if (queryResult.status === 'ok') {
-        message.success((isCheck ? '审批' : '反审批') + '成功');
-        // 成功后关闭界面
-        this.close();
-      } else {
-        message.warning(queryResult.message);
-      }
-    });
-  }
-
   close () {
     const { dispatch } = this.props;
     dispatch({
@@ -132,26 +97,11 @@ class Profile extends PureComponent {
         <Description term="优先级">{data.fPriority}</Description>
       </DescriptionList>
     );
-    // const menu = (
-    //   <Menu>
-    //     <Menu.Item key="1">选项一</Menu.Item>
-    //     <Menu.Item key="2">选项二</Menu.Item>
-    //     <Menu.Item key="3">选项三</Menu.Item>
-    //   </Menu>
-    // );
 
     const action = (
       <Fragment>
         <ButtonGroup>
-          {/* {data.fStatusNumber === "Created" && <Button onClick={() => this.check()}>审批</Button>}
-          {data.fStatusNumber === "Checked" && <Button onClick={() => this.check(false)}>反审批</Button>} */}
-          {/* <Dropdown overlay={menu} placement="bottomRight">
-            <Button>
-              <Icon type="ellipsis" />
-            </Button>
-          </Dropdown> */}
         </ButtonGroup>
-        {/* <Button type="primary" onClick={() => this.save()}>保存</Button> */}
         <Button onClick={() => this.close()}>关闭</Button>
       </Fragment>
     );
@@ -162,16 +112,12 @@ class Profile extends PureComponent {
           <div className={styles.textSecondary}>状态</div>
           <div className={styles.heading}>{data.fStatusName}</div>
         </Col>
-        {/* <Col xs={24} sm={12}>
-          <div className={styles.textSecondary}>订单金额</div>
-          <div className={styles.heading}>¥ 568.08</div>
-        </Col> */}
       </Row>
     );
 
     return (
       <WgPageHeaderWrapper
-        title={data.fMoBillNo}
+        title={"生产任务单：" + data.fMoBillNo}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }

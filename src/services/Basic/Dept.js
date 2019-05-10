@@ -61,3 +61,23 @@ export async function fakeActive (params) {
     },
   });
 }
+
+export async function fakeGetParams (params) {
+  return request('/api/dept/getParams', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'getParams',
+    },
+  });
+}
+
+export async function fakeAddParams (params) {
+  return request('/api/dept/addParams', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'addParams',
+    },
+  });
+}

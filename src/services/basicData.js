@@ -11,12 +11,52 @@ export async function fakeDeptTreeData (params) {
   });
 }
 
+export async function fakeProcessDeptTree (params) {
+  return request('/api/Dept/GetProcessTree', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'GetProcessTree',
+    },
+  });
+}
+
+export async function fakeMachineData (params) {
+  return request('/api/machine/GetData', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'GetTreeData',
+    },
+  });
+}
+
 export async function fakeGetRouteData (params) {
   return request('/api/Route/GetData', {
     method: 'POST',
     body: {
       ...params,
       method: 'GetData',
+    },
+  });
+}
+
+export async function fakeGetTechParamData (params) {
+  return request('/api/Param/GetData', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'GetData',
+    },
+  });
+}
+
+export async function fakeGetTechParamValues (params) {
+  return request('/api/param/getVaules', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'getVaules',
     },
   });
 }

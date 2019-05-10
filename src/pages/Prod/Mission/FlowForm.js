@@ -120,13 +120,13 @@ export class FlowForm extends PureComponent {
             <InputNumber
               placeholder="请输入"
               min={1}
-              max={maxQty}
-            />)}
+              max={maxQty} />
+          )}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="工艺路线">
           {form.getFieldDecorator('fRouteID', {
             rules: [{ required: true, message: '请选择工艺路线' }],
-            initialValue: formVals.fRouteID,
+            initialValue: formVals.fRouteID ? formVals.fRouteID : null,
           })(<Select
             style={{ width: 300 }}
             dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}>

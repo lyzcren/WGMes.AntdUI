@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import { connect } from 'dva';
 import moment from 'moment';
 import {
     Form,
@@ -6,6 +7,7 @@ import {
     Modal,
     Switch,
     Tag,
+    TreeSelect,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import { validatorPhone, validatePassword, getPasswordStatus, passwordProgressMap } from '@/utils/validators';
@@ -13,6 +15,9 @@ import { validatorPhone, validatePassword, getPasswordStatus, passwordProgressMa
 
 const FormItem = Form.Item;
 
+@connect(({ basicData }) => ({
+    basicData,
+}))
 @Form.create()
 export class UpdateForm extends PureComponent {
     static defaultProps = {
@@ -29,6 +34,13 @@ export class UpdateForm extends PureComponent {
         };
     }
 
+    componentDidMount () {
+        const { dispatch } = this.props;
+        dispatch({
+            type: 'basicData/getProcessDeptTree',
+        });
+    }
+
     okHandle = () => {
         const { form, handleSubmit } = this.props;
         form.validateFields((err, fieldsValue) => {
@@ -41,7 +53,7 @@ export class UpdateForm extends PureComponent {
     };
 
     render () {
-        const { form, updateModalVisible, handleModalVisible, values } = this.props;
+        const { form, updateModalVisible, handleModalVisible, values, basicData } = this.props;
         const { formVals } = this.state;
 
         return (
@@ -58,6 +70,17 @@ export class UpdateForm extends PureComponent {
                         initialValue: formVals.fName,
                         rules: [{ required: true, message: '请输入名称', min: 1 }],
                     })(<Input placeholder="请输入" />)}
+                </FormItem>
+                <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="部门">
+                    {form.getFieldDecorator('fDeptID', {
+                        rules: [{ required: true, message: '请选择部门' }],
+                        initialValue: formVals.fDeptID,
+                    })(<TreeSelect
+                        style={{ width: 300 }}
+                        dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                        treeData={basicData.processDeptTree}
+                        treeDefaultExpandAll
+                    />)}
                 </FormItem>
                 <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="启用">
                     {form.getFieldDecorator('fIsActive', {

@@ -40,7 +40,7 @@ export class CreateForm extends PureComponent {
   componentDidMount () {
     const { dispatch } = this.props;
     dispatch({
-      type: 'basicData/getDeptTreeData',
+      type: 'basicData/getProcessDeptTree',
     });
   }
 

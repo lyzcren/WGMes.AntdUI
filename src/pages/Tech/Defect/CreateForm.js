@@ -39,7 +39,7 @@ export class CreateForm extends PureComponent {
   componentDidMount () {
     const { dispatch } = this.props;
     dispatch({
-      type: 'basicData/getDeptTreeData',
+      type: 'basicData/getProcessDeptTree',
     });
   }
 
@@ -86,7 +86,7 @@ export class CreateForm extends PureComponent {
           })(<TreeSelect
             style={{ width: 300 }}
             dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-            treeData={basicData.deptTreeData}
+            treeData={basicData.processDeptTree}
             treeDefaultExpandAll
           />)}
         </FormItem>

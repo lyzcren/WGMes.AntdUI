@@ -54,6 +54,10 @@ class ColumnConfig {
           </Authorized>
           <Authorized authority="Dept_Active">
             <a onClick={() => this._handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
+            <Divider type="vertical" />
+          </Authorized>
+          <Authorized authority="Dept_Update">
+            <a disabled={record.fTypeNumber != "Process"} onClick={() => this._handleTechParam(record)}>工艺参数</a>
           </Authorized>
         </Fragment>
       ),
@@ -66,16 +70,19 @@ class ColumnConfig {
     this.UpdateModalVisibleCallback(record);
   };
 
-  // 删除方法
   DeleteCallback = (record) => { };
   _delete = (record) => {
     this.DeleteCallback(record);
   };
 
-  // 删除方法
   ActiveCallback = (record) => { };
   _handleActive = (record) => {
     this.ActiveCallback(record);
+  };
+
+  TechParamCallback = (record) => { };
+  _handleTechParam = (record) => {
+    this.TechParamCallback(record);
   };
 
 }

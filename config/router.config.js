@@ -73,6 +73,15 @@ export default [
             name: 'flow',
             component: './Prod/Flow/List',
             authority: ['Flow_Read'],
+            routes: [
+              {
+                path: '/prod/flow/transfer',
+                name: 'transfer',
+                component: './Prod/Flow/Transfer',
+                authority: ['Flow_Transfer'],
+                hideInMenu: true,
+              },
+            ],
           },
         ],
       },

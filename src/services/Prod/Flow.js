@@ -12,16 +12,6 @@ export async function fakeQuery (params) {
   });
 }
 
-export async function fakeRemove (params) {
-  return request('/api/Flow/delete', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'delete',
-    },
-  });
-}
-
 export async function fakeSign (params) {
   return request('/api/Flow/sign', {
     method: 'POST',
@@ -38,6 +28,16 @@ export async function fakeAddFromMission (params) {
     body: {
       ...params,
       method: 'post',
+    },
+  });
+}
+
+export async function fakeCurrentRecord (params) {
+  return request('/api/Flow/currentRecord', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'currentRecord',
     },
   });
 }

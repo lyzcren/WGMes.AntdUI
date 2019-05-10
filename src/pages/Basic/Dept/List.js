@@ -26,6 +26,7 @@ import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { UpdateForm } from './UpdateForm';
 import { CreateForm } from './CreateForm';
+import { TechParamForm } from './TechParamForm';
 import { default as ColumnConfig } from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
@@ -49,11 +50,9 @@ const getValue = obj =>
 class TableList extends PureComponent {
   state = {
     // 新增界面
-    modalVisible: false,
+    modalVisible: { add: false, update: false, techParam: false },
     formValues: {},
-    // 修改界面
-    updateModalVisible: false,
-    updateFormValues: {},
+    currentFormValues: {},
     // 其他
     expandForm: false,
     selectedRows: [],
@@ -81,6 +80,7 @@ class TableList extends PureComponent {
     ColumnConfig.UpdateModalVisibleCallback = (record) => this.handleUpdateModalVisible(true, record);
     ColumnConfig.DeleteCallback = (record) => this.handleDelete(record);
     ColumnConfig.ActiveCallback = (record) => this.handleActive(record, !record.fIsActive);
+    ColumnConfig.TechParamCallback = (record) => this.handleTechParamModalVisible(true, record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -237,15 +237,25 @@ class TableList extends PureComponent {
   };
 
   handleModalVisible = flag => {
+    const { modalVisible } = this.state;
     this.setState({
-      modalVisible: !!flag,
+      modalVisible: { ...modalVisible, add: !!flag },
     });
   };
 
   handleUpdateModalVisible = (flag, record) => {
+    const { modalVisible } = this.state;
     this.setState({
-      updateModalVisible: !!flag,
-      updateFormValues: record || {},
+      modalVisible: { ...modalVisible, update: !!flag },
+      currentFormValues: record || {},
+    });
+  };
+
+  handleTechParamModalVisible = (flag, record) => {
+    const { modalVisible } = this.state;
+    this.setState({
+      modalVisible: { ...modalVisible, techParam: !!flag },
+      currentFormValues: record || {},
     });
   };
 
@@ -277,6 +287,27 @@ class TableList extends PureComponent {
       if (queryResult.status === 'ok') {
         message.success('修改成功');
         this.handleUpdateModalVisible();
+        // 成功后再次刷新列表
+        this.search();
+      } else if (queryResult.status === 'warning') {
+        message.warning(queryResult.message);
+      }
+      else {
+        message.error(queryResult.message);
+      }
+    });
+  };
+
+  handleTechParam = fields => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'deptManage/updateTechParam',
+      payload: fields,
+    }).then(() => {
+      const { deptManage: { queryResult } } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success('修改成功');
+        this.handleTechParamModalVisible();
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
@@ -449,8 +480,9 @@ class TableList extends PureComponent {
     const {
       deptManage: { data, queryResult, typeData },
       loading,
+      dispatch,
     } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, updateFormValues, authorityModalVisible, authorizeUserModalVisible } = this.state;
+    const { selectedRows, modalVisible, currentFormValues, authorityModalVisible, authorizeUserModalVisible } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove" disabled={!hasAuthority('Dept_Delete')}>删除</Menu.Item>
@@ -466,6 +498,11 @@ class TableList extends PureComponent {
     const updateMethods = {
       handleModalVisible: this.handleUpdateModalVisible,
       handleSubmit: this.handleUpdate,
+    };
+    const techParamMethods = {
+      handleModalVisible: this.handleTechParamModalVisible,
+      handleSubmit: this.handleTechParam,
+      dispatch,
     };
     return (
       <div style={{ margin: '-24px -24px 0' }}>
@@ -521,12 +558,19 @@ class TableList extends PureComponent {
 
             </div>
           </Card>
-          <CreateForm {...parentMethods} modalVisible={modalVisible} treeData={data.list} typeData={typeData} />
-          {updateFormValues && Object.keys(updateFormValues).length ? (
+          <CreateForm {...parentMethods} modalVisible={modalVisible.add} treeData={data.list} typeData={typeData} />
+          {currentFormValues && Object.keys(currentFormValues).length ? (
             <UpdateForm
               {...updateMethods}
-              updateModalVisible={updateModalVisible}
-              values={updateFormValues} treeData={data.list} typeData={typeData}
+              updateModalVisible={modalVisible.update}
+              values={currentFormValues} treeData={data.list} typeData={typeData}
+            />
+          ) : null}
+          {currentFormValues && Object.keys(currentFormValues).length ? (
+            <TechParamForm
+              {...techParamMethods}
+              modalVisible={modalVisible.techParam}
+              values={currentFormValues}
             />
           ) : null}
         </GridContent>
