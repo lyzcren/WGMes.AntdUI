@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { Layout, Tabs, notification, Button } from 'antd';
+import { Layout, Tabs, } from 'antd';
 import DocumentTitle from 'react-document-title';
 import isEqual from 'lodash/isEqual';
 import memoizeOne from 'memoize-one';
@@ -9,20 +9,16 @@ import classNames from 'classnames';
 import pathToRegexp from 'path-to-regexp';
 import Media from 'react-media';
 import { formatMessage } from 'umi/locale';
-import Authorized from '@/utils/Authorized';
+import { Route, } from 'react-router-dom'
 import logo from '../assets/logo.svg';
 import Footer from './Footer';
 import Header from './WgHeader';
 import Context from './MenuContext';
-import Exception403 from '../pages/Exception/403';
 import PageLoading from '@/components/PageLoading';
 import WgSiderMenu from '@/components/WgSiderMenu';
-import { urlToList } from '@/components/_utils/pathTools';
-import { getFlatMenuKeys } from '@/components/WgSiderMenu/SiderMenuUtils';
-import { Route, Switch } from 'react-router-dom'
-import { ComposeApplicator } from 'lodash-decorators/applicators';
 import { getToken } from '@/utils/token';
 
+import logo from '../assets/logo.svg';
 import styles from './BasicLayout.less';
 
 
@@ -31,8 +27,6 @@ const TabPane = Tabs.TabPane;
 
 // lazy load SettingDrawer
 const SettingDrawer = React.lazy(() => import('@/components/SettingDrawer'));
-
-const { Content } = Layout;
 
 const query = {
   'screen-xs': {
@@ -64,7 +58,7 @@ class WgBasicLayout extends React.PureComponent {
     super(props);
     this.getPageTitle = memoizeOne(this.getPageTitle);
     this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual);
-    let { location: { pathname } } = props;
+    // const { location: { pathname } } = props;
     // 首次进入界面默认加载标签页
     this.defaultPath = "/basic/dept";
 
@@ -77,7 +71,6 @@ class WgBasicLayout extends React.PureComponent {
     const {
       dispatch,
       route: { routes, authority },
-      menuData,
     } = this.props;
     const token = getToken();
     if (!token) {
@@ -180,7 +173,7 @@ class WgBasicLayout extends React.PureComponent {
   }
 
   add = ({ path }) => {
-    const { dispatch, panes } = this.props;
+    const { dispatch, } = this.props;
     dispatch({
       type: 'menu/openMenu',
       payload: { path },
@@ -200,13 +193,10 @@ class WgBasicLayout extends React.PureComponent {
     const {
       navTheme,
       layout: PropsLayout,
-      children,
       location: { pathname },
       isMobile,
       menuData,
       breadcrumbNameMap,
-      route: { routes },
-      fixedHeader,
     } = this.props;
 
     const isTop = PropsLayout === 'topmenu';
@@ -236,11 +226,14 @@ class WgBasicLayout extends React.PureComponent {
             isMobile={isMobile}
             {...this.props}
           />
-          <Tabs className={styles.tabMenu} activeKey={this.props.activeKey}
-            onChange={this.onChange} onEdit={this.onEdit}
+          <Tabs className={styles.tabMenu}
+            activeKey={this.props.activeKey}
+            onChange={this.onChange}
+            onEdit={this.onEdit}
             // TODO: Tabs标签页右键菜单
             // tabBarExtraContent={<Button type="primary">主操作</Button>}
-            hideAdd type="editable-card">
+            hideAdd
+            type="editable-card">
             {
               this.props.panes.map(pane =>
                 <TabPane tab={pane.name} className={styles.tabContent} key={pane.key} closable={pane.closable}>
