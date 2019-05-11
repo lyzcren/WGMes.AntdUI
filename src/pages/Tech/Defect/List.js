@@ -18,7 +18,12 @@ import {
   message,
   Badge,
   Divider,
-  Radio, Popover, Switch, Progress, notification, Popconfirm,
+  Radio,
+  Popover,
+  Switch,
+  Progress,
+  notification,
+  Popconfirm,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
@@ -31,7 +36,6 @@ import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
 
 import styles from './List.less';
-
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -66,18 +70,17 @@ class TableList extends PureComponent {
     pageSize: 10,
   };
 
-
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props;
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
     dispatch({
       type: 'defectManage/fetch',
       payload: params,
     });
     // 列配置相关方法
-    ColumnConfig.UpdateModalVisibleCallback = (record) => this.handleUpdateModalVisible(true, record);
-    ColumnConfig.DeleteCallback = (record) => this.handleDelete(record);
-    ColumnConfig.ActiveCallback = (record) => this.handleActive(record, !record.fIsActive);
+    ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdateModalVisible(true, record);
+    ColumnConfig.DeleteCallback = record => this.handleDelete(record);
+    ColumnConfig.ActiveCallback = record => this.handleActive(record, !record.fIsActive);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -103,7 +106,7 @@ class TableList extends PureComponent {
       this.currentPagination.sorter[sorter.field] = sorter.order.replace('end', '');
     }
 
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     dispatch({
       type: 'defectManage/fetch',
@@ -116,14 +119,16 @@ class TableList extends PureComponent {
     this.search();
   };
 
-  getSearchParam = (fieldsValue) => {
+  getSearchParam = fieldsValue => {
     const values = {
       ...fieldsValue,
     };
     // 查询条件处理
     const queryFilters = [];
-    if (fieldsValue.queryName) queryFilters.push({ name: "fName", compare: "%*%", value: fieldsValue.queryName });
-    if (fieldsValue.queryIsActive) queryFilters.push({ name: "fIsActive", compare: "=", value: fieldsValue.queryIsActive });
+    if (fieldsValue.queryName)
+      queryFilters.push({ name: 'fName', compare: '%*%', value: fieldsValue.queryName });
+    if (fieldsValue.queryIsActive)
+      queryFilters.push({ name: 'fIsActive', compare: '=', value: fieldsValue.queryIsActive });
 
     this.setState({
       formValues: values,
@@ -136,10 +141,10 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters,
     };
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     return params;
-  }
+  };
 
   search = () => {
     const { dispatch, form } = this.props;
@@ -147,34 +152,34 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      var params = this.getSearchParam(fieldsValue);
+      const params = this.getSearchParam(fieldsValue);
       dispatch({
         type: 'defectManage/fetch',
         payload: params,
       });
     });
-  }
+  };
 
-  handleExport = (e) => {
+  handleExport = e => {
     const { dispatch, form } = this.props;
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      var params = this.getSearchParam(fieldsValue);
-      var fileName = '不良.xls';
+      let params = this.getSearchParam(fieldsValue);
+      let fileName = '不良.xls';
       switch (e.key) {
         case 'currentPage':
-          params = { ...params, exportPage: true }
+          params = { ...params, exportPage: true };
           fileName = '不良-第' + params.pagination.current + '页.xls';
           break;
         case 'allPage':
-          params = { ...params, exportAll: true }
+          params = { ...params, exportAll: true };
           break;
         default:
           break;
       }
-      exportExcel('/api/defect/export', params, fileName)
+      exportExcel('/api/defect/export', params, fileName);
     });
   };
 
@@ -228,9 +233,11 @@ class TableList extends PureComponent {
     const { dispatch, form } = this.props;
     dispatch({
       type: 'defectManage/add',
-      payload: fields
+      payload: fields,
     }).then(() => {
-      const { defectManage: { queryResult } } = this.props;
+      const {
+        defectManage: { queryResult },
+      } = this.props;
       if (queryResult.status === 'ok') {
         message.success('添加成功');
         this.handleModalVisible();
@@ -248,7 +255,9 @@ class TableList extends PureComponent {
       type: 'defectManage/update',
       payload: fields,
     }).then(() => {
-      const { defectManage: { queryResult } } = this.props;
+      const {
+        defectManage: { queryResult },
+      } = this.props;
       if (queryResult.status === 'ok') {
         message.success('修改成功');
         this.handleUpdateModalVisible();
@@ -256,8 +265,7 @@ class TableList extends PureComponent {
         this.search();
       } else if (queryResult.status === 'warning') {
         message.warning(queryResult.message);
-      }
-      else {
+      } else {
         message.error(queryResult.message);
       }
     });
@@ -272,21 +280,22 @@ class TableList extends PureComponent {
         fIsActive,
       },
     }).then(() => {
-      const { defectManage: { queryResult } } = this.props;
+      const {
+        defectManage: { queryResult },
+      } = this.props;
       if (queryResult.status === 'ok') {
         message.success('【' + record.fName + '】' + (fIsActive ? '启用' : '禁用') + '成功');
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
         message.warning(queryResult.message);
-      }
-      else {
+      } else {
         message.error(queryResult.message);
       }
     });
   };
 
-  handleDelete = (record) => {
+  handleDelete = record => {
     const { dispatch } = this.props;
     dispatch({
       type: 'defectManage/remove',
@@ -297,15 +306,16 @@ class TableList extends PureComponent {
         this.setState({
           selectedRows: [],
         });
-        const { defectManage: { queryResult } } = this.props;
+        const {
+          defectManage: { queryResult },
+        } = this.props;
         if (queryResult.status === 'ok') {
           message.success('【' + record.fName + '】' + '删除成功');
           // 成功后再次刷新列表
           this.search();
         } else if (queryResult.status === 'warning') {
           message.warning(queryResult.message);
-        }
-        else {
+        } else {
           message.error(queryResult.message);
         }
       },
@@ -325,7 +335,7 @@ class TableList extends PureComponent {
     });
   };
 
-  batchDelete = (selectedRows) => {
+  batchDelete = selectedRows => {
     const { dispatch } = this.props;
     if (typeof selectedRows === 'object' && !Array.isArray(selectedRows)) {
       selectedRows = [selectedRows];
@@ -371,7 +381,7 @@ class TableList extends PureComponent {
     });
   };
 
-  renderSimpleForm () {
+  renderSimpleForm() {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -411,26 +421,39 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm () {
+  renderAdvancedForm() {
     return renderSimpleForm;
   }
 
-  renderForm () {
+  renderForm() {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  render () {
+  render() {
     const {
       defectManage: { data, queryResult },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, updateFormValues, authorityModalVisible, authorizeUserModalVisible } = this.state;
+    const {
+      selectedRows,
+      modalVisible,
+      updateModalVisible,
+      updateFormValues,
+      authorityModalVisible,
+      authorizeUserModalVisible,
+    } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-        <Menu.Item key="remove" disabled={!hasAuthority('Defect_Delete')}>删除</Menu.Item>
-        <Menu.Item key="active" disabled={!hasAuthority('Defect_Active')}>批量启用</Menu.Item>
-        <Menu.Item key="deactive" disabled={!hasAuthority('Defect_Active')}>批量禁用</Menu.Item>
+        <Menu.Item key="remove" disabled={!hasAuthority('Defect_Delete')}>
+          删除
+        </Menu.Item>
+        <Menu.Item key="active" disabled={!hasAuthority('Defect_Active')}>
+          批量启用
+        </Menu.Item>
+        <Menu.Item key="deactive" disabled={!hasAuthority('Defect_Active')}>
+          批量禁用
+        </Menu.Item>
       </Menu>
     );
 
@@ -452,15 +475,17 @@ class TableList extends PureComponent {
                 <Authorized authority="Defect_Create">
                   <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
                     新建
-              </Button>
+                  </Button>
                 </Authorized>
                 <Authorized authority="Defect_Export">
-                  <Dropdown overlay={
-                    <Menu onClick={this.handleExport} selectedKeys={[]}>
-                      <Menu.Item key="currentPage">当前页</Menu.Item>
-                      <Menu.Item key="allPage">所有页</Menu.Item>
-                    </Menu>
-                  }>
+                  <Dropdown
+                    overlay={
+                      <Menu onClick={this.handleExport} selectedKeys={[]}>
+                        <Menu.Item key="currentPage">当前页</Menu.Item>
+                        <Menu.Item key="allPage">所有页</Menu.Item>
+                      </Menu>
+                    }
+                  >
                     <Button>
                       导出 <Icon type="down" />
                     </Button>
@@ -471,7 +496,7 @@ class TableList extends PureComponent {
                     <Authorized authority="Defect_Delete">
                       <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
                     </Authorized>
-                    <Authorized authority={["Defect_Delete", "Defect_Active"]}>
+                    <Authorized authority={['Defect_Delete', 'Defect_Active']}>
                       <Dropdown overlay={menu}>
                         <Button>
                           更多操作 <Icon type="down" />
@@ -492,7 +517,11 @@ class TableList extends PureComponent {
               />
             </div>
           </Card>
-          <CreateForm {...parentMethods} modalVisible={modalVisible} dispatch={this.props.dispatch} />
+          <CreateForm
+            {...parentMethods}
+            modalVisible={modalVisible}
+            dispatch={this.props.dispatch}
+          />
           {updateFormValues && Object.keys(updateFormValues).length ? (
             <UpdateForm
               {...updateMethods}
@@ -501,7 +530,7 @@ class TableList extends PureComponent {
             />
           ) : null}
         </GridContent>
-      </div >
+      </div>
     );
   }
 }

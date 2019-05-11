@@ -11,14 +11,14 @@ export default {
   },
 
   effects: {
-    *fetch (_, { call, put }) {
+    *fetch(_, { call, put }) {
       const response = yield call(queryUsers);
       yield put({
         type: 'save',
         payload: response,
       });
     },
-    *fetchCurrent (_, { call, put }) {
+    *fetchCurrent(_, { call, put }) {
       const response = yield call(queryCurrent);
       yield put({
         type: 'saveCurrentUser',
@@ -28,13 +28,13 @@ export default {
   },
 
   reducers: {
-    save (state, action) {
+    save(state, action) {
       return {
         ...state,
         list: action.payload,
       };
     },
-    saveCurrentUser (state, action) {
+    saveCurrentUser(state, action) {
       if (action.payload) {
         setAuthority(action.payload.currentAuthority);
         if (action.payload.token) {
@@ -46,7 +46,7 @@ export default {
         currentUser: action.payload || {},
       };
     },
-    changeNotifyCount (state, action) {
+    changeNotifyCount(state, action) {
       return {
         ...state,
         currentUser: {

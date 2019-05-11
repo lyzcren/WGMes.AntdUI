@@ -1,15 +1,8 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import {
-  Form,
-  Input,
-  Modal,
-  Radio,
-  Switch,
-  Select,
-} from 'antd';
+import { Form, Input, Modal, Radio, Switch, Select } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import { GlobalConst } from '@/utils/GlobalConst'
+import { GlobalConst } from '@/utils/GlobalConst';
 
 import styles from './List.less';
 
@@ -17,30 +10,26 @@ const FormItem = Form.Item;
 const Option = Select.Option;
 const { TextArea } = Input;
 
-
 /* eslint react/no-multi-comp:0 */
 @connect(({ basicData }) => ({
   basicData,
 }))
-// export const CreateForm = Form.create()(props => {
 @Form.create()
 export class CreateForm extends PureComponent {
-  static defaultProps = {
-  };
+  static defaultProps = {};
 
   constructor(props) {
     super(props);
 
-    this.state = {
-    };
+    this.state = {};
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props;
   }
 
   okHandle = () => {
-    const { form, handleSubmit, } = this.props;
+    const { form, handleSubmit } = this.props;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       // form.resetFields();
@@ -48,7 +37,7 @@ export class CreateForm extends PureComponent {
     });
   };
 
-  render () {
+  render() {
     const { modalVisible, form, handleSubmit, handleModalVisible, basicData } = this.props;
 
     return (
@@ -83,4 +72,4 @@ export class CreateForm extends PureComponent {
       </Modal>
     );
   }
-};
+}

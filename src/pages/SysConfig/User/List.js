@@ -18,7 +18,12 @@ import {
   message,
   Badge,
   Divider,
-  Radio, Popover, Switch, Progress, notification, Popconfirm,
+  Radio,
+  Popover,
+  Switch,
+  Progress,
+  notification,
+  Popconfirm,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
@@ -31,7 +36,6 @@ import { AuthorizeRoleForm } from './AuthorizeRoleForm';
 
 import styles from './List.less';
 
-
 const FormItem = Form.Item;
 const { Option } = Select;
 const getValue = obj =>
@@ -39,8 +43,8 @@ const getValue = obj =>
     .map(key => obj[key])
     .join(',');
 // const sexMap = ['default', 'processing', 'success',];
-const sex = ['保密', '男', '女',];
-const activeData = ['启用', '禁用',];
+const sex = ['保密', '男', '女'];
+const activeData = ['启用', '禁用'];
 
 /* eslint react/no-multi-comp:0 */
 @connect(({ userManage, loading }) => ({
@@ -101,7 +105,7 @@ class TableList extends PureComponent {
           value: 2,
         },
       ],
-      render (val) {
+      render(val) {
         return sex[val];
       },
     },
@@ -118,7 +122,7 @@ class TableList extends PureComponent {
           value: 0,
         },
       ],
-      render (val) {
+      render(val) {
         return <Switch disabled checked={val} />;
       },
     },
@@ -149,9 +153,9 @@ class TableList extends PureComponent {
     },
   ];
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props;
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
     dispatch({
       type: 'userManage/fetch',
       payload: params,
@@ -182,7 +186,7 @@ class TableList extends PureComponent {
       this.currentPagination.sorter[sorter.field] = sorter.order.replace('end', '');
     }
 
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
     // console.log(params);
 
     dispatch({
@@ -208,8 +212,10 @@ class TableList extends PureComponent {
       };
       // 查询条件处理
       const queryFilters = [];
-      if (fieldsValue.queryName) queryFilters.push({ name: "fName", compare: "%*%", value: fieldsValue.queryName });
-      if (fieldsValue.queryIsActive) queryFilters.push({ name: "fIsActive", compare: "=", value: fieldsValue.queryIsActive });
+      if (fieldsValue.queryName)
+        queryFilters.push({ name: 'fName', compare: '%*%', value: fieldsValue.queryName });
+      if (fieldsValue.queryIsActive)
+        queryFilters.push({ name: 'fIsActive', compare: '=', value: fieldsValue.queryIsActive });
 
       this.setState({
         formValues: values,
@@ -223,14 +229,14 @@ class TableList extends PureComponent {
         queryFilters,
       };
       // console.log(this.currentPagination);
-      var params = { pagination: this.currentPagination };
+      const params = { pagination: this.currentPagination };
 
       dispatch({
         type: 'userManage/fetch',
         payload: params,
       });
     });
-  }
+  };
 
   handleFormReset = () => {
     const { form, dispatch } = this.props;
@@ -246,7 +252,7 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters: [],
     };
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     // console.log(params);
     dispatch({
@@ -355,7 +361,7 @@ class TableList extends PureComponent {
         fPhone: fields.fPhone,
         fSex: fields.fSex,
         fPwd: fields.fPwd,
-      }
+      },
     }).then(() => {
       const { userManage } = this.props;
       if (userManage.result.status === 'ok') {
@@ -427,7 +433,7 @@ class TableList extends PureComponent {
     });
   };
 
-  batchDelete = (selectedRows) => {
+  batchDelete = selectedRows => {
     const { dispatch } = this.props;
     if (typeof selectedRows === 'object' && !Array.isArray(selectedRows)) {
       selectedRows = [selectedRows];
@@ -444,9 +450,11 @@ class TableList extends PureComponent {
         const { userManage } = this.props;
         if (userManage.result.status === 'ok') {
           if (userManage.result.message) {
-            userManage.result.message.map(m => notification.error({
-              message: m,
-            }));
+            userManage.result.message.map(m =>
+              notification.error({
+                message: m,
+              })
+            );
           }
           // 成功后再次刷新列表
           this.search();
@@ -455,7 +463,7 @@ class TableList extends PureComponent {
     });
   };
 
-  handleActive = (record) => {
+  handleActive = record => {
     const { dispatch } = this.props;
     dispatch({
       type: 'userManage/update',
@@ -475,7 +483,7 @@ class TableList extends PureComponent {
     });
   };
 
-  renderSimpleForm () {
+  renderSimpleForm() {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -515,7 +523,7 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm () {
+  renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -589,18 +597,26 @@ class TableList extends PureComponent {
     );
   }
 
-  renderForm () {
+  renderForm() {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  render () {
+  render() {
     const {
       userManage: { data },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, updateFormValues, updatePwdModalVisible, updatePwdFormValues,
-      updateRoleModalVisible, updateRoleFormValues } = this.state;
+    const {
+      selectedRows,
+      modalVisible,
+      updateModalVisible,
+      updateFormValues,
+      updatePwdModalVisible,
+      updatePwdFormValues,
+      updateRoleModalVisible,
+      updateRoleFormValues,
+    } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove">删除</Menu.Item>
@@ -633,7 +649,7 @@ class TableList extends PureComponent {
                 <Authorized authority="User_Create">
                   <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
                     新建
-              </Button>
+                  </Button>
                 </Authorized>
                 {selectedRows.length > 0 && (
                   <span>

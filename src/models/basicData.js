@@ -1,4 +1,12 @@
-import { fakeDeptTreeData, fakeProcessDeptTree, fakeMachineData, fakeGetRouteData, fakeGetTechParamData, fakeGetTechParamValues, fakeGetBillNo } from '@/services/basicData';
+import {
+  fakeDeptTreeData,
+  fakeProcessDeptTree,
+  fakeMachineData,
+  fakeGetRouteData,
+  fakeGetTechParamData,
+  fakeGetTechParamValues,
+  fakeGetBillNo,
+} from '@/services/basicData';
 
 export default {
   namespace: 'basicData',
@@ -13,42 +21,42 @@ export default {
   },
 
   effects: {
-    *getDeptTreeData ({ payload }, { call, put }) {
+    *getDeptTreeData({ payload }, { call, put }) {
       const response = yield call(fakeDeptTreeData, payload);
       yield put({
         type: 'saveDeptTreeData',
         payload: response,
       });
     },
-    *getProcessDeptTree ({ payload }, { call, put }) {
+    *getProcessDeptTree({ payload }, { call, put }) {
       const response = yield call(fakeProcessDeptTree, payload);
       yield put({
         type: 'saveProcessDeptTree',
         payload: response,
       });
     },
-    *getMachineData ({ payload }, { call, put }) {
+    *getMachineData({ payload }, { call, put }) {
       const response = yield call(fakeMachineData, payload);
       yield put({
         type: 'saveMachineData',
         payload: response,
       });
     },
-    *getRouteData ({ payload }, { call, put }) {
+    *getRouteData({ payload }, { call, put }) {
       const response = yield call(fakeGetRouteData, payload);
       yield put({
         type: 'saveRouteData',
         payload: response,
       });
     },
-    *getParamData ({ payload }, { call, put }) {
+    *getParamData({ payload }, { call, put }) {
       const response = yield call(fakeGetTechParamData, payload);
       yield put({
         type: 'saveParamData',
         payload: response,
       });
     },
-    *getBillNo ({ payload }, { call, put }) {
+    *getBillNo({ payload }, { call, put }) {
       const response = yield call(fakeGetBillNo, payload);
       yield put({
         type: 'saveBillNoData',
@@ -58,37 +66,37 @@ export default {
   },
 
   reducers: {
-    saveDeptTreeData (state, action) {
+    saveDeptTreeData(state, action) {
       return {
         ...state,
         deptTreeData: action.payload,
       };
     },
-    saveProcessDeptTree (state, action) {
+    saveProcessDeptTree(state, action) {
       return {
         ...state,
         processDeptTree: action.payload,
       };
     },
-    saveMachineData (state, action) {
+    saveMachineData(state, action) {
       return {
         ...state,
         machineData: action.payload,
       };
     },
-    saveRouteData (state, action) {
+    saveRouteData(state, action) {
       return {
         ...state,
         routeData: action.payload,
       };
     },
-    saveParamData (state, action) {
+    saveParamData(state, action) {
       return {
         ...state,
         paramData: action.payload,
       };
     },
-    saveBillNoData (state, action) {
+    saveBillNoData(state, action) {
       const billNoRule = action.payload;
       const newBillNo = { ...state.billNo };
       newBillNo[billNoRule.fNumber] = billNoRule.fCurrentNo;

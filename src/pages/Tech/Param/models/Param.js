@@ -1,6 +1,13 @@
 import {
-  fakeQuery, fakeRemove, fakeAdd, fakeUpdate, fakeActive,
-  fakeQueryValue, fakeAddValue, fakeUpdateValue, fakeRemoveValue,
+  fakeQuery,
+  fakeRemove,
+  fakeAdd,
+  fakeUpdate,
+  fakeActive,
+  fakeQueryValue,
+  fakeAddValue,
+  fakeUpdateValue,
+  fakeRemoveValue,
 } from '@/services/Tech/Param';
 
 export default {
@@ -19,14 +26,14 @@ export default {
   },
 
   effects: {
-    *fetch ({ payload }, { call, put }) {
+    *fetch({ payload }, { call, put }) {
       const response = yield call(fakeQuery, payload);
       yield put({
         type: 'saveQueryData',
         payload: response,
       });
     },
-    *add ({ payload, callback }, { call, put }) {
+    *add({ payload, callback }, { call, put }) {
       const response = yield call(fakeAdd, payload);
       yield put({
         type: 'saveData',
@@ -34,7 +41,7 @@ export default {
       });
       if (callback) callback();
     },
-    *remove ({ payload, callback }, { call, put }) {
+    *remove({ payload, callback }, { call, put }) {
       const response = yield call(fakeRemove, payload);
       yield put({
         type: 'saveData',
@@ -42,7 +49,7 @@ export default {
       });
       if (callback) callback();
     },
-    *update ({ payload, callback }, { call, put }) {
+    *update({ payload, callback }, { call, put }) {
       const response = yield call(fakeUpdate, payload);
       yield put({
         type: 'saveData',
@@ -50,7 +57,7 @@ export default {
       });
       if (callback) callback();
     },
-    *active ({ payload, callback }, { call, put }) {
+    *active({ payload, callback }, { call, put }) {
       const response = yield call(fakeActive, payload);
       yield put({
         type: 'saveData',
@@ -58,14 +65,14 @@ export default {
       });
       if (callback) callback();
     },
-    *fetchValue ({ payload }, { call, put }) {
+    *fetchValue({ payload }, { call, put }) {
       const response = yield call(fakeQueryValue, payload);
       yield put({
         type: 'saveParamValues',
         payload: response,
       });
     },
-    *addValue ({ payload, callback }, { call, put }) {
+    *addValue({ payload, callback }, { call, put }) {
       const response = yield call(fakeAddValue, payload);
       yield put({
         type: 'saveData',
@@ -73,7 +80,7 @@ export default {
       });
       if (callback) callback();
     },
-    *updateValue ({ payload, callback }, { call, put }) {
+    *updateValue({ payload, callback }, { call, put }) {
       const response = yield call(fakeUpdateValue, payload);
       yield put({
         type: 'saveData',
@@ -81,7 +88,7 @@ export default {
       });
       if (callback) callback();
     },
-    *removeValue ({ payload, callback }, { call, put }) {
+    *removeValue({ payload, callback }, { call, put }) {
       const response = yield call(fakeRemoveValue, payload);
       yield put({
         type: 'saveData',
@@ -92,19 +99,19 @@ export default {
   },
 
   reducers: {
-    saveQueryData (state, action) {
+    saveQueryData(state, action) {
       return {
         ...state,
         data: action.payload,
       };
     },
-    saveData (state, action) {
+    saveData(state, action) {
       return {
         ...state,
         queryResult: action.payload ? action.payload : {},
       };
     },
-    saveParamValues (state, action) {
+    saveParamValues(state, action) {
       return {
         ...state,
         paramValues: action.payload ? action.payload : [],

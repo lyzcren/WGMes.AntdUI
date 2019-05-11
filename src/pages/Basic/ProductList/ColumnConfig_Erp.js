@@ -2,7 +2,6 @@ import React, { PureComponent, Fragment } from 'react';
 import { Switch, Popconfirm, Divider } from 'antd';
 import Authorized from '@/utils/Authorized';
 
-
 class ColumnConfig {
   columns = [
     {
@@ -60,11 +59,10 @@ class ColumnConfig {
   ];
 
   // 导入方法
-  ImportModalVisibleCallback = (record) => { };
-  _importModalVisible = (record) => {
+  ImportModalVisibleCallback = record => {};
+  _importModalVisible = record => {
     this.ImportModalVisibleCallback(record);
   };
-
 }
 
 const columnConfig = new ColumnConfig();

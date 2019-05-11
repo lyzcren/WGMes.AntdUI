@@ -1,28 +1,21 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import {
-  Form,
-  Input,
-  Modal,
-  Radio,
-  Switch,
-} from 'antd';
+import { Form, Input, Modal, Radio, Switch } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 
 import styles from './List.less';
 
 const FormItem = Form.Item;
 
-
 /* eslint react/no-multi-comp:0 */
 @connect(({ basicData }) => ({
   basicData,
 }))
 @Form.create()
+/* eslint react/no-multi-comp:0 */
 export class CreateForm extends PureComponent {
-
   okHandle = () => {
-    const { form, handleSubmit, } = this.props;
+    const { form, handleSubmit } = this.props;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       // form.resetFields();
@@ -30,10 +23,14 @@ export class CreateForm extends PureComponent {
     });
   };
 
-
-  render () {
-    const { basicData: { billNo }
-      , modalVisible, form, handleSubmit, handleModalVisible } = this.props;
+  render() {
+    const {
+      basicData: { billNo },
+      modalVisible,
+      form,
+      handleSubmit,
+      handleModalVisible,
+    } = this.props;
     return (
       <Modal
         destroyOnClose
@@ -63,4 +60,4 @@ export class CreateForm extends PureComponent {
       </Modal>
     );
   }
-};
+}

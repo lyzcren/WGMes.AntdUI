@@ -10,11 +10,14 @@ import {
   Switch,
   Tag,
   Select,
-  message, Popconfirm, Divider, TreeSelect,
+  message,
+  Popconfirm,
+  Divider,
+  TreeSelect,
 } from 'antd';
 import isEqual from 'lodash/isEqual';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import { GlobalConst } from '@/utils/GlobalConst'
+import { GlobalConst } from '@/utils/GlobalConst';
 
 import styles from './List.less';
 
@@ -28,6 +31,7 @@ const TypeData = GlobalConst.DefectTypeData;
   basicData,
 }))
 @Form.create()
+/* eslint react/no-multi-comp:0 */
 export class DeptForm extends PureComponent {
   // static defaultProps = {
   //   handleSubmit: () => { },
@@ -48,27 +52,30 @@ export class DeptForm extends PureComponent {
       loading: false,
       /* eslint-disable-next-line react/no-unused-state */
       depts: props.depts,
-      currentStep: props.currentStep
+      currentStep: props.currentStep,
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
       type: 'basicData/getProcessDeptTree',
     });
   }
 
-  componentDidUpdate (preProps) {
-    const { route: { fInterID }, depts, currentStep } = this.props;
+  componentDidUpdate(preProps) {
+    const {
+      route: { fInterID },
+      depts,
+      currentStep,
+    } = this.props;
     if (fInterID !== preProps.route.fInterID || currentStep !== preProps.currentStep) {
       this.setState({ fInterID, depts, currentStep });
-      this.MaxEntryID = Math.max(...(depts.map(d => d.fEntryID)));
+      this.MaxEntryID = Math.max(...depts.map(d => d.fEntryID));
     }
   }
 
-
-  getRowByKey (fEntryID, newData) {
+  getRowByKey(fEntryID, newData) {
     const { depts } = this.state;
     return (newData || depts).filter(item => item.fEntryID === fEntryID)[0];
   }
@@ -101,25 +108,25 @@ export class DeptForm extends PureComponent {
     this.setState({ depts: newData });
   };
 
-  remove (fEntryID) {
+  remove(fEntryID) {
     const { depts } = this.state;
     const newData = depts.filter(v => v.fEntryID !== fEntryID);
     this.setState({ depts: newData });
 
-    const { dispatch, } = this.props;
+    const { dispatch } = this.props;
     dispatch({
       type: 'routeProfile/changeStep',
-      payload: { depts: newData, }
+      payload: { depts: newData },
     });
   }
 
-  handleKeyPress (e, fEntryID) {
+  handleKeyPress(e, fEntryID) {
     if (e.key === 'Enter') {
       this.saveRow(e, fEntryID);
     }
   }
 
-  handleDeptChange (deptId, deptName, fEntryID) {
+  handleDeptChange(deptId, deptName, fEntryID) {
     const { depts } = this.state;
     const newData = depts.map(item => ({ ...item }));
     const target = this.getRowByKey(fEntryID, newData);
@@ -130,7 +137,7 @@ export class DeptForm extends PureComponent {
     }
   }
 
-  handleFieldChange (e, fieldName, fEntryID) {
+  handleFieldChange(e, fieldName, fEntryID) {
     const { depts } = this.state;
     const newData = depts.map(item => ({ ...item }));
     const target = this.getRowByKey(fEntryID, newData);
@@ -140,7 +147,7 @@ export class DeptForm extends PureComponent {
     }
   }
 
-  saveRow (e, fEntryID) {
+  saveRow(e, fEntryID) {
     e.persist();
     this.setState({
       loading: true,
@@ -159,7 +166,9 @@ export class DeptForm extends PureComponent {
           loading: false,
         });
         return;
-      } else if (depts.filter(d => !d.isNew && !d.editable && d.fDeptID === target.fDeptID).length > 0) {
+      } else if (
+        depts.filter(d => !d.isNew && !d.editable && d.fDeptID === target.fDeptID).length > 0
+      ) {
         console.log(depts.filter(d => !d.isNew && !d.editable && d.fDeptID === target.fDeptID));
         message.error('部门重复');
         this.setState({
@@ -168,14 +177,17 @@ export class DeptForm extends PureComponent {
         return;
       }
       depts.forEach(v => {
-        if (v.fEntryID === fEntryID) { delete v.isNew; delete v.editable; }
+        if (v.fEntryID === fEntryID) {
+          delete v.isNew;
+          delete v.editable;
+        }
       });
       this.setState({ depts });
 
-      const { dispatch, } = this.props;
+      const { dispatch } = this.props;
       dispatch({
         type: 'routeProfile/changeStep',
-        payload: { depts, }
+        payload: { depts },
       });
 
       this.setState({
@@ -184,7 +196,7 @@ export class DeptForm extends PureComponent {
     }, 200);
   }
 
-  cancel (e, fEntryID) {
+  cancel(e, fEntryID) {
     this.clickedCancel = true;
     e.preventDefault();
     const { depts } = this.state;
@@ -199,11 +211,10 @@ export class DeptForm extends PureComponent {
     this.clickedCancel = false;
   }
 
-
-  render () {
-    const { form, modalVisible, handleModalVisible, basicData, } = this.props;
+  render() {
+    const { form, modalVisible, handleModalVisible, basicData } = this.props;
     const profileLoading = this.props.loading;
-    const { loading, depts, } = this.state;
+    const { loading, depts } = this.state;
     const columns = [
       {
         title: '部门',
@@ -222,7 +233,7 @@ export class DeptForm extends PureComponent {
               />
             );
           }
-          return (<div style={{ width: '100%' }}>{text}</div>);
+          return <div style={{ width: '100%' }}>{text}</div>;
         },
       },
       {
@@ -235,7 +246,10 @@ export class DeptForm extends PureComponent {
                 <span>
                   <a onClick={e => this.saveRow(e, record.fEntryID)}>添加</a>
                   <Divider type="vertical" />
-                  <Popconfirm title="是否要删除此行？" onConfirm={() => this.remove(record.fEntryID)}>
+                  <Popconfirm
+                    title="是否要删除此行？"
+                    onConfirm={() => this.remove(record.fEntryID)}
+                  >
                     <a>删除</a>
                   </Popconfirm>
                 </span>
@@ -271,7 +285,7 @@ export class DeptForm extends PureComponent {
           dataSource={depts}
           pagination={false}
           rowClassName={record => (record.editable ? styles.editable : '')}
-          style={{ width: '65%', minWidth: '320px', }}
+          style={{ width: '65%', minWidth: '320px' }}
         />
         <Button
           style={{ width: '65%', minWidth: '320px', marginTop: 16, marginBottom: 8 }}
@@ -284,6 +298,6 @@ export class DeptForm extends PureComponent {
       </div>
     );
   }
-};
+}
 
 export default DeptForm;

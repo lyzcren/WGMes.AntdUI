@@ -18,7 +18,12 @@ import {
   message,
   Badge,
   Divider,
-  Radio, Popover, Switch, Progress, notification, Popconfirm,
+  Radio,
+  Popover,
+  Switch,
+  Progress,
+  notification,
+  Popconfirm,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
@@ -30,7 +35,6 @@ import { default as ColumnConfig } from './ColumnConfig_Erp';
 import { hasAuthority } from '@/utils/authority';
 
 import styles from './List.less';
-
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -66,19 +70,19 @@ class TableList extends PureComponent {
     pageSize: 10,
   };
 
-  getList = (params) => {
+  getList = params => {
     const { dispatch } = this.props;
     dispatch({
       type: 'syncProductManage/fetch',
       payload: params,
     });
-  }
+  };
 
-  componentDidMount () {
-    var params = { pagination: this.currentPagination };
+  componentDidMount() {
+    const params = { pagination: this.currentPagination };
     this.getList(params);
     // 列配置相关方法
-    ColumnConfig.ImportModalVisibleCallback = (record) => this.handleImport(record);
+    ColumnConfig.ImportModalVisibleCallback = record => this.handleImport(record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -103,7 +107,7 @@ class TableList extends PureComponent {
       this.currentPagination.sorter[sorter.field] = sorter.order.replace('end', '');
     }
 
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     this.getList(params);
   };
@@ -113,14 +117,16 @@ class TableList extends PureComponent {
     this.search();
   };
 
-  getSearchParam = (fieldsValue) => {
+  getSearchParam = fieldsValue => {
     const values = {
       ...fieldsValue,
     };
     // 查询条件处理
     const queryFilters = [];
-    if (fieldsValue.queryName) queryFilters.push({ name: "fName", compare: "%*%", value: fieldsValue.queryName });
-    if (fieldsValue.queryIsActive) queryFilters.push({ name: "fIsActive", compare: "=", value: fieldsValue.queryIsActive });
+    if (fieldsValue.queryName)
+      queryFilters.push({ name: 'fName', compare: '%*%', value: fieldsValue.queryName });
+    if (fieldsValue.queryIsActive)
+      queryFilters.push({ name: 'fIsActive', compare: '=', value: fieldsValue.queryIsActive });
 
     this.setState({
       formValues: values,
@@ -132,10 +138,10 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters,
     };
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     return params;
-  }
+  };
 
   search = () => {
     const { dispatch, form } = this.props;
@@ -143,10 +149,10 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      var params = this.getSearchParam(fieldsValue);
+      const params = this.getSearchParam(fieldsValue);
       this.getList(params);
     });
-  }
+  };
 
   handleFormReset = () => {
     const { form, dispatch } = this.props;
@@ -161,7 +167,7 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters: [],
     };
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     this.getList(params);
   };
@@ -186,15 +192,17 @@ class TableList extends PureComponent {
     selectedRows.forEach(selectedRow => {
       this.handleImport(selectedRow);
     });
-  }
+  };
 
-  handleImport = (record) => {
+  handleImport = record => {
     const { dispatch, form } = this.props;
     dispatch({
       type: 'syncProductManage/add',
-      payload: { product: record }
+      payload: { product: record },
     }).then(() => {
-      const { syncProductManage: { queryResult } } = this.props;
+      const {
+        syncProductManage: { queryResult },
+      } = this.props;
       if (queryResult.status === 'ok') {
         message.success('添加成功');
         // 成功后再次刷新列表
@@ -205,7 +213,7 @@ class TableList extends PureComponent {
     });
   };
 
-  renderSimpleForm () {
+  renderSimpleForm() {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -235,24 +243,26 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm () {
+  renderAdvancedForm() {
     return renderSimpleForm;
   }
 
-  renderForm () {
+  renderForm() {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  render () {
+  render() {
     const {
       syncProductManage: { data, queryResult },
       loading,
     } = this.props;
-    const { selectedRows, } = this.state;
+    const { selectedRows } = this.state;
     const scrollX = ColumnConfig.columns
-      .map(c => { return c.width; })
-      .reduce(function (sum, width, index) {
+      .map(c => {
+        return c.width;
+      })
+      .reduce(function(sum, width, index) {
         return sum + width;
       });
 

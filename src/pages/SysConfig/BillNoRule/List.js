@@ -18,7 +18,12 @@ import {
   message,
   Badge,
   Divider,
-  Radio, Popover, Switch, Progress, notification, Popconfirm,
+  Radio,
+  Popover,
+  Switch,
+  Progress,
+  notification,
+  Popconfirm,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
@@ -29,7 +34,6 @@ import { default as ColumnConfig } from './ColumnConfig';
 import { hasAuthority } from '@/utils/authority';
 
 import styles from './List.less';
-
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -62,16 +66,15 @@ class TableList extends PureComponent {
     pageSize: 10,
   };
 
-
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props;
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
     dispatch({
       type: 'billNoRuleManage/fetch',
       payload: params,
     });
     // 列配置相关方法
-    ColumnConfig.UpdateModalVisibleCallback = (record) => this.handleUpdateModalVisible(true, record);
+    ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdateModalVisible(true, record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -97,7 +100,7 @@ class TableList extends PureComponent {
       this.currentPagination.sorter[sorter.field] = sorter.order.replace('end', '');
     }
 
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     dispatch({
       type: 'billNoRuleManage/fetch',
@@ -110,13 +113,14 @@ class TableList extends PureComponent {
     this.search();
   };
 
-  getSearchParam = (fieldsValue) => {
+  getSearchParam = fieldsValue => {
     const values = {
       ...fieldsValue,
     };
     // 查询条件处理
     const queryFilters = [];
-    if (fieldsValue.queryName) queryFilters.push({ name: "fName", compare: "%*%", value: fieldsValue.queryName });
+    if (fieldsValue.queryName)
+      queryFilters.push({ name: 'fName', compare: '%*%', value: fieldsValue.queryName });
 
     this.setState({
       formValues: values,
@@ -129,10 +133,10 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters,
     };
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     return params;
-  }
+  };
 
   search = () => {
     const { dispatch, form } = this.props;
@@ -140,13 +144,13 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      var params = this.getSearchParam(fieldsValue);
+      const params = this.getSearchParam(fieldsValue);
       dispatch({
         type: 'billNoRuleManage/fetch',
         payload: params,
       });
     });
-  }
+  };
 
   handleFormReset = () => {
     const { form, dispatch } = this.props;
@@ -162,7 +166,7 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters: [],
     };
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     dispatch({
       type: 'billNoRuleManage/fetch',
@@ -196,7 +200,9 @@ class TableList extends PureComponent {
       type: 'billNoRuleManage/update',
       payload: fields,
     }).then(() => {
-      const { billNoRuleManage: { queryResult } } = this.props;
+      const {
+        billNoRuleManage: { queryResult },
+      } = this.props;
       if (queryResult.status === 'ok') {
         message.success('修改成功');
         this.handleUpdateModalVisible();
@@ -204,15 +210,13 @@ class TableList extends PureComponent {
         this.search();
       } else if (queryResult.status === 'warning') {
         message.warning(queryResult.message);
-      }
-      else {
+      } else {
         message.error(queryResult.message);
       }
     });
   };
 
-
-  renderSimpleForm () {
+  renderSimpleForm() {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -242,24 +246,26 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm () {
+  renderAdvancedForm() {
     return renderSimpleForm;
   }
 
-  renderForm () {
+  renderForm() {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  render () {
+  render() {
     const {
       billNoRuleManage: { data, queryResult },
       loading,
     } = this.props;
-    const { selectedRows, updateModalVisible, updateFormValues, } = this.state;
+    const { selectedRows, updateModalVisible, updateFormValues } = this.state;
     const scrollX = ColumnConfig.columns
-      .map(c => { return c.width; })
-      .reduce(function (sum, width, index) {
+      .map(c => {
+        return c.width;
+      })
+      .reduce(function(sum, width, index) {
         return sum + width;
       });
 
@@ -273,8 +279,7 @@ class TableList extends PureComponent {
           <Card bordered={false}>
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
-              <div className={styles.tableListOperator}>
-              </div>
+              <div className={styles.tableListOperator} />
               <StandardTable
                 rowKey="fItemID"
                 selectedRows={selectedRows}

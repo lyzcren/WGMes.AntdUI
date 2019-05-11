@@ -1,5 +1,4 @@
-
-import { fakeGet, fakeQuerySteps, fakeSaveSteps, } from '@/services/Tech/Route';
+import { fakeGet, fakeQuerySteps, fakeSaveSteps } from '@/services/Tech/Route';
 
 export default {
   namespace: 'routeProfile',
@@ -30,21 +29,21 @@ export default {
   },
 
   effects: {
-    *initModel ({ payload, callback }, { call, put }) {
+    *initModel({ payload, callback }, { call, put }) {
       const response = yield call(fakeQuerySteps, payload);
       // 查询工艺路线步骤
       let steps = [];
       yield response.forEach(dept => {
         let findGroup = steps.find(step => step.fGroupID === dept.fGroupID);
         if (!findGroup) {
-          findGroup = { fGroupID: dept.fGroupID, depts: [], };
+          findGroup = { fGroupID: dept.fGroupID, depts: [] };
           steps.push(findGroup);
         }
         findGroup.depts.push(dept);
       });
       steps = yield steps.sort(step => step.fGroupID);
       if (steps.length <= 0) {
-        yield steps.push({ fGroupID: 1, depts: [], })
+        yield steps.push({ fGroupID: 1, depts: [] });
       }
       // 查询工艺路线表头数据
       const data = yield call(fakeGet, payload);
@@ -60,11 +59,13 @@ export default {
       });
       if (callback) callback();
     },
-    *nextStep ({ }, { call, put, select }) {
-      const { steps, currentStep, maxGroupID, } = yield select(state => state.routeProfile);
+    *nextStep({}, { call, put, select }) {
+      const { steps, currentStep, maxGroupID } = yield select(state => state.routeProfile);
       const step = steps[currentStep];
       // 当前步骤未选择添加任何工序，不允许再加下一个步骤
-      if (step.depts.length <= 0) { return; }
+      if (step.depts.length <= 0) {
+        return;
+      }
       const newStep = currentStep + 1;
       if (newStep >= steps.length) {
         steps.push({
@@ -80,40 +81,40 @@ export default {
         payload,
       });
     },
-    *prevStep ({ }, { call, put, select }) {
-      const { steps, currentStep, maxGroupID, } = yield select(state => state.routeProfile);
+    *prevStep({}, { call, put, select }) {
+      const { steps, currentStep, maxGroupID } = yield select(state => state.routeProfile);
       const newStep = currentStep - 1;
 
-      const payload = { currentStep: newStep, };
+      const payload = { currentStep: newStep };
       yield put({
         type: 'save',
         payload,
       });
     },
-    *deleteStep ({ }, { call, put, select }) {
-      const { steps, currentStep, maxGroupID, } = yield select(state => state.routeProfile);
+    *deleteStep({}, { call, put, select }) {
+      const { steps, currentStep, maxGroupID } = yield select(state => state.routeProfile);
       const newStep = currentStep - 1;
       const newSteps = steps.filter((s, i) => i !== currentStep);
 
-      const payload = { steps: newSteps, currentStep: newStep, };
+      const payload = { steps: newSteps, currentStep: newStep };
       yield put({
         type: 'save',
         payload,
       });
     },
-    *changeStep ({ payload }, { call, put, select }) {
-      const { steps, currentStep, } = yield select(state => state.routeProfile);
+    *changeStep({ payload }, { call, put, select }) {
+      const { steps, currentStep } = yield select(state => state.routeProfile);
       const { depts } = payload;
       const target = steps[currentStep];
       target.depts = depts;
 
       yield put({
         type: 'save',
-        payload: { steps, currentStep, },
+        payload: { steps, currentStep },
       });
     },
-    *saveStep ({ payload, callback }, { call, put, select }) {
-      const { steps, currentStep, maxGroupID, } = yield select(state => state.routeProfile);
+    *saveStep({ payload, callback }, { call, put, select }) {
+      const { steps, currentStep, maxGroupID } = yield select(state => state.routeProfile);
       const submitSteps = [];
       let fEntryID = 1;
       steps.map((group, groupId) => {
@@ -132,13 +133,13 @@ export default {
   },
 
   reducers: {
-    save (state, action) {
+    save(state, action) {
       return {
         ...state,
         ...action.payload,
       };
     },
-    saveData (state, action) {
+    saveData(state, action) {
       return {
         ...state,
         queryResult: action.payload ? action.payload : {},

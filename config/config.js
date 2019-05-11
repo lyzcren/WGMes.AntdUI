@@ -77,7 +77,7 @@ export default {
       // 2、docker proxy
       // target: 'https://172.22.144.221/',
       changeOrigin: true,
-      "secure": false,
+      secure: false,
       // pathRewrite: { '^/api/': '/api/' },
     },
   },

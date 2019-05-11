@@ -18,7 +18,12 @@ import {
   message,
   Badge,
   Divider,
-  Radio, Popover, Switch, Progress, notification, Popconfirm,
+  Radio,
+  Popover,
+  Switch,
+  Progress,
+  notification,
+  Popconfirm,
   TreeSelect,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
@@ -30,11 +35,10 @@ import { ViewStepForm } from './ViewStepForm';
 import { default as ColumnConfig } from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
-import { GlobalConst, badgeStatusList } from '@/utils/GlobalConst'
+import { GlobalConst, badgeStatusList } from '@/utils/GlobalConst';
 
 import styles from './List.less';
 import { tsImportType } from '@babel/types';
-
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -44,7 +48,7 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ flowManage, loading, basicData, }) => ({
+@connect(({ flowManage, loading, basicData }) => ({
   flowManage,
   loading: loading.models.flowManage,
   basicData,
@@ -76,10 +80,9 @@ class TableList extends PureComponent {
     pageSize: 10,
   };
 
-
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props;
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
     dispatch({
       type: 'flowManage/fetch',
       payload: params,
@@ -88,10 +91,11 @@ class TableList extends PureComponent {
       type: 'basicData/getProcessDeptTree',
     });
     // 列配置相关方法
-    ColumnConfig.UpdateModalVisibleCallback = (record) => this.handleUpdateModalVisible(true, record);
-    ColumnConfig.DeleteCallback = (record) => this.handleDelete(record);
-    ColumnConfig.MissionModalVisibleCallback = (record) => this.handleMissionModalVisible(true, record);
-    ColumnConfig.RouteModalVisibleCallback = (record) => this.handleRouteModalVisible(true, record);
+    ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdateModalVisible(true, record);
+    ColumnConfig.DeleteCallback = record => this.handleDelete(record);
+    ColumnConfig.MissionModalVisibleCallback = record =>
+      this.handleMissionModalVisible(true, record);
+    ColumnConfig.RouteModalVisibleCallback = record => this.handleRouteModalVisible(true, record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -117,7 +121,7 @@ class TableList extends PureComponent {
       this.currentPagination.sorter[sorter.field] = sorter.order.replace('end', '');
     }
 
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     dispatch({
       type: 'flowManage/fetch',
@@ -130,30 +134,63 @@ class TableList extends PureComponent {
     this.search();
   };
 
-  getSearchParam = (fieldsValue) => {
+  getSearchParam = fieldsValue => {
     const values = {
       ...fieldsValue,
     };
     // 查询条件处理
     const queryFilters = [];
     // 当前工序可签收
-    if (fieldsValue.queryDept && fieldsValue.queryStatusNumber === "ManufWait4Sign") queryFilters.push({ name: "fNextDeptIDs", compare: "%*%", value: fieldsValue.queryDept });
+    if (fieldsValue.queryDept && fieldsValue.queryStatusNumber === 'ManufWait4Sign')
+      queryFilters.push({ name: 'fNextDeptIDs', compare: '%*%', value: fieldsValue.queryDept });
     // 当前工序生产中
-    else if (fieldsValue.queryDept && fieldsValue.queryStatusNumber === "ManufProducing") queryFilters.push({ name: "fCurrentDeptID", compare: "=", value: fieldsValue.queryDept });
+    else if (fieldsValue.queryDept && fieldsValue.queryStatusNumber === 'ManufProducing')
+      queryFilters.push({ name: 'fCurrentDeptID', compare: '=', value: fieldsValue.queryDept });
     // 当前工序已完成
-    else if (fieldsValue.queryDept && fieldsValue.queryStatusNumber === "ManufEndProduce") queryFilters.push({ name: "fFullBatchNo", compare: "%*%", value: fieldsValue.queryDept });
+    else if (fieldsValue.queryDept && fieldsValue.queryStatusNumber === 'ManufEndProduce')
+      queryFilters.push({ name: 'fFullBatchNo', compare: '%*%', value: fieldsValue.queryDept });
     // 只选择部门，未选择状态，该部门在工艺路线内即可
-    else if (fieldsValue.queryDept) queryFilters.push({ name: "fAllDeptIDs", compare: "%*%", value: fieldsValue.queryDept });
+    else if (fieldsValue.queryDept)
+      queryFilters.push({ name: 'fAllDeptIDs', compare: '%*%', value: fieldsValue.queryDept });
     // 无工序时查询流程单状态
-    else if (fieldsValue.queryStatusNumber) queryFilters.push({ name: "fStatusNumber", compare: "=", value: fieldsValue.queryStatusNumber });
-    if (fieldsValue.queryBatchNo) queryFilters.push({ name: "fFullBatchNo", compare: "%*%", value: fieldsValue.queryBatchNo });
-    if (fieldsValue.queryMoBillNo) queryFilters.push({ name: "fMoBillNo", compare: "%*%", value: fieldsValue.queryMoBillNo });
-    if (fieldsValue.querySoBillNo) queryFilters.push({ name: "fSoBillNo", compare: "%*%", value: fieldsValue.querySoBillNo });
-    if (fieldsValue.queryRouteName) queryFilters.push({ name: "fRouteName", compare: "%*%", value: fieldsValue.queryRouteName });
-    if (fieldsValue.queryRouteNumber) queryFilters.push({ name: "fRouteNumber", compare: "%*%", value: fieldsValue.queryRouteNumber });
-    if (fieldsValue.queryProductName) queryFilters.push({ name: "fProductName", compare: "%*%", value: fieldsValue.queryProductName });
-    if (fieldsValue.queryProductFullName) queryFilters.push({ name: "fProductFullName", compare: "%*%", value: fieldsValue.queryProductFullName });
-    if (fieldsValue.queryProductNumber) queryFilters.push({ name: "fProductNumber", compare: "%*%", value: fieldsValue.queryProductNumber });
+    else if (fieldsValue.queryStatusNumber)
+      queryFilters.push({
+        name: 'fStatusNumber',
+        compare: '=',
+        value: fieldsValue.queryStatusNumber,
+      });
+    if (fieldsValue.queryBatchNo)
+      queryFilters.push({ name: 'fFullBatchNo', compare: '%*%', value: fieldsValue.queryBatchNo });
+    if (fieldsValue.queryMoBillNo)
+      queryFilters.push({ name: 'fMoBillNo', compare: '%*%', value: fieldsValue.queryMoBillNo });
+    if (fieldsValue.querySoBillNo)
+      queryFilters.push({ name: 'fSoBillNo', compare: '%*%', value: fieldsValue.querySoBillNo });
+    if (fieldsValue.queryRouteName)
+      queryFilters.push({ name: 'fRouteName', compare: '%*%', value: fieldsValue.queryRouteName });
+    if (fieldsValue.queryRouteNumber)
+      queryFilters.push({
+        name: 'fRouteNumber',
+        compare: '%*%',
+        value: fieldsValue.queryRouteNumber,
+      });
+    if (fieldsValue.queryProductName)
+      queryFilters.push({
+        name: 'fProductName',
+        compare: '%*%',
+        value: fieldsValue.queryProductName,
+      });
+    if (fieldsValue.queryProductFullName)
+      queryFilters.push({
+        name: 'fProductFullName',
+        compare: '%*%',
+        value: fieldsValue.queryProductFullName,
+      });
+    if (fieldsValue.queryProductNumber)
+      queryFilters.push({
+        name: 'fProductNumber',
+        compare: '%*%',
+        value: fieldsValue.queryProductNumber,
+      });
 
     this.setState({
       formValues: values,
@@ -166,10 +203,10 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters,
     };
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     return params;
-  }
+  };
 
   search = () => {
     const { dispatch, form } = this.props;
@@ -177,14 +214,14 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      var params = this.getSearchParam(fieldsValue);
+      const params = this.getSearchParam(fieldsValue);
       dispatch({
         type: 'flowManage/fetch',
         payload: params,
       });
       this.setState({ queryDeptID: fieldsValue.queryDept });
     });
-  }
+  };
 
   handleFormReset = () => {
     const { form, dispatch } = this.props;
@@ -200,7 +237,7 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters: [],
     };
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     dispatch({
       type: 'flowManage/fetch',
@@ -209,26 +246,26 @@ class TableList extends PureComponent {
     this.setState({ queryDeptID: null });
   };
 
-  handleExport = (e) => {
+  handleExport = e => {
     const { dispatch, form } = this.props;
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      var params = this.getSearchParam(fieldsValue);
-      var fileName = '导出.xls';
+      let params = this.getSearchParam(fieldsValue);
+      let fileName = '导出.xls';
       switch (e.key) {
         case 'currentPage':
-          params = { ...params, exportPage: true }
+          params = { ...params, exportPage: true };
           fileName = '导出-第' + params.pagination.current + '页.xls';
           break;
         case 'allPage':
-          params = { ...params, exportAll: true }
+          params = { ...params, exportAll: true };
           break;
         default:
           break;
       }
-      exportExcel('/api/flow/export', params, fileName)
+      exportExcel('/api/flow/export', params, fileName);
     });
   };
 
@@ -290,7 +327,7 @@ class TableList extends PureComponent {
     });
   };
 
-  transferModalVisible = (record) => {
+  transferModalVisible = record => {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
@@ -298,24 +335,25 @@ class TableList extends PureComponent {
     });
   };
 
-  handleSign = (record) => {
+  handleSign = record => {
     const { dispatch } = this.props;
     dispatch({
       type: 'flowManage/sign',
       payload: {
         fInterID: record.fInterID,
-        fDeptID: this.state.queryDeptID
+        fDeptID: this.state.queryDeptID,
       },
       callback: () => {
-        const { flowManage: { queryResult } } = this.props;
+        const {
+          flowManage: { queryResult },
+        } = this.props;
         if (queryResult.status === 'ok') {
           message.success('【' + record.fFullBatchNo + '】' + '签收成功');
           // 成功后再次刷新列表
           this.search();
         } else if (queryResult.status === 'warning') {
           message.warning(queryResult.message);
-        }
-        else {
+        } else {
           message.error(queryResult.message);
         }
       },
@@ -328,7 +366,12 @@ class TableList extends PureComponent {
       return (
         <Fragment>
           <Authorized authority="Flow_Sign">
-            <a disabled={!record.fNextDeptIDList || !record.fNextDeptIDList.includes(queryDeptID)} onClick={() => this.handleSign(record)}>签收</a>
+            <a
+              disabled={!record.fNextDeptIDList || !record.fNextDeptIDList.includes(queryDeptID)}
+              onClick={() => this.handleSign(record)}
+            >
+              签收
+            </a>
             <Divider type="vertical" />
           </Authorized>
           <Authorized authority="Flow_Transfer">
@@ -371,10 +414,10 @@ class TableList extends PureComponent {
         </Fragment>
       );
     }
-  }
+  };
 
   // 为操作员定制的查询条件
-  renderOperatorForm () {
+  renderOperatorForm() {
     const {
       form: { getFieldDecorator },
       basicData,
@@ -385,17 +428,25 @@ class TableList extends PureComponent {
           <Col md={6} sm={24}>
             <FormItem id="queryDept" label="部门">
               {getFieldDecorator('queryDept', {
-                rules: [{ required: true, message: '请选择部门' }]
-              })
-                (<TreeSelect style={{ width: '100%' }} treeData={basicData.processDeptTree} treeDefaultExpandAll
-                />)}
+                rules: [{ required: true, message: '请选择部门' }],
+              })(
+                <TreeSelect
+                  style={{ width: '100%' }}
+                  treeData={basicData.processDeptTree}
+                  treeDefaultExpandAll
+                />
+              )}
             </FormItem>
           </Col>
           <Col md={6} sm={24}>
             <FormItem label="状态">
               {getFieldDecorator('queryStatusNumber')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                  {badgeStatusList(GlobalConst.ManufStatusArray).map(x => (<Option key={x.value} value={x.value}>{x.text}</Option>))}
+                  {badgeStatusList(GlobalConst.ManufStatusArray).map(x => (
+                    <Option key={x.value} value={x.value}>
+                      {x.text}
+                    </Option>
+                  ))}
                 </Select>
               )}
             </FormItem>
@@ -426,7 +477,7 @@ class TableList extends PureComponent {
     );
   }
 
-  renderSimpleForm () {
+  renderSimpleForm() {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -447,7 +498,11 @@ class TableList extends PureComponent {
             <FormItem label="状态">
               {getFieldDecorator('queryStatusNumber')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                  {badgeStatusList(GlobalConst.FlowStatusArray).map(x => (<Option key={x.value} value={x.value}>{x.text}</Option>))}
+                  {badgeStatusList(GlobalConst.FlowStatusArray).map(x => (
+                    <Option key={x.value} value={x.value}>
+                      {x.text}
+                    </Option>
+                  ))}
                 </Select>
               )}
             </FormItem>
@@ -473,7 +528,7 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm () {
+  renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -501,7 +556,11 @@ class TableList extends PureComponent {
             <FormItem label="状态">
               {getFieldDecorator('queryStatusNumber')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                  {badgeStatusList(GlobalConst.FlowStatusArray).map(x => (<Option key={x.value} value={x.value}>{x.text}</Option>))}
+                  {badgeStatusList(GlobalConst.FlowStatusArray).map(x => (
+                    <Option key={x.value} value={x.value}>
+                      {x.text}
+                    </Option>
+                  ))}
                 </Select>
               )}
             </FormItem>
@@ -551,20 +610,26 @@ class TableList extends PureComponent {
     );
   }
 
-  renderForm () {
+  renderForm() {
     const { expandForm, operatorForm } = this.state;
-    return expandForm ? this.renderAdvancedForm() : (operatorForm ? this.renderOperatorForm() : this.renderSimpleForm());
+    return expandForm
+      ? this.renderAdvancedForm()
+      : operatorForm
+      ? this.renderOperatorForm()
+      : this.renderSimpleForm();
   }
 
-  render () {
+  render() {
     const {
       flowManage: { data, queryResult },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, currentFormValues, } = this.state;
+    const { selectedRows, modalVisible, currentFormValues } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-        <Menu.Item key="remove" disabled={!hasAuthority('Flow_Delete')}>删除</Menu.Item>
+        <Menu.Item key="remove" disabled={!hasAuthority('Flow_Delete')}>
+          删除
+        </Menu.Item>
       </Menu>
     );
 
@@ -581,8 +646,10 @@ class TableList extends PureComponent {
     ColumnConfig.renderOperation = this.renderOperation;
 
     const scrollX = ColumnConfig.columns
-      .map(c => { return c.width; })
-      .reduce(function (sum, width, index) {
+      .map(c => {
+        return c.width;
+      })
+      .reduce(function(sum, width, index) {
         return sum + width;
       });
     return (
@@ -593,12 +660,14 @@ class TableList extends PureComponent {
               <div className={styles.tableListForm}>{this.renderForm()}</div>
               <div className={styles.tableListOperator}>
                 <Authorized authority="Flow_Export">
-                  <Dropdown overlay={
-                    <Menu onClick={this.handleExport} selectedKeys={[]}>
-                      <Menu.Item key="currentPage">当前页</Menu.Item>
-                      <Menu.Item key="allPage">所有页</Menu.Item>
-                    </Menu>
-                  }>
+                  <Dropdown
+                    overlay={
+                      <Menu onClick={this.handleExport} selectedKeys={[]}>
+                        <Menu.Item key="currentPage">当前页</Menu.Item>
+                        <Menu.Item key="allPage">所有页</Menu.Item>
+                      </Menu>
+                    }
+                  >
                     <Button>
                       导出 <Icon type="down" />
                     </Button>
@@ -609,7 +678,7 @@ class TableList extends PureComponent {
                     <Authorized authority="Flow_Delete">
                       <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
                     </Authorized>
-                    <Authorized authority={["Flow_Delete", "Flow_Active"]}>
+                    <Authorized authority={['Flow_Delete', 'Flow_Active']}>
                       <Dropdown overlay={menu}>
                         <Button>
                           更多操作 <Icon type="down" />

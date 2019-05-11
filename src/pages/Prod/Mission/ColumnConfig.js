@@ -3,7 +3,6 @@ import { Switch, Popconfirm, Divider } from 'antd';
 import moment from 'moment';
 import Authorized from '@/utils/Authorized';
 
-
 class ColumnConfig {
   columns = [
     {
@@ -11,7 +10,7 @@ class ColumnConfig {
       dataIndex: 'fMoBillNo',
       width: 180,
       render: (val, record) => {
-        return <a onClick={() => this._profileModalVisibleCallback(record)}>{val}</a>;
+        return <a onClick={() => this.profileModalVisibleCallback(record)}>{val}</a>;
       },
     },
     {
@@ -19,7 +18,7 @@ class ColumnConfig {
       dataIndex: 'fDate',
       sorter: true,
       width: 120,
-      render: (val) => {
+      render: val => {
         return moment(val).format('YYYY-MM-DD');
       },
     },
@@ -28,7 +27,7 @@ class ColumnConfig {
       dataIndex: 'fPlanFinishDate',
       sorter: true,
       width: 140,
-      render: (val) => {
+      render: val => {
         return moment(val).format('YYYY-MM-DD');
       },
     },
@@ -163,7 +162,7 @@ class ColumnConfig {
       dataIndex: 'fCreateDate',
       sorter: true,
       width: 120,
-      render: (val) => {
+      render: val => {
         return moment(val).format('YYYY-MM-DD');
       },
     },
@@ -172,7 +171,7 @@ class ColumnConfig {
       dataIndex: 'fCheckDate',
       sorter: true,
       width: 120,
-      render: (val) => {
+      render: val => {
         return moment(val).format('YYYY-MM-DD');
       },
     },
@@ -181,7 +180,7 @@ class ColumnConfig {
       dataIndex: 'fErpSyncDate',
       sorter: true,
       width: 120,
-      render: (val) => {
+      render: val => {
         return moment(val).format('YYYY-MM-DD');
       },
     },
@@ -199,30 +198,29 @@ class ColumnConfig {
         return (
           <Fragment>
             <Authorized authority="Mission_Read">
-              <a onClick={() => this._profileModalVisibleCallback(record)}>详情</a>
+              <a onClick={() => this.profileModalVisibleCallback(record)}>详情</a>
               <Divider type="vertical" />
-              {(record.fAuxInHighLimitQty - record.fInputQty > 0) &&
+              {record.fAuxInHighLimitQty - record.fInputQty > 0 && (
                 <a onClick={() => this._flowModalVisibleCallback(record)}>开流程单</a>
-              }
+              )}
             </Authorized>
           </Fragment>
-        )
+        );
       },
     },
   ];
 
   // 详情方法
-  ProfileModalVisibleCallback = (record) => { };
-  _profileModalVisibleCallback = (record) => {
+  ProfileModalVisibleCallback = record => {};
+  profileModalVisibleCallback = record => {
     this.ProfileModalVisibleCallback(record);
   };
 
   // 流程单方法
-  FlowModalVisibleCallback = (record) => { };
-  _flowModalVisibleCallback = (record) => {
+  FlowModalVisibleCallback = record => {};
+  _flowModalVisibleCallback = record => {
     this.FlowModalVisibleCallback(record);
   };
-
 }
 
 let columnConfig = new ColumnConfig();

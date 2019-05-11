@@ -1,18 +1,10 @@
 import React, { PureComponent } from 'react';
-import {
-  Form,
-  Input,
-  Modal,
-  Radio,
-  Switch,
-  InputNumber,
-} from 'antd';
+import { Form, Input, Modal, Radio, Switch, InputNumber } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 
 import styles from './List.less';
 
 const FormItem = Form.Item;
-
 
 export const CreateForm = Form.create()(props => {
   const { modalVisible, form, handleSubmit, handleModalVisible } = props;
@@ -24,7 +16,6 @@ export const CreateForm = Form.create()(props => {
       handleSubmit(fieldsValue);
     });
   };
-
 
   return (
     <Modal
@@ -50,13 +41,7 @@ export const CreateForm = Form.create()(props => {
         })(<Input placeholder="请输入" />)}
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="小数位">
-        {form.getFieldDecorator('fPrecision')(
-          <InputNumber
-            placeholder="请输入"
-            min={0}
-            max={4}
-          />
-        )}
+        {form.getFieldDecorator('fPrecision')(<InputNumber placeholder="请输入" min={0} max={4} />)}
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="启用">
         {form.getFieldDecorator('fIsActive', {

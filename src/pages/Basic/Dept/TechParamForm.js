@@ -10,11 +10,13 @@ import {
   Switch,
   Tag,
   Select,
-  message, Popconfirm, Divider,
+  message,
+  Popconfirm,
+  Divider,
 } from 'antd';
 import isEqual from 'lodash/isEqual';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import { GlobalConst } from '@/utils/GlobalConst'
+import { GlobalConst } from '@/utils/GlobalConst';
 
 import styles from './List.less';
 
@@ -22,7 +24,8 @@ const FormItem = Form.Item;
 const { Option } = Select;
 const TypeData = GlobalConst.DefectTypeData;
 
-@connect(({ deptParamsManage, loading, basicData, }) => ({
+/* eslint react/no-multi-comp:0 */
+@connect(({ deptParamsManage, loading, basicData }) => ({
   deptParamsManage,
   loading: loading.models.deptParamsManage,
   basicData,
@@ -30,8 +33,8 @@ const TypeData = GlobalConst.DefectTypeData;
 @Form.create()
 export class TechParamForm extends PureComponent {
   static defaultProps = {
-    handleSubmit: () => { },
-    handleModalVisible: () => { },
+    handleSubmit: () => {},
+    handleModalVisible: () => {},
     values: {},
   };
 
@@ -45,35 +48,38 @@ export class TechParamForm extends PureComponent {
       value: props.value,
       formVals: props.values,
     };
-    const { dispatch, } = props;
+    const { dispatch } = props;
     dispatch({
       type: 'basicData/getParamData',
     });
     dispatch({
       type: 'deptParamsManage/fetch',
-      payload: { fDeptID: props.values.fItemID }
+      payload: { fDeptID: props.values.fItemID },
     }).then(() => {
-      const { deptParamsManage: { data } } = this.props;
+      const {
+        deptParamsManage: { data },
+      } = this.props;
       this.setState({ data });
     });
   }
 
   okHandle = () => {
-    const { form,  } = this.props;
+    const { form } = this.props;
     const { data, formVals } = this.state;
     const retData = data.filter(x => x.fParamID);
 
     this.handleSubmit(formVals.fItemID, retData);
   };
 
-
   handleSubmit = (fDeptID, retData) => {
     const { dispatch, form, handleModalVisible } = this.props;
     dispatch({
       type: 'deptParamsManage/add',
-      payload: { fDeptID, params: retData }
+      payload: { fDeptID, params: retData },
     }).then(() => {
-      const { deptParamsManage: { queryResult } } = this.props;
+      const {
+        deptParamsManage: { queryResult },
+      } = this.props;
       if (queryResult.status === 'ok') {
         message.success('修改成功');
         handleModalVisible();
@@ -85,14 +91,14 @@ export class TechParamForm extends PureComponent {
 
   index = 0;
 
-  getRowByKey (guid, newData) {
+  getRowByKey(guid, newData) {
     const { data } = this.state;
     return (newData || data).filter(item => item.guid === guid)[0];
   }
 
   newItem = () => {
     const { data } = this.state;
-    var newData = data.map(item => ({ ...item }));
+    const newData = data.map(item => ({ ...item }));
     const newItem = {
       guid: `NEW_TEMP_ID_${this.index}`,
       fParamID: '',
@@ -103,18 +109,18 @@ export class TechParamForm extends PureComponent {
     this.setState({ data: newData });
   };
 
-  remove (guid) {
+  remove(guid) {
     const { data } = this.state;
     const newData = data.filter(x => x.guid != guid);
     this.setState({ data: newData });
   }
 
-  handleKeyPress (e, key) {
+  handleKeyPress(e, key) {
     if (e.key === 'Enter') {
     }
   }
 
-  handleFieldChange (e, fieldName, guid) {
+  handleFieldChange(e, fieldName, guid) {
     const { data } = this.state;
     const newData = data.map(item => ({ ...item }));
     const target = this.getRowByKey(guid, newData);
@@ -124,7 +130,7 @@ export class TechParamForm extends PureComponent {
     }
   }
 
-  handleParamIdChange (value, record) {
+  handleParamIdChange(value, record) {
     const { data } = this.state;
     const existsOne = data.find(x => x.guid != record.guid && x.fParamID == value);
     if (existsOne) {
@@ -138,20 +144,27 @@ export class TechParamForm extends PureComponent {
     }
   }
 
-  handleFieldValueChange (fieldName, value, record) {
-    const { basicData: { paramData }, } = this.props;
+  handleFieldValueChange(fieldName, value, record) {
+    const {
+      basicData: { paramData },
+    } = this.props;
     const { data } = this.state;
     if (record) {
       const item = data.find(x => x.guid == record.guid);
       item[fieldName] = value;
-      item['values'] = paramData.find(x => x.fItemID == item['fParamID']).values;
       console.log(data);
       this.setState({ data });
     }
   }
 
-  render () {
-    const { form, modalVisible, handleModalVisible, values, basicData: { paramData }, } = this.props;
+  render() {
+    const {
+      form,
+      modalVisible,
+      handleModalVisible,
+      values,
+      basicData: { paramData },
+    } = this.props;
     const { loading, data, formVals } = this.state;
     const columns = [
       {
@@ -161,10 +174,22 @@ export class TechParamForm extends PureComponent {
         width: '40%',
         render: (text, record) => {
           return (
-            <Select placeholder="请选择工艺参数" style={{ width: "100%" }}
-              onChange={val => this.handleParamIdChange(val, record)} defaultValue={record.fParamID}
-              autoFocus>
-              {paramData.map(x => <Option key={x.fItemID} value={x.fItemID}>{x.fName}</Option>)}
+            <Select
+              placeholder="请选择工艺参数"
+              style={{ width: '100%' }}
+              onChange={val => this.handleParamIdChange(val, record)}
+              defaultValue={record.fParamID}
+              autoFocus
+            >
+              {paramData
+                .filter(
+                  x => x.fItemID == record.fParamID || !data.find(y => y.fParamID == x.fItemID)
+                )
+                .map(x => (
+                  <Option key={x.fItemID} value={x.fItemID}>
+                    {x.fName}
+                  </Option>
+                ))}
             </Select>
           );
         },
@@ -175,22 +200,14 @@ export class TechParamForm extends PureComponent {
         key: 'fDefaultValue',
         width: '40%',
         render: (text, record) => {
-          console.log(record);
-          if (record.values && record.length > 0) {
-            <Select placeholder="请选择参数值" style={{ width: "100%" }}
-              onChange={val => this.handleFieldValueChange('fDefaultValue', val, record)} defaultValue={record.fDefaultValue}>
-              {record.Values.map(x => <Option key={x} value={x}>{x}</Option>)}
-            </Select>
-          } else {
-            return (
-              <Input
-                value={text}
-                onChange={e => this.handleFieldChange(e, 'fDefaultValue', record.guid)}
-                onKeyPress={e => this.handleKeyPress(e, record.guid)}
-                placeholder="参数值"
-              />
-            );
-          }
+          return (
+            <Input
+              value={text}
+              onChange={e => this.handleFieldChange(e, 'fDefaultValue', record.guid)}
+              onKeyPress={e => this.handleKeyPress(e, record.guid)}
+              placeholder="参数值"
+            />
+          );
         },
       },
       {
@@ -209,7 +226,12 @@ export class TechParamForm extends PureComponent {
     return (
       <Modal
         destroyOnClose
-        title={< div > 修改 < Tag color="blue" > {formVals.fName}</Tag> 工艺参数</div >}
+        title={
+          <div>
+            {' '}
+            修改 <Tag color="blue"> {formVals.fName}</Tag> 工艺参数
+          </div>
+        }
         visible={modalVisible}
         onOk={this.okHandle}
         onCancel={() => handleModalVisible(false, values)}
@@ -230,7 +252,7 @@ export class TechParamForm extends PureComponent {
         >
           新增工艺参数
         </Button>
-      </Modal >
+      </Modal>
     );
   }
-};
+}

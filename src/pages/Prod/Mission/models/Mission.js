@@ -16,21 +16,21 @@ export default {
   },
 
   effects: {
-    *fetch ({ payload }, { call, put }) {
+    *fetch({ payload }, { call, put }) {
       const response = yield call(fakeQuery, payload);
       yield put({
         type: 'saveQueryData',
         payload: response,
       });
     },
-    *get ({ payload }, { call, put }) {
+    *get({ payload }, { call, put }) {
       const response = yield call(fakeGet, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
     },
-    *sync ({ payload, callback }, { call, put }) {
+    *sync({ payload, callback }, { call, put }) {
       const response = yield call(fakeSync, payload);
       yield put({
         type: 'saveData',
@@ -38,7 +38,7 @@ export default {
       });
       if (callback) callback();
     },
-    *genFlow ({ payload }, { call, put }) {
+    *genFlow({ payload }, { call, put }) {
       const response = yield call(fakeGenFlow, payload);
       yield put({
         type: 'saveData',
@@ -48,13 +48,13 @@ export default {
   },
 
   reducers: {
-    saveQueryData (state, action) {
+    saveQueryData(state, action) {
       return {
         ...state,
         data: action.payload,
       };
     },
-    saveData (state, action) {
+    saveData(state, action) {
       return {
         ...state,
         queryResult: action.payload ? action.payload : {},

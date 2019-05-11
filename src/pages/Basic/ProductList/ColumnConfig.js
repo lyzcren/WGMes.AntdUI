@@ -2,7 +2,7 @@ import React, { PureComponent, Fragment } from 'react';
 import { Switch, Popconfirm, Divider } from 'antd';
 import Authorized from '@/utils/Authorized';
 
-const activeData = ['启用', '禁用',];
+const activeData = ['启用', '禁用'];
 
 class ColumnConfig {
   columns = [
@@ -44,7 +44,7 @@ class ColumnConfig {
           value: 0,
         },
       ],
-      render (val) {
+      render(val) {
         return <Switch disabled checked={val} />;
       },
     },
@@ -77,15 +77,15 @@ class ColumnConfig {
       render: (text, record) => (
         <Fragment>
           <Authorized authority="Product_Update">
-            <a onClick={() => this._updateModalVisible(record)}>路线</a>
+            <a onClick={() => this.updateModalVisible(record)}>路线</a>
           </Authorized>
           <Authorized authority="Product_Active">
             <Divider type="vertical" />
-            <a onClick={() => this._handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
+            <a onClick={() => this.handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
           </Authorized>
           <Authorized authority="Product_Delete">
             <Divider type="vertical" />
-            <Popconfirm title="是否要删除此行？" onConfirm={() => this._delete(record)}>
+            <Popconfirm title="是否要删除此行？" onConfirm={() => this.delete(record)}>
               <a>删除</a>
             </Popconfirm>
           </Authorized>
@@ -95,23 +95,22 @@ class ColumnConfig {
   ];
 
   // 修改方法
-  UpdateModalVisibleCallback = (record) => { };
-  _updateModalVisible = (record) => {
+  UpdateModalVisibleCallback = record => {};
+  updateModalVisible = record => {
     this.UpdateModalVisibleCallback(record);
   };
 
   // 删除方法
-  DeleteCallback = (record) => { };
-  _delete = (record) => {
+  DeleteCallback = record => {};
+  delete = record => {
     this.DeleteCallback(record);
   };
 
   // 删除方法
-  ActiveCallback = (record) => { };
-  _handleActive = (record) => {
+  ActiveCallback = record => {};
+  handleActive = record => {
     this.ActiveCallback(record);
   };
-
 }
 
 const columnConfig = new ColumnConfig();

@@ -2,12 +2,9 @@ import React, { PureComponent, Fragment } from 'react';
 import { Switch, Popconfirm, Divider, Badge } from 'antd';
 import Authorized from '@/utils/Authorized';
 import RadioButton from 'antd/lib/radio/radioButton';
-import { GlobalConst, badgeStatusList } from '@/utils/GlobalConst'
-
-
+import { GlobalConst, badgeStatusList } from '@/utils/GlobalConst';
 
 class ColumnConfig {
-
   columns = [
     {
       title: '批号',
@@ -36,7 +33,7 @@ class ColumnConfig {
         if (find) {
           return find.text;
         }
-        return "";
+        return '';
       },
       filters: badgeStatusList(GlobalConst.FlowStatusArray),
     },
@@ -112,34 +109,33 @@ class ColumnConfig {
     return (
       <Fragment>
         {/* <Authorized authority="Flow_Update">
-          <a onClick={() => this._updateModalVisible(record)}>修改</a>
+          <a onClick={() => this.updateModalVisible(record)}>修改</a>
           <Divider type="vertical" />
         </Authorized>
         <Authorized authority="Flow_Delete">
-          <Popconfirm title="是否要删除此行？" onConfirm={() => this._delete(record)}>
+          <Popconfirm title="是否要删除此行？" onConfirm={() => this.delete(record)}>
             <a>删除</a>
           </Popconfirm>
           <Divider type="vertical" />
         </Authorized>
         <Authorized authority="Flow_Active">
-          <a onClick={() => this._handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
+          <a onClick={() => this.handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
         </Authorized> */}
       </Fragment>
     );
-  }
+  };
 
   // 查看任务单
-  MissionModalVisibleCallback = (record) => { };
-  _missionModalVisibleCallback = (record) => {
+  MissionModalVisibleCallback = record => {};
+  _missionModalVisibleCallback = record => {
     this.MissionModalVisibleCallback(record);
   };
 
   // 查看工艺路线
-  RouteModalVisibleCallback = (record) => { };
-  _routeModalVisibleCallback = (record) => {
+  RouteModalVisibleCallback = record => {};
+  _routeModalVisibleCallback = record => {
     this.RouteModalVisibleCallback(record);
   };
-
 }
 
 let columnConfig = new ColumnConfig();

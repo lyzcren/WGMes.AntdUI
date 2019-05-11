@@ -1,4 +1,13 @@
-import { fakeQuery, fakeRemove, fakeAdd, fakeUpdate, fakeActive, fakeAddParams, fakeGetTreeData, fakeGetType } from '@/services/Basic/Dept';
+import {
+  fakeQuery,
+  fakeRemove,
+  fakeAdd,
+  fakeUpdate,
+  fakeActive,
+  fakeAddParams,
+  fakeGetTreeData,
+  fakeGetType,
+} from '@/services/Basic/Dept';
 
 export default {
   namespace: 'deptManage',
@@ -17,14 +26,14 @@ export default {
   },
 
   effects: {
-    *fetch ({ payload }, { call, put }) {
+    *fetch({ payload }, { call, put }) {
       const response = yield call(fakeQuery, payload);
       yield put({
         type: 'saveQueryData',
         payload: response,
       });
     },
-    *add ({ payload, callback }, { call, put }) {
+    *add({ payload, callback }, { call, put }) {
       const response = yield call(fakeAdd, payload);
       yield put({
         type: 'saveData',
@@ -32,7 +41,7 @@ export default {
       });
       if (callback) callback();
     },
-    *remove ({ payload, callback }, { call, put }) {
+    *remove({ payload, callback }, { call, put }) {
       const response = yield call(fakeRemove, payload);
       yield put({
         type: 'saveData',
@@ -40,7 +49,7 @@ export default {
       });
       if (callback) callback();
     },
-    *update ({ payload, callback }, { call, put }) {
+    *update({ payload, callback }, { call, put }) {
       const response = yield call(fakeUpdate, payload);
       yield put({
         type: 'saveData',
@@ -48,7 +57,7 @@ export default {
       });
       if (callback) callback();
     },
-    *active ({ payload, callback }, { call, put }) {
+    *active({ payload, callback }, { call, put }) {
       const response = yield call(fakeActive, payload);
       yield put({
         type: 'saveData',
@@ -56,7 +65,7 @@ export default {
       });
       if (callback) callback();
     },
-    *addParams ({ payload, callback }, { call, put }) {
+    *addParams({ payload, callback }, { call, put }) {
       const response = yield call(fakeAddParams, payload);
       yield put({
         type: 'saveData',
@@ -64,7 +73,7 @@ export default {
       });
       if (callback) callback();
     },
-    *getTreeData ({ payload }, { call, put }) {
+    *getTreeData({ payload }, { call, put }) {
       alert('getTreeData');
       const response = yield call(fakeGetTreeData, payload);
       yield put({
@@ -72,7 +81,7 @@ export default {
         payload: response,
       });
     },
-    *getType ({ payload, callback }, { call, put }) {
+    *getType({ payload, callback }, { call, put }) {
       const response = yield call(fakeGetType, payload);
       yield put({
         type: 'saveTypeData',
@@ -83,25 +92,25 @@ export default {
   },
 
   reducers: {
-    saveQueryData (state, action) {
+    saveQueryData(state, action) {
       return {
         ...state,
         data: { list: action.payload },
       };
     },
-    saveData (state, action) {
+    saveData(state, action) {
       return {
         ...state,
         queryResult: action.payload ? action.payload : {},
       };
     },
-    saveTreeData (state, action) {
+    saveTreeData(state, action) {
       return {
         ...state,
         treeData: action.payload.list,
       };
     },
-    saveTypeData (state, action) {
+    saveTypeData(state, action) {
       return {
         ...state,
         typeData: action.payload,

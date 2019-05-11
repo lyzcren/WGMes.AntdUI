@@ -1,8 +1,7 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
 
-
-export async function fakeQuery (params) {
+export async function fakeQuery(params) {
   return request('/api/ProductList/getList', {
     method: 'POST',
     body: {
@@ -12,7 +11,7 @@ export async function fakeQuery (params) {
   });
 }
 
-export async function fakeQueryErp (params) {
+export async function fakeQueryErp(params) {
   return request('/api/ProductList/getErpList', {
     method: 'POST',
     body: {
@@ -22,7 +21,7 @@ export async function fakeQueryErp (params) {
   });
 }
 
-export async function fakeRemove (params) {
+export async function fakeRemove(params) {
   return request('/api/ProductList/delete', {
     method: 'POST',
     body: {
@@ -32,7 +31,7 @@ export async function fakeRemove (params) {
   });
 }
 
-export async function fakeSync (params) {
+export async function fakeSync(params) {
   return request('/api/ProductList/sync', {
     method: 'POST',
     body: {
@@ -42,7 +41,7 @@ export async function fakeSync (params) {
   });
 }
 
-export async function fakeIsSyncing (params) {
+export async function fakeIsSyncing(params) {
   return request('/api/ProductList/isSyncing', {
     method: 'POST',
     body: {
@@ -53,7 +52,7 @@ export async function fakeIsSyncing (params) {
   // return request(`/api/ProductList/isSyncing?${stringify(params)}`);
 }
 
-export async function fakeAdd (params) {
+export async function fakeAdd(params) {
   return request('/api/ProductList', {
     method: 'POST',
     body: {
@@ -63,7 +62,7 @@ export async function fakeAdd (params) {
   });
 }
 
-export async function fakeUpdate (params) {
+export async function fakeUpdate(params) {
   return request('/api/ProductList/update', {
     method: 'POST',
     body: {
@@ -73,7 +72,7 @@ export async function fakeUpdate (params) {
   });
 }
 
-export async function fakeActive (params) {
+export async function fakeActive(params) {
   return request('/api/ProductList/active', {
     method: 'POST',
     body: {

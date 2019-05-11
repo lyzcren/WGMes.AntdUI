@@ -51,7 +51,7 @@ export default [
         path: '/prod',
         name: 'prod',
         icon: 'tool',
-        authority: ['Mission_Read', 'Flow_Read',],
+        authority: ['Mission_Read', 'Flow_Read'],
         routes: [
           {
             path: '/prod/mission',
@@ -89,7 +89,7 @@ export default [
         path: '/techStd',
         name: 'techStd',
         icon: 'cluster',
-        authority: ['Defect_Read', 'Param_Read', 'Route_Read',],
+        authority: ['Defect_Read', 'Param_Read', 'Route_Read'],
         routes: [
           {
             path: '/techStd/defect',
@@ -124,7 +124,7 @@ export default [
         path: '/basic',
         name: 'basic',
         icon: 'deployment-unit',
-        authority: ['Product_Read', 'Dept_Read', 'Unit_Read', 'Machine_Read', 'Emp_Read',],
+        authority: ['Product_Read', 'Dept_Read', 'Unit_Read', 'Machine_Read', 'Emp_Read'],
         routes: [
           {
             path: '/basic/product',
@@ -172,7 +172,7 @@ export default [
         path: '/sysConfig',
         name: 'sysConfig',
         icon: 'setting',
-        authority: ['User_Read', 'Role_Read', 'BillNoRule_Read',],
+        authority: ['User_Read', 'Role_Read', 'BillNoRule_Read'],
         routes: [
           {
             path: '/sysConfig/user',

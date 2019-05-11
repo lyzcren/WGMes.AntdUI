@@ -1,19 +1,18 @@
 import React, { PureComponent } from 'react';
-import {
-  Form,
-  Input,
-  Modal,
-  Radio, Progress, Popover,
-} from 'antd';
+import { Form, Input, Modal, Radio, Progress, Popover } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import { validatorPhone, validatePassword, getPasswordStatus, passwordProgressMap } from '@/utils/validators';
+import {
+  validatorPhone,
+  validatePassword,
+  getPasswordStatus,
+  passwordProgressMap,
+} from '@/utils/validators';
 import { GlobalConst } from '@/utils/GlobalConst';
 
 import styles from './List.less';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
-
 
 export const CreateForm = Form.create()(props => {
   const { modalVisible, form, handleAdd, handleModalVisible } = props;
@@ -55,7 +54,7 @@ export const CreateForm = Form.create()(props => {
       </div>
     ),
   };
-  const renderPasswordProgress = (value) => {
+  const renderPasswordProgress = value => {
     // const value = form.getFieldValue('fPwd');
     const passwordStatus = getPasswordStatus(value);
     return value && value.length ? (
@@ -90,15 +89,11 @@ export const CreateForm = Form.create()(props => {
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="手机号码">
         {form.getFieldDecorator('fPhone', {
-          rules: [
-            { required: false, message: '请输入手机号码！' },
-            { validator: validatorPhone }
-          ]
+          rules: [{ required: false, message: '请输入手机号码！' }, { validator: validatorPhone }],
         })(<Input placeholder="请输入" />)}
       </FormItem>
       <FormItem key="fSex" labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="性别">
-        {form.getFieldDecorator('fSex', {
-        })(
+        {form.getFieldDecorator('fSex', {})(
           <RadioGroup>
             <Radio value="1">男</Radio>
             <Radio value="2">女</Radio>

@@ -1,18 +1,8 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
-import {
-  Form,
-  Input,
-  Modal,
-  Switch,
-  Tag,
-  Select,
-  InputNumber,
-  message,
-} from 'antd';
+import { Form, Input, Modal, Switch, Tag, Select, InputNumber, message } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -26,7 +16,7 @@ const Option = Select.Option;
 @Form.create()
 export class FlowForm extends PureComponent {
   static defaultProps = {
-    handleModalVisible: () => { },
+    handleModalVisible: () => {},
     values: {},
   };
 
@@ -38,11 +28,11 @@ export class FlowForm extends PureComponent {
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
       type: 'basicData/getBillNo',
-      payload: { fNumber: "Flow" }
+      payload: { fNumber: 'Flow' },
     });
     dispatch({
       type: 'basicData/getRouteData',
@@ -50,7 +40,7 @@ export class FlowForm extends PureComponent {
   }
 
   okHandle = () => {
-    const { form, } = this.props;
+    const { form } = this.props;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       // form.resetFields();
@@ -66,7 +56,9 @@ export class FlowForm extends PureComponent {
       type: 'missionManage/genFlow',
       payload: fields,
     }).then(() => {
-      const { missionManage: { queryResult } } = this.props;
+      const {
+        missionManage: { queryResult },
+      } = this.props;
       if (queryResult.status === 'ok') {
         message.success('开流程单成功');
         handleModalVisible(false);
@@ -74,15 +66,20 @@ export class FlowForm extends PureComponent {
         if (handleSuccess) handleSuccess();
       } else if (queryResult.status === 'warning') {
         message.warning(queryResult.message);
-      }
-      else {
+      } else {
         message.error(queryResult.message);
       }
     });
   };
 
-  render () {
-    const { form, modalVisible, handleModalVisible, values, basicData: { billNo, routeData } } = this.props;
+  render() {
+    const {
+      form,
+      modalVisible,
+      handleModalVisible,
+      values,
+      basicData: { billNo, routeData },
+    } = this.props;
     const { formVals } = this.state;
     const maxQty = formVals.fAuxInHighLimitQty - formVals.fInputQty;
 
@@ -90,7 +87,11 @@ export class FlowForm extends PureComponent {
       <Modal
         destroyOnClose
         maskClosable={false}
-        title={<div>开流程单 <Tag color="blue">{formVals.fMoBillNo}</Tag></div>}
+        title={
+          <div>
+            开流程单 <Tag color="blue">{formVals.fMoBillNo}</Tag>
+          </div>
+        }
         visible={modalVisible}
         onOk={this.okHandle}
         onCancel={() => handleModalVisible(false, values)}
@@ -103,38 +104,31 @@ export class FlowForm extends PureComponent {
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="投入数量">
           {form.getFieldDecorator('fInputQty', {
-            rules: [{ required: true, message: '请输入投入数量', }],
+            rules: [{ required: true, message: '请输入投入数量' }],
             initialValue: maxQty,
-          })(
-            <InputNumber
-              placeholder="请输入"
-              min={1}
-              max={maxQty}
-            />)}
+          })(<InputNumber placeholder="请输入" min={1} max={maxQty} />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="每批数量">
           {form.getFieldDecorator('fBatchQty', {
-            rules: [{ required: true, message: '请输入每批数量', }],
+            rules: [{ required: true, message: '请输入每批数量' }],
             initialValue: maxQty,
-          })(
-            <InputNumber
-              placeholder="请输入"
-              min={1}
-              max={maxQty} />
-          )}
+          })(<InputNumber placeholder="请输入" min={1} max={maxQty} />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="工艺路线">
           {form.getFieldDecorator('fRouteID', {
             rules: [{ required: true, message: '请选择工艺路线' }],
             initialValue: formVals.fRouteID ? formVals.fRouteID : null,
-          })(<Select
-            style={{ width: 300 }}
-            dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}>
-            {routeData.map(t => <Option key={t.fInterID} value={t.fInterID}>{t.fName}</Option>)}
-          </Select>
+          })(
+            <Select style={{ width: 300 }} dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}>
+              {routeData.map(t => (
+                <Option key={t.fInterID} value={t.fInterID}>
+                  {t.fName}
+                </Option>
+              ))}
+            </Select>
           )}
         </FormItem>
       </Modal>
     );
   }
-};
+}

@@ -2,7 +2,6 @@ import React, { PureComponent, Fragment } from 'react';
 import { Switch, Popconfirm, Divider } from 'antd';
 import Authorized from '@/utils/Authorized';
 
-
 class ColumnConfig {
   columns = [
     {
@@ -32,7 +31,7 @@ class ColumnConfig {
       title: '年',
       dataIndex: 'fAppendYear',
       width: 80,
-      render (val) {
+      render(val) {
         return <Switch disabled checked={val} />;
       },
     },
@@ -40,7 +39,7 @@ class ColumnConfig {
       title: '4位年',
       dataIndex: 'fLongYear',
       width: 80,
-      render (val) {
+      render(val) {
         return <Switch disabled checked={val} />;
       },
     },
@@ -48,7 +47,7 @@ class ColumnConfig {
       title: '月',
       dataIndex: 'fAppendMonth',
       width: 80,
-      render (val) {
+      render(val) {
         return <Switch disabled checked={val} />;
       },
     },
@@ -56,7 +55,7 @@ class ColumnConfig {
       title: '日',
       dataIndex: 'fAppendDate',
       width: 80,
-      render (val) {
+      render(val) {
         return <Switch disabled checked={val} />;
       },
     },
@@ -77,7 +76,7 @@ class ColumnConfig {
       render: (text, record) => (
         <Fragment>
           <Authorized authority="BillNoRule_Update">
-            <a onClick={() => this._updateModalVisible(record)}>修改</a>
+            <a onClick={() => this.updateModalVisible(record)}>修改</a>
           </Authorized>
         </Fragment>
       ),
@@ -85,11 +84,10 @@ class ColumnConfig {
   ];
 
   // 修改方法
-  UpdateModalVisibleCallback = (record) => { };
-  _updateModalVisible = (record) => {
+  UpdateModalVisibleCallback = record => {};
+  updateModalVisible = record => {
     this.UpdateModalVisibleCallback(record);
   };
-
 }
 
 let columnConfig = new ColumnConfig();

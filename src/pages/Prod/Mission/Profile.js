@@ -29,18 +29,14 @@ import { hasAuthority } from '@/utils/authority';
 
 import styles from './List.less';
 
-
 // const FormItem = Form.Item;
 // const { Option } = Select;
-const {
-  Header, Footer, Sider, Content,
-} = Layout;
+const { Header, Footer, Sider, Content } = Layout;
 const { Description } = DescriptionList;
 const ButtonGroup = Button.Group;
 
-
 /* eslint react/no-multi-comp:0 */
-@connect(({ missionManage, missionProfile, loading, menu, }) => ({
+@connect(({ missionManage, missionProfile, loading, menu }) => ({
   missionManage,
   missionProfile,
   loading: loading.models.missionProfile,
@@ -48,30 +44,34 @@ const ButtonGroup = Button.Group;
 }))
 @Form.create()
 class Profile extends PureComponent {
-  state = {
-  };
+  state = {};
 
-  componentDidMount () {
-    const { data: { fInterID } } = this.props;
+  componentDidMount() {
+    const {
+      data: { fInterID },
+    } = this.props;
     this.loadData(fInterID);
   }
 
-  componentDidUpdate (preProps) {
-    const { dispatch, data: { fInterID } } = this.props;
+  componentDidUpdate(preProps) {
+    const {
+      dispatch,
+      data: { fInterID },
+    } = this.props;
     if (fInterID !== preProps.data.fInterID) {
       this.loadData(fInterID);
     }
   }
 
-  loadData (fInterID) {
-    const { dispatch, } = this.props;
+  loadData(fInterID) {
+    const { dispatch } = this.props;
     dispatch({
       type: 'missionProfile/initModel',
       payload: { fInterID },
     });
   }
 
-  close () {
+  close() {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
@@ -79,9 +79,9 @@ class Profile extends PureComponent {
     });
   }
 
-  render () {
+  render() {
     const {
-      missionProfile: { data, steps, currentStep, },
+      missionProfile: { data, steps, currentStep },
       loading,
       form: { getFieldDecorator },
     } = this.props;
@@ -91,7 +91,9 @@ class Profile extends PureComponent {
         <Description term="任务单号">{data.fMoBillNo}</Description>
         <Description term="订单号">{data.fSoBillNo}</Description>
         <Description term="日期">{moment(data.fDate).format('YYYY-MM-DD')}</Description>
-        <Description term="计划完工日期">{moment(data.fPlanFinishDate).format('YYYY-MM-DD')}</Description>
+        <Description term="计划完工日期">
+          {moment(data.fPlanFinishDate).format('YYYY-MM-DD')}
+        </Description>
         <Description term="工艺路线">{data.fRoutingName}</Description>
         <Description term="产品名称">{data.fProductName}</Description>
         <Description term="优先级">{data.fPriority}</Description>
@@ -100,8 +102,7 @@ class Profile extends PureComponent {
 
     const action = (
       <Fragment>
-        <ButtonGroup>
-        </ButtonGroup>
+        <ButtonGroup />
         <Button onClick={() => this.close()}>关闭</Button>
       </Fragment>
     );
@@ -117,7 +118,7 @@ class Profile extends PureComponent {
 
     return (
       <WgPageHeaderWrapper
-        title={"生产任务单：" + data.fMoBillNo}
+        title={'生产任务单：' + data.fMoBillNo}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }
@@ -151,9 +152,15 @@ class Profile extends PureComponent {
             <Description term="车间">{data.fWorkShopName}</Description>
             <Description term="车间编号">{data.fWorkShopNumber}</Description>
             <Description term="工艺路线">{data.fRoutingName}</Description>
-            <Description term="制单日期">{moment(data.fCreateDate).format('YYYY-MM-DD')}</Description>
-            <Description term="审核日期">{moment(data.fCheckDate).format('YYYY-MM-DD')}</Description>
-            <Description term="同步日期">{moment(data.fErpSyncDate).format('YYYY-MM-DD')}</Description>
+            <Description term="制单日期">
+              {moment(data.fCreateDate).format('YYYY-MM-DD')}
+            </Description>
+            <Description term="审核日期">
+              {moment(data.fCheckDate).format('YYYY-MM-DD')}
+            </Description>
+            <Description term="同步日期">
+              {moment(data.fErpSyncDate).format('YYYY-MM-DD')}
+            </Description>
             <Description term="备注">{data.fComments}</Description>
           </DescriptionList>
         </Card>

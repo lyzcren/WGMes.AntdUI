@@ -29,19 +29,15 @@ import { RouteSteps } from '@/components/WgRouteSteps/RouteSteps';
 
 import styles from './List.less';
 
-
 // const FormItem = Form.Item;
 // const { Option } = Select;
-const {
-  Header, Footer, Sider, Content,
-} = Layout;
+const { Header, Footer, Sider, Content } = Layout;
 const Step = Steps.Step;
 const { Description } = DescriptionList;
 const ButtonGroup = Button.Group;
 
-
 /* eslint react/no-multi-comp:0 */
-@connect(({ routeManage, routeProfile, loading, menu, }) => ({
+@connect(({ routeManage, routeProfile, loading, menu }) => ({
   routeManage,
   routeProfile,
   loading: loading.models.routeProfile,
@@ -49,36 +45,45 @@ const ButtonGroup = Button.Group;
 }))
 @Form.create()
 class TableList extends PureComponent {
-  state = {
-  };
+  state = {};
 
-  componentDidMount () {
-    const { data: { fInterID } } = this.props;
+  componentDidMount() {
+    const {
+      data: { fInterID },
+    } = this.props;
     this.loadData(fInterID);
   }
 
-  componentDidUpdate (preProps) {
-    const { dispatch, data: { fInterID } } = this.props;
+  componentDidUpdate(preProps) {
+    const {
+      dispatch,
+      data: { fInterID },
+    } = this.props;
     if (fInterID !== preProps.data.fInterID) {
       this.loadData(fInterID);
     }
   }
 
-  loadData (fInterID) {
-    const { dispatch, } = this.props;
+  loadData(fInterID) {
+    const { dispatch } = this.props;
     dispatch({
       type: 'routeProfile/initModel',
       payload: { fInterID },
     });
   }
 
-  save () {
-    const { dispatch, data: { fInterID } } = this.props;
+  save() {
+    const {
+      dispatch,
+      data: { fInterID },
+    } = this.props;
     dispatch({
       type: 'routeProfile/saveStep',
       payload: { fInterID },
     }).then(() => {
-      const { routeProfile: { queryResult } } = this.props;
+      const {
+        routeProfile: { queryResult },
+      } = this.props;
       if (queryResult.status === 'ok') {
         message.success('保存成功');
         // 成功后关闭界面
@@ -89,14 +94,19 @@ class TableList extends PureComponent {
     });
   }
 
-  check (isCheck = true) {
-    const { dispatch, data: { fInterID } } = this.props;
+  check(isCheck = true) {
+    const {
+      dispatch,
+      data: { fInterID },
+    } = this.props;
     const checkType = 'routeManage/' + (isCheck ? 'check' : 'uncheck');
     dispatch({
       type: checkType,
       payload: { fInterID },
     }).then(() => {
-      const { routeManage: { queryResult } } = this.props;
+      const {
+        routeManage: { queryResult },
+      } = this.props;
       if (queryResult.status === 'ok') {
         message.success((isCheck ? '审批' : '反审批') + '成功');
         // 成功后关闭界面
@@ -107,7 +117,7 @@ class TableList extends PureComponent {
     });
   }
 
-  close () {
+  close() {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
@@ -115,30 +125,30 @@ class TableList extends PureComponent {
     });
   }
 
-  nextStep () {
-    const { dispatch, } = this.props;
+  nextStep() {
+    const { dispatch } = this.props;
     dispatch({
       type: 'routeProfile/nextStep',
     });
   }
 
-  prevStep () {
-    const { dispatch, } = this.props;
+  prevStep() {
+    const { dispatch } = this.props;
     dispatch({
       type: 'routeProfile/prevStep',
     });
   }
 
-  deleteStep () {
-    const { dispatch, } = this.props;
+  deleteStep() {
+    const { dispatch } = this.props;
     dispatch({
       type: 'routeProfile/deleteStep',
     });
   }
 
-  render () {
+  render() {
     const {
-      routeProfile: { data, steps, currentStep, },
+      routeProfile: { data, steps, currentStep },
       loading,
       form: { getFieldDecorator },
     } = this.props;
@@ -148,7 +158,9 @@ class TableList extends PureComponent {
         <Description term="名称">{data.fName}</Description>
         <Description term="编码">{data.fNumber}</Description>
         <Description term="创建人">{data.fCreatorName}</Description>
-        <Description term="创建时间">{moment(data.fCreateDate).format('YYYY-MM-DD HH:mm:ss')}</Description>
+        <Description term="创建时间">
+          {moment(data.fCreateDate).format('YYYY-MM-DD HH:mm:ss')}
+        </Description>
         <Description term="备注">{data.fComments}</Description>
       </DescriptionList>
     );
@@ -163,15 +175,19 @@ class TableList extends PureComponent {
     const action = (
       <Fragment>
         <ButtonGroup>
-          {data.fStatusNumber === "Created" && <Button onClick={() => this.check()}>审批</Button>}
-          {data.fStatusNumber === "Checked" && <Button onClick={() => this.check(false)}>反审批</Button>}
+          {data.fStatusNumber === 'Created' && <Button onClick={() => this.check()}>审批</Button>}
+          {data.fStatusNumber === 'Checked' && (
+            <Button onClick={() => this.check(false)}>反审批</Button>
+          )}
           {/* <Dropdown overlay={menu} placement="bottomRight">
             <Button>
               <Icon type="ellipsis" />
             </Button>
           </Dropdown> */}
         </ButtonGroup>
-        <Button type="primary" onClick={() => this.save()}>保存</Button>
+        <Button type="primary" onClick={() => this.save()}>
+          保存
+        </Button>
         <Button onClick={() => this.close()}>关闭</Button>
       </Fragment>
     );
@@ -209,31 +225,45 @@ class TableList extends PureComponent {
               <RouteSteps loading={loading} steps={steps} currentStep={currentStep} />
             </Card>
           </Sider>
-          {(steps && steps[currentStep] && <Content>
-            <GridContent style={{ marginLeft: '10px' }}>
-              <Card title={'操作'} bordered={true}>
-                <div className="steps-action" style={{ margin: '10px' }}>
-                  <Button type="primary" onClick={() => this.nextStep()}>下一步</Button>
-                  {
-                    currentStep > 0
-                    && <Button style={{ marginLeft: 8 }} onClick={() => this.prevStep()}>上一步</Button>
-                  }
-                  {
-                    currentStep > 0
-                    && <Button type="danger" style={{ marginLeft: 8 }} onClick={() => this.deleteStep()}>删除</Button>
-                  }
-                </div>
-              </Card>
-              <div>
-                <Card title={'第 ' + (currentStep + 1) + ' 步'} bordered={true}>
-                  <DeptForm loading={loading} route={data} depts={steps[currentStep].depts} currentStep={currentStep} />
+          {steps && steps[currentStep] && (
+            <Content>
+              <GridContent style={{ marginLeft: '10px' }}>
+                <Card title={'操作'} bordered={true}>
+                  <div className="steps-action" style={{ margin: '10px' }}>
+                    <Button type="primary" onClick={() => this.nextStep()}>
+                      下一步
+                    </Button>
+                    {currentStep > 0 && (
+                      <Button style={{ marginLeft: 8 }} onClick={() => this.prevStep()}>
+                        上一步
+                      </Button>
+                    )}
+                    {currentStep > 0 && (
+                      <Button
+                        type="danger"
+                        style={{ marginLeft: 8 }}
+                        onClick={() => this.deleteStep()}
+                      >
+                        删除
+                      </Button>
+                    )}
+                  </div>
                 </Card>
-              </div>
-            </GridContent>
-          </Content>
+                <div>
+                  <Card title={'第 ' + (currentStep + 1) + ' 步'} bordered={true}>
+                    <DeptForm
+                      loading={loading}
+                      route={data}
+                      depts={steps[currentStep].depts}
+                      currentStep={currentStep}
+                    />
+                  </Card>
+                </div>
+              </GridContent>
+            </Content>
           )}
         </Layout>
-      </div >
+      </div>
     );
   }
 }

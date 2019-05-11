@@ -15,7 +15,7 @@ class HeaderView extends PureComponent {
     visible: true,
   };
 
-  static getDerivedStateFromProps (props, state) {
+  static getDerivedStateFromProps(props, state) {
     if (!props.autoHideHeader && !state.visible) {
       return {
         visible: true,
@@ -24,11 +24,11 @@ class HeaderView extends PureComponent {
     return null;
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.addEventListener('scroll', this.handScroll, { passive: true });
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     document.removeEventListener('scroll', this.handScroll);
   }
 
@@ -124,7 +124,7 @@ class HeaderView extends PureComponent {
     }
   };
 
-  render () {
+  render() {
     const { isMobile, handleMenuCollapse, setting } = this.props;
     const { navTheme, layout, fixedHeader } = setting;
     const { visible } = this.state;
@@ -143,14 +143,14 @@ class HeaderView extends PureComponent {
             {...this.props}
           />
         ) : (
-            <GlobalHeader
-              onCollapse={handleMenuCollapse}
-              onNoticeClear={this.handleNoticeClear}
-              onMenuClick={this.handleMenuClick}
-              onNoticeVisibleChange={this.handleNoticeVisibleChange}
-              {...this.props}
-            />
-          )}
+          <GlobalHeader
+            onCollapse={handleMenuCollapse}
+            onNoticeClear={this.handleNoticeClear}
+            onMenuClick={this.handleMenuClick}
+            onNoticeVisibleChange={this.handleNoticeVisibleChange}
+            {...this.props}
+          />
+        )}
       </Header>
     ) : null;
     return (

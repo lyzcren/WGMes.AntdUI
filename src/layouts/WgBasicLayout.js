@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { Layout, Tabs, } from 'antd';
+import { Layout, Tabs } from 'antd';
 import DocumentTitle from 'react-document-title';
 import isEqual from 'lodash/isEqual';
 import memoizeOne from 'memoize-one';
@@ -8,9 +8,7 @@ import { ContainerQuery } from 'react-container-query';
 import classNames from 'classnames';
 import pathToRegexp from 'path-to-regexp';
 import Media from 'react-media';
-import { formatMessage } from 'umi/locale';
-import { Route, } from 'react-router-dom'
-import logo from '../assets/logo.svg';
+import { Route } from 'umi';
 import Footer from './Footer';
 import Header from './WgHeader';
 import Context from './MenuContext';
@@ -21,9 +19,7 @@ import { getToken } from '@/utils/token';
 import logo from '../assets/logo.svg';
 import styles from './BasicLayout.less';
 
-
-
-const TabPane = Tabs.TabPane;
+const { TabPane } = Tabs;
 
 // lazy load SettingDrawer
 const SettingDrawer = React.lazy(() => import('@/components/SettingDrawer'));
@@ -60,21 +56,19 @@ class WgBasicLayout extends React.PureComponent {
     this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual);
     // const { location: { pathname } } = props;
     // 首次进入界面默认加载标签页
-    this.defaultPath = "/basic/dept";
+    this.defaultPath = '/basic/dept';
 
-    this.state = {
-      selectedKeys: props.selectedKeys
-    }
+    this.state = {};
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const {
       dispatch,
       route: { routes, authority },
     } = this.props;
     const token = getToken();
     if (!token) {
-      window.g_app._store.dispatch({
+      dispatch({
         type: 'login/logout',
       });
     } else {
@@ -95,7 +89,7 @@ class WgBasicLayout extends React.PureComponent {
     }
   }
 
-  componentDidUpdate (preProps) {
+  componentDidUpdate(preProps) {
     // After changing to phone mode,
     // if collapsed is true, you need to click twice to display
     const { collapsed, isMobile } = this.props;
@@ -104,7 +98,7 @@ class WgBasicLayout extends React.PureComponent {
     }
   }
 
-  getContext () {
+  getContext() {
     const { location, breadcrumbNameMap } = this.props;
     return {
       location,
@@ -118,19 +112,19 @@ class WgBasicLayout extends React.PureComponent {
   };
 
   getPageTitle = (pathname, breadcrumbNameMap) => {
-    const currRouterData = this.matchParamsPath(pathname, breadcrumbNameMap);
-
     return '望果制造执行系统';
-    if (!currRouterData) {
-      return '望果制造执行系统';
-    }
-    alert('todo：获取路由页面信息');
-    const pageName = formatMessage({
-      id: currRouterData.locale || currRouterData.name,
-      defaultMessage: currRouterData.name,
-    });
 
-    return `${pageName} - 望果制造执行系统`;
+    // const currRouterData = this.matchParamsPath(pathname, breadcrumbNameMap);
+    // if (!currRouterData) {
+    //   return '望果制造执行系统';
+    // }
+    // alert('todo：获取路由页面信息');
+    // const pageName = formatMessage({
+    //   id: currRouterData.locale || currRouterData.name,
+    //   defaultMessage: currRouterData.name,
+    // });
+
+    // return `${pageName} - 望果制造执行系统`;
   };
 
   getLayoutStyle = () => {
@@ -160,36 +154,35 @@ class WgBasicLayout extends React.PureComponent {
     return <SettingDrawer />;
   };
 
-  onChange = (activeKey) => {
+  onChange = activeKey => {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
       payload: { path: activeKey },
     });
-  }
+  };
 
   onEdit = (targetKey, action) => {
     this[action](targetKey);
-  }
+  };
 
   add = ({ path }) => {
-    const { dispatch, } = this.props;
+    const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
       payload: { path },
     });
-  }
+  };
 
-  remove = (targetKey) => {
+  remove = targetKey => {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
       payload: { path: targetKey },
     });
-  }
+  };
 
-
-  render () {
+  render() {
     const {
       navTheme,
       layout: PropsLayout,
@@ -197,6 +190,8 @@ class WgBasicLayout extends React.PureComponent {
       isMobile,
       menuData,
       breadcrumbNameMap,
+      activeKey,
+      panes,
     } = this.props;
 
     const isTop = PropsLayout === 'topmenu';
@@ -226,20 +221,26 @@ class WgBasicLayout extends React.PureComponent {
             isMobile={isMobile}
             {...this.props}
           />
-          <Tabs className={styles.tabMenu}
-            activeKey={this.props.activeKey}
+          <Tabs
+            className={styles.tabMenu}
+            activeKey={activeKey}
             onChange={this.onChange}
             onEdit={this.onEdit}
             // TODO: Tabs标签页右键菜单
             // tabBarExtraContent={<Button type="primary">主操作</Button>}
             hideAdd
-            type="editable-card">
-            {
-              this.props.panes.map(pane =>
-                <TabPane tab={pane.name} className={styles.tabContent} key={pane.key} closable={pane.closable}>
-                  <Route>{<pane.component {...pane} />}</Route>
-                </TabPane>)
-            }
+            type="editable-card"
+          >
+            {panes.map(pane => (
+              <TabPane
+                tab={pane.name}
+                className={styles.tabContent}
+                key={pane.key}
+                closable={pane.closable}
+              >
+                <Route>{<pane.component {...pane} />}</Route>
+              </TabPane>
+            ))}
           </Tabs>
           <Footer />
         </Layout>

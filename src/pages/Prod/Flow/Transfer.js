@@ -30,18 +30,14 @@ import { hasAuthority } from '@/utils/authority';
 
 import styles from './List.less';
 
-
 const FormItem = Form.Item;
 const { Option } = Select;
-const {
-  Header, Footer, Sider, Content,
-} = Layout;
+const { Header, Footer, Sider, Content } = Layout;
 const { Description } = DescriptionList;
 const ButtonGroup = Button.Group;
 
-
 /* eslint react/no-multi-comp:0 */
-@connect(({ flowTransfer, loading, menu, basicData, }) => ({
+@connect(({ flowTransfer, loading, menu, basicData }) => ({
   flowTransfer,
   loading: loading.models.flowTransfer,
   menu,
@@ -49,34 +45,39 @@ const ButtonGroup = Button.Group;
 }))
 @Form.create()
 class Transfer extends PureComponent {
-  state = {
-  };
+  state = {};
 
-  componentDidMount () {
-    const { dispatch, data: { fInterID, fCurrentDeptID } } = this.props;
+  componentDidMount() {
+    const {
+      dispatch,
+      data: { fInterID, fCurrentDeptID },
+    } = this.props;
     dispatch({
       type: 'basicData/getMachineData',
-      payload: { fDeptID: fCurrentDeptID }
+      payload: { fDeptID: fCurrentDeptID },
     });
     this.loadData(fInterID);
   }
 
-  componentDidUpdate (preProps) {
-    const { dispatch, data: { fInterID } } = this.props;
+  componentDidUpdate(preProps) {
+    const {
+      dispatch,
+      data: { fInterID },
+    } = this.props;
     if (fInterID !== preProps.data.fInterID) {
       this.loadData(fInterID);
     }
   }
 
-  loadData (fInterID) {
-    const { dispatch, } = this.props;
+  loadData(fInterID) {
+    const { dispatch } = this.props;
     dispatch({
       type: 'flowTransfer/initModel',
       payload: { fInterID },
     });
   }
 
-  close () {
+  close() {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
@@ -84,12 +85,12 @@ class Transfer extends PureComponent {
     });
   }
 
-  render () {
+  render() {
     const {
-      flowTransfer: { data, },
+      flowTransfer: { data },
       loading,
       form: { getFieldDecorator },
-      basicData: { machineData }
+      basicData: { machineData },
     } = this.props;
 
     const description = (
@@ -108,8 +109,7 @@ class Transfer extends PureComponent {
 
     const action = (
       <Fragment>
-        <ButtonGroup>
-        </ButtonGroup>
+        <ButtonGroup />
         <Button onClick={() => this.close()}>关闭</Button>
       </Fragment>
     );
@@ -129,7 +129,7 @@ class Transfer extends PureComponent {
 
     return (
       <WgPageHeaderWrapper
-        title={"流程单：" + data.fFullBatchNo}
+        title={'流程单：' + data.fFullBatchNo}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }
@@ -148,7 +148,11 @@ class Transfer extends PureComponent {
                     rules: [{ required: true, message: '请选择机台' }],
                   })(
                     <Select placeholder="请选择机台" autoFocus>
-                      {machineData.map(x => <Option key={x.fItemID} value={x.fItemID}>{x.fName}</Option>)}
+                      {machineData.map(x => (
+                        <Option key={x.fItemID} value={x.fItemID}>
+                          {x.fName}
+                        </Option>
+                      ))}
                     </Select>
                   )}
                 </Form.Item>
@@ -175,33 +179,21 @@ class Transfer extends PureComponent {
                 <Form.Item label="机台">
                   {getFieldDecorator('machineId', {
                     rules: [{ required: false, message: '请选择机台' }],
-                  })(
-                    <InputNumber
-                      placeholder="请输入"
-                      min={1} />
-                  )}
+                  })(<InputNumber placeholder="请输入" min={1} />)}
                 </Form.Item>
               </Col>
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <Form.Item label="模具">
                   {getFieldDecorator('machineId', {
                     rules: [{ required: false, message: '请选择模具' }],
-                  })(
-                    <InputNumber
-                      placeholder="请输入"
-                      min={1} />
-                  )}
+                  })(<InputNumber placeholder="请输入" min={1} />)}
                 </Form.Item>
               </Col>
               <Col xl={{ span: 8, offset: 2 }} lg={{ span: 10 }} md={{ span: 24 }} sm={24}>
                 <Form.Item label="仓库">
                   {getFieldDecorator('owner', {
                     rules: [{ required: false, message: '请选择管理员' }],
-                  })(
-                    <InputNumber
-                      placeholder="请输入"
-                      min={1} />
-                  )}
+                  })(<InputNumber placeholder="请输入" min={1} />)}
                 </Form.Item>
               </Col>
             </Row>
@@ -214,33 +206,21 @@ class Transfer extends PureComponent {
                 <Form.Item label="机台">
                   {getFieldDecorator('machineId', {
                     rules: [{ required: false, message: '请选择机台' }],
-                  })(
-                    <InputNumber
-                      placeholder="请输入"
-                      min={1} />
-                  )}
+                  })(<InputNumber placeholder="请输入" min={1} />)}
                 </Form.Item>
               </Col>
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <Form.Item label="模具">
                   {getFieldDecorator('machineId', {
                     rules: [{ required: false, message: '请选择模具' }],
-                  })(
-                    <InputNumber
-                      placeholder="请输入"
-                      min={1} />
-                  )}
+                  })(<InputNumber placeholder="请输入" min={1} />)}
                 </Form.Item>
               </Col>
               <Col xl={{ span: 8, offset: 2 }} lg={{ span: 10 }} md={{ span: 24 }} sm={24}>
                 <Form.Item label="仓库">
                   {getFieldDecorator('owner', {
                     rules: [{ required: false, message: '请选择管理员' }],
-                  })(
-                    <InputNumber
-                      placeholder="请输入"
-                      min={1} />
-                  )}
+                  })(<InputNumber placeholder="请输入" min={1} />)}
                 </Form.Item>
               </Col>
             </Row>

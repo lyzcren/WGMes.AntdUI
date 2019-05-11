@@ -1,4 +1,4 @@
-import { fakeGetParams, fakeAddParams, } from '@/services/Basic/Dept';
+import { fakeGetParams, fakeAddParams } from '@/services/Basic/Dept';
 import { fakeQueryValue } from '@/services/Tech/Param';
 
 export default {
@@ -13,14 +13,14 @@ export default {
   },
 
   effects: {
-    *fetch ({ payload }, { call, put }) {
+    *fetch({ payload }, { call, put }) {
       const response = yield call(fakeGetParams, payload);
       yield put({
         type: 'saveQueryData',
         payload: response,
       });
     },
-    *add ({ payload, callback }, { call, put }) {
+    *add({ payload, callback }, { call, put }) {
       const response = yield call(fakeAddParams, payload);
       yield put({
         type: 'saveData',
@@ -28,7 +28,7 @@ export default {
       });
       if (callback) callback();
     },
-    *fetchValue ({ payload }, { call, put }) {
+    *fetchValue({ payload }, { call, put }) {
       const response = yield call(fakeQueryValue, payload);
       yield put({
         type: 'saveParamValues',
@@ -38,13 +38,13 @@ export default {
   },
 
   reducers: {
-    saveQueryData (state, action) {
+    saveQueryData(state, action) {
       return {
         ...state,
         data: action.payload,
       };
     },
-    saveData (state, action) {
+    saveData(state, action) {
       return {
         ...state,
         queryResult: action.payload ? action.payload : {},

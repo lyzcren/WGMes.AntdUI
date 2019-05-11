@@ -152,7 +152,7 @@ export function isUrl (path) {
 
 export function formatWan (val) {
   const v = val * 1;
-  if (!v || Number.isNaN(v)) return '';
+  if (!v || typeof (v) != 'number') return '';
 
   let result = val;
   if (val > 10000) {
@@ -177,11 +177,9 @@ export function formatWan (val) {
   return result;
 }
 
-
-
 export function getComponentMaps (menuData) {
-  let menuComponentMap = [];
-  const getMenuDataMap = (memuData) => {
+  const menuComponentMap = [];
+  const getMenuDataMap = memuData => {
     memuData.map(m => {
       if (m.component) {
         menuComponentMap.push(m);
@@ -190,27 +188,40 @@ export function getComponentMaps (menuData) {
         getMenuDataMap(m.children);
       }
     });
-  }
+  };
   getMenuDataMap(menuData);
 
   return menuComponentMap;
-};
+}
 
 // 给官方演示站点用，用于关闭真实开发环境不需要使用的特性
 export function isAntdPro () {
   return window.location.hostname === 'preview.pro.ant.design';
 }
 
-
 export function getBillNoByRule (rule) {
-  const { fName, fPrefix, fSuffix, fNoLength
-    , fAppendYear, fLongYear, fAppendMonth, fAppendDate } = rule;
+  const {
+    fPrefix,
+    fSuffix,
+    fNoLength,
+    fAppendYear,
+    fLongYear,
+    fAppendMonth,
+    fAppendDate,
+  } = rule;
   const date = new Date();
 
-  return fPrefix
-    + (fAppendYear ? date.getFullYear().toString().substring(fLongYear ? 0 : 2, 4) : "")
-    + (fAppendMonth ? date.getMonth() : "")
-    + (fAppendDate ? date.getDate() : "")
-    + (rule.fMaxID ? rule.fMaxID.toString() : "1").padStart(fNoLength, "0")
-    + fSuffix
+  return (
+    fPrefix +
+    (fAppendYear
+      ? date
+        .getFullYear()
+        .toString()
+        .substring(fLongYear ? 0 : 2, 4)
+      : '') +
+    (fAppendMonth ? date.getMonth() : '') +
+    (fAppendDate ? date.getDate() : '') +
+    (rule.fMaxID ? rule.fMaxID.toString() : '1').padStart(fNoLength, '0') +
+    fSuffix
+  );
 }

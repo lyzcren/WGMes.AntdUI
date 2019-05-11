@@ -1,8 +1,7 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
 
-
-export async function fakeQuery (params) {
+export async function fakeQuery(params) {
   return request('/api/Dept/GetTreeList', {
     method: 'POST',
     body: {
@@ -12,7 +11,7 @@ export async function fakeQuery (params) {
   });
 }
 
-export async function fakeGetType (params) {
+export async function fakeGetType(params) {
   return request('/api/Dept/GetType', {
     method: 'POST',
     body: {
@@ -22,7 +21,7 @@ export async function fakeGetType (params) {
   });
 }
 
-export async function fakeRemove (params) {
+export async function fakeRemove(params) {
   return request('/api/Dept/delete', {
     method: 'POST',
     body: {
@@ -32,7 +31,7 @@ export async function fakeRemove (params) {
   });
 }
 
-export async function fakeAdd (params) {
+export async function fakeAdd(params) {
   return request('/api/Dept', {
     method: 'POST',
     body: {
@@ -42,7 +41,7 @@ export async function fakeAdd (params) {
   });
 }
 
-export async function fakeUpdate (params) {
+export async function fakeUpdate(params) {
   return request('/api/Dept/update', {
     method: 'POST',
     body: {
@@ -52,7 +51,7 @@ export async function fakeUpdate (params) {
   });
 }
 
-export async function fakeActive (params) {
+export async function fakeActive(params) {
   return request('/api/Dept/active', {
     method: 'POST',
     body: {
@@ -62,7 +61,7 @@ export async function fakeActive (params) {
   });
 }
 
-export async function fakeGetParams (params) {
+export async function fakeGetParams(params) {
   return request('/api/dept/getParams', {
     method: 'POST',
     body: {
@@ -72,7 +71,7 @@ export async function fakeGetParams (params) {
   });
 }
 
-export async function fakeAddParams (params) {
+export async function fakeAddParams(params) {
   return request('/api/dept/addParams', {
     method: 'POST',
     body: {

@@ -29,10 +29,7 @@ export const getMenuMatches = (flatMenuKeys, path) =>
  * @memberof SiderMenu
  */
 export const getDefaultCollapsedSubMenus = props => {
-  const {
-    path,
-    flatMenuKeys,
-  } = props;
+  const { path, flatMenuKeys } = props;
   const pathname = path;
   return urlToList(pathname)
     .map(item => getMenuMatches(flatMenuKeys, item)[0])

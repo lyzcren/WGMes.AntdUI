@@ -1,6 +1,5 @@
 import fetch from 'dva/fetch';
 import { notification } from 'antd';
-import router from 'umi/router';
 import hash from 'hash.js';
 import { isAntdPro } from './utils';
 import { getToken } from './token';
@@ -29,14 +28,13 @@ const checkStatus = response => {
   }
   const errortext = codeMessage[response.status] || response.statusText;
   // 添加对401状态码的具体提示判断 by:ywlin 2018-01-26
-  if (response.status == 401) {
+  if (response.status === 401) {
     notification.error({
       message: `登录信息过期，请重新登录`,
     });
-  }
-  else if (response.status == 403) {// 403状态码需进一步做判断
-  }
-  else {
+  } else if (response.status === 403) {
+    // 403状态码需进一步做判断
+  } else {
     notification.error({
       message: `请求错误 ${response.status}: ${response.url}`,
       description: errortext,
@@ -161,15 +159,15 @@ export default function request (url, option) {
       }
       if (status === 403) {
         // 当出现403代码时，检查token
-        fetch("/api/account/checkToken", {
-          method: "POST",
+        fetch('/api/account/checkToken', {
+          method: 'POST',
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json; charset=utf-8',
           },
-          body: JSON.stringify({ token })
+          body: JSON.stringify({ token }),
         }).then(response => {
-          if (response.status == 401) {
+          if (response.status === 401) {
             notification.error({
               message: `登录信息过期，请重新登录`,
             });
@@ -181,8 +179,6 @@ export default function request (url, option) {
               message: `当前用户无对应的操作权限。`,
             });
           }
-
-          return;
         });
       }
       // // environment should not be used

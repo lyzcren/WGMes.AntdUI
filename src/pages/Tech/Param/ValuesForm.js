@@ -9,11 +9,13 @@ import {
   Switch,
   Tag,
   Select,
-  message, Popconfirm, Divider,
+  message,
+  Popconfirm,
+  Divider,
 } from 'antd';
 import isEqual from 'lodash/isEqual';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import { GlobalConst } from '@/utils/GlobalConst'
+import { GlobalConst } from '@/utils/GlobalConst';
 
 import styles from './List.less';
 
@@ -21,11 +23,12 @@ const FormItem = Form.Item;
 const Option = Select.Option;
 const TypeData = GlobalConst.DefectTypeData;
 
+/* eslint react/no-multi-comp:0 */
 @Form.create()
 export class ValuesForm extends PureComponent {
   static defaultProps = {
-    handleSubmit: () => { },
-    handleModalVisible: () => { },
+    handleSubmit: () => {},
+    handleModalVisible: () => {},
     values: {},
   };
 
@@ -62,15 +65,16 @@ export class ValuesForm extends PureComponent {
     });
   };
 
-  handleAdd = (record) => {
-    const { dispatch, } = this.props;
+  handleAdd = record => {
+    const { dispatch } = this.props;
     this.setState({
       loading: true,
     });
     dispatch({
       type: 'paramManage/addValue',
       payload: {
-        fValue: record.fValue, fItemID: this.state.formVals.fItemID
+        fValue: record.fValue,
+        fItemID: this.state.formVals.fItemID,
       },
     }).then(() => {
       const { queryResult } = this.props;
@@ -85,15 +89,16 @@ export class ValuesForm extends PureComponent {
     });
   };
 
-  handleUpdate = (record) => {
-    const { dispatch, } = this.props;
+  handleUpdate = record => {
+    const { dispatch } = this.props;
     this.setState({
       loading: true,
     });
     dispatch({
       type: 'paramManage/updateValue',
       payload: {
-        fValue: record.fValue, guid: record.guid
+        fValue: record.fValue,
+        guid: record.guid,
       },
     }).then(() => {
       const { queryResult } = this.props;
@@ -108,12 +113,11 @@ export class ValuesForm extends PureComponent {
     });
   };
 
-
   index = 0;
 
   cacheOriginData = {};
 
-  static getDerivedStateFromProps (nextProps, preState) {
+  static getDerivedStateFromProps(nextProps, preState) {
     if (isEqual(nextProps.value, preState.value)) {
       return null;
     }
@@ -123,7 +127,7 @@ export class ValuesForm extends PureComponent {
     };
   }
 
-  getRowByKey (guid, newData) {
+  getRowByKey(guid, newData) {
     const { data } = this.state;
     return (newData || data).filter(item => item.guid === guid)[0];
   }
@@ -156,15 +160,15 @@ export class ValuesForm extends PureComponent {
     this.setState({ data: newData });
   };
 
-  remove (guid) {
-    const { dispatch, } = this.props;
+  remove(guid) {
+    const { dispatch } = this.props;
     this.setState({
       loading: true,
     });
     dispatch({
       type: 'paramManage/removeValue',
       payload: {
-        guid: guid
+        guid: guid,
       },
     }).then(() => {
       const { queryResult } = this.props;
@@ -179,13 +183,13 @@ export class ValuesForm extends PureComponent {
     });
   }
 
-  handleKeyPress (e, key) {
+  handleKeyPress(e, key) {
     if (e.key === 'Enter') {
       this.saveRow(e, key);
     }
   }
 
-  handleFieldChange (e, fieldName, guid) {
+  handleFieldChange(e, fieldName, guid) {
     const { data } = this.state;
     const newData = data.map(item => ({ ...item }));
     const target = this.getRowByKey(guid, newData);
@@ -195,7 +199,7 @@ export class ValuesForm extends PureComponent {
     }
   }
 
-  saveRow (e, guid) {
+  saveRow(e, guid) {
     e.persist();
     if (this.clickedCancel) {
       this.clickedCancel = false;
@@ -216,7 +220,7 @@ export class ValuesForm extends PureComponent {
     // this.toggleEditable(e, guid);
   }
 
-  cancel (e, guid) {
+  cancel(e, guid) {
     this.clickedCancel = true;
     e.preventDefault();
     const { data } = this.state;
@@ -231,8 +235,7 @@ export class ValuesForm extends PureComponent {
     this.clickedCancel = false;
   }
 
-
-  render () {
+  render() {
     const { form, modalVisible, handleModalVisible, values } = this.props;
     const { loading, data, formVals } = this.state;
     const columns = [
@@ -292,17 +295,29 @@ export class ValuesForm extends PureComponent {
       },
     ];
 
-    const footer = <div><Button
-      loading={false}
-      onClick={() => handleModalVisible(false, values)}
-      prefixCls="ant-btn"
-      ghost={false}
-      block={false}>关闭</Button></div>;
+    const footer = (
+      <div>
+        <Button
+          loading={false}
+          onClick={() => handleModalVisible(false, values)}
+          prefixCls="ant-btn"
+          ghost={false}
+          block={false}
+        >
+          关闭
+        </Button>
+      </div>
+    );
 
     return (
       <Modal
         destroyOnClose
-        title={< div > 修改 < Tag color="blue" > {formVals.fName}</Tag> 参数值</div >}
+        title={
+          <div>
+            {' '}
+            修改 <Tag color="blue"> {formVals.fName}</Tag> 参数值
+          </div>
+        }
         visible={modalVisible}
         footer={footer}
         // okButtonProps={{ disabled: true }}
@@ -326,7 +341,7 @@ export class ValuesForm extends PureComponent {
         >
           新增参数值
         </Button>
-      </Modal >
+      </Modal>
     );
   }
-};
+}

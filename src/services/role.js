@@ -1,11 +1,11 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
 
-export async function query () {
+export async function query() {
   return request('/api/roles');
 }
 
-export async function queryRole (params) {
+export async function queryRole(params) {
   return request('/api/role/getList', {
     method: 'POST',
     body: {
@@ -16,7 +16,7 @@ export async function queryRole (params) {
   // return request(`/api/role?${stringify(params)}`);
 }
 
-export async function removeRole (params) {
+export async function removeRole(params) {
   return request('/api/role/delete', {
     method: 'POST',
     body: {
@@ -26,7 +26,7 @@ export async function removeRole (params) {
   });
 }
 
-export async function addRole (params) {
+export async function addRole(params) {
   return request('/api/role', {
     method: 'POST',
     body: {
@@ -36,7 +36,7 @@ export async function addRole (params) {
   });
 }
 
-export async function updateRole (params) {
+export async function updateRole(params) {
   return request('/api/role/update', {
     method: 'POST',
     body: {
@@ -46,7 +46,7 @@ export async function updateRole (params) {
   });
 }
 
-export async function active (params) {
+export async function active(params) {
   return request('/api/role/active', {
     method: 'POST',
     body: {
@@ -56,11 +56,11 @@ export async function active (params) {
   });
 }
 
-export async function getAuth (params) {
+export async function getAuth(params) {
   return request(`/api/role/authority?${stringify(params)}`);
 }
 
-export async function setAuth (params) {
+export async function setAuth(params) {
   return request('/api/role/authorize', {
     method: 'POST',
     body: {
@@ -70,11 +70,11 @@ export async function setAuth (params) {
   });
 }
 
-export async function getCurrentAuth (params) {
+export async function getCurrentAuth(params) {
   return request(`/api/role/currentAuthority?${stringify(params)}`);
 }
 
-export async function fakeGetAuthorizeUser (params) {
+export async function fakeGetAuthorizeUser(params) {
   return request('/api/role/getAuthorizedUser', {
     method: 'POST',
     body: {
@@ -84,17 +84,16 @@ export async function fakeGetAuthorizeUser (params) {
   });
 }
 
-export async function fakeAuthorizeUser (params) {
+export async function fakeAuthorizeUser(params) {
   return request('/api/role/AuthorizeUser', {
     method: 'POST',
     body: {
       ...params,
       method: 'AuthorizeUser',
     },
-  })
-
+  });
 }
-export async function fakeUnAuthorizeUser (params) {
+export async function fakeUnAuthorizeUser(params) {
   return request('/api/role/UnAuthorizeUser', {
     method: 'POST',
     body: {

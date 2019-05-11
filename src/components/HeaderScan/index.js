@@ -20,13 +20,13 @@ export default class HeaderScan extends PureComponent {
 
   static defaultProps = {
     defaultActiveFirstOption: false,
-    onPressEnter: () => { },
-    onSearch: () => { },
+    onPressEnter: () => {},
+    onSearch: () => {},
     className: '',
     placeholder: '',
     dataSource: [],
     defaultOpen: false,
-    onVisibleChange: () => { },
+    onVisibleChange: () => {},
   };
 
   static getDerivedStateFromProps(props) {

@@ -1,4 +1,4 @@
-import { fakeQueryErp, fakeAdd, fakeSync, fakeIsSyncing, } from '@/services/Basic/ProductList';
+import { fakeQueryErp, fakeAdd, fakeSync, fakeIsSyncing } from '@/services/Basic/ProductList';
 
 export default {
   namespace: 'syncProductManage',
@@ -16,14 +16,14 @@ export default {
   },
 
   effects: {
-    *fetch ({ payload }, { call, put }) {
+    *fetch({ payload }, { call, put }) {
       const response = yield call(fakeQueryErp, payload);
       yield put({
         type: 'saveQueryData',
         payload: response,
       });
     },
-    *add ({ payload, callback }, { call, put }) {
+    *add({ payload, callback }, { call, put }) {
       const response = yield call(fakeAdd, payload);
       yield put({
         type: 'saveData',
@@ -31,7 +31,7 @@ export default {
       });
       if (callback) callback();
     },
-    *sync ({ payload, callback }, { call, put }) {
+    *sync({ payload, callback }, { call, put }) {
       const response = yield call(fakeSync, payload);
       yield put({
         type: 'saveData',
@@ -39,7 +39,7 @@ export default {
       });
       if (callback) callback();
     },
-    *isSyncing ({ payload, callback }, { call, put }) {
+    *isSyncing({ payload, callback }, { call, put }) {
       const response = yield call(fakeIsSyncing, payload);
       yield put({
         type: 'saveSyncing',
@@ -50,19 +50,19 @@ export default {
   },
 
   reducers: {
-    saveQueryData (state, action) {
+    saveQueryData(state, action) {
       return {
         ...state,
         data: action.payload,
       };
     },
-    saveData (state, action) {
+    saveData(state, action) {
       return {
         ...state,
         queryResult: action.payload ? action.payload : {},
       };
     },
-    saveSyncing (state, action) {
+    saveSyncing(state, action) {
       return {
         ...state,
         isSyncing: action.payload ? action.payload : false,

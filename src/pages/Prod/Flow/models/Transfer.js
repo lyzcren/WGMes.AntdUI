@@ -1,13 +1,10 @@
-
-import { fakeCurrentRecord, } from '@/services/Prod/Flow';
+import { fakeCurrentRecord } from '@/services/Prod/Flow';
 
 export default {
   namespace: 'flowTransfer',
 
   state: {
-    data: {
-
-    },
+    data: {},
 
     queryResult: {
       status: 'ok',
@@ -16,7 +13,7 @@ export default {
   },
 
   effects: {
-    *initModel ({ payload, callback }, { call, put }) {
+    *initModel({ payload, callback }, { call, put }) {
       const data = yield call(fakeCurrentRecord, payload);
 
       yield put({
@@ -30,13 +27,13 @@ export default {
   },
 
   reducers: {
-    save (state, action) {
+    save(state, action) {
       return {
         ...state,
         ...action.payload,
       };
     },
-    saveData (state, action) {
+    saveData(state, action) {
       return {
         ...state,
         queryResult: action.payload ? action.payload : {},

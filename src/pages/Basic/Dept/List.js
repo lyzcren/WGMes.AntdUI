@@ -18,7 +18,12 @@ import {
   message,
   Badge,
   Divider,
-  Radio, Popover, Switch, Progress, notification, Popconfirm,
+  Radio,
+  Popover,
+  Switch,
+  Progress,
+  notification,
+  Popconfirm,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
@@ -32,7 +37,6 @@ import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
 
 import styles from './List.less';
-
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -65,10 +69,9 @@ class TableList extends PureComponent {
     pageSize: 10,
   };
 
-
-  componentDidMount () {
-    const { dispatch, } = this.props;
-    var params = { pagination: this.currentPagination };
+  componentDidMount() {
+    const { dispatch } = this.props;
+    const params = { pagination: this.currentPagination };
     dispatch({
       type: 'deptManage/fetch',
       payload: params,
@@ -77,10 +80,10 @@ class TableList extends PureComponent {
       type: 'deptManage/getType',
     });
     // 列配置相关方法
-    ColumnConfig.UpdateModalVisibleCallback = (record) => this.handleUpdateModalVisible(true, record);
-    ColumnConfig.DeleteCallback = (record) => this.handleDelete(record);
-    ColumnConfig.ActiveCallback = (record) => this.handleActive(record, !record.fIsActive);
-    ColumnConfig.TechParamCallback = (record) => this.handleTechParamModalVisible(true, record);
+    ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdateModalVisible(true, record);
+    ColumnConfig.DeleteCallback = record => this.handleDelete(record);
+    ColumnConfig.ActiveCallback = record => this.handleActive(record, !record.fIsActive);
+    ColumnConfig.TechParamCallback = record => this.handleTechParamModalVisible(true, record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -106,7 +109,7 @@ class TableList extends PureComponent {
       this.currentPagination.sorter[sorter.field] = sorter.order.replace('end', '');
     }
 
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     dispatch({
       type: 'deptManage/fetch',
@@ -119,14 +122,16 @@ class TableList extends PureComponent {
     this.search();
   };
 
-  getSearchParam = (fieldsValue) => {
+  getSearchParam = fieldsValue => {
     const values = {
       ...fieldsValue,
     };
     // 查询条件处理
     const queryFilters = [];
-    if (fieldsValue.queryName) queryFilters.push({ name: "fName", compare: "%*%", value: fieldsValue.queryName });
-    if (fieldsValue.queryIsActive) queryFilters.push({ name: "fIsActive", compare: "=", value: fieldsValue.queryIsActive });
+    if (fieldsValue.queryName)
+      queryFilters.push({ name: 'fName', compare: '%*%', value: fieldsValue.queryName });
+    if (fieldsValue.queryIsActive)
+      queryFilters.push({ name: 'fIsActive', compare: '=', value: fieldsValue.queryIsActive });
 
     this.setState({
       formValues: values,
@@ -139,10 +144,10 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters,
     };
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     return params;
-  }
+  };
 
   search = () => {
     const { dispatch, form } = this.props;
@@ -150,13 +155,13 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      var params = this.getSearchParam(fieldsValue);
+      const params = this.getSearchParam(fieldsValue);
       dispatch({
         type: 'deptManage/fetch',
         payload: params,
       });
     });
-  }
+  };
 
   handleFormReset = () => {
     const { form, dispatch } = this.props;
@@ -172,7 +177,7 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters: [],
     };
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     dispatch({
       type: 'deptManage/fetch',
@@ -180,26 +185,26 @@ class TableList extends PureComponent {
     });
   };
 
-  handleExport = (e) => {
+  handleExport = e => {
     const { dispatch, form } = this.props;
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      var params = this.getSearchParam(fieldsValue);
-      var fileName = '部门.xls';
+      let params = this.getSearchParam(fieldsValue);
+      let fileName = '部门.xls';
       switch (e.key) {
         case 'currentPage':
-          params = { ...params, exportPage: true }
+          params = { ...params, exportPage: true };
           fileName = '部门-第' + params.pagination.current + '页.xls';
           break;
         case 'allPage':
-          params = { ...params, exportAll: true }
+          params = { ...params, exportAll: true };
           break;
         default:
           break;
       }
-      exportExcel('/api/dept/export', params, fileName)
+      exportExcel('/api/dept/export', params, fileName);
     });
   };
 
@@ -263,9 +268,11 @@ class TableList extends PureComponent {
     const { dispatch, form } = this.props;
     dispatch({
       type: 'deptManage/add',
-      payload: fields
+      payload: fields,
     }).then(() => {
-      const { deptManage: { queryResult } } = this.props;
+      const {
+        deptManage: { queryResult },
+      } = this.props;
       if (queryResult.status === 'ok') {
         message.success('添加成功');
         this.handleModalVisible();
@@ -283,7 +290,9 @@ class TableList extends PureComponent {
       type: 'deptManage/update',
       payload: fields,
     }).then(() => {
-      const { deptManage: { queryResult } } = this.props;
+      const {
+        deptManage: { queryResult },
+      } = this.props;
       if (queryResult.status === 'ok') {
         message.success('修改成功');
         this.handleUpdateModalVisible();
@@ -291,8 +300,7 @@ class TableList extends PureComponent {
         this.search();
       } else if (queryResult.status === 'warning') {
         message.warning(queryResult.message);
-      }
-      else {
+      } else {
         message.error(queryResult.message);
       }
     });
@@ -304,7 +312,9 @@ class TableList extends PureComponent {
       type: 'deptManage/updateTechParam',
       payload: fields,
     }).then(() => {
-      const { deptManage: { queryResult } } = this.props;
+      const {
+        deptManage: { queryResult },
+      } = this.props;
       if (queryResult.status === 'ok') {
         message.success('修改成功');
         this.handleTechParamModalVisible();
@@ -312,8 +322,7 @@ class TableList extends PureComponent {
         this.search();
       } else if (queryResult.status === 'warning') {
         message.warning(queryResult.message);
-      }
-      else {
+      } else {
         message.error(queryResult.message);
       }
     });
@@ -328,21 +337,22 @@ class TableList extends PureComponent {
         fIsActive: fIsActive,
       },
     }).then(() => {
-      const { deptManage: { queryResult } } = this.props;
+      const {
+        deptManage: { queryResult },
+      } = this.props;
       if (queryResult.status === 'ok') {
         message.success('【' + record.fName + '】' + (fIsActive ? '启用' : '禁用') + '成功');
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
         message.warning(queryResult.message);
-      }
-      else {
+      } else {
         message.error(queryResult.message);
       }
     });
   };
 
-  handleDelete = (record) => {
+  handleDelete = record => {
     const { dispatch } = this.props;
     dispatch({
       type: 'deptManage/remove',
@@ -353,15 +363,16 @@ class TableList extends PureComponent {
         this.setState({
           selectedRows: [],
         });
-        const { deptManage: { queryResult } } = this.props;
+        const {
+          deptManage: { queryResult },
+        } = this.props;
         if (queryResult.status === 'ok') {
           message.success('【' + record.fName + '】' + '删除成功');
           // 成功后再次刷新列表
           this.search();
         } else if (queryResult.status === 'warning') {
           message.warning(queryResult.message);
-        }
-        else {
+        } else {
           message.error(queryResult.message);
         }
       },
@@ -381,7 +392,7 @@ class TableList extends PureComponent {
     });
   };
 
-  batchDelete = (selectedRows) => {
+  batchDelete = selectedRows => {
     const { dispatch } = this.props;
     if (typeof selectedRows === 'object' && !Array.isArray(selectedRows)) {
       selectedRows = [selectedRows];
@@ -427,7 +438,7 @@ class TableList extends PureComponent {
     });
   };
 
-  renderSimpleForm () {
+  renderSimpleForm() {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -467,27 +478,39 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm () {
+  renderAdvancedForm() {
     return renderSimpleForm;
   }
 
-  renderForm () {
+  renderForm() {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  render () {
+  render() {
     const {
       deptManage: { data, queryResult, typeData },
       loading,
       dispatch,
     } = this.props;
-    const { selectedRows, modalVisible, currentFormValues, authorityModalVisible, authorizeUserModalVisible } = this.state;
+    const {
+      selectedRows,
+      modalVisible,
+      currentFormValues,
+      authorityModalVisible,
+      authorizeUserModalVisible,
+    } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-        <Menu.Item key="remove" disabled={!hasAuthority('Dept_Delete')}>删除</Menu.Item>
-        <Menu.Item key="active" disabled={!hasAuthority('Dept_Active')}>批量启用</Menu.Item>
-        <Menu.Item key="deactive" disabled={!hasAuthority('Dept_Active')}>批量禁用</Menu.Item>
+        <Menu.Item key="remove" disabled={!hasAuthority('Dept_Delete')}>
+          删除
+        </Menu.Item>
+        <Menu.Item key="active" disabled={!hasAuthority('Dept_Active')}>
+          批量启用
+        </Menu.Item>
+        <Menu.Item key="deactive" disabled={!hasAuthority('Dept_Active')}>
+          批量禁用
+        </Menu.Item>
       </Menu>
     );
 
@@ -514,15 +537,17 @@ class TableList extends PureComponent {
                 <Authorized authority="Dept_Create">
                   <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
                     新建
-              </Button>
+                  </Button>
                 </Authorized>
                 <Authorized authority="Dept_Export">
-                  <Dropdown overlay={
-                    <Menu onClick={this.handleExport} selectedKeys={[]}>
-                      <Menu.Item key="currentPage">当前页</Menu.Item>
-                      <Menu.Item key="allPage">所有页</Menu.Item>
-                    </Menu>
-                  }>
+                  <Dropdown
+                    overlay={
+                      <Menu onClick={this.handleExport} selectedKeys={[]}>
+                        <Menu.Item key="currentPage">当前页</Menu.Item>
+                        <Menu.Item key="allPage">所有页</Menu.Item>
+                      </Menu>
+                    }
+                  >
                     <Button>
                       导出 <Icon type="down" />
                     </Button>
@@ -533,7 +558,7 @@ class TableList extends PureComponent {
                     <Authorized authority="Dept_Delete">
                       <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
                     </Authorized>
-                    <Authorized authority={["Dept_Delete", "Dept_Active"]}>
+                    <Authorized authority={['Dept_Delete', 'Dept_Active']}>
                       <Dropdown overlay={menu}>
                         <Button>
                           更多操作 <Icon type="down" />
@@ -545,25 +570,35 @@ class TableList extends PureComponent {
               </div>
               {/* defaultExpandAllRows在Table首次初始化有数据时才会起作用，若不是会导致无法展开问题
             详见 https://github.com/ant-design/ant-design/issues/4145 */}
-              {data && data.list.length ? <StandardTable
-                rowKey="fItemID"
-                defaultExpandAllRows={true}
-                selectedRows={selectedRows}
-                loading={loading}
-                data={data}
-                columns={ColumnConfig.columns}
-                onSelectRow={this.handleSelectRows}
-                onChange={this.handleStandardTableChange}
-              /> : '暂无数据'}
-
+              {data && data.list.length ? (
+                <StandardTable
+                  rowKey="fItemID"
+                  defaultExpandAllRows={true}
+                  selectedRows={selectedRows}
+                  loading={loading}
+                  data={data}
+                  columns={ColumnConfig.columns}
+                  onSelectRow={this.handleSelectRows}
+                  onChange={this.handleStandardTableChange}
+                />
+              ) : (
+                '暂无数据'
+              )}
             </div>
           </Card>
-          <CreateForm {...parentMethods} modalVisible={modalVisible.add} treeData={data.list} typeData={typeData} />
+          <CreateForm
+            {...parentMethods}
+            modalVisible={modalVisible.add}
+            treeData={data.list}
+            typeData={typeData}
+          />
           {currentFormValues && Object.keys(currentFormValues).length ? (
             <UpdateForm
               {...updateMethods}
               updateModalVisible={modalVisible.update}
-              values={currentFormValues} treeData={data.list} typeData={typeData}
+              values={currentFormValues}
+              treeData={data.list}
+              typeData={typeData}
             />
           ) : null}
           {currentFormValues && Object.keys(currentFormValues).length ? (

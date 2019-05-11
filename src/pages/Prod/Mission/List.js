@@ -18,7 +18,12 @@ import {
   message,
   Badge,
   Divider,
-  Radio, Popover, Switch, Progress, notification, Popconfirm,
+  Radio,
+  Popover,
+  Switch,
+  Progress,
+  notification,
+  Popconfirm,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
@@ -30,7 +35,6 @@ import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
 
 import styles from './List.less';
-
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -67,18 +71,18 @@ class TableList extends PureComponent {
     pageSize: 10,
   };
 
-
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props;
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
     dispatch({
       type: 'missionManage/fetch',
       payload: params,
     });
     // 列配置相关方法
-    ColumnConfig.ProfileModalVisibleCallback = (record) => this.handleProfileModalVisible(true, record);
-    ColumnConfig.FlowModalVisibleCallback = (record) => this.handleFlowModalVisible(true, record);
-    ColumnConfig.DeleteCallback = (record) => this.handleDelete(record);
+    ColumnConfig.ProfileModalVisibleCallback = record =>
+      this.handleProfileModalVisible(true, record);
+    ColumnConfig.FlowModalVisibleCallback = record => this.handleFlowModalVisible(true, record);
+    ColumnConfig.DeleteCallback = record => this.handleDelete(record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -104,7 +108,7 @@ class TableList extends PureComponent {
       this.currentPagination.sorter[sorter.field] = sorter.order.replace('end', '');
     }
 
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     dispatch({
       type: 'missionManage/fetch',
@@ -117,14 +121,16 @@ class TableList extends PureComponent {
     this.search();
   };
 
-  getSearchParam = (fieldsValue) => {
+  getSearchParam = fieldsValue => {
     const values = {
       ...fieldsValue,
     };
     // 查询条件处理
     const queryFilters = [];
-    if (fieldsValue.querySOBillNo) queryFilters.push({ name: "fSOBillNo", compare: "%*%", value: fieldsValue.querySOBillNo });
-    if (fieldsValue.queryMOBillNo) queryFilters.push({ name: "fMOBillNo", compare: "%*%", value: fieldsValue.queryMOBillNo });
+    if (fieldsValue.querySOBillNo)
+      queryFilters.push({ name: 'fSOBillNo', compare: '%*%', value: fieldsValue.querySOBillNo });
+    if (fieldsValue.queryMOBillNo)
+      queryFilters.push({ name: 'fMOBillNo', compare: '%*%', value: fieldsValue.queryMOBillNo });
 
     this.setState({
       formValues: values,
@@ -137,10 +143,10 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters,
     };
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     return params;
-  }
+  };
 
   search = () => {
     const { dispatch, form } = this.props;
@@ -148,13 +154,13 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      var params = this.getSearchParam(fieldsValue);
+      const params = this.getSearchParam(fieldsValue);
       dispatch({
         type: 'missionManage/fetch',
         payload: params,
       });
     });
-  }
+  };
 
   handleFormReset = () => {
     const { form, dispatch } = this.props;
@@ -170,7 +176,7 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters: [],
     };
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     dispatch({
       type: 'missionManage/fetch',
@@ -183,7 +189,9 @@ class TableList extends PureComponent {
     dispatch({
       type: 'missionManage/sync',
     }).then(() => {
-      const { missionManage: { queryResult } } = this.props;
+      const {
+        missionManage: { queryResult },
+      } = this.props;
       if (queryResult.status === 'ok') {
         message.success('同步生产任务成功');
         // 成功后再次刷新列表
@@ -192,28 +200,28 @@ class TableList extends PureComponent {
         message.warning(queryResult.message);
       }
     });
-  }
+  };
 
-  handleExport = (e) => {
+  handleExport = e => {
     const { dispatch, form } = this.props;
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      var params = this.getSearchParam(fieldsValue);
-      var fileName = '导出.xls';
+      let params = this.getSearchParam(fieldsValue);
+      let fileName = '导出.xls';
       switch (e.key) {
         case 'currentPage':
-          params = { ...params, exportPage: true }
+          params = { ...params, exportPage: true };
           fileName = '导出-第' + params.pagination.current + '页.xls';
           break;
         case 'allPage':
-          params = { ...params, exportAll: true }
+          params = { ...params, exportAll: true };
           break;
         default:
           break;
       }
-      exportExcel('/api/mission/export', params, fileName)
+      exportExcel('/api/mission/export', params, fileName);
     });
   };
 
@@ -246,7 +254,7 @@ class TableList extends PureComponent {
     });
   };
 
-  renderSimpleForm () {
+  renderSimpleForm() {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -281,21 +289,27 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm () {
+  renderAdvancedForm() {
     return renderSimpleForm;
   }
 
-  renderForm () {
+  renderForm() {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  render () {
+  render() {
     const {
       missionManage: { data, queryResult },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, currentFormValues, authorityModalVisible, authorizeUserModalVisible } = this.state;
+    const {
+      selectedRows,
+      modalVisible,
+      currentFormValues,
+      authorityModalVisible,
+      authorizeUserModalVisible,
+    } = this.state;
 
     const flowMethods = {
       handleModalVisible: this.handleFlowModalVisible,
@@ -303,8 +317,10 @@ class TableList extends PureComponent {
       handleSuccess: this.search,
     };
     const scrollX = ColumnConfig.columns
-      .map(c => { return c.width; })
-      .reduce(function (sum, width, index) {
+      .map(c => {
+        return c.width;
+      })
+      .reduce(function(sum, width, index) {
         return sum + width;
       });
     return (
@@ -317,15 +333,17 @@ class TableList extends PureComponent {
                 <Authorized authority="Mission_Sync">
                   <Button icon="plus" type="primary" onClick={() => this.handleSync()}>
                     从 K3 同步
-                </Button>
+                  </Button>
                 </Authorized>
                 <Authorized authority="Mission_Export">
-                  <Dropdown overlay={
-                    <Menu onClick={this.handleExport} selectedKeys={[]}>
-                      <Menu.Item key="currentPage">当前页</Menu.Item>
-                      <Menu.Item key="allPage">所有页</Menu.Item>
-                    </Menu>
-                  }>
+                  <Dropdown
+                    overlay={
+                      <Menu onClick={this.handleExport} selectedKeys={[]}>
+                        <Menu.Item key="currentPage">当前页</Menu.Item>
+                        <Menu.Item key="allPage">所有页</Menu.Item>
+                      </Menu>
+                    }
+                  >
                     <Button>
                       导出 <Icon type="down" />
                     </Button>

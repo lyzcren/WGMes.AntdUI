@@ -1,8 +1,7 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
 
-
-export async function fakeQuery (params) {
+export async function fakeQuery(params) {
   return request('/api/Flow/getList', {
     method: 'POST',
     body: {
@@ -12,7 +11,7 @@ export async function fakeQuery (params) {
   });
 }
 
-export async function fakeSign (params) {
+export async function fakeSign(params) {
   return request('/api/Flow/sign', {
     method: 'POST',
     body: {
@@ -22,7 +21,7 @@ export async function fakeSign (params) {
   });
 }
 
-export async function fakeAddFromMission (params) {
+export async function fakeAddFromMission(params) {
   return request('/api/Flow/FromMission', {
     method: 'POST',
     body: {
@@ -32,7 +31,7 @@ export async function fakeAddFromMission (params) {
   });
 }
 
-export async function fakeCurrentRecord (params) {
+export async function fakeCurrentRecord(params) {
   return request('/api/Flow/currentRecord', {
     method: 'POST',
     body: {
@@ -42,7 +41,7 @@ export async function fakeCurrentRecord (params) {
   });
 }
 
-export async function fakeUpdate (params) {
+export async function fakeUpdate(params) {
   return request('/api/Flow/update', {
     method: 'POST',
     body: {

@@ -1,4 +1,4 @@
-import React from 'react'; 
+import React from 'react';
 import { Route, Redirect } from 'umi';
 import Authorized from './Authorized';
 

@@ -12,13 +12,12 @@ import styles from './index.less';
 import screenfull from 'screenfull';
 
 export default class GlobalHeaderRight extends PureComponent {
-
   componentDidMount = () => {
     // 监听全屏事件
     this.watchFullScreen();
-  }
+  };
 
-  getNoticeData () {
+  getNoticeData() {
     const { notices = [] } = this.props;
     if (notices.length === 0) {
       return {};
@@ -86,7 +85,7 @@ export default class GlobalHeaderRight extends PureComponent {
   };
 
   changeFullScreen = () => {
-    const { dispatch, } = this.props;
+    const { dispatch } = this.props;
     if (screenfull.isFullscreen) {
       screenfull.exit();
     } else {
@@ -96,16 +95,15 @@ export default class GlobalHeaderRight extends PureComponent {
 
   //监听fullscreenchange事件
   watchFullScreen = () => {
-    const { dispatch, } = this.props;
-    const screenChange =
-      () => {
-        dispatch({
-          type: 'global/fullScreen',
-          payload: {
-            isFullScreen: screenfull.isFullscreen
-          }
-        });
-      };
+    const { dispatch } = this.props;
+    const screenChange = () => {
+      dispatch({
+        type: 'global/fullScreen',
+        payload: {
+          isFullScreen: screenfull.isFullscreen,
+        },
+      });
+    };
 
     if (screenfull.enabled) {
       screenfull.on('change', screenChange);
@@ -142,7 +140,7 @@ export default class GlobalHeaderRight extends PureComponent {
     // );
   };
 
-  render () {
+  render() {
     const {
       currentUser,
       fetchingMoreNotices,
@@ -269,10 +267,10 @@ export default class GlobalHeaderRight extends PureComponent {
             </span>
           </HeaderDropdown>
         ) : (
-            <Spin size="small" style={{ marginLeft: 8, marginRight: 8 }} />
-          )}
+          <Spin size="small" style={{ marginLeft: 8, marginRight: 8 }} />
+        )}
         {/* <SelectLang className={styles.action} /> */}
-        {screenfull.enabled &&
+        {screenfull.enabled && (
           <Tooltip title={formatMessage({ id: 'component.globalHeader.fullScreen' })}>
             <a
               target="_blank"
@@ -281,9 +279,13 @@ export default class GlobalHeaderRight extends PureComponent {
               className={styles.action}
             >
               {/* <Icon type="border" style={isFullScreen ? { fontSize: 20, color: '#52c41a' } : {}} /> */}
-              <Icon type={isFullScreen ? "fullscreen-exit" : "fullscreen"} style={isFullScreen ? { fontSize: 20, color: '#52c41a' } : { fontSize: 20 }} />
+              <Icon
+                type={isFullScreen ? 'fullscreen-exit' : 'fullscreen'}
+                style={isFullScreen ? { fontSize: 20, color: '#52c41a' } : { fontSize: 20 }}
+              />
             </a>
-          </Tooltip>}
+          </Tooltip>
+        )}
       </div>
     );
   }

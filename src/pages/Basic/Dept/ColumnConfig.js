@@ -2,7 +2,7 @@ import React, { PureComponent, Fragment } from 'react';
 import { Switch, Popconfirm, Divider } from 'antd';
 import Authorized from '@/utils/Authorized';
 
-const activeData = ['启用', '禁用',];
+const activeData = ['启用', '禁用'];
 
 class ColumnConfig {
   columns = [
@@ -34,7 +34,7 @@ class ColumnConfig {
           value: 0,
         },
       ],
-      render (val) {
+      render(val) {
         return <Switch disabled checked={val} />;
       },
     },
@@ -43,21 +43,26 @@ class ColumnConfig {
       render: (text, record) => (
         <Fragment>
           <Authorized authority="Dept_Update">
-            <a onClick={() => this._updateModalVisible(record)}>修改</a>
+            <a onClick={() => this.updateModalVisible(record)}>修改</a>
             <Divider type="vertical" />
           </Authorized>
           <Authorized authority="Dept_Delete">
-            <Popconfirm title="是否要删除此行？" onConfirm={() => this._delete(record)}>
+            <Popconfirm title="是否要删除此行？" onConfirm={() => this.delete(record)}>
               <a>删除</a>
             </Popconfirm>
             <Divider type="vertical" />
           </Authorized>
           <Authorized authority="Dept_Active">
-            <a onClick={() => this._handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
+            <a onClick={() => this.handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
             <Divider type="vertical" />
           </Authorized>
           <Authorized authority="Dept_Update">
-            <a disabled={record.fTypeNumber != "Process"} onClick={() => this._handleTechParam(record)}>工艺参数</a>
+            <a
+              disabled={record.fTypeNumber != 'Process'}
+              onClick={() => this._handleTechParam(record)}
+            >
+              工艺参数
+            </a>
           </Authorized>
         </Fragment>
       ),
@@ -65,26 +70,25 @@ class ColumnConfig {
   ];
 
   // 修改方法
-  UpdateModalVisibleCallback = (record) => { };
-  _updateModalVisible = (record) => {
+  UpdateModalVisibleCallback = record => {};
+  updateModalVisible = record => {
     this.UpdateModalVisibleCallback(record);
   };
 
-  DeleteCallback = (record) => { };
-  _delete = (record) => {
+  DeleteCallback = record => {};
+  delete = record => {
     this.DeleteCallback(record);
   };
 
-  ActiveCallback = (record) => { };
-  _handleActive = (record) => {
+  ActiveCallback = record => {};
+  handleActive = record => {
     this.ActiveCallback(record);
   };
 
-  TechParamCallback = (record) => { };
-  _handleTechParam = (record) => {
+  TechParamCallback = record => {};
+  _handleTechParam = record => {
     this.TechParamCallback(record);
   };
-
 }
 
 let columnConfig = new ColumnConfig();

@@ -18,7 +18,12 @@ import {
   message,
   Badge,
   Divider,
-  Radio, Popover, Switch, Progress, notification, Popconfirm,
+  Radio,
+  Popover,
+  Switch,
+  Progress,
+  notification,
+  Popconfirm,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
@@ -31,7 +36,6 @@ import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
 
 import styles from './List.less';
-
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -69,19 +73,18 @@ class TableList extends PureComponent {
     pageSize: 10,
   };
 
-
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props;
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
     dispatch({
       type: 'productManage/fetch',
       payload: params,
     });
     this.Checkk3Syncing();
     // 列配置相关方法
-    ColumnConfig.UpdateModalVisibleCallback = (record) => this.handleUpdateModalVisible(true, record);
-    ColumnConfig.DeleteCallback = (record) => this.handleDelete(record);
-    ColumnConfig.ActiveCallback = (record) => this.handleActive(record, !record.fIsActive);
+    ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdateModalVisible(true, record);
+    ColumnConfig.DeleteCallback = record => this.handleDelete(record);
+    ColumnConfig.ActiveCallback = record => this.handleActive(record, !record.fIsActive);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -107,7 +110,7 @@ class TableList extends PureComponent {
       this.currentPagination.sorter[sorter.field] = sorter.order.replace('end', '');
     }
 
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     dispatch({
       type: 'productManage/fetch',
@@ -120,18 +123,24 @@ class TableList extends PureComponent {
     this.search();
   };
 
-  getSearchParam = (fieldsValue) => {
+  getSearchParam = fieldsValue => {
     const values = {
       ...fieldsValue,
     };
     // 查询条件处理
     const queryFilters = [];
-    if (fieldsValue.queryName) queryFilters.push({ name: "fName", compare: "%*%", value: fieldsValue.queryName });
-    if (fieldsValue.queryNumber) queryFilters.push({ name: "fNumber", compare: "%*%", value: fieldsValue.queryNumber });
-    if (fieldsValue.queryModel) queryFilters.push({ name: "fModel", compare: "%*%", value: fieldsValue.queryModel });
-    if (fieldsValue.queryRouteName) queryFilters.push({ name: "fRouteName", compare: "%*%", value: fieldsValue.queryRouteName });
-    if (fieldsValue.queryClsName) queryFilters.push({ name: "fErpClsName", compare: "%*%", value: fieldsValue.queryClsName });
-    if (fieldsValue.queryIsActive) queryFilters.push({ name: "fIsActive", compare: "=", value: fieldsValue.queryIsActive });
+    if (fieldsValue.queryName)
+      queryFilters.push({ name: 'fName', compare: '%*%', value: fieldsValue.queryName });
+    if (fieldsValue.queryNumber)
+      queryFilters.push({ name: 'fNumber', compare: '%*%', value: fieldsValue.queryNumber });
+    if (fieldsValue.queryModel)
+      queryFilters.push({ name: 'fModel', compare: '%*%', value: fieldsValue.queryModel });
+    if (fieldsValue.queryRouteName)
+      queryFilters.push({ name: 'fRouteName', compare: '%*%', value: fieldsValue.queryRouteName });
+    if (fieldsValue.queryClsName)
+      queryFilters.push({ name: 'fErpClsName', compare: '%*%', value: fieldsValue.queryClsName });
+    if (fieldsValue.queryIsActive)
+      queryFilters.push({ name: 'fIsActive', compare: '=', value: fieldsValue.queryIsActive });
 
     this.setState({
       formValues: values,
@@ -144,10 +153,10 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters,
     };
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     return params;
-  }
+  };
 
   search = () => {
     const { dispatch, form } = this.props;
@@ -155,13 +164,13 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      var params = this.getSearchParam(fieldsValue);
+      const params = this.getSearchParam(fieldsValue);
       dispatch({
         type: 'productManage/fetch',
         payload: params,
       });
     });
-  }
+  };
 
   handleFormReset = () => {
     const { form, dispatch } = this.props;
@@ -177,7 +186,7 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters: [],
     };
-    var params = { pagination: this.currentPagination };
+    const params = { pagination: this.currentPagination };
 
     dispatch({
       type: 'productManage/fetch',
@@ -185,26 +194,26 @@ class TableList extends PureComponent {
     });
   };
 
-  handleExport = (e) => {
+  handleExport = e => {
     const { dispatch, form } = this.props;
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      var params = this.getSearchParam(fieldsValue);
-      var fileName = '导出.xls';
+      let params = this.getSearchParam(fieldsValue);
+      let fileName = '导出.xls';
       switch (e.key) {
         case 'currentPage':
-          params = { ...params, exportPage: true }
+          params = { ...params, exportPage: true };
           fileName = '导出-第' + params.pagination.current + '页.xls';
           break;
         case 'allPage':
-          params = { ...params, exportAll: true }
+          params = { ...params, exportAll: true };
           break;
         default:
           break;
       }
-      exportExcel('/api/productList/export', params, fileName)
+      exportExcel('/api/productList/export', params, fileName);
     });
   };
 
@@ -274,7 +283,7 @@ class TableList extends PureComponent {
         });
         dispatch({
           type: 'syncProductManage/sync',
-        })
+        });
         // .then(() => {
         //   const { syncProductManage: { queryResult } } = this.props;
         //   if (queryResult.status === 'ok') {
@@ -287,7 +296,7 @@ class TableList extends PureComponent {
           // 检查同步状态
           this.Checkk3Syncing();
         }, 3000);
-      }
+      },
     });
   };
 
@@ -296,28 +305,31 @@ class TableList extends PureComponent {
     dispatch({
       type: 'syncProductManage/isSyncing',
     }).then(() => {
-      const { syncProductManage: { isSyncing } } = this.props;
+      const {
+        syncProductManage: { isSyncing },
+      } = this.props;
       if (isSyncing) {
         setTimeout(() => {
           this.Checkk3Syncing();
         }, 3000);
       } else {
-        if (this.state.isSyncing)
-          message.success('从 K3 同步物料已完成');
+        if (this.state.isSyncing) message.success('从 K3 同步物料已完成');
       }
       this.setState({
         isSyncing: isSyncing,
       });
     });
-  }
+  };
 
   handleAdd = fields => {
     const { dispatch, form } = this.props;
     dispatch({
       type: 'productManage/add',
-      payload: fields
+      payload: fields,
     }).then(() => {
-      const { productManage: { queryResult } } = this.props;
+      const {
+        productManage: { queryResult },
+      } = this.props;
       if (queryResult.status === 'ok') {
         message.success('添加成功');
         this.handleModalVisible();
@@ -335,7 +347,9 @@ class TableList extends PureComponent {
       type: 'productManage/update',
       payload: fields,
     }).then(() => {
-      const { productManage: { queryResult } } = this.props;
+      const {
+        productManage: { queryResult },
+      } = this.props;
       if (queryResult.status === 'ok') {
         message.success('修改成功');
         this.handleUpdateModalVisible();
@@ -343,8 +357,7 @@ class TableList extends PureComponent {
         this.search();
       } else if (queryResult.status === 'warning') {
         message.warning(queryResult.message);
-      }
-      else {
+      } else {
         message.error(queryResult.message);
       }
     });
@@ -359,21 +372,22 @@ class TableList extends PureComponent {
         fIsActive,
       },
     }).then(() => {
-      const { productManage: { queryResult } } = this.props;
+      const {
+        productManage: { queryResult },
+      } = this.props;
       if (queryResult.status === 'ok') {
         message.success('【' + record.fName + '】' + (fIsActive ? '启用' : '禁用') + '成功');
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
         message.warning(queryResult.message);
-      }
-      else {
+      } else {
         message.error(queryResult.message);
       }
     });
   };
 
-  handleDelete = (record) => {
+  handleDelete = record => {
     const { dispatch } = this.props;
     dispatch({
       type: 'productManage/remove',
@@ -384,15 +398,16 @@ class TableList extends PureComponent {
         this.setState({
           selectedRows: [],
         });
-        const { productManage: { queryResult } } = this.props;
+        const {
+          productManage: { queryResult },
+        } = this.props;
         if (queryResult.status === 'ok') {
           message.success('【' + record.fName + '】' + '删除成功');
           // 成功后再次刷新列表
           this.search();
         } else if (queryResult.status === 'warning') {
           message.warning(queryResult.message);
-        }
-        else {
+        } else {
           message.error(queryResult.message);
         }
       },
@@ -412,7 +427,7 @@ class TableList extends PureComponent {
     });
   };
 
-  batchDelete = (selectedRows) => {
+  batchDelete = selectedRows => {
     const { dispatch } = this.props;
     if (typeof selectedRows === 'object' && !Array.isArray(selectedRows)) {
       selectedRows = [selectedRows];
@@ -458,7 +473,7 @@ class TableList extends PureComponent {
     });
   };
 
-  renderSimpleForm () {
+  renderSimpleForm() {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -498,7 +513,7 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm () {
+  renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -560,24 +575,37 @@ class TableList extends PureComponent {
     );
   }
 
-  renderForm () {
+  renderForm() {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  render () {
+  render() {
     const {
       dispatch,
       productManage: { data, queryResult },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, updateFormValues, authorityModalVisible, authorizeUserModalVisible,
-      isSyncing, } = this.state;
+    const {
+      selectedRows,
+      modalVisible,
+      updateModalVisible,
+      updateFormValues,
+      authorityModalVisible,
+      authorizeUserModalVisible,
+      isSyncing,
+    } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-        <Menu.Item key="remove" disabled={!hasAuthority('Product_Delete')}>删除</Menu.Item>
-        <Menu.Item key="active" disabled={!hasAuthority('Product_Active')}>批量启用</Menu.Item>
-        <Menu.Item key="deactive" disabled={!hasAuthority('Product_Active')}>批量禁用</Menu.Item>
+        <Menu.Item key="remove" disabled={!hasAuthority('Product_Delete')}>
+          删除
+        </Menu.Item>
+        <Menu.Item key="active" disabled={!hasAuthority('Product_Active')}>
+          批量启用
+        </Menu.Item>
+        <Menu.Item key="deactive" disabled={!hasAuthority('Product_Active')}>
+          批量禁用
+        </Menu.Item>
       </Menu>
     );
 
@@ -591,8 +619,10 @@ class TableList extends PureComponent {
       handleSubmit: this.handleUpdate,
     };
     const scrollX = ColumnConfig.columns
-      .map(c => { return c.width; })
-      .reduce(function (sum, width, index) {
+      .map(c => {
+        return c.width;
+      })
+      .reduce(function(sum, width, index) {
         return sum + width;
       });
 
@@ -606,18 +636,25 @@ class TableList extends PureComponent {
                 <Authorized authority="Product_Create">
                   <Button icon="plus" type="primary" onClick={() => this.handleImport(true)}>
                     从 K3 手动导入
-                </Button>
-                  <Button icon="plus" type="primary" loading={isSyncing} onClick={() => this.handleSync()}>
+                  </Button>
+                  <Button
+                    icon="plus"
+                    type="primary"
+                    loading={isSyncing}
+                    onClick={() => this.handleSync()}
+                  >
                     从 K3 一键同步
-                </Button>
+                  </Button>
                 </Authorized>
                 <Authorized authority="Product_Export">
-                  <Dropdown overlay={
-                    <Menu onClick={this.handleExport} selectedKeys={[]}>
-                      <Menu.Item key="currentPage">当前页</Menu.Item>
-                      <Menu.Item key="allPage">所有页</Menu.Item>
-                    </Menu>
-                  }>
+                  <Dropdown
+                    overlay={
+                      <Menu onClick={this.handleExport} selectedKeys={[]}>
+                        <Menu.Item key="currentPage">当前页</Menu.Item>
+                        <Menu.Item key="allPage">所有页</Menu.Item>
+                      </Menu>
+                    }
+                  >
                     <Button>
                       导出 <Icon type="down" />
                     </Button>
@@ -628,7 +665,7 @@ class TableList extends PureComponent {
                     <Authorized authority="Product_Delete">
                       <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
                     </Authorized>
-                    <Authorized authority={["Product_Delete", "Product_Active"]}>
+                    <Authorized authority={['Product_Delete', 'Product_Active']}>
                       <Dropdown overlay={menu}>
                         <Button>
                           更多操作 <Icon type="down" />

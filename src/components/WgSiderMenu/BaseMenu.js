@@ -24,12 +24,11 @@ const getIcon = icon => {
 };
 
 export default class BaseMenu extends PureComponent {
-
   constructor(props) {
     super(props);
 
     const {
-      location: { pathname }
+      location: { pathname },
     } = props;
     // this.state = {
     //   selectedKeys: this.getSelectedMenuKeys(pathname)
@@ -72,8 +71,8 @@ export default class BaseMenu extends PureComponent {
                 <span>{name}</span>
               </span>
             ) : (
-                name
-              )
+              name
+            )
           }
           key={item.path}
         >
@@ -112,17 +111,17 @@ export default class BaseMenu extends PureComponent {
         onClick={
           isMobile
             ? () => {
-              onCollapse(true);
-            }
-            : (e) => {
-              e.preventDefault();
-              const { dispatch } = this.props;
-              // 使用state的selectedKeys绑定，不使用antd默认路由方式
-              dispatch({
-                type: 'menu/openMenu',
-                payload: { path: itemPath },
-              });
-            }
+                onCollapse(true);
+              }
+            : e => {
+                e.preventDefault();
+                const { dispatch } = this.props;
+                // 使用state的selectedKeys绑定，不使用antd默认路由方式
+                dispatch({
+                  type: 'menu/openMenu',
+                  payload: { path: itemPath },
+                });
+              }
         }
       >
         {icon}
@@ -138,7 +137,7 @@ export default class BaseMenu extends PureComponent {
     return `/${path || ''}`.replace(/\/+/g, '/');
   };
 
-  render () {
+  render() {
     const {
       openKeys,
       theme,

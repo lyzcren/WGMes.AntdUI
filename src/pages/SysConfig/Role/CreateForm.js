@@ -1,17 +1,10 @@
 import React, { PureComponent } from 'react';
-import {
-  Form,
-  Input,
-  Modal,
-  Radio,
-  Switch,
-} from 'antd';
+import { Form, Input, Modal, Radio, Switch } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 
 import styles from './List.less';
 
 const FormItem = Form.Item;
-
 
 export const CreateForm = Form.create()(props => {
   const { modalVisible, form, handleAdd, handleModalVisible } = props;
@@ -23,7 +16,6 @@ export const CreateForm = Form.create()(props => {
       handleAdd(fieldsValue);
     });
   };
-
 
   return (
     <Modal

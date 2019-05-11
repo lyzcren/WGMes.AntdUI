@@ -1,8 +1,8 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { Switch, Popconfirm, Divider } from 'antd';
 import Authorized from '@/utils/Authorized';
 
-const activeData = ['启用', '禁用',];
+const activeData = ['启用', '禁用'];
 
 class ColumnConfig {
   columns = [
@@ -17,6 +17,13 @@ class ColumnConfig {
       sorter: true,
     },
     {
+      title: '参数值',
+      dataIndex: 'values',
+      render(val) {
+        return val.join(', ');
+      },
+    },
+    {
       title: '启用',
       dataIndex: 'fIsActive',
       filters: [
@@ -29,7 +36,7 @@ class ColumnConfig {
           value: 0,
         },
       ],
-      render (val) {
+      render(val) {
         return <Switch disabled checked={val} />;
       },
     },
@@ -38,19 +45,19 @@ class ColumnConfig {
       render: (text, record) => (
         <Fragment>
           <Authorized authority="Param_Update">
-            <a onClick={() => this._updateModalVisible(record)}>修改</a>
+            <a onClick={() => this.updateModalVisible(record)}>修改</a>
             <Divider type="vertical" />
             <a onClick={() => this._valuesModalVisible(record)}>参数值</a>
             <Divider type="vertical" />
           </Authorized>
           <Authorized authority="Param_Delete">
-            <Popconfirm title="是否要删除此行？" onConfirm={() => this._delete(record)}>
+            <Popconfirm title="是否要删除此行？" onConfirm={() => this.delete(record)}>
               <a>删除</a>
             </Popconfirm>
             <Divider type="vertical" />
           </Authorized>
           <Authorized authority="Param_Active">
-            <a onClick={() => this._handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
+            <a onClick={() => this.handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
           </Authorized>
         </Fragment>
       ),
@@ -58,29 +65,28 @@ class ColumnConfig {
   ];
 
   // 修改方法
-  UpdateModalVisibleCallback = (record) => { };
-  _updateModalVisible = (record) => {
+  UpdateModalVisibleCallback = record => {};
+  updateModalVisible = record => {
     this.UpdateModalVisibleCallback(record);
   };
 
   // 参数方法
-  ValuesModalVisibleCallback = (record) => { };
-  _valuesModalVisible = (record) => {
+  ValuesModalVisibleCallback = record => {};
+  _valuesModalVisible = record => {
     this.ValuesModalVisibleCallback(record);
   };
 
   // 删除方法
-  DeleteCallback = (record) => { };
-  _delete = (record) => {
+  DeleteCallback = record => {};
+  delete = record => {
     this.DeleteCallback(record);
   };
 
   // 删除方法
-  ActiveCallback = (record) => { };
-  _handleActive = (record) => {
+  ActiveCallback = record => {};
+  handleActive = record => {
     this.ActiveCallback(record);
   };
-
 }
 
 let columnConfig = new ColumnConfig();

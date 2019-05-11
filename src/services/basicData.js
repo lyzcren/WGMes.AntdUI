@@ -1,7 +1,7 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
 
-export async function fakeDeptTreeData (params) {
+export async function fakeDeptTreeData(params) {
   return request('/api/Dept/GetTreeData', {
     method: 'POST',
     body: {
@@ -11,7 +11,7 @@ export async function fakeDeptTreeData (params) {
   });
 }
 
-export async function fakeProcessDeptTree (params) {
+export async function fakeProcessDeptTree(params) {
   return request('/api/Dept/GetProcessTree', {
     method: 'POST',
     body: {
@@ -21,7 +21,7 @@ export async function fakeProcessDeptTree (params) {
   });
 }
 
-export async function fakeMachineData (params) {
+export async function fakeMachineData(params) {
   return request('/api/machine/GetData', {
     method: 'POST',
     body: {
@@ -31,7 +31,7 @@ export async function fakeMachineData (params) {
   });
 }
 
-export async function fakeGetRouteData (params) {
+export async function fakeGetRouteData(params) {
   return request('/api/Route/GetData', {
     method: 'POST',
     body: {
@@ -41,7 +41,7 @@ export async function fakeGetRouteData (params) {
   });
 }
 
-export async function fakeGetTechParamData (params) {
+export async function fakeGetTechParamData(params) {
   return request('/api/Param/GetData', {
     method: 'POST',
     body: {
@@ -51,7 +51,7 @@ export async function fakeGetTechParamData (params) {
   });
 }
 
-export async function fakeGetTechParamValues (params) {
+export async function fakeGetTechParamValues(params) {
   return request('/api/param/getVaules', {
     method: 'POST',
     body: {
@@ -61,7 +61,7 @@ export async function fakeGetTechParamValues (params) {
   });
 }
 
-export async function fakeGetBillNo (params) {
+export async function fakeGetBillNo(params) {
   return request('/api/billNoRule/Get', {
     method: 'POST',
     body: {

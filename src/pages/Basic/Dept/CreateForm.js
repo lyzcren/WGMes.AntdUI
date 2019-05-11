@@ -1,20 +1,11 @@
 import React, { PureComponent } from 'react';
-import {
-  Form,
-  Input,
-  Modal,
-  Select,
-  Radio,
-  Switch,
-  TreeSelect,
-} from 'antd';
+import { Form, Input, Modal, Select, Radio, Switch, TreeSelect } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 
 import styles from './List.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
-
 
 export const CreateForm = Form.create()(props => {
   const { treeData, modalVisible, form, handleSubmit, handleModalVisible, typeData } = props;
@@ -26,7 +17,6 @@ export const CreateForm = Form.create()(props => {
       handleSubmit(fieldsValue);
     });
   };
-
 
   return (
     <Modal
@@ -49,13 +39,25 @@ export const CreateForm = Form.create()(props => {
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="所属部门">
         {form.getFieldDecorator('fParentID', {
           rules: [{ required: true, message: '请输入所属部门' }],
-        })(<TreeSelect placeholder="请选择" style={{ width: 300 }} treeData={treeData} treeDefaultExpandAll />)}
+        })(
+          <TreeSelect
+            placeholder="请选择"
+            style={{ width: 300 }}
+            treeData={treeData}
+            treeDefaultExpandAll
+          />
+        )}
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="类型">
-        {form.getFieldDecorator('fTypeID', {
-        })(<Select placeholder="请选择" style={{ width: '100%' }}>
-          {typeData.map(x => (<Option key={x.fKey} value={x.fKey}>{x.fValue}</Option>))}
-        </Select>)}
+        {form.getFieldDecorator('fTypeID', {})(
+          <Select placeholder="请选择" style={{ width: '100%' }}>
+            {typeData.map(x => (
+              <Option key={x.fKey} value={x.fKey}>
+                {x.fValue}
+              </Option>
+            ))}
+          </Select>
+        )}
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="启用">
         {form.getFieldDecorator('fIsActive', {
