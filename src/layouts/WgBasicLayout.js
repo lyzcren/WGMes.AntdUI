@@ -56,7 +56,7 @@ class WgBasicLayout extends React.PureComponent {
     this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual);
     // const { location: { pathname } } = props;
     // 首次进入界面默认加载标签页
-    this.defaultPath = '/basic/dept';
+    this.defaultPath = '/prod/flow';
 
     this.state = {};
   }

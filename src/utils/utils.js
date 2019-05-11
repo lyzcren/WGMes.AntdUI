@@ -3,11 +3,11 @@ import React from 'react';
 import nzh from 'nzh/cn';
 import { parse, stringify } from 'qs';
 
-export function fixedZero (val) {
+export function fixedZero(val) {
   return val * 1 < 10 ? `0${val}` : val;
 }
 
-export function getTimeDistance (type) {
+export function getTimeDistance(type) {
   const now = new Date();
   const oneDay = 1000 * 60 * 60 * 24;
 
@@ -52,7 +52,7 @@ export function getTimeDistance (type) {
   return [moment(`${year}-01-01 00:00:00`), moment(`${year}-12-31 23:59:59`)];
 }
 
-export function getPlainNode (nodeList, parentPath = '') {
+export function getPlainNode(nodeList, parentPath = '') {
   const arr = [];
   nodeList.forEach(node => {
     const item = node;
@@ -70,11 +70,11 @@ export function getPlainNode (nodeList, parentPath = '') {
   return arr;
 }
 
-export function digitUppercase (n) {
+export function digitUppercase(n) {
   return nzh.toMoney(n);
 }
 
-function getRelation (str1, str2) {
+function getRelation(str1, str2) {
   if (str1 === str2) {
     console.warn('Two path are equal!'); // eslint-disable-line
   }
@@ -89,7 +89,7 @@ function getRelation (str1, str2) {
   return 3;
 }
 
-function getRenderArr (routes) {
+function getRenderArr(routes) {
   let renderArr = [];
   renderArr.push(routes[0]);
   for (let i = 1; i < routes.length; i += 1) {
@@ -110,7 +110,7 @@ function getRenderArr (routes) {
  * @param {string} path
  * @param {routerData} routerData
  */
-export function getRoutes (path, routerData) {
+export function getRoutes(path, routerData) {
   let routes = Object.keys(routerData).filter(
     routePath => routePath.indexOf(path) === 0 && routePath !== path
   );
@@ -131,11 +131,11 @@ export function getRoutes (path, routerData) {
   return renderRoutes;
 }
 
-export function getPageQuery () {
+export function getPageQuery() {
   return parse(window.location.href.split('?')[1]);
 }
 
-export function getQueryPath (path = '', query = {}) {
+export function getQueryPath(path = '', query = {}) {
   const search = stringify(query);
   if (search.length) {
     return `${path}?${search}`;
@@ -146,13 +146,13 @@ export function getQueryPath (path = '', query = {}) {
 /* eslint no-useless-escape:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
 
-export function isUrl (path) {
+export function isUrl(path) {
   return reg.test(path);
 }
 
-export function formatWan (val) {
+export function formatWan(val) {
   const v = val * 1;
-  if (!v || typeof (v) != 'number') return '';
+  if (!v || typeof v != 'number') return '';
 
   let result = val;
   if (val > 10000) {
@@ -177,7 +177,7 @@ export function formatWan (val) {
   return result;
 }
 
-export function getComponentMaps (menuData) {
+export function getComponentMaps(menuData) {
   const menuComponentMap = [];
   const getMenuDataMap = memuData => {
     memuData.map(m => {
@@ -195,29 +195,21 @@ export function getComponentMaps (menuData) {
 }
 
 // 给官方演示站点用，用于关闭真实开发环境不需要使用的特性
-export function isAntdPro () {
+export function isAntdPro() {
   return window.location.hostname === 'preview.pro.ant.design';
 }
 
-export function getBillNoByRule (rule) {
-  const {
-    fPrefix,
-    fSuffix,
-    fNoLength,
-    fAppendYear,
-    fLongYear,
-    fAppendMonth,
-    fAppendDate,
-  } = rule;
+export function getBillNoByRule(rule) {
+  const { fPrefix, fSuffix, fNoLength, fAppendYear, fLongYear, fAppendMonth, fAppendDate } = rule;
   const date = new Date();
 
   return (
     fPrefix +
     (fAppendYear
       ? date
-        .getFullYear()
-        .toString()
-        .substring(fLongYear ? 0 : 2, 4)
+          .getFullYear()
+          .toString()
+          .substring(fLongYear ? 0 : 2, 4)
       : '') +
     (fAppendMonth ? date.getMonth() : '') +
     (fAppendDate ? date.getDate() : '') +

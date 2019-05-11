@@ -61,6 +61,26 @@ export async function fakeGetTechParamValues(params) {
   });
 }
 
+export async function fakeGetDefect(params) {
+  return request('/api/defect/getData', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'getData',
+    },
+  });
+}
+
+export async function fakeGetOperatorList(params) {
+  return request('/api/emp/getOperatorList', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'getOperatorList',
+    },
+  });
+}
+
 export async function fakeGetBillNo(params) {
   return request('/api/billNoRule/Get', {
     method: 'POST',

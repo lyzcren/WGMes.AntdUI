@@ -582,7 +582,7 @@ class TableList extends PureComponent {
                   onChange={this.handleStandardTableChange}
                 />
               ) : (
-                '暂无数据'
+                '查询中，请稍后...'
               )}
             </div>
           </Card>

@@ -5,6 +5,8 @@ import {
   fakeGetRouteData,
   fakeGetTechParamData,
   fakeGetTechParamValues,
+  fakeGetDefect,
+  fakeGetOperatorList,
   fakeGetBillNo,
 } from '@/services/basicData';
 
@@ -17,6 +19,8 @@ export default {
     machineData: [],
     routeData: [],
     paramData: [],
+    defectData: [],
+    operators: [],
     billNo: {},
   },
 
@@ -53,6 +57,20 @@ export default {
       const response = yield call(fakeGetTechParamData, payload);
       yield put({
         type: 'saveParamData',
+        payload: response,
+      });
+    },
+    *getDefectData({ payload }, { call, put }) {
+      const response = yield call(fakeGetDefect, payload);
+      yield put({
+        type: 'saveDefectData',
+        payload: response,
+      });
+    },
+    *getOperator({ payload }, { call, put }) {
+      const response = yield call(fakeGetOperatorList, payload);
+      yield put({
+        type: 'saveOperatorData',
         payload: response,
       });
     },
@@ -94,6 +112,18 @@ export default {
       return {
         ...state,
         paramData: action.payload,
+      };
+    },
+    saveDefectData(state, action) {
+      return {
+        ...state,
+        defectData: action.payload,
+      };
+    },
+    saveOperatorData(state, action) {
+      return {
+        ...state,
+        operators: action.payload,
       };
     },
     saveBillNoData(state, action) {
