@@ -6,13 +6,13 @@ import { formatMessage, FormattedMessage } from 'umi/locale';
 
 const FormItem = Form.Item;
 
-/* eslint react/no-multi-comp:0 */
-@connect(({ flowManage, loading, basicData }) => ({
-  flowManage,
-  loading: loading.models.flowManage,
+@connect(({ recordManage, loading, basicData }) => ({
+  recordManage,
+  loading: loading.models.recordManage,
   basicData,
 }))
 @Form.create()
+/* eslint react/no-multi-comp:0 */
 export class UpdateForm extends PureComponent {
   static defaultProps = {
     handleSuccess: () => {},
@@ -42,11 +42,11 @@ export class UpdateForm extends PureComponent {
   handleSubmit = fields => {
     const { dispatch, handleModalVisible, handleSuccess } = this.props;
     dispatch({
-      type: 'flowManage/update',
+      type: 'recordManage/update',
       payload: fields,
     }).then(() => {
       const {
-        flowManage: { queryResult },
+        recordManage: { queryResult },
       } = this.props;
       if (queryResult.status === 'ok') {
         message.success('修改成功');

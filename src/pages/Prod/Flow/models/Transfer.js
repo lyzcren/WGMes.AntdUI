@@ -1,4 +1,4 @@
-import { fakeCurrentRecord } from '@/services/Prod/Flow';
+import { fakeGetProducingRecord, fakeTransfer } from '@/services/Prod/Record';
 import { fakeGetDefect, fakeMachineData } from '@/services/basicData';
 import { fakeQueryParams } from '@/services/Tech/Route';
 import { defaultCipherList } from 'constants';
@@ -22,16 +22,13 @@ export default {
 
   effects: {
     *initModel({ payload, callback }, { call, put }) {
-      const data = yield call(fakeCurrentRecord, payload);
+      const data = yield call(fakeGetProducingRecord, payload);
       yield put({
         type: 'save',
         payload: {
           data,
         },
       });
-
-      const { fDeptID, fRouteID, fRouteEntryID } = data;
-
       if (callback) callback();
     },
     *getMachineData({ payload }, { call, put }) {
@@ -97,6 +94,14 @@ export default {
       });
       if (callback) callback();
     },
+    *transfer({ payload, callback }, { call, put }) {
+      const response = yield call(fakeTransfer, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
+      });
+      if (callback) callback();
+    },
   },
 
   reducers: {
@@ -110,6 +115,7 @@ export default {
       return {
         ...state,
         queryResult: action.payload ? action.payload : {},
+        // data: (action.payload && action.payload.model) ? action.payload.model : state.data
       };
     },
     saveMachineData(state, action) {

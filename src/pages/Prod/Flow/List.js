@@ -30,7 +30,7 @@ import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
-import { UpdateForm } from './UpdateForm';
+import { SignForm } from './SignForm';
 import { ViewStepForm } from './ViewStepForm';
 import { default as ColumnConfig } from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
@@ -59,7 +59,7 @@ class TableList extends PureComponent {
     // 界面是否可见
     modalVisible: {
       add: false,
-      update: false,
+      sign: false,
       route: false,
     },
     formValues: {},
@@ -91,8 +91,6 @@ class TableList extends PureComponent {
       type: 'basicData/getProcessDeptTree',
     });
     // 列配置相关方法
-    ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdateModalVisible(true, record);
-    ColumnConfig.DeleteCallback = record => this.handleDelete(record);
     ColumnConfig.MissionModalVisibleCallback = record =>
       this.handleMissionModalVisible(true, record);
     ColumnConfig.RouteModalVisibleCallback = record => this.handleRouteModalVisible(true, record);
@@ -303,10 +301,10 @@ class TableList extends PureComponent {
     });
   };
 
-  handleUpdateModalVisible = (flag, record) => {
+  handleSignModalVisible = (flag, record) => {
     const { modalVisible } = this.state;
     this.setState({
-      modalVisible: { ...modalVisible, update: !!flag },
+      modalVisible: { ...modalVisible, sign: !!flag },
       currentFormValues: record || {},
     });
   };
@@ -315,7 +313,7 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/mission/profile', data: { fInterID: record.fMoPlanID } },
+      payload: { path: '/prod/mission/profile', data: { fInterID: record.fMissionID } },
     });
   };
 
@@ -337,11 +335,38 @@ class TableList extends PureComponent {
 
   handleSign = record => {
     const { dispatch } = this.props;
+    const { queryDeptID } = this.state;
+    if (queryDeptID) {
+      this.sign(record, queryDeptID);
+    } else {
+      dispatch({
+        type: 'flowManage/getDepts',
+        payload: {
+          fInterID: record.fInterID,
+        },
+      }).then(() => {
+        const {
+          flowManage: { nextDepts },
+        } = this.props;
+        if (!nextDepts || nextDepts.length <= 0) {
+          message.warning('无可签收工序.');
+        } else if (nextDepts.length === 1) {
+          message.warning(`使用${nextDepts[0].fDeptName}签收`);
+          this.sign({ fInterID: record.fInterID }, nextDepts[0].fDeptID);
+        } else {
+          this.handleSignModalVisible(true, record);
+        }
+      });
+    }
+  };
+
+  sign = (record, fDeptID) => {
+    const { dispatch } = this.props;
     dispatch({
       type: 'flowManage/sign',
       payload: {
         fInterID: record.fInterID,
-        fDeptID: this.state.queryDeptID,
+        fDeptID,
       },
       callback: () => {
         const {
@@ -362,58 +387,43 @@ class TableList extends PureComponent {
 
   renderOperation = (val, record) => {
     const { queryDeptID } = this.state;
-    if (queryDeptID) {
-      return (
-        <Fragment>
-          <Authorized authority="Flow_Sign">
-            <a
-              disabled={!record.fNextDeptIDList || !record.fNextDeptIDList.includes(queryDeptID)}
-              onClick={() => this.handleSign(record)}
-            >
-              签收
-            </a>
-            <Divider type="vertical" />
-          </Authorized>
-          <Authorized authority="Flow_Transfer">
-            <a onClick={() => this.transferModalVisible(record)}>转序</a>
-            <Divider type="vertical" />
-          </Authorized>
-          <Dropdown
-            overlay={
-              <Menu onClick={({ key }) => editAndDelete(key, props.current)}>
-                <Menu.Item key="edit">编辑</Menu.Item>
-                <Menu.Item key="delete">删除</Menu.Item>
-              </Menu>
-            }
-          >
-            <a>
-              更多 <Icon type="down" />
-            </a>
-          </Dropdown>
-        </Fragment>
-      );
-    } else {
-      return (
-        <Fragment>
-          <Authorized authority="Flow_Transfer">
-            <a onClick={() => this.transferModalVisible(record)}>转序</a>
-            <Divider type="vertical" />
-          </Authorized>
-          <Dropdown
-            overlay={
-              <Menu onClick={({ key }) => editAndDelete(key, props.current)}>
-                <Menu.Item key="edit">编辑</Menu.Item>
-                <Menu.Item key="delete">删除</Menu.Item>
-              </Menu>
-            }
-          >
-            <a>
-              更多 <Icon type="down" />
-            </a>
-          </Dropdown>
-        </Fragment>
-      );
-    }
+    // 指定部门则判断签收工序是否包含指定的部门，否则则判断当前是否有工序可签收
+    const canSign =
+      record.fNextDeptIDList &&
+      (queryDeptID
+        ? record.fNextDeptIDList.includes(queryDeptID)
+        : record.fRecordStatusNumber !== 'ManufProducing');
+    const canTransfer =
+      record.fRecordStatusNumber === 'ManufProducing' &&
+      (!queryDeptID || record.fCurrentDeptID === queryDeptID);
+    return (
+      <Fragment>
+        <Authorized authority="Flow_Sign">
+          <a disabled={!canSign} onClick={() => this.handleSign(record)}>
+            签收
+          </a>
+          <Divider type="vertical" />
+        </Authorized>
+        <Authorized authority="Flow_Transfer">
+          <a disabled={!canTransfer} onClick={() => this.transferModalVisible(record)}>
+            转序
+          </a>
+          <Divider type="vertical" />
+        </Authorized>
+        <Dropdown
+          overlay={
+            <Menu onClick={({ key }) => moreMenuClick(key, props.current)}>
+              <Menu.Item key="edit">编辑</Menu.Item>
+              <Menu.Item key="delete">删除</Menu.Item>
+            </Menu>
+          }
+        >
+          <a>
+            更多 <Icon type="down" />
+          </a>
+        </Dropdown>
+      </Fragment>
+    );
   };
 
   // 为操作员定制的查询条件
@@ -633,14 +643,15 @@ class TableList extends PureComponent {
       </Menu>
     );
 
-    const updateMethods = {
+    const signMethods = {
       dispatch: this.props.dispatch,
-      handleModalVisible: this.handleUpdateModalVisible,
+      handleModalVisible: this.handleSignModalVisible,
       handleSuccess: this.search,
     };
     const routeMethods = {
       dispatch: this.props.dispatch,
       handleModalVisible: this.handleRouteModalVisible,
+      handleSubmit: this.sign,
     };
     // 指定操作列
     ColumnConfig.renderOperation = this.renderOperation;
@@ -701,9 +712,9 @@ class TableList extends PureComponent {
             </div>
           </Card>
           {currentFormValues && Object.keys(currentFormValues).length ? (
-            <UpdateForm
-              {...updateMethods}
-              modalVisible={modalVisible.update}
+            <SignForm
+              {...signMethods}
+              modalVisible={modalVisible.sign}
               values={currentFormValues}
             />
           ) : null}

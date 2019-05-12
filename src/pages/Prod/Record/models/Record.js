@@ -1,7 +1,7 @@
-import { fakeQuery, fakeSign, fakeRemove, fakeUpdate, fakeGetDepts } from '@/services/Prod/Flow';
+import { fakeQuery, fakeRemove, fakeAdd, fakeUpdate, fakeActive } from '@/services/Prod/Record';
 
 export default {
-  namespace: 'flowManage',
+  namespace: 'recordManage',
 
   state: {
     data: {
@@ -12,7 +12,6 @@ export default {
       status: 'ok',
       message: '',
     },
-    nextDepts: [],
   },
 
   effects: {
@@ -23,8 +22,8 @@ export default {
         payload: response,
       });
     },
-    *sign({ payload, callback }, { call, put }) {
-      const response = yield call(fakeSign, payload);
+    *add({ payload, callback }, { call, put }) {
+      const response = yield call(fakeAdd, payload);
       yield put({
         type: 'saveData',
         payload: response,
@@ -47,12 +46,13 @@ export default {
       });
       if (callback) callback();
     },
-    *getDepts({ payload }, { call, put }) {
-      const response = yield call(fakeGetDepts, payload);
+    *active({ payload, callback }, { call, put }) {
+      const response = yield call(fakeActive, payload);
       yield put({
-        type: 'saveDepts',
+        type: 'saveData',
         payload: response,
       });
+      if (callback) callback();
     },
   },
 
@@ -67,12 +67,6 @@ export default {
       return {
         ...state,
         queryResult: action.payload ? action.payload : {},
-      };
-    },
-    saveDepts(state, action) {
-      return {
-        ...state,
-        nextDepts: action.payload,
       };
     },
   },

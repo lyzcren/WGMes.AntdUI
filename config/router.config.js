@@ -51,7 +51,7 @@ export default [
         path: '/prod',
         name: 'prod',
         icon: 'tool',
-        authority: ['Mission_Read', 'Flow_Read'],
+        authority: ['Mission_Read', 'Flow_Read', 'Record_Read'],
         routes: [
           {
             path: '/prod/mission',
@@ -82,6 +82,12 @@ export default [
                 hideInMenu: true,
               },
             ],
+          },
+          {
+            path: '/prod/record',
+            name: 'record',
+            component: './Prod/Record/List',
+            authority: ['Record_Read'],
           },
         ],
       },

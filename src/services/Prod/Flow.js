@@ -11,6 +11,16 @@ export async function fakeQuery(params) {
   });
 }
 
+export async function fakeGetDepts(params) {
+  return request('/api/flow/nextDepts', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'nextDepts',
+    },
+  });
+}
+
 export async function fakeSign(params) {
   return request('/api/Flow/sign', {
     method: 'POST',
@@ -27,16 +37,6 @@ export async function fakeAddFromMission(params) {
     body: {
       ...params,
       method: 'post',
-    },
-  });
-}
-
-export async function fakeCurrentRecord(params) {
-  return request('/api/Flow/currentRecord', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'currentRecord',
     },
   });
 }

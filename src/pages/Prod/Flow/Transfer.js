@@ -102,6 +102,52 @@ class Transfer extends PureComponent {
     });
   }
 
+  transfer() {
+    const {
+      form,
+      dispatch,
+      flowTransfer: { data },
+    } = this.props;
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+
+      data.fOperatorID = fieldsValue.fOperatorID;
+      data.fMachineID = fieldsValue.fMachineID;
+      data.fMoldID = fieldsValue.fMoldID;
+      data.defects = [];
+      data.params = [];
+      for (let key in fieldsValue) {
+        if (key.indexOf('detailDefectID') === 0 && fieldsValue[key]) {
+          data.defects.push({
+            fDefectID: key.replace('detailDefectID', ''),
+            fValue: fieldsValue[key],
+          });
+        } else if (key.indexOf('paramsID') === 0) {
+          data.params.push({ fParamID: key.replace('paramsID', ''), fValue: fieldsValue[key] });
+        }
+      }
+
+      dispatch({
+        type: 'flowTransfer/transfer',
+        payload: { ...data },
+      }).then(() => {
+        const {
+          flowTransfer: {
+            queryResult: { status, message },
+          },
+        } = this.props;
+        if (status === 'ok') {
+          message.success('转序成功');
+          this.close();
+        } else if (status === 'warning') {
+          message.warning(message);
+        } else {
+          message.error(message);
+        }
+      });
+    });
+  }
+
   close() {
     const { dispatch } = this.props;
     dispatch({
@@ -177,7 +223,6 @@ class Transfer extends PureComponent {
       basicData: { defectData, operators },
     } = this.props;
     const { showMoreDefect, moreDefectValue } = this.state;
-    console.log(paramList);
 
     const description = (
       <DescriptionList className={styles.headerList} size="small" col="3">
@@ -192,10 +237,26 @@ class Transfer extends PureComponent {
         <Description term="合格数量">{data.fPassQty}</Description>
       </DescriptionList>
     );
+    const menu = (
+      <Menu>
+        <Menu.Item key="1">选项一</Menu.Item>
+        <Menu.Item key="2">选项二</Menu.Item>
+        <Menu.Item key="3">选项三</Menu.Item>
+      </Menu>
+    );
 
     const action = (
       <Fragment>
-        <ButtonGroup />
+        <ButtonGroup>
+          <Button type="primary" onClickCapture={() => this.transfer()}>
+            转序
+          </Button>
+          <Dropdown overlay={menu} placement="bottomRight">
+            <Button>
+              <Icon type="ellipsis" />
+            </Button>
+          </Dropdown>
+        </ButtonGroup>
         <Button onClick={() => this.close()}>关闭</Button>
       </Fragment>
     );
@@ -229,8 +290,8 @@ class Transfer extends PureComponent {
           <Form layout="vertical">
             <Row gutter={16}>
               <Col lg={6} md={12} sm={24}>
-                <FormItem key="fEmpID" label="操作员">
-                  {getFieldDecorator('fEmpID', {
+                <FormItem key="fOperatorID" label="操作员">
+                  {getFieldDecorator('fOperatorID', {
                     rules: [{ required: true, message: '请选择操作员' }],
                   })(
                     <Select
@@ -292,8 +353,8 @@ class Transfer extends PureComponent {
                   md={12}
                   sm={24}
                 >
-                  <FormItem key={'detailDefectID' + i} label={d.fName}>
-                    {getFieldDecorator('detailDefectID' + i, {
+                  <FormItem key={'detailDefectID' + d.fItemID} label={d.fName}>
+                    {getFieldDecorator('detailDefectID' + d.fItemID, {
                       rules: [{ required: false, message: '' }],
                       initialValue: d.fValue,
                     })(
@@ -313,7 +374,7 @@ class Transfer extends PureComponent {
                 <Col lg={6} md={12} sm={24}>
                   <FormItem key="fOtherDefectID" label="其他不良">
                     {getFieldDecorator('fOtherDefectID', {
-                      rules: [{ required: true, message: '请选择不良' }],
+                      rules: [{ required: false, message: '请选择不良' }],
                     })(
                       <Select
                         showSearch
@@ -370,17 +431,25 @@ class Transfer extends PureComponent {
                   md={12}
                   sm={24}
                 >
-                  <FormItem key={'paramsID' + i} label={d.fParamName}>
-                    {getFieldDecorator('paramsID' + i, {
+                  <FormItem key={'paramsID' + d.fParamID} label={d.fParamName}>
+                    {getFieldDecorator('paramsID' + d.fParamID, {
                       rules: [{ required: false, message: '' }],
                       initialValue: d.fDefaultValue,
                     })(
-                      <Input
-                        onChange={e => this.handleParamChange(e, d.fParamID)}
-                        style={{ width: '100%' }}
-                        placeholder="请输入数量"
-                        min={1}
-                      />
+                      <Select
+                        showSearch
+                        filterOption={(input, option) =>
+                          option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        placeholder="请选择"
+                        onChange={val => console.log(val)}
+                      >
+                        {d.values.map(x => (
+                          <Option key={x} value={x}>
+                            {x}
+                          </Option>
+                        ))}
+                      </Select>
                     )}
                   </FormItem>
                 </Col>
