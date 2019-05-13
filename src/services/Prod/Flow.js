@@ -22,7 +22,7 @@ export async function fakeGetDepts(params) {
 }
 
 export async function fakeSign(params) {
-  return request('/api/Flow/sign', {
+  return request('/api/flow/sign', {
     method: 'POST',
     body: {
       ...params,

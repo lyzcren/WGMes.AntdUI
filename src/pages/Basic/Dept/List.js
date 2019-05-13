@@ -32,7 +32,7 @@ import Authorized from '@/utils/Authorized';
 import { UpdateForm } from './UpdateForm';
 import { CreateForm } from './CreateForm';
 import { TechParamForm } from './TechParamForm';
-import { default as ColumnConfig } from './ColumnConfig';
+import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
 

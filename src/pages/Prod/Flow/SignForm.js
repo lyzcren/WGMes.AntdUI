@@ -33,16 +33,13 @@ export class SignForm extends PureComponent {
   }
 
   okHandle = () => {
-    const {
-      form,
-      handleSubmit,
-      values: { fInterID },
-    } = this.props;
+    const { form, handleSubmit, values } = this.props;
+    const { fInterID } = values;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       // form.resetFields();
-      fieldsValue.fInterID = fInterID;
-      this.handleSubmit(fieldsValue);
+      // fieldsValue.fInterID = fInterID;
+      handleSubmit(values, fieldsValue.fDeptID);
     });
   };
 
@@ -55,7 +52,6 @@ export class SignForm extends PureComponent {
       flowManage: { nextDepts },
     } = this.props;
     const { formVals } = this.state;
-    console.log(depts);
 
     return (
       <Modal
@@ -72,12 +68,16 @@ export class SignForm extends PureComponent {
       >
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="名称">
           {form.getFieldDecorator('fDeptID', {
-            rules: [{ required: true, message: '请输入名称', min: 1 }],
-            initialValue: formVals.fName,
+            rules: [{ required: true, message: '请输入部门' }],
+            initialValue: formVals.fDeptID,
           })(
             <Select
+              style={{ width: '100%' }}
               placeholder="请选择部门"
               autoFocus
+              dropdownMatchSelectWidth
+              defaultOpen
+              defaultActiveFirstOption
               showSearch
               filterOption={(input, option) =>
                 option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0

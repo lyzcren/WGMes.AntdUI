@@ -30,7 +30,7 @@ import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { FlowForm } from './FlowForm';
-import { default as ColumnConfig } from './ColumnConfig';
+import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
 

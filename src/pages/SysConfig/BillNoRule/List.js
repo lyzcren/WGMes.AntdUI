@@ -30,7 +30,7 @@ import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { UpdateForm } from './UpdateForm';
-import { default as ColumnConfig } from './ColumnConfig';
+import ColumnConfig from './ColumnConfig';
 import { hasAuthority } from '@/utils/authority';
 
 import styles from './List.less';

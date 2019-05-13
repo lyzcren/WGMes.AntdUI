@@ -20,7 +20,7 @@ import Authorized from '@/utils/Authorized';
 import { UpdateForm } from './UpdateForm';
 import { CreateForm } from './CreateForm';
 import { ParamForm } from './ParamForm';
-import { default as ColumnConfig } from './ColumnConfig';
+import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
 

@@ -24,16 +24,17 @@ import {
   Progress,
   notification,
   Popconfirm,
+  TreeSelect,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { UpdateForm } from './UpdateForm';
-import { CreateForm } from './CreateForm';
-import { default as ColumnConfig } from './ColumnConfig';
+import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
+import { GlobalConst, badgeStatusList } from '@/utils/GlobalConst';
 
 import styles from './List.less';
 
@@ -45,9 +46,10 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ recordManage, loading }) => ({
+@connect(({ recordManage, loading, basicData }) => ({
   recordManage,
   loading: loading.models.recordManage,
+  basicData,
 }))
 @Form.create()
 class TableList extends PureComponent {
@@ -79,10 +81,12 @@ class TableList extends PureComponent {
       type: 'recordManage/fetch',
       payload: params,
     });
+    dispatch({
+      type: 'basicData/getProcessDeptTree',
+    });
     // 列配置相关方法
-    ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdateModalVisible(true, record);
-    ColumnConfig.DeleteCallback = record => this.handleDelete(record);
-    ColumnConfig.ActiveCallback = record => this.handleActive(record, !record.fIsActive);
+    ColumnConfig.MissionModalVisibleCallback = record =>
+      this.handleMissionModalVisible(true, record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -127,10 +131,12 @@ class TableList extends PureComponent {
     };
     // 查询条件处理
     const queryFilters = [];
-    if (fieldsValue.queryName)
-      queryFilters.push({ name: 'fName', compare: '%*%', value: fieldsValue.queryName });
-    if (fieldsValue.queryIsActive)
-      queryFilters.push({ name: 'fIsActive', compare: '=', value: fieldsValue.queryIsActive });
+    if (fieldsValue.queryDept)
+      queryFilters.push({ name: 'fDeptID', compare: '=', value: fieldsValue.queryDept });
+    if (fieldsValue.queryBatchNo)
+      queryFilters.push({ name: 'fFullBatchNo', compare: '%*%', value: fieldsValue.queryBatchNo });
+    if (fieldsValue.queryMoBillNo)
+      queryFilters.push({ name: 'fMoBillNo', compare: '%*%', value: fieldsValue.queryMoBillNo });
 
     this.setState({
       formValues: values,
@@ -214,180 +220,61 @@ class TableList extends PureComponent {
     });
   };
 
-  handleMenuClick = e => {
-    const { dispatch } = this.props;
-    const { selectedRows } = this.state;
-
-    if (selectedRows.length === 0) return;
-    switch (e.key) {
-      case 'remove':
-        this.handleBatchDeleteClick();
-        break;
-      case 'active':
-        this.handleBatchActiveClick();
-        break;
-      case 'deactive':
-        this.handleBatchDeactiveClick();
-        break;
-      default:
-        break;
-    }
-  };
-
   handleSelectRows = rows => {
     this.setState({
       selectedRows: rows,
     });
   };
 
-  handleModalVisible = flag => {
-    const { modalVisible } = this.state;
-    this.setState({
-      modalVisible: { ...modalVisible, add: !!flag },
+  handleMissionModalVisible = (flag, record) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/openMenu',
+      payload: { path: '/prod/mission/profile', data: { fInterID: record.fMissionID } },
     });
   };
 
-  handleUpdateModalVisible = (flag, record) => {
+  handleModalVisible = (key, flag, record) => {
     const { modalVisible } = this.state;
+    modalVisible[key] = !!flag;
     this.setState({
-      modalVisible: { ...modalVisible, update: !!flag },
+      modalVisible: { modalVisible },
       currentFormValues: record || {},
-    });
-  };
-
-  handleActive = (record, fIsActive) => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'recordManage/active',
-      payload: {
-        fItemID: record.fItemID,
-        fIsActive,
-      },
-    }).then(() => {
-      const {
-        recordManage: { queryResult },
-      } = this.props;
-      if (queryResult.status === 'ok') {
-        message.success('【' + record.fName + '】' + (fIsActive ? '启用' : '禁用') + '成功');
-        // 成功后再次刷新列表
-        this.search();
-      } else if (queryResult.status === 'warning') {
-        message.warning(queryResult.message);
-      } else {
-        message.error(queryResult.message);
-      }
-    });
-  };
-
-  handleDelete = record => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'recordManage/remove',
-      payload: {
-        fItemID: record.fItemID,
-      },
-      callback: () => {
-        this.setState({
-          selectedRows: [],
-        });
-        const {
-          recordManage: { queryResult },
-        } = this.props;
-        if (queryResult.status === 'ok') {
-          message.success('【' + record.fName + '】' + '删除成功');
-          // 成功后再次刷新列表
-          this.search();
-        } else if (queryResult.status === 'warning') {
-          message.warning(queryResult.message);
-        } else {
-          message.error(queryResult.message);
-        }
-      },
-    });
-  };
-
-  handleBatchDeleteClick = () => {
-    const { selectedRows } = this.state;
-
-    if (selectedRows.length === 0) return;
-    Modal.confirm({
-      title: '删除记录',
-      content: '确定批量删除记录吗？',
-      okText: '确认',
-      cancelText: '取消',
-      onOk: () => this.batchDelete(selectedRows),
-    });
-  };
-
-  batchDelete = selectedRows => {
-    const { dispatch } = this.props;
-    if (typeof selectedRows === 'object' && !Array.isArray(selectedRows)) {
-      selectedRows = [selectedRows];
-    }
-    selectedRows.forEach(selectedRow => {
-      this.handleDelete(selectedRow);
-    });
-  };
-
-  handleBatchActiveClick = () => {
-    const { selectedRows } = this.state;
-
-    if (selectedRows.length === 0) return;
-    Modal.confirm({
-      title: '启用记录',
-      content: '确定批量启用记录吗？',
-      okText: '确认',
-      cancelText: '取消',
-      onOk: () => this.batchActive(selectedRows, true),
-    });
-  };
-
-  handleBatchDeactiveClick = () => {
-    const { selectedRows } = this.state;
-
-    if (selectedRows.length === 0) return;
-    Modal.confirm({
-      title: '禁用记录',
-      content: '确定批量禁用记录吗？',
-      okText: '确认',
-      cancelText: '取消',
-      onOk: () => this.batchActive(selectedRows, false),
-    });
-  };
-
-  batchActive = (selectedRows, fIsActive) => {
-    const { dispatch } = this.props;
-    if (typeof selectedRows === 'object' && !Array.isArray(selectedRows)) {
-      selectedRows = [selectedRows];
-    }
-    selectedRows.forEach(selectedRow => {
-      this.handleActive(selectedRow, fIsActive);
     });
   };
 
   renderSimpleForm() {
     const {
       form: { getFieldDecorator },
+      basicData,
     } = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={8} sm={24}>
-            <FormItem id="queryName" label="名称">
-              {getFieldDecorator('queryName')(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="状态">
-              {getFieldDecorator('queryIsActive')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="1">启用</Option>
-                  <Option value="0">禁用</Option>
-                </Select>
+          <Col md={6} sm={24}>
+            <FormItem id="queryDept" label="部门">
+              {getFieldDecorator('queryDept', {
+                rules: [{ required: false, message: '请选择部门' }],
+              })(
+                <TreeSelect
+                  style={{ width: '100%' }}
+                  treeData={basicData.processDeptTree}
+                  treeDefaultExpandAll
+                />
               )}
             </FormItem>
           </Col>
-          <Col md={8} sm={24}>
+          <Col md={6} sm={24}>
+            <FormItem id="queryBatchNo" label="批号">
+              {getFieldDecorator('queryBatchNo')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={6} sm={24}>
+            <FormItem id="queryMoBillNo" label="任务单号">
+              {getFieldDecorator('queryMoBillNo')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={6} sm={24}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
                 查询
@@ -395,7 +282,7 @@ class TableList extends PureComponent {
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
               </Button>
-              <a style={{ marginLeft: 8 }} onClick={this.toggleForm} hidden>
+              <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
                 展开 <Icon type="down" />
               </a>
             </span>
@@ -428,30 +315,20 @@ class TableList extends PureComponent {
       authorityModalVisible,
       authorizeUserModalVisible,
     } = this.state;
-    const menu = (
-      <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-        <Menu.Item key="remove" disabled={!hasAuthority('Record_Delete')}>
-          删除
-        </Menu.Item>
-        <Menu.Item key="active" disabled={!hasAuthority('Record_Active')}>
-          批量启用
-        </Menu.Item>
-        <Menu.Item key="deactive" disabled={!hasAuthority('Record_Active')}>
-          批量禁用
-        </Menu.Item>
-      </Menu>
-    );
 
-    const parentMethods = {
-      dispatch,
-      handleModalVisible: this.handleModalVisible,
-      handleSuccess: this.search,
-    };
     const updateMethods = {
       dispatch,
-      handleModalVisible: this.handleUpdateModalVisible,
+      handleModalVisible: (value, record) => this.handleModalVisible('update', value, record),
       handleSuccess: this.search,
     };
+
+    const scrollX = ColumnConfig.columns
+      .map(c => {
+        return c.width;
+      })
+      .reduce(function(sum, width, index) {
+        return sum + width;
+      });
     return (
       <div style={{ margin: '-24px -24px 0' }}>
         <GridContent>
@@ -459,11 +336,6 @@ class TableList extends PureComponent {
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
               <div className={styles.tableListOperator}>
-                <Authorized authority="Record_Create">
-                  <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
-                    新建
-                  </Button>
-                </Authorized>
                 <Authorized authority="Record_Export">
                   <Dropdown
                     overlay={
@@ -478,20 +350,6 @@ class TableList extends PureComponent {
                     </Button>
                   </Dropdown>
                 </Authorized>
-                {selectedRows.length > 0 && (
-                  <span>
-                    <Authorized authority="Record_Delete">
-                      <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
-                    </Authorized>
-                    <Authorized authority={['Record_Delete', 'Record_Active']}>
-                      <Dropdown overlay={menu}>
-                        <Button>
-                          更多操作 <Icon type="down" />
-                        </Button>
-                      </Dropdown>
-                    </Authorized>
-                  </span>
-                )}
               </div>
               <StandardTable
                 rowKey="fInterID"
@@ -501,10 +359,10 @@ class TableList extends PureComponent {
                 columns={ColumnConfig.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
+                scroll={{ x: scrollX }}
               />
             </div>
           </Card>
-          <CreateForm {...parentMethods} modalVisible={modalVisible.add} />
           {currentFormValues && Object.keys(currentFormValues).length ? (
             <UpdateForm
               {...updateMethods}

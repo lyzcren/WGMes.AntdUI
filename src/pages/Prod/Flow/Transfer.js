@@ -20,6 +20,7 @@ import {
   Tooltip,
   Divider,
   InputNumber,
+  DatePicker,
 } from 'antd';
 import { NumericInput } from '@/components/WgInputNumber';
 import StandardTable from '@/components/StandardTable';
@@ -36,6 +37,7 @@ const { Option } = Select;
 const { Header, Footer, Sider, Content } = Layout;
 const { Description } = DescriptionList;
 const ButtonGroup = Button.Group;
+const { RangePicker } = DatePicker;
 
 /* eslint react/no-multi-comp:0 */
 @connect(({ flowTransfer, basicData, loading, menu }) => ({
@@ -49,6 +51,8 @@ class Transfer extends PureComponent {
   state = {
     showMoreDefect: false,
     moreDefectValue: '',
+    fBeginDate: '',
+    fTransferDate: '',
   };
 
   OtherDefectRef = undefined;
@@ -70,7 +74,7 @@ class Transfer extends PureComponent {
     }
   }
 
-  loadData(fInterID, fDeptID) {
+  loadData(fInterID) {
     const { dispatch } = this.props;
     dispatch({
       type: 'flowTransfer/initModel',
@@ -78,27 +82,27 @@ class Transfer extends PureComponent {
     }).then(() => {
       const {
         flowTransfer: {
-          data: { fRouteID, fRouteEntryID },
+          data: { fRouteID, fRouteEntryID, fDeptID },
         },
       } = this.props;
       dispatch({
         type: 'flowTransfer/getParams',
         payload: { fInterID: fRouteID, fEntryID: fRouteEntryID },
       });
-    });
-    dispatch({
-      type: 'flowTransfer/getMachineData',
-      payload: { fDeptID },
-    });
-    dispatch({
-      type: 'flowTransfer/getDefect',
-      payload: { fDeptID },
-    });
-    dispatch({
-      type: 'basicData/getDefectData',
-    });
-    dispatch({
-      type: 'basicData/getOperator',
+      dispatch({
+        type: 'flowTransfer/getMachineData',
+        payload: { fDeptID },
+      });
+      dispatch({
+        type: 'flowTransfer/getDefect',
+        payload: { fDeptID },
+      });
+      dispatch({
+        type: 'basicData/getDefectData',
+      });
+      dispatch({
+        type: 'basicData/getOperator',
+      });
     });
   }
 
@@ -108,12 +112,15 @@ class Transfer extends PureComponent {
       dispatch,
       flowTransfer: { data },
     } = this.props;
+    const { fBeginDate, fTransferDate } = this.state;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
       data.fOperatorID = fieldsValue.fOperatorID;
       data.fMachineID = fieldsValue.fMachineID;
       data.fMoldID = fieldsValue.fMoldID;
+      data.fBeginDate = fBeginDate ? fBeginDate.format('YYYY-MM-DD HH:mm:ss') : undefined;
+      data.fTransferDate = fTransferDate ? fTransferDate.format('YYYY-MM-DD HH:mm:ss') : undefined;
       data.defects = [];
       data.params = [];
       for (let key in fieldsValue) {
@@ -213,6 +220,20 @@ class Transfer extends PureComponent {
   handleShowMoreDefect = () => {
     const { showMoreDefect } = this.state;
     this.setState({ showMoreDefect: !showMoreDefect });
+  };
+
+  disabledDate = (date, fSignDate) => {
+    return date < moment(fSignDate) || date >= moment();
+  };
+
+  handleChangeDate = value => {
+    console.log(
+      'onOK: ',
+      value[0].format('YYYY-MM-DD HH:mm:ss'),
+      '--',
+      value[1].format('YYYY-MM-DD HH:mm:ss')
+    );
+    this.setState({ fBeginDate: value[0], fTransferDate: value[1] });
   };
 
   render() {
@@ -339,6 +360,70 @@ class Transfer extends PureComponent {
                   })(<Input placeholder="请输入" />)}
                 </FormItem>
               </Col>
+            </Row>
+          </Form>
+          <Form layout="vertical">
+            <Row gutter={16}>
+              <Col lg={6} md={12} sm={24}>
+                <FormItem key="fSignDate" label="签收时间">
+                  {getFieldDecorator('fSignDate', {
+                    rules: [{ required: false, message: '请选择开工时间' }],
+                    initialValue: moment(data.fSignDate),
+                  })(
+                    <DatePicker
+                      disabled
+                      format="YYYY-MM-DD HH:mm:ss"
+                      // disabledDate={current => current && current < data.fSignDate}
+                      // disabledTime={disabledDateTime}
+                      showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}
+                    />
+                  )}
+                </FormItem>
+              </Col>
+              <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
+                <FormItem key="fBeginDate" label="生产时间">
+                  {getFieldDecorator('fBeginDate', {
+                    rules: [{ required: true, message: '请选择生产时间' }],
+                    initialValue: [moment(data.fSignDate), moment()],
+                  })(
+                    <RangePicker
+                      showTime={{ format: 'HH:mm' }}
+                      format="YYYY-MM-DD HH:mm"
+                      placeholder={['开工时间', '完工时间']}
+                      disabledDate={value => {
+                        return this.disabledDate(value, data.fSignDate);
+                      }}
+                      onOk={this.handleChangeDate}
+                    />
+                  )}
+                </FormItem>
+              </Col>
+              {/* <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
+                <FormItem key="fBeginDate" label="开工时间">
+                  {getFieldDecorator('fBeginDate', {
+                    rules: [{ required: true, message: '请选择开工时间' }],
+                    initialValue: moment(data.fSignDate)
+                  })(
+                    <DatePicker
+                      format="YYYY-MM-DD HH:mm:ss"
+                      showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}
+                    />
+                  )}
+                </FormItem>
+              </Col>
+              <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
+                <FormItem key="fTransferDate" label="转序时间">
+                  {getFieldDecorator('fTransferDate', {
+                    rules: [{ required: true, message: '请选择转序时间' }],
+                    initialValue: moment()
+                  })(
+                    <DatePicker
+                      format="YYYY-MM-DD HH:mm:ss"
+                      showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}
+                    />
+                  )}
+                </FormItem>
+              </Col> */}
             </Row>
           </Form>
         </Card>

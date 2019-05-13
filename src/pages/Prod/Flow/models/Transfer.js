@@ -40,6 +40,11 @@ export default {
     },
     *getParams({ payload, callback }, { call, put }) {
       const response = yield call(fakeQueryParams, payload);
+      response.forEach(p => {
+        if (!p.values.includes(p.fDefaultValue)) {
+          p.values.unshift(p.fDefaultValue);
+        }
+      });
       yield put({
         type: 'saveParam',
         payload: response,

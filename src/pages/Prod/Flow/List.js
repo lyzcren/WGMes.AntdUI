@@ -32,7 +32,7 @@ import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { SignForm } from './SignForm';
 import { ViewStepForm } from './ViewStepForm';
-import { default as ColumnConfig } from './ColumnConfig';
+import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
 import { GlobalConst, badgeStatusList } from '@/utils/GlobalConst';
@@ -68,7 +68,7 @@ class TableList extends PureComponent {
     // expandForm: 是否展开更多查询条件
     expandForm: false,
     // 操作员查询条件
-    operatorForm: true,
+    operatorForm: false,
     selectedRows: [],
     queryFilters: [],
     queryDeptID: null,
@@ -281,14 +281,18 @@ class TableList extends PureComponent {
     });
   };
 
-  handleMenuClick = e => {
+  moreMenuClick = (key, record) => {
     const { dispatch } = this.props;
-    const { selectedRows } = this.state;
 
-    if (selectedRows.length === 0) return;
-    switch (e.key) {
-      case 'remove':
-        this.handleBatchDeleteClick();
+    switch (key) {
+      case 'take':
+        alert('取走');
+        break;
+      case 'split':
+        alert('分批');
+        break;
+      case 'refund':
+        alert('退回');
         break;
       default:
         break;
@@ -350,10 +354,7 @@ class TableList extends PureComponent {
         } = this.props;
         if (!nextDepts || nextDepts.length <= 0) {
           message.warning('无可签收工序.');
-        } else if (nextDepts.length === 1) {
-          message.warning(`使用${nextDepts[0].fDeptName}签收`);
-          this.sign({ fInterID: record.fInterID }, nextDepts[0].fDeptID);
-        } else {
+        } else if (nextDepts && nextDepts.length) {
           this.handleSignModalVisible(true, record);
         }
       });
@@ -362,10 +363,11 @@ class TableList extends PureComponent {
 
   sign = (record, fDeptID) => {
     const { dispatch } = this.props;
+    const { fInterID } = record;
     dispatch({
       type: 'flowManage/sign',
       payload: {
-        fInterID: record.fInterID,
+        fInterID,
         fDeptID,
       },
       callback: () => {
@@ -374,6 +376,7 @@ class TableList extends PureComponent {
         } = this.props;
         if (queryResult.status === 'ok') {
           message.success('【' + record.fFullBatchNo + '】' + '签收成功');
+          this.handleSignModalVisible(false);
           // 成功后再次刷新列表
           this.search();
         } else if (queryResult.status === 'warning') {
@@ -390,31 +393,41 @@ class TableList extends PureComponent {
     // 指定部门则判断签收工序是否包含指定的部门，否则则判断当前是否有工序可签收
     const canSign =
       record.fNextDeptIDList &&
-      (queryDeptID
-        ? record.fNextDeptIDList.includes(queryDeptID)
-        : record.fRecordStatusNumber !== 'ManufProducing');
+      record.fRecordStatusNumber !== 'ManufProducing' &&
+      (!queryDeptID || record.fNextDeptIDList.includes(queryDeptID));
     const canTransfer =
       record.fRecordStatusNumber === 'ManufProducing' &&
       (!queryDeptID || record.fCurrentDeptID === queryDeptID);
     return (
       <Fragment>
-        <Authorized authority="Flow_Sign">
-          <a disabled={!canSign} onClick={() => this.handleSign(record)}>
-            签收
-          </a>
-          <Divider type="vertical" />
-        </Authorized>
-        <Authorized authority="Flow_Transfer">
-          <a disabled={!canTransfer} onClick={() => this.transferModalVisible(record)}>
-            转序
-          </a>
-          <Divider type="vertical" />
-        </Authorized>
+        {record.fStatusNumber !== 'EndProduce' && record.fRecordStatusNumber !== 'ManufProducing' && (
+          <Authorized authority="Flow_Sign">
+            <a disabled={!canSign} onClick={() => this.handleSign(record)}>
+              签收
+            </a>
+            <Divider type="vertical" />
+          </Authorized>
+        )}
+        {record.fRecordStatusNumber === 'ManufProducing' && (
+          <Authorized authority="Flow_Transfer">
+            <a disabled={!canTransfer} onClick={() => this.transferModalVisible(record)}>
+              转序
+            </a>
+            <Divider type="vertical" />
+          </Authorized>
+        )}
+        {record.fStatusNumber === 'EndProduce' && (
+          <Authorized authority="Flow_Report">
+            <a onClick={() => {}}>汇报</a>
+            <Divider type="vertical" />
+          </Authorized>
+        )}
         <Dropdown
           overlay={
-            <Menu onClick={({ key }) => moreMenuClick(key, props.current)}>
-              <Menu.Item key="edit">编辑</Menu.Item>
-              <Menu.Item key="delete">删除</Menu.Item>
+            <Menu onClick={({ key }) => this.moreMenuClick(key, record)}>
+              <Menu.Item key="take">取走</Menu.Item>
+              <Menu.Item key="split">分批</Menu.Item>
+              <Menu.Item key="refund">退回</Menu.Item>
             </Menu>
           }
         >
@@ -634,24 +647,16 @@ class TableList extends PureComponent {
       flowManage: { data, queryResult },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, currentFormValues } = this.state;
-    const menu = (
-      <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-        <Menu.Item key="remove" disabled={!hasAuthority('Flow_Delete')}>
-          删除
-        </Menu.Item>
-      </Menu>
-    );
+    const { queryDeptID, selectedRows, modalVisible, currentFormValues } = this.state;
 
     const signMethods = {
       dispatch: this.props.dispatch,
       handleModalVisible: this.handleSignModalVisible,
-      handleSuccess: this.search,
+      handleSubmit: this.sign,
     };
     const routeMethods = {
       dispatch: this.props.dispatch,
       handleModalVisible: this.handleRouteModalVisible,
-      handleSubmit: this.sign,
     };
     // 指定操作列
     ColumnConfig.renderOperation = this.renderOperation;
@@ -686,15 +691,15 @@ class TableList extends PureComponent {
                 </Authorized>
                 {selectedRows.length > 0 && (
                   <span>
-                    <Authorized authority="Flow_Delete">
-                      <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
+                    <Authorized authority="Flow_Sign">
+                      <Button disabled={!queryDeptID} onClick={this.handleBatchSign}>
+                        签收
+                      </Button>
                     </Authorized>
-                    <Authorized authority={['Flow_Delete', 'Flow_Active']}>
-                      <Dropdown overlay={menu}>
-                        <Button>
-                          更多操作 <Icon type="down" />
-                        </Button>
-                      </Dropdown>
+                    <Authorized authority="Flow_Read">
+                      <Button disabled={!queryDeptID} onClick={this.handleBatchCombine}>
+                        合批
+                      </Button>
                     </Authorized>
                   </span>
                 )}
