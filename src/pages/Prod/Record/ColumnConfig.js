@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import moment from 'moment';
+import numeral from 'numeral';
 import { Switch, Popconfirm, Divider } from 'antd';
 import Authorized from '@/utils/Authorized';
 import { GlobalConst, badgeStatusList } from '@/utils/GlobalConst';
@@ -35,6 +36,16 @@ class ColumnConfig {
       dataIndex: 'fPassQty',
       width: 120,
       sorter: true,
+    },
+    {
+      title: '良率',
+      dataIndex: 'fPassRate',
+      width: 120,
+      render: (val, record) => {
+        return record.fPassQty
+          ? numeral((record.fPassQty * 100.0) / record.fInputQty).format('0.00') + '%'
+          : '';
+      },
     },
     {
       title: '状态',
@@ -96,7 +107,7 @@ class ColumnConfig {
     {
       title: '产品全称',
       dataIndex: 'fProductFullName',
-      width: 180,
+      width: 350,
     },
     {
       title: '产品编码',

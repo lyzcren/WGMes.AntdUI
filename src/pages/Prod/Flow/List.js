@@ -93,7 +93,8 @@ class TableList extends PureComponent {
     // 列配置相关方法
     ColumnConfig.MissionModalVisibleCallback = record =>
       this.handleMissionModalVisible(true, record);
-    ColumnConfig.RouteModalVisibleCallback = record => this.handleRouteModalVisible(true, record);
+    ColumnConfig.RouteModalVisibleCallback = record =>
+      this.handleModalVisible({ key: 'route', flag: true }, record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -292,7 +293,7 @@ class TableList extends PureComponent {
         alert('分批');
         break;
       case 'refund':
-        alert('退回');
+        this.handleRefund(record);
         break;
       default:
         break;
@@ -305,10 +306,11 @@ class TableList extends PureComponent {
     });
   };
 
-  handleSignModalVisible = (flag, record) => {
+  handleModalVisible = ({ key, flag }, record) => {
     const { modalVisible } = this.state;
+    modalVisible[key] = !!flag;
     this.setState({
-      modalVisible: { ...modalVisible, sign: !!flag },
+      modalVisible: { ...modalVisible },
       currentFormValues: record || {},
     });
   };
@@ -318,14 +320,6 @@ class TableList extends PureComponent {
     dispatch({
       type: 'menu/openMenu',
       payload: { path: '/prod/mission/profile', data: { fInterID: record.fMissionID } },
-    });
-  };
-
-  handleRouteModalVisible = (flag, record) => {
-    const { modalVisible } = this.state;
-    this.setState({
-      modalVisible: { ...modalVisible, route: !!flag },
-      currentFormValues: record || {},
     });
   };
 
@@ -355,7 +349,7 @@ class TableList extends PureComponent {
         if (!nextDepts || nextDepts.length <= 0) {
           message.warning('无可签收工序.');
         } else if (nextDepts && nextDepts.length) {
-          this.handleSignModalVisible(true, record);
+          this.handleModalVisible({ key: 'sign', flag: true }, record);
         }
       });
     }
@@ -376,7 +370,7 @@ class TableList extends PureComponent {
         } = this.props;
         if (queryResult.status === 'ok') {
           message.success('【' + record.fFullBatchNo + '】' + '签收成功');
-          this.handleSignModalVisible(false);
+          this.handleModalVisible({ key: 'sign', flag: false });
           // 成功后再次刷新列表
           this.search();
         } else if (queryResult.status === 'warning') {
@@ -387,6 +381,8 @@ class TableList extends PureComponent {
       },
     });
   };
+
+  handleRefund = record => {};
 
   renderOperation = (val, record) => {
     const { queryDeptID } = this.state;
@@ -651,12 +647,12 @@ class TableList extends PureComponent {
 
     const signMethods = {
       dispatch: this.props.dispatch,
-      handleModalVisible: this.handleSignModalVisible,
+      handleModalVisible: (flag, record) => this.handleModalVisible({ key: 'sign', flag }, record),
       handleSubmit: this.sign,
     };
     const routeMethods = {
       dispatch: this.props.dispatch,
-      handleModalVisible: this.handleRouteModalVisible,
+      handleModalVisible: (flag, record) => this.handleModalVisible({ key: 'route', flag }, record),
     };
     // 指定操作列
     ColumnConfig.renderOperation = this.renderOperation;

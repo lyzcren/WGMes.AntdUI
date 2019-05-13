@@ -5,6 +5,7 @@ export default {
   'app.login.message-invalid-verification-code': '验证码错误',
   'app.login.tab-login-credentials': '账户密码登录',
   'app.login.tab-login-mobile': '手机号登录',
+  'app.login.tab-login-idcard': '刷卡登录',
   'app.login.remember-me': '自动登录',
   'app.login.forgot-password': '忘记密码',
   'app.login.sign-in-with': '其他登录方式',
@@ -35,4 +36,5 @@ export default {
   'validation.date.required': '请选择起止日期',
   'validation.goal.required': '请输入目标描述',
   'validation.standard.required': '请输入衡量标准',
+  'validation.idcard-number.required': '请扫描工卡！',
 };

@@ -59,7 +59,7 @@ class ColumnConfig {
     {
       title: '产品全称',
       dataIndex: 'fProductFullName',
-      width: 180,
+      width: 350,
     },
     {
       title: '产品编码',

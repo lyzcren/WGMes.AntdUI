@@ -6,7 +6,7 @@ import { Checkbox, Alert } from 'antd';
 import Login from '@/components/Login';
 import styles from './Login.less';
 
-const { Tab, UserName, Password, Mobile, Captcha, Submit } = Login;
+const { Tab, UserName, Password, IdCard, Mobile, Captcha, Submit } = Login;
 
 @connect(({ login, loading }) => ({
   login,
@@ -104,7 +104,20 @@ class LoginPage extends Component {
               onPressEnter={() => this.loginForm.validateFields(this.handleSubmit)}
             />
           </Tab>
-          <Tab key="mobile" tab={formatMessage({ id: 'app.login.tab-login-mobile' })}>
+          <Tab key="idcard" tab={formatMessage({ id: 'app.login.tab-login-idcard' })}>
+            <IdCard
+              name="idcard"
+              autoFocus
+              placeholder={formatMessage({ id: 'form.idcard-number.placeholder' })}
+              rules={[
+                {
+                  required: true,
+                  message: formatMessage({ id: 'validation.idcard-number.required' }),
+                },
+              ]}
+            />
+          </Tab>
+          {/* <Tab key="mobile" tab={formatMessage({ id: 'app.login.tab-login-mobile' })}>
             {login.status === 'error' &&
               login.type === 'mobile' &&
               !submitting &&
@@ -139,15 +152,17 @@ class LoginPage extends Component {
                 },
               ]}
             />
-          </Tab>
-          <div>
-            <Checkbox checked={autoLogin} onChange={this.changeAutoLogin}>
-              <FormattedMessage id="app.login.remember-me" />
-            </Checkbox>
-            <a style={{ float: 'right' }} href="">
-              <FormattedMessage id="app.login.forgot-password" />
-            </a>
-          </div>
+          </Tab> */}
+          {type !== 'idcard' && (
+            <div>
+              <Checkbox checked={autoLogin} onChange={this.changeAutoLogin}>
+                <FormattedMessage id="app.login.remember-me" />
+              </Checkbox>
+              <a style={{ float: 'right' }} href="">
+                <FormattedMessage id="app.login.forgot-password" />
+              </a>
+            </div>
+          )}
           <Submit loading={submitting}>
             <FormattedMessage id="app.login.login" />
           </Submit>

@@ -92,6 +92,11 @@ export const CreateForm = Form.create()(props => {
           rules: [{ required: false, message: '请输入手机号码！' }, { validator: validatorPhone }],
         })(<Input placeholder="请输入" />)}
       </FormItem>
+      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="工卡卡号">
+        {form.getFieldDecorator('fIdCardNumber', {
+          rules: [{ required: false, message: '请扫描工卡！' }],
+        })(<Input placeholder="请扫描工卡" />)}
+      </FormItem>
       <FormItem key="fSex" labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="性别">
         {form.getFieldDecorator('fSex', {})(
           <RadioGroup>

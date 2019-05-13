@@ -30,6 +30,7 @@ export class UpdateForm extends PureComponent {
         fNumber: props.values.fNumber,
         fName: props.values.fName,
         fPhone: props.values.fPhone,
+        fIdCardNumber: props.values.fIdCardNumber,
         fSex: props.values.fSex,
       },
     };
@@ -80,12 +81,20 @@ export class UpdateForm extends PureComponent {
             ],
           })(<Input placeholder="请输入" />)}
         </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="工卡卡号">
+          {form.getFieldDecorator('fIdCardNumber', {
+            rules: [{ required: false, message: '请扫描工卡！' }],
+            initialValue: formVals.fIdCardNumber,
+          })(<Input placeholder="请扫描工卡" />)}
+        </FormItem>
         <FormItem key="fSex" labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="性别">
           {form.getFieldDecorator('fSex', {
-            initialValue: formVals.fSex.toString(),
+            initialValue: formVals.fSex,
           })(
             <RadioGroup>
-              <Radio value="1">男</Radio>
+              <Radio value="1" checked>
+                男
+              </Radio>
               <Radio value="2">女</Radio>
             </RadioGroup>
           )}

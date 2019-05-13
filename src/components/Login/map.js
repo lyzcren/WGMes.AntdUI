@@ -32,6 +32,19 @@ export default {
       },
     ],
   },
+  IdCard: {
+    props: {
+      size: 'large',
+      prefix: <Icon type="idcard" className={styles.prefixIcon} />,
+      placeholder: 'idcard number',
+    },
+    rules: [
+      {
+        required: true,
+        message: 'Please enter idcard number!',
+      },
+    ],
+  },
   Mobile: {
     props: {
       size: 'large',
