@@ -31,6 +31,16 @@ export async function fakeSign(params) {
   });
 }
 
+export async function fakeReport(params) {
+  return request('/api/flow/report', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'report',
+    },
+  });
+}
+
 export async function fakeAddFromMission(params) {
   return request('/api/Flow/FromMission', {
     method: 'POST',

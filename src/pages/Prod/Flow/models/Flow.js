@@ -1,4 +1,11 @@
-import { fakeQuery, fakeSign, fakeRemove, fakeUpdate, fakeGetDepts } from '@/services/Prod/Flow';
+import {
+  fakeQuery,
+  fakeSign,
+  fakeReport,
+  fakeRemove,
+  fakeUpdate,
+  fakeGetDepts,
+} from '@/services/Prod/Flow';
 
 export default {
   namespace: 'flowManage',
@@ -25,6 +32,14 @@ export default {
     },
     *sign({ payload, callback }, { call, put }) {
       const response = yield call(fakeSign, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    *report({ payload, callback }, { call, put }) {
+      const response = yield call(fakeReport, payload);
       yield put({
         type: 'saveData',
         payload: response,

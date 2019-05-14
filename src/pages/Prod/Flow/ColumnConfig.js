@@ -1,4 +1,5 @@
 import React, { PureComponent, Fragment } from 'react';
+import numeral from 'numeral';
 import { Switch, Popconfirm, Divider, Badge } from 'antd';
 import Authorized from '@/utils/Authorized';
 import RadioButton from 'antd/lib/radio/radioButton';
@@ -13,16 +14,26 @@ class ColumnConfig {
       sorter: true,
     },
     {
+      title: '良品数量',
+      dataIndex: 'fCurrentPassQty',
+      width: 120,
+      sorter: true,
+    },
+    {
       title: '投入数量',
       dataIndex: 'fInputQty',
       width: 120,
       sorter: true,
     },
     {
-      title: '总投入数量',
-      dataIndex: 'fTotalInputQty',
+      title: '良品率',
+      dataIndex: 'fCurrentPassRate',
       width: 120,
-      sorter: true,
+      render: (val, record) => {
+        return record.fCurrentPassQty
+          ? numeral((record.fCurrentPassQty * 100.0) / record.fInputQty).format('0.00') + '%'
+          : '';
+      },
     },
     {
       title: '状态',
@@ -38,6 +49,11 @@ class ColumnConfig {
       filters: badgeStatusList(GlobalConst.FlowStatusArray),
     },
     {
+      title: '当前工序',
+      dataIndex: 'fCurrentDeptName',
+      width: 150,
+    },
+    {
       title: '任务单号',
       dataIndex: 'fMoBillNo',
       width: 200,
@@ -45,6 +61,12 @@ class ColumnConfig {
       render: (val, record) => {
         return <a onClick={() => this._missionModalVisibleCallback(record)}>{val}</a>;
       },
+    },
+    {
+      title: '总投入数量',
+      dataIndex: 'fTotalInputQty',
+      width: 120,
+      sorter: true,
     },
     {
       title: '订单号',
@@ -94,6 +116,24 @@ class ColumnConfig {
     {
       title: '优先级',
       dataIndex: 'fPriority',
+      sorter: true,
+      width: 120,
+    },
+    {
+      title: '车间',
+      dataIndex: 'fWorkShopName',
+      sorter: true,
+      width: 120,
+    },
+    {
+      title: '车间编码',
+      dataIndex: 'fWorkShopNumber',
+      sorter: true,
+      width: 120,
+    },
+    {
+      title: '汇报单',
+      dataIndex: 'fMoRptBillNo',
       sorter: true,
       width: 120,
     },

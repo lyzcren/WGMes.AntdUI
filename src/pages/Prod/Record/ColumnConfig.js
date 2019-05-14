@@ -38,7 +38,7 @@ class ColumnConfig {
       sorter: true,
     },
     {
-      title: '良率',
+      title: '良品率',
       dataIndex: 'fPassRate',
       width: 120,
       render: (val, record) => {

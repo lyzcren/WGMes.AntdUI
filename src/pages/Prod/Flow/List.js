@@ -72,6 +72,7 @@ class TableList extends PureComponent {
     selectedRows: [],
     queryFilters: [],
     queryDeptID: null,
+    queryStatusNumber: null,
   };
 
   // 列表查询参数
@@ -219,6 +220,9 @@ class TableList extends PureComponent {
         payload: params,
       });
       this.setState({ queryDeptID: fieldsValue.queryDept });
+      if (!fieldsValue.queryDept) {
+        this.setState({ queryStatusNumber: fieldsValue.queryStatusNumber });
+      }
     });
   };
 
@@ -384,6 +388,43 @@ class TableList extends PureComponent {
 
   handleRefund = record => {};
 
+  handleBatchReport = () => {
+    const { selectedRows } = this.state;
+
+    if (selectedRows.length === 0) return;
+    Modal.confirm({
+      title: '汇报',
+      content: '确定汇报吗？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => this.report(selectedRows),
+    });
+  };
+
+  report = records => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'flowManage/report',
+      payload: {
+        fInterIdList: records.map(row => row.fInterID),
+      },
+      callback: () => {
+        const {
+          flowManage: { queryResult },
+        } = this.props;
+        if (queryResult.status === 'ok') {
+          message.success(queryResult.message);
+          // 成功后再次刷新列表
+          this.search();
+        } else if (queryResult.status === 'warning') {
+          message.warning(queryResult.message);
+        } else {
+          message.error(queryResult.message);
+        }
+      },
+    });
+  };
+
   renderOperation = (val, record) => {
     const { queryDeptID } = this.state;
     // 指定部门则判断签收工序是否包含指定的部门，否则则判断当前是否有工序可签收
@@ -414,7 +455,7 @@ class TableList extends PureComponent {
         )}
         {record.fStatusNumber === 'EndProduce' && (
           <Authorized authority="Flow_Report">
-            <a onClick={() => {}}>汇报</a>
+            <a onClick={() => this.report([record])}>汇报</a>
             <Divider type="vertical" />
           </Authorized>
         )}
@@ -643,7 +684,13 @@ class TableList extends PureComponent {
       flowManage: { data, queryResult },
       loading,
     } = this.props;
-    const { queryDeptID, selectedRows, modalVisible, currentFormValues } = this.state;
+    const {
+      queryDeptID,
+      queryStatusNumber,
+      selectedRows,
+      modalVisible,
+      currentFormValues,
+    } = this.state;
 
     const signMethods = {
       dispatch: this.props.dispatch,
@@ -692,9 +739,17 @@ class TableList extends PureComponent {
                         签收
                       </Button>
                     </Authorized>
-                    <Authorized authority="Flow_Read">
+                    <Authorized authority="Flow_Combine">
                       <Button disabled={!queryDeptID} onClick={this.handleBatchCombine}>
                         合批
+                      </Button>
+                    </Authorized>
+                    <Authorized authority="Flow_Report">
+                      <Button
+                        disabled={queryStatusNumber !== 'EndProduce'}
+                        onClick={this.handleBatchReport}
+                      >
+                        汇报
                       </Button>
                     </Authorized>
                   </span>
