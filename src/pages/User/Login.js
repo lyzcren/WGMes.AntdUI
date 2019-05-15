@@ -49,7 +49,7 @@ class LoginPage extends Component {
           ...values,
           type,
         },
-      });
+      }).then(() => {});
     }
   };
 
@@ -101,10 +101,16 @@ class LoginPage extends Component {
                   message: formatMessage({ id: 'validation.password.required' }),
                 },
               ]}
-              onPressEnter={() => this.loginForm.validateFields(this.handleSubmit)}
+              onPressEnter={() =>
+                this.loginForm.validateFields(['password', 'userName'], this.handleSubmit)
+              }
             />
           </Tab>
           <Tab key="idcard" tab={formatMessage({ id: 'app.login.tab-login-idcard' })}>
+            {login.status === 'error' &&
+              login.type === 'idcard' &&
+              !submitting &&
+              this.renderMessage('卡号错误')}
             <IdCard
               name="idcard"
               autoFocus
@@ -115,6 +121,7 @@ class LoginPage extends Component {
                   message: formatMessage({ id: 'validation.idcard-number.required' }),
                 },
               ]}
+              onPressEnter={() => this.loginForm.validateFields(['idcard'], this.handleSubmit)}
             />
           </Tab>
           {/* <Tab key="mobile" tab={formatMessage({ id: 'app.login.tab-login-mobile' })}>

@@ -85,6 +85,10 @@ class TableList extends PureComponent {
       sorter: true,
     },
     {
+      title: '绑定操作员',
+      dataIndex: 'fBindEmpName',
+    },
+    {
       title: '移动电话',
       dataIndex: 'fPhone',
     },
@@ -203,38 +207,36 @@ class TableList extends PureComponent {
   search = () => {
     const { dispatch, form } = this.props;
 
-    form.validateFields((err, fieldsValue) => {
-      if (err) return;
+    const fieldsValue = form.getFieldsValue();
 
-      const values = {
-        ...fieldsValue,
-        updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
-      };
-      // 查询条件处理
-      const queryFilters = [];
-      if (fieldsValue.queryName)
-        queryFilters.push({ name: 'fName', compare: '%*%', value: fieldsValue.queryName });
-      if (fieldsValue.queryIsActive)
-        queryFilters.push({ name: 'fIsActive', compare: '=', value: fieldsValue.queryIsActive });
+    const values = {
+      ...fieldsValue,
+      updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
+    };
+    // 查询条件处理
+    const queryFilters = [];
+    if (fieldsValue.queryName)
+      queryFilters.push({ name: 'fName', compare: '%*%', value: fieldsValue.queryName });
+    if (fieldsValue.queryIsActive)
+      queryFilters.push({ name: 'fIsActive', compare: '=', value: fieldsValue.queryIsActive });
 
-      this.setState({
-        formValues: values,
-        queryFilters: queryFilters,
-      });
+    this.setState({
+      formValues: values,
+      queryFilters: queryFilters,
+    });
 
-      const { pageSize, filters, sorter } = this.currentPagination;
-      this.currentPagination = {
-        ...this.currentPagination,
-        current: 1,
-        queryFilters,
-      };
-      // console.log(this.currentPagination);
-      const params = { pagination: this.currentPagination };
+    const { pageSize, filters, sorter } = this.currentPagination;
+    this.currentPagination = {
+      ...this.currentPagination,
+      current: 1,
+      queryFilters,
+    };
+    // console.log(this.currentPagination);
+    const params = { pagination: this.currentPagination };
 
-      dispatch({
-        type: 'userManage/fetch',
-        payload: params,
-      });
+    dispatch({
+      type: 'userManage/fetch',
+      payload: params,
     });
   };
 
@@ -355,13 +357,7 @@ class TableList extends PureComponent {
     const { dispatch, form } = this.props;
     dispatch({
       type: 'userManage/add',
-      payload: {
-        fNumber: fields.fNumber,
-        fName: fields.fName,
-        fPhone: fields.fPhone,
-        fSex: fields.fSex,
-        fPwd: fields.fPwd,
-      },
+      payload: { ...fields },
     }).then(() => {
       const { userManage } = this.props;
       if (userManage.result.status === 'ok') {
@@ -379,23 +375,21 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'userManage/update',
-      payload: {
-        fItemID: fields.fItemID,
-        fNumber: fields.fNumber,
-        fName: fields.fName,
-        fPhone: fields.fPhone,
-        fSex: fields.fSex,
-      },
+      payload: fields,
     }).then(() => {
-      const { userManage } = this.props;
-      if (userManage.result.status === 'ok') {
+      const {
+        userManage: {
+          result: { status, message },
+        },
+      } = this.props;
+      if (status === 'ok') {
         message.success('修改成功');
         this.handleUpdateModalVisible();
         // 成功后再次刷新列表
         this.search();
-      } else if (userManage.result.status === 'warning') {
-        message.warning(userManage.result.message);
-      }
+      } else if (status === 'warning') {
+        message.warning(message);
+      } else message.error(message);
     });
   };
 
@@ -408,15 +402,19 @@ class TableList extends PureComponent {
         fPwd: fields.fPwd,
       },
     }).then(() => {
-      const { userManage } = this.props;
-      if (userManage.result.status === 'ok') {
+      const {
+        userManage: {
+          result: { status, message },
+        },
+      } = this.props;
+      if (status === 'ok') {
         message.success('修改成功');
         this.handleUpdatePwdModalVisible();
         // 成功后再次刷新列表
         this.search();
-      } else if (userManage.result.status === 'warning') {
-        message.warning(userManage.result.message);
-      }
+      } else if (status === 'warning') {
+        message.warning(message);
+      } else message.error(message);
     });
   };
 
@@ -604,8 +602,10 @@ class TableList extends PureComponent {
 
   render() {
     const {
+      form,
       userManage: { data },
       loading,
+      dispatch,
     } = this.props;
     const {
       selectedRows,
@@ -626,6 +626,7 @@ class TableList extends PureComponent {
 
     const parentMethods = {
       handleAdd: this.handleAdd,
+      form,
       handleModalVisible: this.handleModalVisible,
     };
     const updateMethods = {
@@ -675,7 +676,7 @@ class TableList extends PureComponent {
               />
             </div>
           </Card>
-          <CreateForm {...parentMethods} modalVisible={modalVisible} />
+          <CreateForm {...parentMethods} dispatch modalVisible={modalVisible} />
           {updateFormValues && Object.keys(updateFormValues).length ? (
             <UpdateForm
               {...updateMethods}

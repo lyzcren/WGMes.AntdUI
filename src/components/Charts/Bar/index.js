@@ -11,11 +11,11 @@ class Bar extends Component {
     autoHideXLabels: false,
   };
 
-  componentDidMount () {
+  componentDidMount() {
     window.addEventListener('resize', this.resize, { passive: true });
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('resize', this.resize);
   }
 
@@ -29,7 +29,7 @@ class Bar extends Component {
 
   @Bind()
   @Debounce(400)
-  resize () {
+  resize() {
     if (!this.node) {
       return;
     }
@@ -54,7 +54,7 @@ class Bar extends Component {
     }
   }
 
-  render () {
+  render() {
     const {
       height,
       title,
