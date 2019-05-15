@@ -9,12 +9,43 @@ const { RangePicker } = DatePicker;
 const { TabPane } = Tabs;
 
 const rankingListData = [];
-for (let i = 0; i < 7; i += 1) {
+for (let i = 0; i < 12; i += 1) {
   rankingListData.push({
-    title: formatMessage({ id: 'app.analysis.test' }, { no: i }),
-    total: 323234,
+    title: `操作员${i}`,
+    total: 32334,
   });
 }
+
+const rankingDepartment = [
+  { id: 0, name: '总部' },
+  { id: 1, name: '基础1部' },
+  { id: 2, name: '基础2部' },
+  { id: 3, name: '绕线' },
+  { id: 4, name: '烘烤' },
+  { id: 5, name: '涂漆' },
+  { id: 6, name: '浸油' },
+  { id: 7, name: '切割' },
+  { id: 8, name: '切边框' },
+  { id: 9, name: '切线角' },
+  { id: 10, name: '烧制' },
+  { id: 11, name: '成型' },
+  { id: 12, name: '出库' },
+];
+
+const passRateListData = [
+  { x: '1月', y: 89 },
+  { x: '2月', y: 87 },
+  { x: '3月', y: 80 },
+  { x: '4月', y: 91 },
+  { x: '5月', y: 83 },
+  { x: '6月', y: 77 },
+  { x: '7月', y: 89 },
+  { x: '8月', y: 96 },
+  { x: '9月', y: 96 },
+  { x: '10月', y: 94 },
+  { x: '11月', y: 97 },
+  { x: '12月', y: 98 },
+];
 
 const SalesCard = memo(
   ({ rangePickerValue, salesData, isActive, handleRangePickerChange, loading, selectDate }) => (
@@ -47,100 +78,46 @@ const SalesCard = memo(
           size="large"
           tabBarStyle={{ marginBottom: 24 }}
         >
-          <TabPane
-            tab={<FormattedMessage id="app.analysis.sales" defaultMessage="Sales" />}
-            key="sales"
-          >
-            <Row>
-              <Col xl={16} lg={12} md={12} sm={24} xs={24}>
-                <div className={styles.salesBar}>
-                  <Bar
-                    height={295}
-                    title={
-                      <FormattedMessage
-                        id="app.analysis.sales-trend"
-                        defaultMessage="Sales Trend"
-                      />
-                    }
-                    data={salesData}
-                  />
-                </div>
-              </Col>
-              <Col xl={8} lg={12} md={12} sm={24} xs={24}>
-                <div className={styles.salesRank}>
-                  <h4 className={styles.rankingTitle}>
-                    <FormattedMessage
-                      id="app.analysis.sales-ranking"
-                      defaultMessage="Sales Ranking"
+          {rankingDepartment.map(dept => (
+            <TabPane tab={dept.name} key={dept.id}>
+              <Row>
+                <Col xl={16} lg={12} md={12} sm={24} xs={24}>
+                  <div className={styles.salesBar}>
+                    <Bar height={250} title={'产量'} data={salesData} />
+                    <Bar
+                      color={'rgba(24, 205, 104, 0.85)'}
+                      scale={{ x: { type: 'cat' }, y: { min: 60 } }}
+                      height={250}
+                      title={'良率（%）'}
+                      data={passRateListData}
                     />
-                  </h4>
-                  <ul className={styles.rankingList}>
-                    {rankingListData.map((item, i) => (
-                      <li key={item.title}>
-                        <span
-                          className={`${styles.rankingItemNumber} ${i < 3 ? styles.active : ''}`}
-                        >
-                          {i + 1}
-                        </span>
-                        <span className={styles.rankingItemTitle} title={item.title}>
-                          {item.title}
-                        </span>
-                        <span className={styles.rankingItemValue}>
-                          {numeral(item.total).format('0,0')}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </Col>
-            </Row>
-          </TabPane>
-          <TabPane
-            tab={<FormattedMessage id="app.analysis.visits" defaultMessage="Visits" />}
-            key="views"
-          >
-            <Row>
-              <Col xl={16} lg={12} md={12} sm={24} xs={24}>
-                <div className={styles.salesBar}>
-                  <Bar
-                    height={292}
-                    title={
-                      <FormattedMessage
-                        id="app.analysis.visits-trend"
-                        defaultMessage="Visits Trend"
-                      />
-                    }
-                    data={salesData}
-                  />
-                </div>
-              </Col>
-              <Col xl={8} lg={12} md={12} sm={24} xs={24}>
-                <div className={styles.salesRank}>
-                  <h4 className={styles.rankingTitle}>
-                    <FormattedMessage
-                      id="app.analysis.visits-ranking"
-                      defaultMessage="Visits Ranking"
-                    />
-                  </h4>
-                  <ul className={styles.rankingList}>
-                    {rankingListData.map((item, i) => (
-                      <li key={item.title}>
-                        <span
-                          className={`${styles.rankingItemNumber} ${i < 3 ? styles.active : ''}`}
-                        >
-                          {i + 1}
-                        </span>
-                        <span className={styles.rankingItemTitle} title={item.title}>
-                          {item.title}
-                        </span>
-                        <span>{numeral(item.total).format('0,0')}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </Col>
-            </Row>
-          </TabPane>
+                  </div>
+                </Col>
+                <Col xl={8} lg={12} md={12} sm={24} xs={24}>
+                  <div className={styles.salesRank}>
+                    <h4 className={styles.rankingTitle}>操作员产量排名</h4>
+                    <ul className={styles.rankingList}>
+                      {rankingListData.map((item, i) => (
+                        <li key={item.title}>
+                          <span
+                            className={`${styles.rankingItemNumber} ${i < 3 ? styles.active : ''}`}
+                          >
+                            {i + 1}
+                          </span>
+                          <span className={styles.rankingItemTitle} title={item.title}>
+                            {item.title}
+                          </span>
+                          <span className={styles.rankingItemValue}>
+                            {numeral(item.total).format('0,0')}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </Col>
+              </Row>
+            </TabPane>
+          ))}
         </Tabs>
       </div>
     </Card>

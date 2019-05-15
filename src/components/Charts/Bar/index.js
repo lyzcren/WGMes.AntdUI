@@ -11,11 +11,11 @@ class Bar extends Component {
     autoHideXLabels: false,
   };
 
-  componentDidMount() {
+  componentDidMount () {
     window.addEventListener('resize', this.resize, { passive: true });
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     window.removeEventListener('resize', this.resize);
   }
 
@@ -29,7 +29,7 @@ class Bar extends Component {
 
   @Bind()
   @Debounce(400)
-  resize() {
+  resize () {
     if (!this.node) {
       return;
     }
@@ -54,19 +54,20 @@ class Bar extends Component {
     }
   }
 
-  render() {
+  render () {
     const {
       height,
       title,
       forceFit = true,
       data,
+      scale,
       color = 'rgba(24, 144, 255, 0.85)',
       padding,
     } = this.props;
 
     const { autoHideXLabels } = this.state;
 
-    const scale = {
+    const defaultScale = {
       x: {
         type: 'cat',
       },
@@ -88,7 +89,7 @@ class Bar extends Component {
         <div ref={this.handleRef}>
           {title && <h4 style={{ marginBottom: 20 }}>{title}</h4>}
           <Chart
-            scale={scale}
+            scale={scale || defaultScale}
             height={title ? height - 41 : height}
             forceFit={forceFit}
             data={data}
