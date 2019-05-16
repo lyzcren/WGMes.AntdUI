@@ -161,6 +161,7 @@ class TableList extends PureComponent {
         payload: params,
       });
     });
+    this.handleSelectRows([]);
   };
 
   handleFormReset = () => {
@@ -183,6 +184,7 @@ class TableList extends PureComponent {
       type: 'deptManage/fetch',
       payload: params,
     });
+    this.handleSelectRows([]);
   };
 
   handleExport = e => {

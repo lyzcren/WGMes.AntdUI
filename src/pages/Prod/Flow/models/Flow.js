@@ -5,6 +5,7 @@ import {
   fakeRemove,
   fakeUpdate,
   fakeGetDepts,
+  fakeGetRecord,
 } from '@/services/Prod/Flow';
 
 export default {

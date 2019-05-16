@@ -217,3 +217,22 @@ export function getBillNoByRule(rule) {
     fSuffix
   );
 }
+
+export function getTimeDiff(beginTime, endTime) {
+  //时间相差毫秒数
+  var span = endTime.getTime() - beginTime.getTime();
+  //计算相差天数
+  var result = '';
+  var days = Math.floor(span / (24 * 3600 * 1000));
+  result += days ? days + '天' : '';
+  //相差小时数
+  var leave1 = span % (24 * 3600 * 1000);
+  var hours = Math.floor(leave1 / (3600 * 1000));
+  result += hours + '小时';
+  //相差分钟
+  var leave2 = leave1 % (3600 * 1000);
+  var minutes = Math.floor(leave2 / (60 * 1000));
+  result += minutes + '分钟';
+
+  return result;
+}

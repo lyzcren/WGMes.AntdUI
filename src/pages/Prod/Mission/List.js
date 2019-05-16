@@ -160,6 +160,7 @@ class TableList extends PureComponent {
         payload: params,
       });
     });
+    this.handleSelectRows([]);
   };
 
   handleFormReset = () => {
@@ -182,6 +183,7 @@ class TableList extends PureComponent {
       type: 'missionManage/fetch',
       payload: params,
     });
+    this.handleSelectRows([]);
   };
 
   handleSync = () => {

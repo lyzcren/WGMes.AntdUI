@@ -21,7 +21,7 @@ const topColResponsiveProps = {
 const rankingWorkshop = [{ id: 1, name: '前段' }, { id: 2, name: '后段' }];
 
 const IntroduceRow = memo(({ loading, visitData }) => (
-  <Tabs>
+  <Tabs style={{ marginTop: -23 }}>
     {rankingWorkshop.map(workshop => (
       <TabPane tab={workshop.name} key={workshop.id}>
         <Row gutter={24}>

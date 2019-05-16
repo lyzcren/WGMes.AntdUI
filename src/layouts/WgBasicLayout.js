@@ -226,6 +226,7 @@ class WgBasicLayout extends React.PureComponent {
             activeKey={activeKey}
             onChange={this.onChange}
             onEdit={this.onEdit}
+            tabBarStyle={{ backgroundColor: 'white', marginBottom: 0 }}
             // TODO: Tabs标签页右键菜单
             // tabBarExtraContent={<Button type="primary">主操作</Button>}
             hideAdd

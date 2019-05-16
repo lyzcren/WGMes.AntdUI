@@ -76,6 +76,7 @@ class TableList extends PureComponent {
       type: 'syncProductManage/fetch',
       payload: params,
     });
+    this.handleSelectRows([]);
   };
 
   componentDidMount() {
@@ -152,6 +153,7 @@ class TableList extends PureComponent {
       const params = this.getSearchParam(fieldsValue);
       this.getList(params);
     });
+    this.handleSelectRows([]);
   };
 
   handleFormReset = () => {

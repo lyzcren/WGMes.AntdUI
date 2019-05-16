@@ -21,6 +21,10 @@ export async function fakeGetDepts(params) {
   });
 }
 
+export async function fakeGetRecord(params) {
+  return request(`/api/flow/${params.fInterID}/record`);
+}
+
 export async function fakeSign(params) {
   return request('/api/flow/sign', {
     method: 'POST',

@@ -162,6 +162,7 @@ class TableList extends PureComponent {
         type: 'paramManage/fetch',
         payload: params,
       });
+      this.handleSelectRows([]);
     });
   };
 
@@ -185,6 +186,7 @@ class TableList extends PureComponent {
       type: 'paramManage/fetch',
       payload: params,
     });
+    this.handleSelectRows([]);
   };
 
   handleExport = e => {

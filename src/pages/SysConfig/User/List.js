@@ -238,6 +238,7 @@ class TableList extends PureComponent {
       type: 'userManage/fetch',
       payload: params,
     });
+    this.handleSelectRows([]);
   };
 
   handleFormReset = () => {
@@ -261,6 +262,7 @@ class TableList extends PureComponent {
       type: 'userManage/fetch',
       payload: params,
     });
+    this.handleSelectRows([]);
   };
 
   toggleForm = () => {

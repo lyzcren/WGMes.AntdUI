@@ -32,6 +32,7 @@ import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { SignForm } from './SignForm';
 import { ViewStepForm } from './ViewStepForm';
+import { ViewRecordForm } from './ViewRecordForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
@@ -61,6 +62,7 @@ class TableList extends PureComponent {
       add: false,
       sign: false,
       route: false,
+      record: false,
     },
     formValues: {},
     // 当前操作选中列的数据
@@ -223,7 +225,9 @@ class TableList extends PureComponent {
       if (!fieldsValue.queryDept) {
         this.setState({ queryStatusNumber: fieldsValue.queryStatusNumber });
       }
+      this.handleSelectRows([]);
     });
+    this.handleSelectRows([]);
   };
 
   handleFormReset = () => {
@@ -247,6 +251,7 @@ class TableList extends PureComponent {
       payload: params,
     });
     this.setState({ queryDeptID: null });
+    this.handleSelectRows([]);
   };
 
   handleExport = e => {
@@ -335,6 +340,22 @@ class TableList extends PureComponent {
     });
   };
 
+  handleBatchSign = () => {
+    const { selectedRows, queryDeptID } = this.state;
+    if (selectedRows.length === 0) return;
+
+    if (!queryDeptID) {
+      message.warning('批量签收须先选择部门.');
+    }
+    Modal.confirm({
+      title: '批量签收',
+      content: '确定批量签收吗？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => selectedRows.forEach(row => this.sign(row, queryDeptID)),
+    });
+  };
+
   handleSign = record => {
     const { dispatch } = this.props;
     const { queryDeptID } = this.state;
@@ -368,21 +389,20 @@ class TableList extends PureComponent {
         fInterID,
         fDeptID,
       },
-      callback: () => {
-        const {
-          flowManage: { queryResult },
-        } = this.props;
-        if (queryResult.status === 'ok') {
-          message.success('【' + record.fFullBatchNo + '】' + '签收成功');
-          this.handleModalVisible({ key: 'sign', flag: false });
-          // 成功后再次刷新列表
-          this.search();
-        } else if (queryResult.status === 'warning') {
-          message.warning(queryResult.message);
-        } else {
-          message.error(queryResult.message);
-        }
-      },
+    }).then(() => {
+      const {
+        flowManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success('【' + record.fFullBatchNo + '】' + '签收成功');
+        this.handleModalVisible({ key: 'sign', flag: false });
+        // 成功后再次刷新列表
+        this.search();
+      } else if (queryResult.status === 'warning') {
+        message.warning('【' + record.fFullBatchNo + '】' + queryResult.message);
+      } else {
+        message.error('【' + record.fFullBatchNo + '】' + queryResult.message);
+      }
     });
   };
 
@@ -408,21 +428,24 @@ class TableList extends PureComponent {
       payload: {
         fInterIdList: records.map(row => row.fInterID),
       },
-      callback: () => {
-        const {
-          flowManage: { queryResult },
-        } = this.props;
-        if (queryResult.status === 'ok') {
-          message.success(queryResult.message);
-          // 成功后再次刷新列表
-          this.search();
-        } else if (queryResult.status === 'warning') {
-          message.warning(queryResult.message);
-        } else {
-          message.error(queryResult.message);
-        }
-      },
+    }).then(() => {
+      const {
+        flowManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success(queryResult.message);
+        // 成功后再次刷新列表
+        this.search();
+      } else if (queryResult.status === 'warning') {
+        message.warning(queryResult.message);
+      } else {
+        message.error(queryResult.message);
+      }
     });
+  };
+
+  viewRecord = record => {
+    this.handleModalVisible({ key: 'record', flag: true }, record);
   };
 
   renderOperation = (val, record) => {
@@ -437,27 +460,43 @@ class TableList extends PureComponent {
       (!queryDeptID || record.fCurrentDeptID === queryDeptID);
     return (
       <Fragment>
+        <Authorized authority="Record_Read">
+          <a
+            disabled={record.fStatusNumber === 'BeforeProduce'}
+            onClick={() => this.viewRecord(record)}
+          >
+            执行情况
+          </a>
+        </Authorized>
         {record.fStatusNumber !== 'EndProduce' && record.fRecordStatusNumber !== 'ManufProducing' && (
-          <Authorized authority="Flow_Sign">
-            <a disabled={!canSign} onClick={() => this.handleSign(record)}>
-              签收
-            </a>
+          <span>
             <Divider type="vertical" />
-          </Authorized>
+            <Authorized authority="Flow_Sign">
+              <a disabled={!canSign} onClick={() => this.handleSign(record)}>
+                签收
+              </a>
+              <Divider type="vertical" />
+            </Authorized>
+          </span>
         )}
         {record.fRecordStatusNumber === 'ManufProducing' && (
-          <Authorized authority="Flow_Transfer">
-            <a disabled={!canTransfer} onClick={() => this.transferModalVisible(record)}>
-              转序
-            </a>
+          <span>
             <Divider type="vertical" />
-          </Authorized>
+            <Authorized authority="Flow_Transfer">
+              <a disabled={!canTransfer} onClick={() => this.transferModalVisible(record)}>
+                转序
+              </a>
+              <Divider type="vertical" />
+            </Authorized>
+          </span>
         )}
         {record.fStatusNumber === 'EndProduce' && (
-          <Authorized authority="Flow_Report">
-            <a onClick={() => this.report([record])}>汇报</a>
-            <Divider type="vertical" />
-          </Authorized>
+          <span>
+            <Authorized authority="Flow_Report">
+              <a onClick={() => this.report([record])}>汇报</a>
+              <Divider type="vertical" />
+            </Authorized>
+          </span>
         )}
         <Dropdown
           overlay={
@@ -681,6 +720,7 @@ class TableList extends PureComponent {
 
   render() {
     const {
+      dispatch,
       flowManage: { data, queryResult },
       loading,
     } = this.props;
@@ -693,12 +733,12 @@ class TableList extends PureComponent {
     } = this.state;
 
     const signMethods = {
-      dispatch: this.props.dispatch,
+      dispatch,
       handleModalVisible: (flag, record) => this.handleModalVisible({ key: 'sign', flag }, record),
       handleSubmit: this.sign,
     };
     const routeMethods = {
-      dispatch: this.props.dispatch,
+      dispatch,
       handleModalVisible: (flag, record) => this.handleModalVisible({ key: 'route', flag }, record),
     };
     // 指定操作列
@@ -739,11 +779,11 @@ class TableList extends PureComponent {
                         签收
                       </Button>
                     </Authorized>
-                    <Authorized authority="Flow_Combine">
+                    {/* <Authorized authority="Flow_Combine">
                       <Button disabled={!queryDeptID} onClick={this.handleBatchCombine}>
                         合批
                       </Button>
-                    </Authorized>
+                    </Authorized> */}
                     <Authorized authority="Flow_Report">
                       <Button
                         disabled={queryStatusNumber !== 'EndProduce'}
@@ -779,6 +819,16 @@ class TableList extends PureComponent {
               {...routeMethods}
               modalVisible={modalVisible.route}
               fInterID={currentFormValues.fRouteID}
+            />
+          ) : null}
+          {currentFormValues && Object.keys(currentFormValues).length ? (
+            <ViewRecordForm
+              dispatch
+              handleModalVisible={(flag, record) =>
+                this.handleModalVisible({ key: 'record', flag }, record)
+              }
+              modalVisible={modalVisible.record}
+              fInterID={currentFormValues.fInterID}
             />
           ) : null}
         </GridContent>

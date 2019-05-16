@@ -157,7 +157,31 @@ class TableList extends PureComponent {
         type: 'defectManage/fetch',
         payload: params,
       });
+      this.handleSelectRows([]);
     });
+  };
+
+  handleFormReset = () => {
+    const { form, dispatch } = this.props;
+    form.resetFields();
+    this.setState({
+      formValues: {},
+      queryFilters: [],
+    });
+
+    const { pageSize, filters, sorter } = this.currentPagination;
+    this.currentPagination = {
+      ...this.currentPagination,
+      current: 1,
+      queryFilters: [],
+    };
+    const params = { pagination: this.currentPagination };
+
+    dispatch({
+      type: 'defectManage/fetch',
+      payload: params,
+    });
+    this.handleSelectRows([]);
   };
 
   handleExport = e => {

@@ -150,6 +150,7 @@ class TableList extends PureComponent {
         payload: params,
       });
     });
+    this.handleSelectRows([]);
   };
 
   handleFormReset = () => {
@@ -172,6 +173,7 @@ class TableList extends PureComponent {
       type: 'billNoRuleManage/fetch',
       payload: params,
     });
+    this.handleSelectRows([]);
   };
 
   toggleForm = () => {

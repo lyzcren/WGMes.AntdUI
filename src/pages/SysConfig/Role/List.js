@@ -202,6 +202,7 @@ class TableList extends PureComponent {
         type: 'roleManage/fetch',
         payload: params,
       });
+      this.handleSelectRows([]);
     });
   };
 
@@ -225,6 +226,7 @@ class TableList extends PureComponent {
       type: 'roleManage/fetch',
       payload: params,
     });
+    this.handleSelectRows([]);
   };
 
   toggleForm = () => {
