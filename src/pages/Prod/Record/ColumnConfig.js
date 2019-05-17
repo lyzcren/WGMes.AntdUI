@@ -12,6 +12,9 @@ class ColumnConfig {
       dataIndex: 'fFullBatchNo',
       width: 220,
       sorter: true,
+      render: (val, record) => {
+        return <a onClick={() => this.profileVisible(record)}>{val}</a>;
+      },
     },
     {
       title: '部门',

@@ -51,7 +51,7 @@ export default [
         path: '/prod',
         name: 'prod',
         icon: 'tool',
-        authority: ['Mission_Read', 'Flow_Read', 'Record_Read'],
+        authority: ['Mission_Read', 'Flow_Read', 'Record_Read', 'ProdDefect_Read'],
         routes: [
           {
             path: '/prod/mission',
@@ -97,6 +97,21 @@ export default [
                 hideInMenu: true,
               },
             ],
+          },
+          {
+            path: '/prod/defect',
+            name: 'defect',
+            component: './Prod/Defect/List',
+            authority: ['ProdDefect_Read'],
+            // routes: [
+            //   {
+            //     path: '/prod/defect/profile',
+            //     name: 'profile',
+            //     component: './Prod/Defect/Profile',
+            //     authority: ['Defect_Read'],
+            //     hideInMenu: true,
+            //   },
+            // ],
           },
         ],
       },

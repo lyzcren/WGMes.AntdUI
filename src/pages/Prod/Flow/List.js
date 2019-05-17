@@ -467,10 +467,10 @@ class TableList extends PureComponent {
           >
             执行情况
           </a>
+          <Divider type="vertical" />
         </Authorized>
         {record.fStatusNumber !== 'EndProduce' && record.fRecordStatusNumber !== 'ManufProducing' && (
           <span>
-            <Divider type="vertical" />
             <Authorized authority="Flow_Sign">
               <a disabled={!canSign} onClick={() => this.handleSign(record)}>
                 签收
@@ -481,7 +481,6 @@ class TableList extends PureComponent {
         )}
         {record.fRecordStatusNumber === 'ManufProducing' && (
           <span>
-            <Divider type="vertical" />
             <Authorized authority="Flow_Transfer">
               <a disabled={!canTransfer} onClick={() => this.transferModalVisible(record)}>
                 转序
