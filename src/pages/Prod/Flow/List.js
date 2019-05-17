@@ -502,8 +502,8 @@ class TableList extends PureComponent {
           overlay={
             <Menu onClick={({ key }) => this.moreMenuClick(key, record)}>
               <Menu.Item key="take">取走</Menu.Item>
-              <Menu.Item key="split">分批</Menu.Item>
               <Menu.Item key="refund">退回</Menu.Item>
+              <Menu.Item key="split">分批</Menu.Item>
             </Menu>
           }
         >

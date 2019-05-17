@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Form, Card, Steps, Input, Modal, Radio, Switch, Select, message, Button } from 'antd';
+import { Link } from 'umi';
 
 const { Step } = Steps;
 
@@ -44,6 +45,15 @@ export class ViewRecordForm extends PureComponent {
     });
   }
 
+  recordProfile(record) {
+    const { dispatch, handleModalVisible } = this.props;
+    dispatch({
+      type: 'menu/openMenu',
+      payload: { path: '/prod/record/profile', data: record },
+    });
+    handleModalVisible(false);
+  }
+
   render() {
     const {
       loading,
@@ -64,7 +74,7 @@ export class ViewRecordForm extends PureComponent {
         </Button>
       </div>
     );
-    console.log(steps);
+    // console.log(steps);
 
     return (
       <Modal
@@ -78,7 +88,24 @@ export class ViewRecordForm extends PureComponent {
         <Card bordered={false} loading={loading}>
           <Steps direction="vertical" current={currentStep}>
             {steps.map(step => (
-              <Step key={step.order} title={step.title} description={step.description} />
+              <Step
+                key={step.order}
+                title={
+                  step.recordId ? (
+                    <Link
+                      to="/"
+                      onClick={() => {
+                        this.recordProfile(step.depts[0]);
+                      }}
+                    >
+                      {step.title}
+                    </Link>
+                  ) : (
+                    <span>{step.title}</span>
+                  )
+                }
+                description={step.description}
+              />
             ))}
           </Steps>
         </Card>

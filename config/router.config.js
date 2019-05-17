@@ -88,6 +88,15 @@ export default [
             name: 'record',
             component: './Prod/Record/List',
             authority: ['Record_Read'],
+            routes: [
+              {
+                path: '/prod/record/profile',
+                name: 'profile',
+                component: './Prod/Record/Profile',
+                authority: ['Record_Read'],
+                hideInMenu: true,
+              },
+            ],
           },
         ],
       },

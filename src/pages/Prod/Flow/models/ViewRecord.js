@@ -21,7 +21,6 @@ export default {
       response.forEach(dept => {
         if (dept.fOrder) {
           steps.push({ order: steps.length + 1, depts: [dept] });
-          currentStep = steps.length;
         } else {
           const findGroup = steps.find(step => step.fRouteGroupID === dept.fRouteGroupID);
           if (!findGroup) {
@@ -34,10 +33,16 @@ export default {
             findGroup.depts.push(dept);
           }
         }
+        if (dept.fOrder && dept.fStatus > 1) {
+          currentStep = steps.length;
+        }
       });
 
       steps.map(step => {
         step.title = step.depts.map(dept => dept.fDeptName).join(' & ');
+        if (step.depts.length === 1 && step.depts[0].fStatus === 2) {
+          step.recordId = step.depts[0].fInterID;
+        }
         if (step.depts.length === 1) {
           const record = step.depts[0];
           if (record.fStatus === 2) {

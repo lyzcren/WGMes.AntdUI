@@ -132,13 +132,32 @@ class ColumnConfig {
       sorter: true,
       width: 120,
     },
+    {
+      title: '操作',
+      fixed: 'right',
+      width: 80,
+      render: (text, record) => this.renderOperation(text, record),
+    },
   ];
+
+  renderOperation = (text, record) => {
+    return (
+      <Fragment>
+        <Authorized authority="Record_Read">
+          <a onClick={() => this.profileVisible(record)}>详情</a>
+        </Authorized>
+      </Fragment>
+    );
+  };
 
   // 查看任务单
   MissionModalVisibleCallback = record => {};
   missionModalVisibleCallback = record => {
     this.MissionModalVisibleCallback(record);
   };
+
+  // 详情
+  profileVisible = record => {};
 }
 
 let columnConfig = new ColumnConfig();

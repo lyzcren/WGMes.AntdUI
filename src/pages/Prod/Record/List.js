@@ -87,6 +87,7 @@ class TableList extends PureComponent {
     // 列配置相关方法
     ColumnConfig.MissionModalVisibleCallback = record =>
       this.handleMissionModalVisible(true, record);
+    ColumnConfig.profileVisible = record => this.profileVisible(record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -225,6 +226,14 @@ class TableList extends PureComponent {
   handleSelectRows = rows => {
     this.setState({
       selectedRows: rows,
+    });
+  };
+
+  profileVisible = record => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/openMenu',
+      payload: { path: '/prod/record/profile', data: record },
     });
   };
 

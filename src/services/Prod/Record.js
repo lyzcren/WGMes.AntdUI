@@ -1,6 +1,10 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
 
+export async function fakeGet(params) {
+  return request(`/api/Record/${params.fInterID}`);
+}
+
 export async function fakeQuery(params) {
   return request('/api/Record/getList', {
     method: 'POST',
