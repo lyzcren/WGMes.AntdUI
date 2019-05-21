@@ -1,4 +1,4 @@
-import { fakeQuery, fakeRemove, fakeAdd, fakeUpdate, fakeActive } from '@/services/Prod/Defect';
+import { fakeQuery, fakeRepair } from '@/services/Prod/Defect';
 
 export default {
   namespace: 'defectManage',
@@ -22,8 +22,8 @@ export default {
         payload: response,
       });
     },
-    *update({ payload, callback }, { call, put }) {
-      const response = yield call(fakeUpdate, payload);
+    *repair({ payload, callback }, { call, put }) {
+      const response = yield call(fakeRepair, payload);
       yield put({
         type: 'saveData',
         payload: response,

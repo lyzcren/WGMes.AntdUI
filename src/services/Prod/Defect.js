@@ -11,12 +11,12 @@ export async function fakeQuery(params) {
   });
 }
 
-export async function fakeUpdate(params) {
-  return request('/api/ProdDefect/update', {
+export async function fakeRepair(params) {
+  return request('/api/ProdDefect/repair', {
     method: 'POST',
     body: {
       ...params,
-      method: 'update',
+      method: 'repair',
     },
   });
 }

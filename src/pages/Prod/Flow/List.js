@@ -336,7 +336,7 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/flow/transfer', data: record },
+      payload: { path: '/prod/flow/transfer', data: record, successCallback: this.search },
     });
   };
 
@@ -467,49 +467,54 @@ class TableList extends PureComponent {
           >
             执行情况
           </a>
-          <Divider type="vertical" />
         </Authorized>
-        {record.fStatusNumber !== 'EndProduce' && record.fRecordStatusNumber !== 'ManufProducing' && (
+        {record.fStatusNumber !== 'Reported' && (
           <span>
-            <Authorized authority="Flow_Sign">
-              <a disabled={!canSign} onClick={() => this.handleSign(record)}>
-                签收
+            {record.fStatusNumber !== 'EndProduce' &&
+              record.fRecordStatusNumber !== 'ManufProducing' && (
+                <span>
+                  <Authorized authority="Flow_Sign">
+                    <Divider type="vertical" />
+                    <a disabled={!canSign} onClick={() => this.handleSign(record)}>
+                      签收
+                    </a>
+                  </Authorized>
+                </span>
+              )}
+            {record.fRecordStatusNumber === 'ManufProducing' && (
+              <span>
+                <Authorized authority="Flow_Transfer">
+                  <Divider type="vertical" />
+                  <a disabled={!canTransfer} onClick={() => this.transferModalVisible(record)}>
+                    转序
+                  </a>
+                </Authorized>
+              </span>
+            )}
+            {record.fStatusNumber === 'EndProduce' && (
+              <span>
+                <Authorized authority="Flow_Report">
+                  <Divider type="vertical" />
+                  <a onClick={() => this.report([record])}>汇报</a>
+                </Authorized>
+              </span>
+            )}
+            <Dropdown
+              overlay={
+                <Menu onClick={({ key }) => this.moreMenuClick(key, record)}>
+                  <Menu.Item key="take">取走</Menu.Item>
+                  <Menu.Item key="refund">退回</Menu.Item>
+                  <Menu.Item key="split">分批</Menu.Item>
+                </Menu>
+              }
+            >
+              <a>
+                <Divider type="vertical" />
+                更多 <Icon type="down" />
               </a>
-              <Divider type="vertical" />
-            </Authorized>
+            </Dropdown>
           </span>
         )}
-        {record.fRecordStatusNumber === 'ManufProducing' && (
-          <span>
-            <Authorized authority="Flow_Transfer">
-              <a disabled={!canTransfer} onClick={() => this.transferModalVisible(record)}>
-                转序
-              </a>
-              <Divider type="vertical" />
-            </Authorized>
-          </span>
-        )}
-        {record.fStatusNumber === 'EndProduce' && (
-          <span>
-            <Authorized authority="Flow_Report">
-              <a onClick={() => this.report([record])}>汇报</a>
-              <Divider type="vertical" />
-            </Authorized>
-          </span>
-        )}
-        <Dropdown
-          overlay={
-            <Menu onClick={({ key }) => this.moreMenuClick(key, record)}>
-              <Menu.Item key="take">取走</Menu.Item>
-              <Menu.Item key="refund">退回</Menu.Item>
-              <Menu.Item key="split">分批</Menu.Item>
-            </Menu>
-          }
-        >
-          <a>
-            更多 <Icon type="down" />
-          </a>
-        </Dropdown>
       </Fragment>
     );
   };

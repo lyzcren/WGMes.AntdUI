@@ -30,13 +30,13 @@ import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
-import { UpdateForm } from './UpdateForm';
-import { CreateForm } from './CreateForm';
+import { RepairForm } from './RepairForm';
 import { default as ColumnConfig } from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
 
 import styles from './List.less';
+import { filter } from 'minimatch';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -56,8 +56,7 @@ class TableList extends PureComponent {
   state = {
     // 界面是否可见
     modalVisible: {
-      add: false,
-      update: false,
+      repair: false,
     },
     formValues: {},
     // 当前操作选中列的数据
@@ -216,10 +215,12 @@ class TableList extends PureComponent {
     });
   };
 
-  handleModalVisible = flag => {
+  handleModalVisible = ({ key, flag }, record) => {
     const { modalVisible } = this.state;
+    modalVisible[key] = !!flag;
     this.setState({
-      modalVisible: { ...modalVisible, add: !!flag },
+      modalVisible: { ...modalVisible },
+      currentFormValues: record || {},
     });
   };
 
@@ -276,29 +277,27 @@ class TableList extends PureComponent {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
+  handleRepair() {
+    const { selectedRows } = this.state;
+    const filterRows = Array.from(new Set(selectedRows.map(row => row.fMoBillNo)));
+    if (filterRows.length > 1) {
+      message.warning('不同任务单无法同时返修.');
+      return;
+    }
+    this.handleModalVisible({ key: 'repair', flag: true }, selectedRows);
+  }
+
   render() {
     const {
       dispatch,
       defectManage: { data, queryResult },
       loading,
     } = this.props;
-    const {
-      selectedRows,
-      modalVisible,
-      updateModalVisible,
-      currentFormValues,
-      authorityModalVisible,
-      authorizeUserModalVisible,
-    } = this.state;
+    const { selectedRows, modalVisible, repairModalVisible, currentFormValues } = this.state;
 
-    const parentMethods = {
+    const repairMethods = {
       dispatch,
-      handleModalVisible: this.handleModalVisible,
-      handleSuccess: this.search,
-    };
-    const updateMethods = {
-      dispatch,
-      handleModalVisible: this.handleUpdateModalVisible,
+      handleModalVisible: flag => this.handleModalVisible({ key: 'repair', flag }),
       handleSuccess: this.search,
     };
     const scrollX = ColumnConfig.columns
@@ -332,7 +331,7 @@ class TableList extends PureComponent {
                 {selectedRows.length > 0 && (
                   <span>
                     <Authorized authority="ProdDefect_Repair">
-                      <Button onClick={() => {}}>返修</Button>
+                      <Button onClick={() => this.handleRepair()}>返修</Button>
                     </Authorized>
                     <Authorized authority="ProdDefect_Divert">
                       <Button onClick={() => {}}>转移</Button>
@@ -355,12 +354,11 @@ class TableList extends PureComponent {
               />
             </div>
           </Card>
-          <CreateForm {...parentMethods} modalVisible={modalVisible.add} />
-          {currentFormValues && Object.keys(currentFormValues).length ? (
-            <UpdateForm
-              {...updateMethods}
-              modalVisible={modalVisible.update}
-              values={currentFormValues}
+          {selectedRows && selectedRows.length ? (
+            <RepairForm
+              {...repairMethods}
+              modalVisible={modalVisible.repair}
+              selectedRows={selectedRows}
             />
           ) : null}
         </GridContent>

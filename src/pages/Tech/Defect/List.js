@@ -25,7 +25,6 @@ import {
   notification,
   Popconfirm,
 } from 'antd';
-import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
@@ -361,7 +360,7 @@ class TableList extends PureComponent {
 
   batchDelete = selectedRows => {
     const { dispatch } = this.props;
-    if (typeof selectedRows === 'object' && !Array.isArray(selectedRows)) {
+    if (!Array.isArray(selectedRows)) {
       selectedRows = [selectedRows];
     }
     selectedRows.forEach(selectedRow => {
@@ -397,7 +396,7 @@ class TableList extends PureComponent {
 
   batchActive = (selectedRows, fIsActive) => {
     const { dispatch } = this.props;
-    if (typeof selectedRows === 'object' && !Array.isArray(selectedRows)) {
+    if (!Array.isArray(selectedRows)) {
       selectedRows = [selectedRows];
     }
     selectedRows.forEach(selectedRow => {

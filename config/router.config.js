@@ -141,7 +141,7 @@ export default [
             routes: [
               {
                 path: '/techStd/route/profile',
-                name: 'routeProfile',
+                name: 'profile',
                 component: './Tech/Route/Profile',
                 authority: ['Route_Read'],
                 hideInMenu: true,

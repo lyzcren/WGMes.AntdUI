@@ -47,15 +47,45 @@ class ColumnConfig {
       sorter: true,
     },
     {
-      title: '不良数量',
-      dataIndex: 'fQty',
+      title: '数量',
+      dataIndex: 'fCurrentQty',
       width: 120,
       sorter: true,
     },
+    // {
+    //   title: '总数量',
+    //   dataIndex: 'fQty',
+    //   width: 120,
+    //   sorter: true,
+    // },
+    // {
+    //   title: '返修数量',
+    //   dataIndex: 'fRepairQty',
+    //   width: 120,
+    //   sorter: true,
+    // },
+    // {
+    //   title: '报废数量',
+    //   dataIndex: 'fScrapQty',
+    //   width: 120,
+    //   sorter: true,
+    // },
+    // {
+    //   title: '转移数量',
+    //   dataIndex: 'fDivertQty',
+    //   width: 120,
+    //   sorter: true,
+    // },
     {
       title: '单位',
       dataIndex: 'fUnitName',
       width: 120,
+    },
+    {
+      title: '流程单号',
+      dataIndex: 'fFullBatchNo',
+      width: 220,
+      sorter: true,
     },
     {
       title: '任务单号',

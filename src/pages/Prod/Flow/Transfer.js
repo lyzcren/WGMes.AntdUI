@@ -111,6 +111,7 @@ class Transfer extends PureComponent {
       form,
       dispatch,
       flowTransfer: { data },
+      successCallback,
     } = this.props;
     const { fBeginDate, fTransferDate } = this.state;
     form.validateFields((err, fieldsValue) => {
@@ -145,6 +146,7 @@ class Transfer extends PureComponent {
         } = this.props;
         if (status === 'ok') {
           message.success('转序成功');
+          if (successCallback) successCallback();
           this.close();
         } else if (status === 'warning') {
           message.warning(message);
