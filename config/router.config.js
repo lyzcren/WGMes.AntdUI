@@ -51,7 +51,13 @@ export default [
         path: '/prod',
         name: 'prod',
         icon: 'tool',
-        authority: ['Mission_Read', 'Flow_Read', 'Record_Read', 'ProdDefect_Read'],
+        authority: [
+          'Mission_Read',
+          'Flow_Read',
+          'Record_Read',
+          'ProdDefect_Read',
+          'DefectRepair_Read',
+        ],
         routes: [
           {
             path: '/prod/mission',
@@ -112,6 +118,12 @@ export default [
             //     hideInMenu: true,
             //   },
             // ],
+          },
+          {
+            path: '/prod/defectRepair',
+            name: 'defectRepair',
+            component: './Prod/DefectRepair/List',
+            authority: ['DefectRepair_Read'],
           },
         ],
       },

@@ -271,6 +271,7 @@ class TableList extends PureComponent {
                   style={{ width: '100%' }}
                   treeData={basicData.processDeptTree}
                   treeDefaultExpandAll
+                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                 />
               )}
             </FormItem>

@@ -30,13 +30,13 @@ import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
-import { RepairForm } from './RepairForm';
+import { UpdateForm } from './UpdateForm';
+import { CreateForm } from './CreateForm';
 import { default as ColumnConfig } from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
 
 import styles from './List.less';
-import { filter } from 'minimatch';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -46,9 +46,9 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ defectManage, loading, basicData }) => ({
-  defectManage,
-  loading: loading.models.defectManage,
+@connect(({ defectRepairManage, loading, basicData }) => ({
+  defectRepairManage,
+  loading: loading.models.defectRepairManage,
   basicData,
 }))
 @Form.create()
@@ -56,7 +56,8 @@ class TableList extends PureComponent {
   state = {
     // 界面是否可见
     modalVisible: {
-      repair: false,
+      add: false,
+      update: false,
     },
     formValues: {},
     // 当前操作选中列的数据
@@ -76,7 +77,7 @@ class TableList extends PureComponent {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'defectManage/fetch',
+      type: 'defectRepairManage/fetch',
       payload: this.currentPagination,
     });
     dispatch({
@@ -108,7 +109,7 @@ class TableList extends PureComponent {
     }
 
     dispatch({
-      type: 'defectManage/fetch',
+      type: 'defectRepairManage/fetch',
       payload: this.currentPagination,
     });
   };
@@ -126,6 +127,8 @@ class TableList extends PureComponent {
     const queryFilters = [];
     if (fieldsValue.queryMoBillNo)
       queryFilters.push({ name: 'fMoBillNo', compare: '%*%', value: fieldsValue.queryMoBillNo });
+    if (fieldsValue.queryBatchNo)
+      queryFilters.push({ name: 'fFullBatchNo', compare: '%*%', value: fieldsValue.queryBatchNo });
     if (fieldsValue.queryDept)
       queryFilters.push({ name: 'fDeptID', compare: '=', value: fieldsValue.queryDept });
 
@@ -134,6 +137,7 @@ class TableList extends PureComponent {
       queryFilters: queryFilters,
     });
 
+    const { pageSize, filters, sorter } = this.currentPagination;
     this.currentPagination = {
       ...this.currentPagination,
       current: 1,
@@ -151,7 +155,7 @@ class TableList extends PureComponent {
 
       const pagination = this.getSearchParam(fieldsValue);
       dispatch({
-        type: 'defectManage/fetch',
+        type: 'defectRepairManage/fetch',
         payload: pagination,
       });
       this.handleSelectRows([]);
@@ -166,6 +170,7 @@ class TableList extends PureComponent {
       queryFilters: [],
     });
 
+    const { pageSize, filters, sorter } = this.currentPagination;
     this.currentPagination = {
       ...this.currentPagination,
       current: 1,
@@ -173,7 +178,7 @@ class TableList extends PureComponent {
     };
 
     dispatch({
-      type: 'defectManage/fetch',
+      type: 'defectRepairManage/fetch',
       payload: this.currentPagination,
     });
     this.handleSelectRows([]);
@@ -190,11 +195,11 @@ class TableList extends PureComponent {
         case 'currentPage':
           pagination.exportPage = true;
           const fileName = '导出-第' + pagination.current + '页.xls';
-          exportExcel('/api/prodDefect/export', pagination, fileName);
+          exportExcel('/api/defectRepair/export', pagination, fileName);
           break;
         case 'allPage':
           pagination.exportPage = false;
-          exportExcel('/api/prodDefect/export', pagination, '导出.xls');
+          exportExcel('/api/defectRepair/export', pagination, '导出.xls');
           break;
         default:
           break;
@@ -209,49 +214,124 @@ class TableList extends PureComponent {
     });
   };
 
+  handleMenuClick = e => {
+    const { dispatch } = this.props;
+    const { selectedRows } = this.state;
+
+    if (selectedRows.length === 0) return;
+    switch (e.key) {
+      case 'remove':
+        this.handleBatchDeleteClick();
+        break;
+      default:
+        break;
+    }
+  };
+
   handleSelectRows = rows => {
     this.setState({
       selectedRows: rows,
     });
   };
 
-  handleModalVisible = ({ key, flag }, record) => {
+  handleModalVisible = flag => {
     const { modalVisible } = this.state;
-    modalVisible[key] = !!flag;
     this.setState({
-      modalVisible: { ...modalVisible },
+      modalVisible: { ...modalVisible, add: !!flag },
+    });
+  };
+
+  handleUpdateModalVisible = (flag, record) => {
+    const { modalVisible } = this.state;
+    this.setState({
+      modalVisible: { ...modalVisible, update: !!flag },
       currentFormValues: record || {},
+    });
+  };
+
+  handleDelete = record => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'defectRepairManage/remove',
+      payload: {
+        fItemID: record.fItemID,
+      },
+      callback: () => {
+        this.setState({
+          selectedRows: [],
+        });
+        const {
+          defectRepairManage: { queryResult },
+        } = this.props;
+        if (queryResult.status === 'ok') {
+          message.success('【' + record.fName + '】' + '删除成功');
+          // 成功后再次刷新列表
+          this.search();
+        } else if (queryResult.status === 'warning') {
+          message.warning(queryResult.message);
+        } else {
+          message.error(queryResult.message);
+        }
+      },
+    });
+  };
+
+  handleBatchDeleteClick = () => {
+    const { selectedRows } = this.state;
+
+    if (selectedRows.length === 0) return;
+    Modal.confirm({
+      title: '删除记录',
+      content: '确定批量删除记录吗？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => this.batchDelete(selectedRows),
+    });
+  };
+
+  batchDelete = selectedRows => {
+    const { dispatch } = this.props;
+    if (typeof selectedRows === 'object' && !Array.isArray(selectedRows)) {
+      selectedRows = [selectedRows];
+    }
+    selectedRows.forEach(selectedRow => {
+      this.handleDelete(selectedRow);
     });
   };
 
   renderSimpleForm() {
     const {
       form: { getFieldDecorator },
-      basicData,
+      basicData: { processDeptTree },
     } = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={8} sm={24}>
-            <FormItem id="queryMoBillNo" label="任务单号">
-              {getFieldDecorator('queryMoBillNo')(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
+          <Col md={6} sm={24}>
             <FormItem id="queryDept" label="部门">
               {getFieldDecorator('queryDept', {
                 rules: [{ required: false, message: '请选择部门' }],
               })(
                 <TreeSelect
                   style={{ width: '100%' }}
-                  treeData={basicData.processDeptTree}
+                  treeData={processDeptTree}
                   treeDefaultExpandAll
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                 />
               )}
             </FormItem>
           </Col>
-          <Col md={8} sm={24}>
+          <Col md={6} sm={24}>
+            <FormItem id="queryMoBillNo" label="任务单号">
+              {getFieldDecorator('queryMoBillNo')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={6} sm={24}>
+            <FormItem id="queryBatchNo" label="返修单号">
+              {getFieldDecorator('queryBatchNo')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={6} sm={24}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
                 查询
@@ -278,27 +358,36 @@ class TableList extends PureComponent {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  handleRepair() {
-    const { selectedRows } = this.state;
-    const filterRows = Array.from(new Set(selectedRows.map(row => row.fMoBillNo)));
-    if (filterRows.length > 1) {
-      message.warning('不同任务单无法同时返修.');
-      return;
-    }
-    this.handleModalVisible({ key: 'repair', flag: true }, selectedRows);
-  }
-
   render() {
     const {
       dispatch,
-      defectManage: { data, queryResult },
+      defectRepairManage: { data, queryResult },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, repairModalVisible, currentFormValues } = this.state;
+    const {
+      selectedRows,
+      modalVisible,
+      updateModalVisible,
+      currentFormValues,
+      authorityModalVisible,
+      authorizeUserModalVisible,
+    } = this.state;
+    const menu = (
+      <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
+        <Menu.Item key="remove" disabled={!hasAuthority('DefectRepair_Delete')}>
+          删除
+        </Menu.Item>
+      </Menu>
+    );
 
-    const repairMethods = {
+    const parentMethods = {
       dispatch,
-      handleModalVisible: flag => this.handleModalVisible({ key: 'repair', flag }),
+      handleModalVisible: this.handleModalVisible,
+      handleSuccess: this.search,
+    };
+    const updateMethods = {
+      dispatch,
+      handleModalVisible: this.handleUpdateModalVisible,
       handleSuccess: this.search,
     };
     const scrollX = ColumnConfig.columns
@@ -315,7 +404,12 @@ class TableList extends PureComponent {
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
               <div className={styles.tableListOperator}>
-                <Authorized authority="ProdDefect_Export">
+                <Authorized authority="DefectRepair_Create">
+                  <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+                    新建
+                  </Button>
+                </Authorized>
+                <Authorized authority="DefectRepair_Export">
                   <Dropdown
                     overlay={
                       <Menu onClick={this.handleExport} selectedKeys={[]}>
@@ -331,14 +425,15 @@ class TableList extends PureComponent {
                 </Authorized>
                 {selectedRows.length > 0 && (
                   <span>
-                    <Authorized authority="ProdDefect_Repair">
-                      <Button onClick={() => this.handleRepair()}>返修</Button>
+                    <Authorized authority="DefectRepair_Delete">
+                      <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
                     </Authorized>
-                    <Authorized authority="ProdDefect_Divert">
-                      <Button onClick={() => {}}>转移</Button>
-                    </Authorized>
-                    <Authorized authority="ProdDefect_Scrap">
-                      <Button onClick={() => {}}>报废</Button>
+                    <Authorized authority={['DefectRepair_Delete']}>
+                      <Dropdown overlay={menu}>
+                        <Button>
+                          更多操作 <Icon type="down" />
+                        </Button>
+                      </Dropdown>
                     </Authorized>
                   </span>
                 )}
@@ -355,11 +450,12 @@ class TableList extends PureComponent {
               />
             </div>
           </Card>
-          {selectedRows && selectedRows.length ? (
-            <RepairForm
-              {...repairMethods}
-              modalVisible={modalVisible.repair}
-              selectedRows={selectedRows}
+          <CreateForm {...parentMethods} modalVisible={modalVisible.add} />
+          {currentFormValues && Object.keys(currentFormValues).length ? (
+            <UpdateForm
+              {...updateMethods}
+              modalVisible={modalVisible.update}
+              values={currentFormValues}
             />
           ) : null}
         </GridContent>

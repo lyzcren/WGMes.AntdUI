@@ -45,6 +45,7 @@ export const CreateForm = Form.create()(props => {
             style={{ width: 300 }}
             treeData={treeData}
             treeDefaultExpandAll
+            dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
           />
         )}
       </FormItem>
