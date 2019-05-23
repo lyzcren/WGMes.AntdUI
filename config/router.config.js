@@ -57,6 +57,7 @@ export default [
           'Record_Read',
           'ProdDefect_Read',
           'DefectRepair_Read',
+          'DefectScrap_Read',
         ],
         routes: [
           {
@@ -124,6 +125,12 @@ export default [
             name: 'defectRepair',
             component: './Prod/DefectRepair/List',
             authority: ['DefectRepair_Read'],
+          },
+          {
+            path: '/prod/defectScrap',
+            name: 'defectScrap',
+            component: './Prod/DefectScrap/List',
+            authority: ['DefectScrap_Read'],
           },
         ],
       },

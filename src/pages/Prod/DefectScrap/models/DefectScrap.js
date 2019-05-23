@@ -1,7 +1,13 @@
-import { fakeQuery, fakeRepair, fakeScrap } from '@/services/Prod/Defect';
+import {
+  fakeQuery,
+  fakeRemove,
+  fakeAdd,
+  fakeUpdate,
+  fakeActive,
+} from '@/services/Prod/DefectScrap';
 
 export default {
-  namespace: 'defectManage',
+  namespace: 'defectScrapManage',
 
   state: {
     data: {
@@ -22,16 +28,32 @@ export default {
         payload: response,
       });
     },
-    *repair({ payload, callback }, { call, put }) {
-      const response = yield call(fakeRepair, payload);
+    *add({ payload, callback }, { call, put }) {
+      const response = yield call(fakeAdd, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
       if (callback) callback();
     },
-    *scrap({ payload, callback }, { call, put }) {
-      const response = yield call(fakeScrap, payload);
+    *remove({ payload, callback }, { call, put }) {
+      const response = yield call(fakeRemove, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    *update({ payload, callback }, { call, put }) {
+      const response = yield call(fakeUpdate, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    *active({ payload, callback }, { call, put }) {
+      const response = yield call(fakeActive, payload);
       yield put({
         type: 'saveData',
         payload: response,

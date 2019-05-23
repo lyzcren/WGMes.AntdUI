@@ -50,7 +50,7 @@ export class RepairForm extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       const list = records.map(item => {
-        return { fInterID: item.fInterID, fQty: item.fQty };
+        return { fInterID: item.fInterID, fQty: item.fCurrentQty };
       });
       const submitData = { list, fRouteID: fieldsValue.fRouteID };
       this.handleSubmit(submitData);
@@ -58,24 +58,25 @@ export class RepairForm extends PureComponent {
   };
 
   handleSubmit = submitData => {
-    console.log(submitData);
     const { dispatch, handleModalVisible, handleSuccess } = this.props;
     dispatch({
       type: 'defectManage/repair',
       payload: submitData,
     }).then(() => {
       const {
-        defectManage: { queryResult },
+        defectManage: {
+          queryResult: { status, message, model },
+        },
       } = this.props;
-      if (queryResult.status === 'ok') {
-        message.success('返修成功');
+      if (status === 'ok') {
+        message.success('返修成功，返修流程单：' + model.join(', '));
         handleModalVisible(false);
         // 成功后再次刷新列表
         if (handleSuccess) handleSuccess();
-      } else if (queryResult.status === 'warning') {
-        message.warning(queryResult.message);
+      } else if (status === 'warning') {
+        message.warning(message);
       } else {
-        message.error(queryResult.message);
+        message.error(message);
       }
     });
   };

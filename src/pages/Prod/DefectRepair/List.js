@@ -220,9 +220,6 @@ class TableList extends PureComponent {
 
     if (selectedRows.length === 0) return;
     switch (e.key) {
-      case 'remove':
-        this.handleBatchDeleteClick();
-        break;
       default:
         break;
     }
@@ -246,56 +243,6 @@ class TableList extends PureComponent {
     this.setState({
       modalVisible: { ...modalVisible, update: !!flag },
       currentFormValues: record || {},
-    });
-  };
-
-  handleDelete = record => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'defectRepairManage/remove',
-      payload: {
-        fItemID: record.fItemID,
-      },
-      callback: () => {
-        this.setState({
-          selectedRows: [],
-        });
-        const {
-          defectRepairManage: { queryResult },
-        } = this.props;
-        if (queryResult.status === 'ok') {
-          message.success('【' + record.fName + '】' + '删除成功');
-          // 成功后再次刷新列表
-          this.search();
-        } else if (queryResult.status === 'warning') {
-          message.warning(queryResult.message);
-        } else {
-          message.error(queryResult.message);
-        }
-      },
-    });
-  };
-
-  handleBatchDeleteClick = () => {
-    const { selectedRows } = this.state;
-
-    if (selectedRows.length === 0) return;
-    Modal.confirm({
-      title: '删除记录',
-      content: '确定批量删除记录吗？',
-      okText: '确认',
-      cancelText: '取消',
-      onOk: () => this.batchDelete(selectedRows),
-    });
-  };
-
-  batchDelete = selectedRows => {
-    const { dispatch } = this.props;
-    if (typeof selectedRows === 'object' && !Array.isArray(selectedRows)) {
-      selectedRows = [selectedRows];
-    }
-    selectedRows.forEach(selectedRow => {
-      this.handleDelete(selectedRow);
     });
   };
 
@@ -372,13 +319,7 @@ class TableList extends PureComponent {
       authorityModalVisible,
       authorizeUserModalVisible,
     } = this.state;
-    const menu = (
-      <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-        <Menu.Item key="remove" disabled={!hasAuthority('DefectRepair_Delete')}>
-          删除
-        </Menu.Item>
-      </Menu>
-    );
+    const menu = <Menu onClick={this.handleMenuClick} selectedKeys={[]} />;
 
     const parentMethods = {
       dispatch,
@@ -423,20 +364,6 @@ class TableList extends PureComponent {
                     </Button>
                   </Dropdown>
                 </Authorized>
-                {selectedRows.length > 0 && (
-                  <span>
-                    <Authorized authority="DefectRepair_Delete">
-                      <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
-                    </Authorized>
-                    <Authorized authority={['DefectRepair_Delete']}>
-                      <Dropdown overlay={menu}>
-                        <Button>
-                          更多操作 <Icon type="down" />
-                        </Button>
-                      </Dropdown>
-                    </Authorized>
-                  </span>
-                )}
               </div>
               <StandardTable
                 rowKey="fInterID"

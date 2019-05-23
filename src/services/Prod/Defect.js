@@ -20,3 +20,13 @@ export async function fakeRepair(params) {
     },
   });
 }
+
+export async function fakeScrap(params) {
+  return request('/api/ProdDefect/scrap', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'scrap',
+    },
+  });
+}

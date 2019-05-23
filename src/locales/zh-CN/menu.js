@@ -48,6 +48,7 @@ export default {
   'menu.prod.record.profile': '生产记录详情',
   'menu.prod.defect': '不良库存',
   'menu.prod.defectRepair': '返修记录',
+  'menu.prod.defectScrap': '报废记录',
   // 生产基础资料
   'menu.techStd': '工艺标准',
   'menu.techStd.defect': '不良信息',
