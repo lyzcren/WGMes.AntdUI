@@ -58,6 +58,7 @@ export default [
           'ProdDefect_Read',
           'DefectRepair_Read',
           'DefectScrap_Read',
+          'InvCheck_Read',
         ],
         routes: [
           {
@@ -131,6 +132,21 @@ export default [
             name: 'defectScrap',
             component: './Prod/DefectScrap/List',
             authority: ['DefectScrap_Read'],
+          },
+          {
+            path: '/prod/invCheck',
+            name: 'invCheck',
+            component: './Prod/InvCheck/List',
+            authority: ['InvCheck_Read'],
+            routes: [
+              {
+                path: '/prod/invCheck/create',
+                name: 'create',
+                component: './Prod/InvCheck/Create',
+                authority: ['InvCheck_Create'],
+                hideInMenu: true,
+              },
+            ],
           },
         ],
       },

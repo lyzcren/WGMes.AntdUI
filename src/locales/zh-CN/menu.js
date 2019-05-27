@@ -49,6 +49,8 @@ export default {
   'menu.prod.defect': '不良库存',
   'menu.prod.defectRepair': '返修记录',
   'menu.prod.defectScrap': '报废记录',
+  'menu.prod.invCheck': '在制品盘点',
+  'menu.prod.invCheck.create': '新增在制品盘点',
   // 生产基础资料
   'menu.techStd': '工艺标准',
   'menu.techStd.defect': '不良信息',

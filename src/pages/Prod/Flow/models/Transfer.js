@@ -23,10 +23,12 @@ export default {
   effects: {
     *initModel({ payload, callback }, { call, put }) {
       const data = yield call(fakeGetProducingRecord, payload);
+      data.fPassQty = data.fInputQty;
       yield put({
         type: 'save',
         payload: {
           data,
+          defectList: [],
         },
       });
       if (callback) callback();
@@ -145,15 +147,22 @@ export default {
       const {
         payload: { fDefectID, fValue },
       } = action;
-      const { defect } = state;
+      const { data, defect } = state;
       const existsDefect = defect.find(d => d.fDefectID === fDefectID);
       if (existsDefect) {
         existsDefect.fValue = fValue;
       } else {
         defect.push({ fDefectID, fValue });
       }
+      const defectQty = defect
+        .filter(x => x.fValue)
+        .map(x => x.fValue)
+        .reduce((sum, x) => (sum += x));
+      data.fDefectQty = defectQty;
+      data.fPassQty = data.fInputQty - data.fDefectQty;
       return {
         ...state,
+        data,
         defect,
       };
     },

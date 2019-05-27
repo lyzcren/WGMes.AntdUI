@@ -468,7 +468,7 @@ class TableList extends PureComponent {
             执行情况
           </a>
         </Authorized>
-        {record.fStatusNumber !== 'Reported' && (
+        {record.fStatusNumber !== 'Reported' && record.fStatusNumber !== 'NonProduced' && (
           <span>
             {record.fStatusNumber !== 'EndProduce' &&
               record.fRecordStatusNumber !== 'ManufProducing' && (

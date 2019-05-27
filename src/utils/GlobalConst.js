@@ -54,10 +54,16 @@ export const GlobalConst = {
       badgeStatus: 'success',
     },
     {
-      text: '完成',
+      text: '已汇报',
       value: 3,
       number: 'Reported',
       badgeStatus: 'success',
+    },
+    {
+      text: '无产出',
+      value: 4,
+      number: 'NonProduced',
+      badgeStatus: 'error',
     },
   ],
   ManufStatusArray: [
@@ -78,6 +84,12 @@ export const GlobalConst = {
       value: 3,
       number: 'ManufEndProduce',
       badgeStatus: 'success',
+    },
+    {
+      text: '错误',
+      value: 4,
+      number: 'ManufNonProduced',
+      badgeStatus: 'error',
     },
   ],
 };

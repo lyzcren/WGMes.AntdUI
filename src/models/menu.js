@@ -1,4 +1,5 @@
 import memoizeOne from 'memoize-one';
+import { notification } from 'antd';
 import isEqual from 'lodash/isEqual';
 import { formatMessage } from 'umi/locale';
 import Authorized from '@/utils/Authorized';
@@ -185,11 +186,11 @@ export default {
           // 打开Tab页
           panes.push({ ...componentMap, key: activeKey, closable });
         } else {
-          return;
           // TODO: 未找到路由时进行特殊处理
-          // notification.error({
-          //   message: "未找到路由.",
-          // });
+          notification.error({
+            message: '未找到路由.',
+          });
+          return;
         }
       }
 
