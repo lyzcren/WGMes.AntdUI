@@ -8,6 +8,7 @@ import {
   fakeGetDefect,
   fakeGetOperatorList,
   fakeGetBillNo,
+  fakeGetStatus,
 } from '@/services/basicData';
 
 export default {
@@ -22,6 +23,7 @@ export default {
     defectData: [],
     operators: [],
     billNo: {},
+    status: {},
   },
 
   effects: {
@@ -81,9 +83,25 @@ export default {
         payload: response,
       });
     },
+    *getStatus({ payload }, { call, put, select }) {
+      const { number } = payload;
+      const response = yield call(fakeGetStatus, number);
+      const newStatus = yield select(state => state.basicData.status);
+      newStatus[number] = response;
+      yield put({
+        type: 'save',
+        payload: { status: newStatus },
+      });
+    },
   },
 
   reducers: {
+    save(state, action) {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
     saveDeptTreeData(state, action) {
       return {
         ...state,

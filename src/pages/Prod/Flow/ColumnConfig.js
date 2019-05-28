@@ -65,7 +65,7 @@ class ColumnConfig {
     {
       title: '总投入数量',
       dataIndex: 'fTotalInputQty',
-      width: 120,
+      width: 130,
       sorter: true,
     },
     {

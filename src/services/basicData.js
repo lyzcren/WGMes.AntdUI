@@ -90,3 +90,7 @@ export async function fakeGetBillNo(params) {
     },
   });
 }
+
+export async function fakeGetStatus(number) {
+  return request(`/api/keyValue/${number}`);
+}

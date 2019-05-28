@@ -93,6 +93,8 @@ class Transfer extends PureComponent {
       fFlowInputQty,
       fInputQty,
       fPassQty,
+      fInvCheckDeltaQty,
+      fTakeQty,
       fStatusName,
       fDeptName,
       fFullBatchNo,
@@ -114,6 +116,8 @@ class Transfer extends PureComponent {
         <Description term="流程单数量">{fFlowInputQty}</Description>
         <Description term="投入数量">{fInputQty}</Description>
         <Description term="合格数量">{fPassQty}</Description>
+        <Description term="盘点盈亏数量">{fInvCheckDeltaQty}</Description>
+        <Description term="取走数量">{fTakeQty}</Description>
       </DescriptionList>
     );
     const menu = (

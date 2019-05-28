@@ -51,6 +51,8 @@ export default {
   'menu.prod.defectScrap': '报废记录',
   'menu.prod.invCheck': '在制品盘点',
   'menu.prod.invCheck.create': '新增在制品盘点',
+  'menu.prod.invCheck.update': '修改在制品盘点',
+  'menu.prod.invCheck.profile': '查看在制品盘点',
   // 生产基础资料
   'menu.techStd': '工艺标准',
   'menu.techStd.defect': '不良信息',

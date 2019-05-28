@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import moment from 'moment';
-import { Switch, Popconfirm, Divider } from 'antd';
+import { Switch, Popconfirm, Divider, Badge } from 'antd';
 import Authorized from '@/utils/Authorized';
 
 class ColumnConfig {
@@ -8,6 +8,9 @@ class ColumnConfig {
     {
       title: '单号',
       dataIndex: 'fBillNo',
+      render: (val, record) => {
+        return <a onClick={() => this.profileCallback(record)}>{val}</a>;
+      },
     },
     {
       title: '部门',
@@ -25,6 +28,7 @@ class ColumnConfig {
     {
       title: '状态',
       dataIndex: 'fStatusName',
+      render: (val, record) => <Badge color={record.fStatusColor} text={val} />,
     },
     {
       title: '创建人',
@@ -43,11 +47,21 @@ class ColumnConfig {
       render: (text, record) => (
         <Fragment>
           <Authorized authority="InvCheck_Update">
-            <a onClick={() => this.updateModalVisible(record)}>修改</a>
+            <a disabled={record.fStatus != 0} onClick={() => this.updateCallback(record)}>
+              修改
+            </a>
+          </Authorized>
+          <Authorized authority="InvCheck_Check">
+            <Divider type="vertical" />
+            {record.fStatus === 0 ? (
+              <a onClick={() => this.checkCallback(record)}>审核</a>
+            ) : (
+              <a onClick={() => this.uncheckCallback(record)}>反审核</a>
+            )}
           </Authorized>
           <Authorized authority="InvCheck_Delete">
             <Divider type="vertical" />
-            <Popconfirm title="是否要删除此行？" onConfirm={() => this.delete(record)}>
+            <Popconfirm title="是否要删除此行？" onConfirm={() => this.deleteCallback(record)}>
               <a>删除</a>
             </Popconfirm>
           </Authorized>
@@ -56,17 +70,11 @@ class ColumnConfig {
     },
   ];
 
-  // 修改方法
-  UpdateModalVisibleCallback = record => {};
-  updateModalVisible = record => {
-    this.UpdateModalVisibleCallback(record);
-  };
-
-  // 删除方法
-  DeleteCallback = record => {};
-  delete = record => {
-    this.DeleteCallback(record);
-  };
+  profileCallback = record => {};
+  updateCallback = record => {};
+  deleteCallback = record => {};
+  checkCallback = record => {};
+  uncheckCallback = record => {};
 }
 
 let columnConfig = new ColumnConfig();

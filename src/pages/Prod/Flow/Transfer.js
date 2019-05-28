@@ -258,6 +258,8 @@ class Transfer extends PureComponent {
         <Description term="流程单数量">{data.fFlowInputQty}</Description>
         <Description term="投入数量">{data.fInputQty}</Description>
         <Description term="合格数量">{data.fPassQty}</Description>
+        <Description term="盘点盈亏数量">{data.fInvCheckDeltaQty}</Description>
+        <Description term="取走数量">{data.fTakeQty}</Description>
       </DescriptionList>
     );
     const menu = (

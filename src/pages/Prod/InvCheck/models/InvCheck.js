@@ -1,4 +1,11 @@
-import { fakeQuery, fakeRemove, fakeAdd, fakeUpdate } from '@/services/Prod/InvCheck';
+import {
+  fakeQuery,
+  fakeRemove,
+  fakeAdd,
+  fakeUpdate,
+  fakeCheck,
+  fakeUnCheck,
+} from '@/services/Prod/InvCheck';
 
 export default {
   namespace: 'invCheckManage',
@@ -22,29 +29,41 @@ export default {
         payload: response,
       });
     },
-    *add({ payload, callback }, { call, put }) {
+    *add({ payload }, { call, put }) {
       const response = yield call(fakeAdd, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
-      if (callback) callback();
     },
-    *remove({ payload, callback }, { call, put }) {
-      const response = yield call(fakeRemove, payload);
+    *remove({ payload }, { call, put }) {
+      const id = payload.fInterID;
+      const response = yield call(fakeRemove, id);
       yield put({
         type: 'saveData',
         payload: response,
       });
-      if (callback) callback();
     },
-    *update({ payload, callback }, { call, put }) {
+    *update({ payload }, { call, put }) {
       const response = yield call(fakeUpdate, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
-      if (callback) callback();
+    },
+    *check({ payload }, { call, put }) {
+      const response = yield call(fakeCheck, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
+      });
+    },
+    *uncheck({ payload }, { call, put }) {
+      const response = yield call(fakeUnCheck, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
+      });
     },
   },
 

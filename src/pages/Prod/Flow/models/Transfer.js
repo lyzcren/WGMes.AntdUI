@@ -23,7 +23,7 @@ export default {
   effects: {
     *initModel({ payload, callback }, { call, put }) {
       const data = yield call(fakeGetProducingRecord, payload);
-      data.fPassQty = data.fInputQty;
+      data.fPassQty = data.fInputQty + data.fInvCheckDeltaQty - data.fTakeQty;
       yield put({
         type: 'save',
         payload: {
@@ -159,7 +159,7 @@ export default {
         .map(x => x.fValue)
         .reduce((sum, x) => (sum += x));
       data.fDefectQty = defectQty;
-      data.fPassQty = data.fInputQty - data.fDefectQty;
+      data.fPassQty = data.fInputQty + data.fInvCheckDeltaQty - data.fTakeQty - data.fDefectQty;
       return {
         ...state,
         data,

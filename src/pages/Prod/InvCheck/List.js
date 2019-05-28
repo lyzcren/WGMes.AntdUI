@@ -25,12 +25,12 @@ import {
   Progress,
   notification,
   Popconfirm,
+  TreeSelect,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
-import { UpdateForm } from './UpdateForm';
 import { default as ColumnConfig } from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
@@ -45,10 +45,11 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ invCheckManage, loading, menu }) => ({
+@connect(({ invCheckManage, loading, menu, basicData }) => ({
   invCheckManage,
   loading: loading.models.invCheckManage,
   menu,
+  basicData,
 }))
 @Form.create()
 class TableList extends PureComponent {
@@ -79,9 +80,19 @@ class TableList extends PureComponent {
       type: 'invCheckManage/fetch',
       payload: this.currentPagination,
     });
+    dispatch({
+      type: 'basicData/getProcessDeptTree',
+    });
+    dispatch({
+      type: 'basicData/getStatus',
+      payload: { number: 'invCheckStatus' },
+    });
     // 列配置相关方法
-    ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdateModalVisible(true, record);
-    ColumnConfig.DeleteCallback = record => this.handleDelete(record);
+    ColumnConfig.profileCallback = record => this.handleProfile(record);
+    ColumnConfig.updateCallback = record => this.handleUpdate(record);
+    ColumnConfig.deleteCallback = record => this.handleDelete(record);
+    ColumnConfig.checkCallback = record => this.handleCheck(record);
+    ColumnConfig.uncheckCallback = record => this.handleUnCheck(record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -124,8 +135,16 @@ class TableList extends PureComponent {
     };
     // 查询条件处理
     const queryFilters = [];
+    if (fieldsValue.queryDeptID)
+      queryFilters.push({ name: 'fDeptID', compare: '=', value: fieldsValue.queryDeptID });
     if (fieldsValue.queryBillNo)
       queryFilters.push({ name: 'fBillNo', compare: '%*%', value: fieldsValue.queryBillNo });
+    if (fieldsValue.queryStatusNumber)
+      queryFilters.push({
+        name: 'fStatusNumber',
+        compare: '=',
+        value: fieldsValue.queryStatusNumber,
+      });
 
     this.setState({
       formValues: values,
@@ -234,38 +253,75 @@ class TableList extends PureComponent {
     });
   };
 
-  handleUpdateModalVisible = (flag, record) => {
-    const { modalVisible } = this.state;
-    this.setState({
-      modalVisible: { ...modalVisible, update: !!flag },
-      currentFormValues: record || {},
-    });
-  };
-
   handleDelete = record => {
     const { dispatch } = this.props;
     dispatch({
       type: 'invCheckManage/remove',
       payload: {
-        fItemID: record.fItemID,
+        fInterID: record.fInterID,
       },
-      callback: () => {
-        this.setState({
-          selectedRows: [],
-        });
-        const {
-          invCheckManage: { queryResult },
-        } = this.props;
-        if (queryResult.status === 'ok') {
-          message.success('【' + record.fName + '】' + '删除成功');
-          // 成功后再次刷新列表
-          this.search();
-        } else if (queryResult.status === 'warning') {
-          message.warning(queryResult.message);
-        } else {
-          message.error(queryResult.message);
-        }
+    }).then(() => {
+      const {
+        invCheckManage: { queryResult },
+      } = this.props;
+      this.setState({
+        selectedRows: [],
+      });
+      if (queryResult.status === 'ok') {
+        message.success('【' + record.fBillNo + '】' + '删除成功');
+        // 成功后再次刷新列表
+        this.search();
+      } else if (queryResult.status === 'warning') {
+        message.warning(queryResult.message);
+      } else {
+        message.error(queryResult.message);
+      }
+    });
+  };
+
+  handleCheck = record => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'invCheckManage/check',
+      payload: {
+        fInterID: record.fInterID,
       },
+    }).then(() => {
+      const {
+        invCheckManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success('【' + record.fBillNo + '】' + '审核成功');
+        // 成功后再次刷新列表
+        this.search();
+      } else if (queryResult.status === 'warning') {
+        message.warning(queryResult.message);
+      } else {
+        message.error(queryResult.message);
+      }
+    });
+  };
+
+  handleUnCheck = record => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'invCheckManage/uncheck',
+      payload: {
+        fInterID: record.fInterID,
+      },
+    }).then(() => {
+      const {
+        invCheckManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success('【' + record.fBillNo + '】' + '反审核成功');
+        // 成功后再次刷新列表
+        this.search();
+      } else if (queryResult.status === 'warning') {
+        message.warning(queryResult.message);
+      } else {
+        message.error(queryResult.message);
+      }
     });
   };
 
@@ -295,16 +351,48 @@ class TableList extends PureComponent {
   renderSimpleForm() {
     const {
       form: { getFieldDecorator },
+      basicData: {
+        processDeptTree,
+        status: { invCheckStatus },
+      },
     } = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={8} sm={24}>
+          <Col md={6} sm={24}>
+            <FormItem label="部门">
+              {getFieldDecorator('queryDeptID', {
+                rules: [{ required: false, message: '请选择部门' }],
+              })(
+                <TreeSelect
+                  style={{ width: '100%' }}
+                  treeData={processDeptTree}
+                  treeDefaultExpandAll
+                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                />
+              )}
+            </FormItem>
+          </Col>
+          <Col md={6} sm={24}>
             <FormItem label="单号">
               {getFieldDecorator('queryBillNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
-          <Col md={8} sm={24}>
+          <Col md={6} sm={24}>
+            <FormItem label="状态">
+              {getFieldDecorator('queryStatusNumber')(
+                <Select placeholder="请选择" style={{ width: '100%' }}>
+                  {invCheckStatus &&
+                    invCheckStatus.map(x => (
+                      <Option key={x.fKeyName} value={x.fKeyName}>
+                        <Badge color={x.fColor} text={x.fValue} />
+                      </Option>
+                    ))}
+                </Select>
+              )}
+            </FormItem>
+          </Col>
+          <Col md={6} sm={24}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
                 查询
@@ -335,37 +423,68 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/invCheck/create' },
+      payload: { path: '/prod/invCheck/create', handleSuccess: this.search },
     });
   }
 
-  expandedRowRender = () => {
-    const columns = [
-      { title: 'Date', dataIndex: 'date', key: 'date' },
-      { title: 'Name', dataIndex: 'name', key: 'name' },
-      {
-        title: 'Status',
-        key: 'state',
-        render: () => (
-          <span>
-            <Badge status="success" />
-            Finished
-          </span>
-        ),
-      },
-      { title: 'Upgrade Status', dataIndex: 'upgradeNum', key: 'upgradeNum' },
-    ];
+  handleProfile(record) {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/openMenu',
+      payload: { path: '/prod/invCheck/profile', record, handleSuccess: this.search },
+    });
+  }
 
-    const data = [];
-    for (let i = 0; i < 3; ++i) {
-      data.push({
-        key: i,
-        date: '2014-12-24 23:12:00',
-        name: 'This is production name',
-        upgradeNum: 'Upgraded: 56',
-      });
-    }
-    return <Table columns={columns} dataSource={data} pagination={false} />;
+  handleUpdate(record) {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/openMenu',
+      payload: { path: '/prod/invCheck/update', record, handleSuccess: this.search },
+    });
+  }
+
+  expandedRowRender = record => {
+    const columns = [
+      {
+        title: '产品',
+        dataIndex: 'fProductName',
+      },
+      {
+        title: '产品编码',
+        dataIndex: 'fProductNumber',
+      },
+      {
+        title: '规格型号',
+        dataIndex: 'fProductModel',
+      },
+      {
+        title: '批次',
+        dataIndex: 'fFullBatchNo',
+      },
+      {
+        title: '单位',
+        dataIndex: 'fUnitName',
+      },
+      {
+        title: '盘点数量',
+        dataIndex: 'fQty',
+      },
+      {
+        title: '数量',
+        dataIndex: 'fInvQty',
+      },
+      {
+        title: '盈亏',
+        dataIndex: 'fDeltaQty',
+      },
+      {
+        title: '备注',
+        dataIndex: 'fRowComments',
+      },
+    ];
+    return (
+      <Table rowKey="fRecordID" columns={columns} dataSource={record.details} pagination={false} />
+    );
   };
 
   render() {
@@ -383,11 +502,6 @@ class TableList extends PureComponent {
       </Menu>
     );
 
-    const updateMethods = {
-      dispatch,
-      handleModalVisible: this.handleUpdateModalVisible,
-      handleSuccess: this.search,
-    };
     const scrollX = ColumnConfig.columns
       .map(c => {
         return c.width;
@@ -449,13 +563,6 @@ class TableList extends PureComponent {
               />
             </div>
           </Card>
-          {currentFormValues && Object.keys(currentFormValues).length ? (
-            <UpdateForm
-              {...updateMethods}
-              modalVisible={modalVisible.update}
-              values={currentFormValues}
-            />
-          ) : null}
         </GridContent>
       </div>
     );

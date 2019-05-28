@@ -11,11 +11,14 @@ export async function fakeQuery(params) {
   });
 }
 
-export async function fakeRemove(params) {
-  return request('/api/invCheck/delete', {
+export async function fakeGet(params) {
+  return request(`/api/invCheck/${params.fInterID}`);
+}
+
+export async function fakeRemove(id) {
+  return request('/api/invCheck/' + id, {
     method: 'DELETE',
     body: {
-      ...params,
       method: 'delete',
     },
   });
@@ -32,11 +35,31 @@ export async function fakeAdd(params) {
 }
 
 export async function fakeUpdate(params) {
-  return request('/api/invCheck/update', {
+  return request('/api/invCheck/' + params.fInterID, {
     method: 'PUT',
     body: {
       ...params,
       method: 'update',
+    },
+  });
+}
+
+export async function fakeCheck(params) {
+  return request(`/api/invCheck/${params.fInterID}/check`, {
+    method: 'PUT',
+    body: {
+      ...params,
+      method: 'check',
+    },
+  });
+}
+
+export async function fakeUnCheck(params) {
+  return request(`/api/invCheck/${params.fInterID}/uncheck`, {
+    method: 'PUT',
+    body: {
+      ...params,
+      method: 'uncheck',
     },
   });
 }

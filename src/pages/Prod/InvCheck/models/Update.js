@@ -1,7 +1,7 @@
-import { fakeAdd, fakeInvByDept } from '@/services/Prod/InvCheck';
+import { fakeUpdate, fakeInvByDept } from '@/services/Prod/InvCheck';
 
 export default {
-  namespace: 'invCheckCreate',
+  namespace: 'invCheckUpdate',
 
   state: {
     queryResult: {
@@ -11,8 +11,8 @@ export default {
   },
 
   effects: {
-    *add({ payload }, { call, put }) {
-      const response = yield call(fakeAdd, payload);
+    *update({ payload }, { call, put }) {
+      const response = yield call(fakeUpdate, payload);
 
       yield put({
         type: 'save',
