@@ -53,6 +53,10 @@ export default {
   'menu.prod.invCheck.create': '新增在制品盘点',
   'menu.prod.invCheck.update': '修改在制品盘点',
   'menu.prod.invCheck.profile': '查看在制品盘点',
+  'menu.prod.defectCheck': '不良品盘点',
+  'menu.prod.defectCheck.create': '新增不良品盘点',
+  'menu.prod.defectCheck.update': '修改不良品盘点',
+  'menu.prod.defectCheck.profile': '查看不良品盘点',
   // 生产基础资料
   'menu.techStd': '工艺标准',
   'menu.techStd.defect': '不良信息',

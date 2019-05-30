@@ -2,7 +2,7 @@ import { stringify } from 'qs';
 import request from '@/utils/request';
 
 export async function fakeQuery(params) {
-  return request('/api/invCheck/getList', {
+  return request('/api/defectCheck/getList', {
     method: 'POST',
     body: {
       ...params,
@@ -12,11 +12,11 @@ export async function fakeQuery(params) {
 }
 
 export async function fakeGet(params) {
-  return request(`/api/invCheck/${params.fInterID}`);
+  return request(`/api/defectCheck/${params.fInterID}`);
 }
 
 export async function fakeRemove(id) {
-  return request('/api/invCheck/' + id, {
+  return request('/api/defectCheck/' + id, {
     method: 'DELETE',
     body: {
       method: 'delete',
@@ -25,7 +25,7 @@ export async function fakeRemove(id) {
 }
 
 export async function fakeAdd(params) {
-  return request('/api/invCheck', {
+  return request('/api/defectCheck', {
     method: 'POST',
     body: {
       ...params,
@@ -35,7 +35,7 @@ export async function fakeAdd(params) {
 }
 
 export async function fakeUpdate(params) {
-  return request('/api/invCheck/' + params.fInterID, {
+  return request('/api/defectCheck/' + params.fInterID, {
     method: 'PUT',
     body: {
       ...params,
@@ -45,7 +45,7 @@ export async function fakeUpdate(params) {
 }
 
 export async function fakeCheck(params) {
-  return request(`/api/invCheck/check/${params.fInterID}`, {
+  return request(`/api/defectCheck/check/${params.fInterID}`, {
     method: 'PUT',
     body: {
       ...params,
@@ -55,7 +55,7 @@ export async function fakeCheck(params) {
 }
 
 export async function fakeUnCheck(params) {
-  return request(`/api/invCheck/uncheck/${params.fInterID}`, {
+  return request(`/api/defectCheck/uncheck/${params.fInterID}`, {
     method: 'PUT',
     body: {
       ...params,
@@ -65,5 +65,5 @@ export async function fakeUnCheck(params) {
 }
 
 export async function fakeInvByDept(params) {
-  return request(`/api/invCheck/deptInv/${params.id}`);
+  return request(`/api/defectCheck/deptInv/${params.id}`);
 }

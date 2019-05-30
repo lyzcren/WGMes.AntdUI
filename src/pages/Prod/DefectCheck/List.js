@@ -45,9 +45,9 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ invCheckManage, loading, menu, basicData }) => ({
-  invCheckManage,
-  loading: loading.models.invCheckManage,
+@connect(({ defectCheckManage, loading, menu, basicData }) => ({
+  defectCheckManage,
+  loading: loading.models.defectCheckManage,
   menu,
   basicData,
 }))
@@ -77,7 +77,7 @@ class TableList extends PureComponent {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'invCheckManage/fetch',
+      type: 'defectCheckManage/fetch',
       payload: this.currentPagination,
     });
     dispatch({
@@ -85,7 +85,7 @@ class TableList extends PureComponent {
     });
     dispatch({
       type: 'basicData/getStatus',
-      payload: { number: 'invCheckStatus' },
+      payload: { number: 'defectCheckStatus' },
     });
     // 列配置相关方法
     ColumnConfig.profileCallback = record => this.handleProfile(record);
@@ -119,7 +119,7 @@ class TableList extends PureComponent {
     }
 
     dispatch({
-      type: 'invCheckManage/fetch',
+      type: 'defectCheckManage/fetch',
       payload: this.currentPagination,
     });
   };
@@ -168,7 +168,7 @@ class TableList extends PureComponent {
 
       const pagination = this.getSearchParam(fieldsValue);
       dispatch({
-        type: 'invCheckManage/fetch',
+        type: 'defectCheckManage/fetch',
         payload: pagination,
       });
       this.handleSelectRows([]);
@@ -190,7 +190,7 @@ class TableList extends PureComponent {
     };
 
     dispatch({
-      type: 'invCheckManage/fetch',
+      type: 'defectCheckManage/fetch',
       payload: this.currentPagination,
     });
     this.handleSelectRows([]);
@@ -206,12 +206,12 @@ class TableList extends PureComponent {
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          const fileName = '在制品盘点-第' + pagination.current + '页.xls';
-          exportExcel('/api/invCheck/export', pagination, fileName);
+          const fileName = '不良盘点-第' + pagination.current + '页.xls';
+          exportExcel('/api/defectCheck/export', pagination, fileName);
           break;
         case 'allPage':
           pagination.exportPage = false;
-          exportExcel('/api/invCheck/export', pagination, '在制品盘点.xls');
+          exportExcel('/api/defectCheck/export', pagination, '不良盘点.xls');
           break;
         default:
           break;
@@ -256,13 +256,13 @@ class TableList extends PureComponent {
   handleDelete = record => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'invCheckManage/remove',
+      type: 'defectCheckManage/remove',
       payload: {
         fInterID: record.fInterID,
       },
     }).then(() => {
       const {
-        invCheckManage: { queryResult },
+        defectCheckManage: { queryResult },
       } = this.props;
       this.setState({
         selectedRows: [],
@@ -282,13 +282,13 @@ class TableList extends PureComponent {
   handleCheck = record => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'invCheckManage/check',
+      type: 'defectCheckManage/check',
       payload: {
         fInterID: record.fInterID,
       },
     }).then(() => {
       const {
-        invCheckManage: { queryResult },
+        defectCheckManage: { queryResult },
       } = this.props;
       if (queryResult.status === 'ok') {
         message.success('【' + record.fBillNo + '】' + '审核成功');
@@ -305,13 +305,13 @@ class TableList extends PureComponent {
   handleUnCheck = record => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'invCheckManage/uncheck',
+      type: 'defectCheckManage/uncheck',
       payload: {
         fInterID: record.fInterID,
       },
     }).then(() => {
       const {
-        invCheckManage: { queryResult },
+        defectCheckManage: { queryResult },
       } = this.props;
       if (queryResult.status === 'ok') {
         message.success('【' + record.fBillNo + '】' + '反审核成功');
@@ -353,7 +353,7 @@ class TableList extends PureComponent {
       form: { getFieldDecorator },
       basicData: {
         processDeptTree,
-        status: { invCheckStatus },
+        status: { defectCheckStatus },
       },
     } = this.props;
     return (
@@ -382,8 +382,8 @@ class TableList extends PureComponent {
             <FormItem label="状态">
               {getFieldDecorator('queryStatusNumber')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                  {invCheckStatus &&
-                    invCheckStatus.map(x => (
+                  {defectCheckStatus &&
+                    defectCheckStatus.map(x => (
                       <Option key={x.fKeyName} value={x.fKeyName}>
                         <Badge color={x.fColor} text={x.fValue} />
                       </Option>
@@ -423,7 +423,7 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/invCheck/create', handleSuccess: this.search },
+      payload: { path: '/prod/defectCheck/create', handleSuccess: this.search },
     });
   }
 
@@ -431,7 +431,7 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/invCheck/profile', record, handleSuccess: this.search },
+      payload: { path: '/prod/defectCheck/profile', record, handleSuccess: this.search },
     });
   }
 
@@ -439,7 +439,7 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/invCheck/update', record, handleSuccess: this.search },
+      payload: { path: '/prod/defectCheck/update', record, handleSuccess: this.search },
     });
   }
 
@@ -458,8 +458,12 @@ class TableList extends PureComponent {
         dataIndex: 'fProductModel',
       },
       {
-        title: '批次',
-        dataIndex: 'fFullBatchNo',
+        title: '不良',
+        dataIndex: 'fDefectName',
+      },
+      {
+        title: '任务单号',
+        dataIndex: 'fMoBillNo',
       },
       {
         title: '单位',
@@ -483,20 +487,25 @@ class TableList extends PureComponent {
       },
     ];
     return (
-      <Table rowKey="fRecordID" columns={columns} dataSource={record.details} pagination={false} />
+      <Table
+        rowKey="fDefectInvID"
+        columns={columns}
+        dataSource={record.details}
+        pagination={false}
+      />
     );
   };
 
   render() {
     const {
       dispatch,
-      invCheckManage: { data, queryResult },
+      defectCheckManage: { data, queryResult },
       loading,
     } = this.props;
     const { selectedRows, modalVisible, updateModalVisible, currentFormValues } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-        <Menu.Item key="remove" disabled={!hasAuthority('InvCheck_Delete')}>
+        <Menu.Item key="remove" disabled={!hasAuthority('DefectCheck_Delete')}>
           删除
         </Menu.Item>
       </Menu>
@@ -516,12 +525,12 @@ class TableList extends PureComponent {
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
               <div className={styles.tableListOperator}>
-                <Authorized authority="InvCheck_Create">
+                <Authorized authority="DefectCheck_Create">
                   <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
                     新建
                   </Button>
                 </Authorized>
-                <Authorized authority="InvCheck_Export">
+                <Authorized authority="DefectCheck_Export">
                   <Dropdown
                     overlay={
                       <Menu onClick={this.handleExport} selectedKeys={[]}>
@@ -537,10 +546,10 @@ class TableList extends PureComponent {
                 </Authorized>
                 {selectedRows.length > 0 && (
                   <span>
-                    <Authorized authority="InvCheck_Delete">
+                    <Authorized authority="DefectCheck_Delete">
                       <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
                     </Authorized>
-                    <Authorized authority={['InvCheck_Delete']}>
+                    <Authorized authority={['DefectCheck_Delete']}>
                       <Dropdown overlay={menu}>
                         <Button>
                           更多操作 <Icon type="down" />

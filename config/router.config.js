@@ -162,6 +162,35 @@ export default [
               },
             ],
           },
+          {
+            path: '/prod/defectCheck',
+            name: 'defectCheck',
+            component: './Prod/DefectCheck/List',
+            authority: ['DefectCheck_Read'],
+            routes: [
+              {
+                path: '/prod/defectCheck/create',
+                name: 'create',
+                component: './Prod/DefectCheck/Create',
+                authority: ['DefectCheck_Create'],
+                hideInMenu: true,
+              },
+              {
+                path: '/prod/defectCheck/update',
+                name: 'update',
+                component: './Prod/DefectCheck/Update',
+                authority: ['DefectCheck_Update'],
+                hideInMenu: true,
+              },
+              {
+                path: '/prod/defectCheck/profile',
+                name: 'profile',
+                component: './Prod/DefectCheck/Profile',
+                authority: ['DefectCheck_Read'],
+                hideInMenu: true,
+              },
+            ],
+          },
         ],
       },
       {

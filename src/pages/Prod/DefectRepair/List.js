@@ -194,12 +194,12 @@ class TableList extends PureComponent {
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          const fileName = '导出-第' + pagination.current + '页.xls';
+          const fileName = '不良返修-第' + pagination.current + '页.xls';
           exportExcel('/api/defectRepair/export', pagination, fileName);
           break;
         case 'allPage':
           pagination.exportPage = false;
-          exportExcel('/api/defectRepair/export', pagination, '导出.xls');
+          exportExcel('/api/defectRepair/export', pagination, '不良返修.xls');
           break;
         default:
           break;

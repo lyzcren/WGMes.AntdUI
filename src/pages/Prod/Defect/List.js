@@ -189,12 +189,12 @@ class TableList extends PureComponent {
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          const fileName = '导出-第' + pagination.current + '页.xls';
+          const fileName = '不良-第' + pagination.current + '页.xls';
           exportExcel('/api/prodDefect/export', pagination, fileName);
           break;
         case 'allPage':
           pagination.exportPage = false;
-          exportExcel('/api/prodDefect/export', pagination, '导出.xls');
+          exportExcel('/api/prodDefect/export', pagination, '不良.xls');
           break;
         default:
           break;
@@ -233,12 +233,12 @@ class TableList extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem id="queryMoBillNo" label="任务单号">
+            <FormItem label="任务单号">
               {getFieldDecorator('queryMoBillNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem id="queryDept" label="部门">
+            <FormItem label="部门">
               {getFieldDecorator('queryDept', {
                 rules: [{ required: false, message: '请选择部门' }],
               })(

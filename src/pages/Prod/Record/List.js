@@ -200,11 +200,11 @@ class TableList extends PureComponent {
       if (err) return;
 
       let params = this.getSearchParam(fieldsValue);
-      const fileName = '导出.xls';
+      const fileName = '生产记录.xls';
       switch (e.key) {
         case 'currentPage':
           params = { ...params, exportPage: true };
-          fileName = '导出-第' + params.pagination.current + '页.xls';
+          fileName = '生产记录-第' + params.pagination.current + '页.xls';
           break;
         case 'allPage':
           params = { ...params, exportAll: true };
