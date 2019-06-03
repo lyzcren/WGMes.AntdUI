@@ -280,7 +280,7 @@ export default [
         path: '/sysConfig',
         name: 'sysConfig',
         icon: 'setting',
-        authority: ['User_Read', 'Role_Read', 'BillNoRule_Read'],
+        authority: ['User_Read', 'Role_Read', 'BillNoRule_Read', 'PrintTemplate_Read'],
         routes: [
           {
             path: '/sysConfig/user',
@@ -299,6 +299,12 @@ export default [
             name: 'billNoRule',
             component: './SysConfig/BillNoRule/List',
             authority: ['BillNoRule_Read'],
+          },
+          {
+            path: '/sysConfig/printTemplate',
+            name: 'printTemplate',
+            component: './Sys/PrintTemplate/List',
+            authority: ['PrintTemplate_Read'],
           },
         ],
       },

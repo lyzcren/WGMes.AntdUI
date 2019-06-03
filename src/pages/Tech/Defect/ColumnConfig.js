@@ -45,7 +45,8 @@ class ColumnConfig {
       dataIndex: 'fTypeID',
       filters: TypeData,
       render(val) {
-        return TypeData.find((type, index) => type.value == val).text;
+        const type = TypeData.find((type, index) => type.value == val);
+        return type ? type.text : '';
       },
     },
     {

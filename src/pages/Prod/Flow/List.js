@@ -93,6 +93,9 @@ class TableList extends PureComponent {
     dispatch({
       type: 'basicData/getProcessDeptTree',
     });
+    dispatch({
+      type: 'flowManage/getPrintTemplates',
+    });
     // 列配置相关方法
     ColumnConfig.MissionModalVisibleCallback = record =>
       this.handleMissionModalVisible(true, record);
@@ -275,6 +278,28 @@ class TableList extends PureComponent {
       }
       exportExcel('/api/flow/export', params, fileName);
     });
+  };
+
+  //应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
+  webapp_start(templateId, interIds, type) {
+    var option = {
+      baseurl: 'http://' + window.location.host,
+      report: '/api/PrintTemplate/grf?id=' + templateId,
+      data: '/api/flow/getPrintData?id=' + interIds,
+      selfsql: false,
+      type: type,
+    };
+
+    //创建启动WEB报表客户端的URL协议参数
+    window.location.href = 'grwebapp://' + JSON.stringify(option);
+  }
+
+  handlePrint = e => {
+    const { dispatch, form } = this.props;
+    const { selectedRows } = this.state;
+
+    const templateId = e.key;
+    this.webapp_start(templateId, selectedRows.map(row => row.fInterID).join(','), 'preview');
   };
 
   toggleForm = () => {
@@ -529,7 +554,7 @@ class TableList extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6} sm={24}>
-            <FormItem id="queryDept" label="部门">
+            <FormItem label="部门">
               {getFieldDecorator('queryDept', {
                 rules: [{ required: true, message: '请选择部门' }],
               })(
@@ -556,7 +581,7 @@ class TableList extends PureComponent {
             </FormItem>
           </Col>
           <Col md={6} sm={24}>
-            <FormItem id="queryBatchNo" label="批号">
+            <FormItem label="批号">
               {getFieldDecorator('queryBatchNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
@@ -589,12 +614,12 @@ class TableList extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6} sm={24}>
-            <FormItem id="queryBatchNo" label="批号">
+            <FormItem label="批号">
               {getFieldDecorator('queryBatchNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={6} sm={24}>
-            <FormItem id="queryMoBillNo" label="任务单号">
+            <FormItem label="任务单号">
               {getFieldDecorator('queryMoBillNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
@@ -640,17 +665,17 @@ class TableList extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem id="queryBatchNo" label="批号">
+            <FormItem label="批号">
               {getFieldDecorator('queryBatchNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem id="queryMoBillNo" label="生产任务单号">
+            <FormItem label="生产任务单号">
               {getFieldDecorator('queryMoBillNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem id="querySoBillNo" label="订单号">
+            <FormItem label="订单号">
               {getFieldDecorator('querySoBillNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
@@ -726,7 +751,7 @@ class TableList extends PureComponent {
   render() {
     const {
       dispatch,
-      flowManage: { data, queryResult },
+      flowManage: { data, queryResult, printTemplates },
       loading,
     } = this.props;
     const {
@@ -777,6 +802,23 @@ class TableList extends PureComponent {
                     </Button>
                   </Dropdown>
                 </Authorized>
+                {selectedRows.length > 0 && printTemplates && printTemplates.length > 0 ? (
+                  <Authorized authority="Flow_Print">
+                    <Dropdown
+                      overlay={
+                        <Menu onClick={this.handlePrint} selectedKeys={[]}>
+                          {printTemplates.map(val => {
+                            return <Menu.Item key={val.fInterID}>{val.fName}</Menu.Item>;
+                          })}
+                        </Menu>
+                      }
+                    >
+                      <Button>
+                        打印 <Icon type="down" />
+                      </Button>
+                    </Dropdown>
+                  </Authorized>
+                ) : null}
                 {selectedRows.length > 0 && (
                   <span>
                     <Authorized authority="Flow_Sign">

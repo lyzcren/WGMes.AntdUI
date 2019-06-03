@@ -7,6 +7,7 @@ import {
   fakeGetDepts,
   fakeGetRecord,
 } from '@/services/Prod/Flow';
+import { fakeQueryPrintTemplate } from '@/services/Sys/PrintTemplate';
 
 export default {
   namespace: 'flowManage',
@@ -21,6 +22,7 @@ export default {
       message: '',
     },
     nextDepts: [],
+    printTemplates: [],
   },
 
   effects: {
@@ -70,9 +72,22 @@ export default {
         payload: response,
       });
     },
+    *getPrintTemplates({ payload }, { call, put }) {
+      const response = yield call(fakeQueryPrintTemplate, { number: 'prod-flow' });
+      yield put({
+        type: 'save',
+        payload: { printTemplates: response },
+      });
+    },
   },
 
   reducers: {
+    save(state, action) {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
     saveQueryData(state, action) {
       return {
         ...state,

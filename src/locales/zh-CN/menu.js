@@ -76,4 +76,5 @@ export default {
   'menu.sysConfig.user': '用户管理',
   'menu.sysConfig.role': '角色管理',
   'menu.sysConfig.billNoRule': '编码规则',
+  'menu.sysConfig.printTemplate': '打印模板',
 };

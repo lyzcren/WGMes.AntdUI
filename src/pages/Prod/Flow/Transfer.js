@@ -461,7 +461,7 @@ class Transfer extends PureComponent {
             {showMoreDefect && (
               <Row gutter={16}>
                 <Col lg={6} md={12} sm={24}>
-                  <FormItem key="fOtherDefectID" label="其他不良">
+                  <FormItem label="其他不良">
                     {getFieldDecorator('fOtherDefectID', {
                       rules: [{ required: false, message: '请选择不良' }],
                     })(
