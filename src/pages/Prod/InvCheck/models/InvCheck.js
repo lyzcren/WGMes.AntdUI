@@ -6,6 +6,7 @@ import {
   fakeCheck,
   fakeUnCheck,
 } from '@/services/Prod/InvCheck';
+import { fakeQueryPrintTemplate } from '@/services/Sys/PrintTemplate';
 
 export default {
   namespace: 'invCheckManage',
@@ -15,6 +16,7 @@ export default {
       list: [],
       pagination: {},
     },
+    printTemplates: [],
     queryResult: {
       status: 'ok',
       message: '',
@@ -65,9 +67,22 @@ export default {
         payload: response,
       });
     },
+    *getPrintTemplates({ payload }, { call, put }) {
+      const response = yield call(fakeQueryPrintTemplate, { number: 'prod-invCheck' });
+      yield put({
+        type: 'save',
+        payload: { printTemplates: response },
+      });
+    },
   },
 
   reducers: {
+    save(state, action) {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
     saveQueryData(state, action) {
       return {
         ...state,

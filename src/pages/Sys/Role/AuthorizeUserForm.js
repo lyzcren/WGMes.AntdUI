@@ -13,7 +13,7 @@ const sex = ['保密', '男', '女'];
 
 /* eslint react/no-multi-comp:0 */
 @Form.create()
-export class AuthorizeRoleForm extends PureComponent {
+export class AuthorizeUserForm extends PureComponent {
   static defaultProps = {
     handleUpdate: () => {},
     handleModalVisible: () => {},
@@ -36,8 +36,19 @@ export class AuthorizeRoleForm extends PureComponent {
 
   columns = [
     {
-      title: '角色',
+      title: '用户名',
+      dataIndex: 'fNumber',
+    },
+    {
+      title: '姓名',
       dataIndex: 'fName',
+    },
+    {
+      title: '性别',
+      dataIndex: 'fSex',
+      render(val) {
+        return sex[val];
+      },
     },
     {
       title: '状态',
@@ -74,11 +85,11 @@ export class AuthorizeRoleForm extends PureComponent {
     const { dispatch } = this.props;
     // 获取当前角色已关联的用户列表
     dispatch({
-      type: 'userManage/getAuthorizeRole',
+      type: 'roleManage/getAuthorizeUser',
       payload: {
         fItemID: fieldsValue.fItemID,
-        fIsAuthorized: fieldsValue.fIsAuthorized,
-        roleName: fieldsValue.roleName,
+        fIsActive: fieldsValue.fIsActive,
+        userName: fieldsValue.userName,
       },
     });
   };
@@ -102,10 +113,10 @@ export class AuthorizeRoleForm extends PureComponent {
   handleAuthorize = record => {
     const { dispatch, form } = this.props;
     dispatch({
-      type: 'userManage/authorizeRole',
+      type: 'roleManage/authorizeUser',
       payload: {
-        fUserID: this.state.formVals.fItemID,
-        fRoleID: record.fItemID,
+        fUserID: record.fItemID,
+        fRoleID: this.state.formVals.fItemID,
       },
     }).then(() => {
       const { queryResult } = this.props;
@@ -124,10 +135,10 @@ export class AuthorizeRoleForm extends PureComponent {
   handleUnAuthorize = record => {
     const { dispatch, form } = this.props;
     dispatch({
-      type: 'userManage/unAuthorizeRole',
+      type: 'roleManage/unAuthorizeUser',
       payload: {
-        fUserID: this.state.formVals.fItemID,
-        fRoleID: record.fItemID,
+        fUserID: record.fItemID,
+        fRoleID: this.state.formVals.fItemID,
       },
     }).then(() => {
       const { queryResult } = this.props;
@@ -165,7 +176,14 @@ export class AuthorizeRoleForm extends PureComponent {
   };
 
   render() {
-    const { loading, form, modalVisible, handleModalVisible, values, authorizeRole } = this.props;
+    const {
+      loading,
+      form,
+      authorizeUserModalVisible,
+      handleModalVisible,
+      values,
+      authorizeUser,
+    } = this.props;
     const { formVals, selectedRows } = this.state;
 
     const footer = (
@@ -187,10 +205,10 @@ export class AuthorizeRoleForm extends PureComponent {
         destroyOnClose
         title={
           <div>
-            授权 <Tag color="blue">{formVals.fName}</Tag>角色
+            绑定 <Tag color="blue">{formVals.fName}</Tag>用户
           </div>
         }
-        visible={modalVisible}
+        visible={authorizeUserModalVisible}
         width="760px"
         footer={footer}
         // okButtonProps={{ disabled: true }}
@@ -201,13 +219,13 @@ export class AuthorizeRoleForm extends PureComponent {
         <Form onSubmit={this.handleSearch} layout="inline">
           <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
             <Col md={10} sm={2}>
-              <FormItem id="roleName" label="角色">
-                {form.getFieldDecorator('roleName')(<Input placeholder="请输入" />)}
+              <FormItem label="姓名">
+                {form.getFieldDecorator('userName')(<Input placeholder="请输入" />)}
               </FormItem>
             </Col>
             <Col md={8} sm={0}>
               <FormItem label="状态">
-                {form.getFieldDecorator('fIsAuthorized')(
+                {form.getFieldDecorator('fIsActive')(
                   <Select placeholder="请选择" style={{ width: '124px' }}>
                     <Option value="true">已授权</Option>
                     <Option value="false">未授权</Option>
@@ -227,11 +245,11 @@ export class AuthorizeRoleForm extends PureComponent {
             </Col>
           </Row>
         </Form>
-        <Table
-          rowKey="fName"
+        <StandardTable
+          rowKey="fNumber"
           selectedRows={selectedRows}
           loading={loading}
-          dataSource={authorizeRole}
+          dataSource={authorizeUser}
           // data={data}
           columns={this.columns}
           onSelectRow={this.handleSelectRows}

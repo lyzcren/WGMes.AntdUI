@@ -255,6 +255,7 @@ class Transfer extends PureComponent {
         <Description term="产品名称">{data.fProductName}</Description>
         <Description term="规格型号">{data.fModel}</Description>
         <Description term="父件型号">{data.fParentModel}</Description>
+        <Description term="单位">{data.fUnitName}</Description>
         <Description term="流程单数量">{data.fFlowInputQty}</Description>
         <Description term="投入数量">{data.fInputQty}</Description>
         <Description term="合格数量">{data.fPassQty}</Description>

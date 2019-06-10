@@ -90,6 +90,7 @@ class Transfer extends PureComponent {
       fProductName,
       fModel,
       fParentModel,
+      fUnitName,
       fFlowInputQty,
       fInputQty,
       fPassQty,
@@ -113,6 +114,7 @@ class Transfer extends PureComponent {
         <Description term="产品名称">{fProductName}</Description>
         <Description term="规格型号">{fModel}</Description>
         <Description term="父件型号">{fParentModel}</Description>
+        <Description term="单位">{fUnitName}</Description>
         <Description term="流程单数量">{fFlowInputQty}</Description>
         <Description term="投入数量">{fInputQty}</Description>
         <Description term="合格数量">{fPassQty}</Description>

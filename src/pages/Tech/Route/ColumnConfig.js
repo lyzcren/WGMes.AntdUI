@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Switch, Divider, Dropdown, Menu, Icon } from 'antd';
+import { Switch, Divider, Dropdown, Menu, Icon, Modal } from 'antd';
 import moment from 'moment';
 import Authorized from '@/utils/Authorized';
 import { hasAuthority } from '@/utils/authority';

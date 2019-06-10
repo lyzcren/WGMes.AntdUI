@@ -12,24 +12,11 @@ export async function fakeQuery(params) {
 }
 
 export async function fakeGet(params) {
-  return request(`/api/Mission?${stringify(params)}`);
-  // return request('/api/Mission', {
-  //   method: 'GET',
-  //   body: {
-  //     ...params,
-  //     method: 'get',
-  //   },
-  // });
+  return request(`/api/Mission/${params.fInterID}`);
 }
 
 export async function fakeSync(params) {
-  return request('/api/Mission/sync', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'sync',
-    },
-  });
+  return request('/api/Mission/sync');
 }
 
 export async function fakeGenFlow(params) {

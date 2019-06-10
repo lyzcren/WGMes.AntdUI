@@ -140,6 +140,7 @@ class Profile extends PureComponent {
         </Card>
         <Card title="数量信息" style={{ marginBottom: 24 }} bordered={false}>
           <DescriptionList style={{ marginBottom: 24 }}>
+            <Description term="单位">{data.fUnitName}</Description>
             <Description term="计划">{data.fPlanQty}</Description>
             <Description term="投入">{data.fInputQty}</Description>
             <Description term="完工">{data.fFinishQty}</Description>

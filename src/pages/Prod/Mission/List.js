@@ -73,10 +73,9 @@ class TableList extends PureComponent {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    const params = { pagination: this.currentPagination };
     dispatch({
       type: 'missionManage/fetch',
-      payload: params,
+      payload: this.currentPagination,
     });
     // 列配置相关方法
     ColumnConfig.ProfileModalVisibleCallback = record =>
@@ -108,11 +107,9 @@ class TableList extends PureComponent {
       this.currentPagination.sorter[sorter.field] = sorter.order.replace('end', '');
     }
 
-    const params = { pagination: this.currentPagination };
-
     dispatch({
       type: 'missionManage/fetch',
-      payload: params,
+      payload: this.currentPagination,
     });
   };
 
@@ -143,9 +140,8 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters,
     };
-    const params = { pagination: this.currentPagination };
 
-    return params;
+    return this.currentPagination;
   };
 
   search = () => {
@@ -154,10 +150,10 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      const params = this.getSearchParam(fieldsValue);
+      const pagination = this.getSearchParam(fieldsValue);
       dispatch({
         type: 'missionManage/fetch',
-        payload: params,
+        payload: pagination,
       });
     });
     this.handleSelectRows([]);
@@ -177,11 +173,10 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters: [],
     };
-    const params = { pagination: this.currentPagination };
 
     dispatch({
       type: 'missionManage/fetch',
-      payload: params,
+      payload: this.currentPagination,
     });
     this.handleSelectRows([]);
   };
@@ -210,20 +205,20 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      let params = this.getSearchParam(fieldsValue);
+      let pagination = this.getSearchParam(fieldsValue);
       let fileName = '任务单.xls';
       switch (e.key) {
         case 'currentPage':
-          params = { ...params, exportPage: true };
-          fileName = '任务单-第' + params.pagination.current + '页.xls';
+          pagination.exportPage = true;
+          fileName = '任务单-第' + pagination.current + '页.xls';
           break;
         case 'allPage':
-          params = { ...params, exportAll: true };
+          pagination.exportPage = false;
           break;
         default:
           break;
       }
-      exportExcel('/api/mission/export', params, fileName);
+      exportExcel('/api/mission/export', pagination, fileName);
     });
   };
 
@@ -264,12 +259,12 @@ class TableList extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem id="querySOBillNo" label="订单号">
+            <FormItem label="订单号">
               {getFieldDecorator('querySOBillNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem id="queryMOBillNo" label="生产任务单号">
+            <FormItem label="生产任务单号">
               {getFieldDecorator('queryMOBillNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>

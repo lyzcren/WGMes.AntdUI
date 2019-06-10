@@ -63,6 +63,10 @@ class TableList extends PureComponent {
             <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/MjEImQtenlyueSmVEfUD.svg" />{' '}
             下载插件
           </a>
+          <a href="http://www.rubylong.cn/download/Grid++Report6.zip">
+            <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/MjEImQtenlyueSmVEfUD.svg" />{' '}
+            报表开发插件
+          </a>
           <a href="http://www.gridreport.cn/demos/html5/" target="_blank">
             <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/ohOEPSYdDTNnyMbGuyLb.svg" />{' '}
             参考设计文档

@@ -263,7 +263,7 @@ class TableList extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6} sm={24}>
-            <FormItem id="queryDept" label="部门">
+            <FormItem label="部门">
               {getFieldDecorator('queryDept', {
                 rules: [{ required: false, message: '请选择部门' }],
               })(
@@ -277,12 +277,12 @@ class TableList extends PureComponent {
             </FormItem>
           </Col>
           <Col md={6} sm={24}>
-            <FormItem id="queryBatchNo" label="批号">
+            <FormItem label="批号">
               {getFieldDecorator('queryBatchNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={6} sm={24}>
-            <FormItem id="queryMoBillNo" label="任务单号">
+            <FormItem label="任务单号">
               {getFieldDecorator('queryMoBillNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>

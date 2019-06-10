@@ -85,10 +85,9 @@ class TableList extends PureComponent {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    const params = { pagination: this.currentPagination };
     dispatch({
       type: 'flowManage/fetch',
-      payload: params,
+      payload: this.currentPagination,
     });
     dispatch({
       type: 'basicData/getProcessDeptTree',
@@ -126,11 +125,9 @@ class TableList extends PureComponent {
       this.currentPagination.sorter[sorter.field] = sorter.order.replace('end', '');
     }
 
-    const params = { pagination: this.currentPagination };
-
     dispatch({
       type: 'flowManage/fetch',
-      payload: params,
+      payload: this.currentPagination,
     });
   };
 
@@ -208,9 +205,8 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters,
     };
-    const params = { pagination: this.currentPagination };
 
-    return params;
+    return this.currentPagination;
   };
 
   search = () => {
@@ -219,10 +215,10 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      const params = this.getSearchParam(fieldsValue);
+      const pagination = this.getSearchParam(fieldsValue);
       dispatch({
         type: 'flowManage/fetch',
-        payload: params,
+        payload: pagination,
       });
       this.setState({ queryDeptID: fieldsValue.queryDept });
       if (!fieldsValue.queryDept) {
@@ -247,11 +243,10 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters: [],
     };
-    const params = { pagination: this.currentPagination };
 
     dispatch({
       type: 'flowManage/fetch',
-      payload: params,
+      payload: this.currentPagination,
     });
     this.setState({ queryDeptID: null });
     this.handleSelectRows([]);
@@ -263,20 +258,20 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      let params = this.getSearchParam(fieldsValue);
+      let pagination = this.getSearchParam(fieldsValue);
       let fileName = '流程单.xls';
       switch (e.key) {
         case 'currentPage':
-          params = { ...params, exportPage: true };
-          fileName = '流程单-第' + params.pagination.current + '页.xls';
+          pagination.exportPage = true;
+          fileName = '流程单-第' + pagination.current + '页.xls';
           break;
         case 'allPage':
-          params = { ...params, exportAll: true };
+          pagination.exportPage = false;
           break;
         default:
           break;
       }
-      exportExcel('/api/flow/export', params, fileName);
+      exportExcel('/api/flow/export', pagination, fileName);
     });
   };
 

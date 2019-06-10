@@ -87,12 +87,13 @@ class TableList extends PureComponent {
       type: 'basicData/getStatus',
       payload: { number: 'defectCheckStatus' },
     });
+    dispatch({
+      type: 'defectCheckManage/getPrintTemplates',
+    });
+    // 指定操作列
+    ColumnConfig.renderOperation = this.renderOperation;
     // 列配置相关方法
     ColumnConfig.profileCallback = record => this.handleProfile(record);
-    ColumnConfig.updateCallback = record => this.handleUpdate(record);
-    ColumnConfig.deleteCallback = record => this.handleDelete(record);
-    ColumnConfig.checkCallback = record => this.handleCheck(record);
-    ColumnConfig.uncheckCallback = record => this.handleUnCheck(record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -217,6 +218,28 @@ class TableList extends PureComponent {
           break;
       }
     });
+  };
+
+  //应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
+  webapp_start(templateId, interId, type) {
+    var option = {
+      baseurl: 'http://' + window.location.host,
+      report: '/api/PrintTemplate/grf?id=' + templateId,
+      data: '/api/defectCheck/getPrintData?id=' + interId,
+      selfsql: false,
+      type: type,
+    };
+
+    //创建启动WEB报表客户端的URL协议参数
+    window.location.href = 'grwebapp://' + JSON.stringify(option);
+  }
+
+  handlePrint = (key, record) => {
+    const { dispatch, form } = this.props;
+    const { selectedRows } = this.state;
+
+    const templateId = key;
+    this.webapp_start(templateId, record.fInterID, 'preview');
   };
 
   toggleForm = () => {
@@ -346,6 +369,53 @@ class TableList extends PureComponent {
     selectedRows.forEach(selectedRow => {
       this.handleDelete(selectedRow);
     });
+  };
+
+  renderOperation = (val, record) => {
+    const {
+      defectCheckManage: { printTemplates },
+    } = this.props;
+    return (
+      <Fragment>
+        <Authorized authority="DefectCheck_Update">
+          <a disabled={record.fStatus != 0} onClick={() => this.handleUpdate(record)}>
+            修改
+          </a>
+        </Authorized>
+        <Authorized authority="DefectCheck_Check">
+          <Divider type="vertical" />
+          {record.fStatus === 0 ? (
+            <a onClick={() => this.handleCheck(record)}>审核</a>
+          ) : (
+            <a onClick={() => this.handleUnCheck(record)}>反审核</a>
+          )}
+        </Authorized>
+        <Authorized authority="DefectCheck_Delete">
+          <Divider type="vertical" />
+          <Popconfirm title="是否要删除此行？" onConfirm={() => this.handleDelete(record)}>
+            <a>删除</a>
+          </Popconfirm>
+        </Authorized>
+        {printTemplates.length > 0 ? (
+          <Authorized authority="DefectCheck_Print">
+            <Dropdown
+              overlay={
+                <Menu onClick={({ key }) => this.handlePrint(key, record)}>
+                  {printTemplates.map(val => {
+                    return <Menu.Item key={val.fInterID}>{val.fName}</Menu.Item>;
+                  })}
+                </Menu>
+              }
+            >
+              <a>
+                <Divider type="vertical" />
+                打印 <Icon type="down" />
+              </a>
+            </Dropdown>
+          </Authorized>
+        ) : null}
+      </Fragment>
+    );
   };
 
   renderSimpleForm() {

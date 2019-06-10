@@ -71,7 +71,7 @@ export class DeptForm extends PureComponent {
     } = this.props;
     if (fInterID !== preProps.route.fInterID || currentStep !== preProps.currentStep) {
       this.setState({ fInterID, depts, currentStep });
-      this.MaxEntryID = Math.max(...depts.map(d => d.fEntryID));
+      this.MaxEntryID = depts.length > 0 ? Math.max(...depts.map(d => d.fEntryID)) : 0;
     }
   }
 
@@ -80,30 +80,14 @@ export class DeptForm extends PureComponent {
     return (newData || depts).filter(item => item.fEntryID === fEntryID)[0];
   }
 
-  toggleEditable = (e, fEntryID) => {
-    e.preventDefault();
-    const { depts } = this.state;
-    const newData = depts.map(item => ({ ...item }));
-    const target = this.getRowByKey(fEntryID, newData);
-    if (target) {
-      // 进入编辑状态时保存原始数据
-      if (!target.editable) {
-        this.cacheOriginData[fEntryID] = { ...target };
-      }
-      target.editable = !target.editable;
-      this.setState({ depts: newData });
-    }
-  };
-
   newItem = () => {
+    const { dispatch } = this.props;
     const { depts } = this.state;
     const newData = depts.map(item => ({ ...item }));
     newData.push({
       fEntryID: ++this.MaxEntryID,
-      fDeptID: 0,
+      fDeptID: '',
       fDeptName: '',
-      editable: true,
-      isNew: true,
     });
     this.setState({ depts: newData });
   };
@@ -120,13 +104,8 @@ export class DeptForm extends PureComponent {
     });
   }
 
-  handleKeyPress(e, fEntryID) {
-    if (e.key === 'Enter') {
-      this.saveRow(e, fEntryID);
-    }
-  }
-
   handleDeptChange(deptId, deptName, fEntryID) {
+    const { dispatch } = this.props;
     const { depts } = this.state;
     const newData = depts.map(item => ({ ...item }));
     const target = this.getRowByKey(fEntryID, newData);
@@ -135,6 +114,10 @@ export class DeptForm extends PureComponent {
       target.fDeptName = deptName;
       this.setState({ depts: newData });
     }
+    dispatch({
+      type: 'routeProfile/changeStep',
+      payload: { depts: newData },
+    });
   }
 
   handleFieldChange(e, fieldName, fEntryID) {
@@ -147,126 +130,49 @@ export class DeptForm extends PureComponent {
     }
   }
 
-  saveRow(e, fEntryID) {
-    e.persist();
-    this.setState({
-      loading: true,
-    });
-    setTimeout(() => {
-      const { depts } = this.state;
-      if (this.clickedCancel) {
-        this.clickedCancel = false;
-        return;
-      }
-      const target = this.getRowByKey(fEntryID) || {};
-      if (!target.fDeptID) {
-        message.error('请选择部门');
-        e.target.focus();
-        this.setState({
-          loading: false,
-        });
-        return;
-      } else if (
-        depts.filter(d => !d.isNew && !d.editable && d.fDeptID === target.fDeptID).length > 0
-      ) {
-        console.log(depts.filter(d => !d.isNew && !d.editable && d.fDeptID === target.fDeptID));
-        message.error('部门重复');
-        this.setState({
-          loading: false,
-        });
-        return;
-      }
-      depts.forEach(v => {
-        if (v.fEntryID === fEntryID) {
-          delete v.isNew;
-          delete v.editable;
-        }
-      });
-      this.setState({ depts });
-
-      const { dispatch } = this.props;
-      dispatch({
-        type: 'routeProfile/changeStep',
-        payload: { depts },
-      });
-
-      this.setState({
-        loading: false,
-      });
-    }, 200);
-  }
-
-  cancel(e, fEntryID) {
-    this.clickedCancel = true;
-    e.preventDefault();
-    const { depts } = this.state;
-    const newData = depts.map(item => ({ ...item }));
-    const target = this.getRowByKey(fEntryID, newData);
-    if (this.cacheOriginData[fEntryID]) {
-      Object.assign(target, this.cacheOriginData[fEntryID]);
-      delete this.cacheOriginData[fEntryID];
-    }
-    target.editable = false;
-    this.setState({ depts: newData });
-    this.clickedCancel = false;
-  }
-
   render() {
-    const { form, modalVisible, handleModalVisible, basicData } = this.props;
+    const {
+      form: { getFieldDecorator },
+      modalVisible,
+      handleModalVisible,
+      basicData: { processDeptTree },
+    } = this.props;
     const profileLoading = this.props.loading;
     const { loading, depts } = this.state;
+
     const columns = [
       {
         title: '部门',
         dataIndex: 'fDeptName',
         key: 'fDeptName',
         render: (text, record) => {
-          if (record.editable) {
-            return (
-              <TreeSelect
-                style={{ width: '100%' }}
-                dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                treeData={basicData.processDeptTree}
-                // defaultValue={record.fDeptName}
-                treeDefaultExpandAll
-                onChange={(depts, label) => this.handleDeptChange(depts, label[0], record.fEntryID)}
-              />
-            );
-          }
-          return <div style={{ width: '100%' }}>{text}</div>;
+          return (
+            <FormItem style={{ marginBottom: 0 }}>
+              {getFieldDecorator('fDeptID_' + record.fInterID, {
+                rules: [{ required: true, message: '请输入' }],
+                initialValue: record.fDeptID,
+              })(
+                <TreeSelect
+                  style={{ width: '100%' }}
+                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                  treeData={processDeptTree}
+                  // defaultValue={record.fDeptID}
+                  treeDefaultExpandAll
+                  onChange={(depts, label) =>
+                    this.handleDeptChange(depts, label[0], record.fEntryID)
+                  }
+                />
+              )}
+            </FormItem>
+          );
         },
       },
       {
         title: '操作',
         key: 'action',
         render: (text, record) => {
-          if (record.editable) {
-            if (record.isNew) {
-              return (
-                <span>
-                  <a onClick={e => this.saveRow(e, record.fEntryID)}>添加</a>
-                  <Divider type="vertical" />
-                  <Popconfirm
-                    title="是否要删除此行？"
-                    onConfirm={() => this.remove(record.fEntryID)}
-                  >
-                    <a>删除</a>
-                  </Popconfirm>
-                </span>
-              );
-            }
-            return (
-              <span>
-                <a onClick={e => this.saveRow(e, record.fEntryID)}>保存</a>
-                <Divider type="vertical" />
-                <a onClick={e => this.cancel(e, record.fEntryID)}>取消</a>
-              </span>
-            );
-          }
           return (
             <span>
-              <a onClick={e => this.toggleEditable(e, record.fEntryID)}>编辑</a>
-              <Divider type="vertical" />
               <Popconfirm title="是否要删除此行？" onConfirm={() => this.remove(record.fEntryID)}>
                 <a>删除</a>
               </Popconfirm>
@@ -284,7 +190,6 @@ export class DeptForm extends PureComponent {
           columns={columns}
           dataSource={depts}
           pagination={false}
-          rowClassName={record => (record.editable ? styles.editable : '')}
           style={{ width: '65%', minWidth: '320px' }}
         />
         <Button

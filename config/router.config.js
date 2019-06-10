@@ -285,19 +285,19 @@ export default [
           {
             path: '/sysConfig/user',
             name: 'user',
-            component: './SysConfig/User/List',
+            component: './Sys/User/List',
             authority: ['User_Read'],
           },
           {
             path: '/sysConfig/role',
             name: 'role',
-            component: './SysConfig/Role/List',
+            component: './Sys/Role/List',
             authority: ['Role_Read'],
           },
           {
             path: '/sysConfig/billNoRule',
             name: 'billNoRule',
-            component: './SysConfig/BillNoRule/List',
+            component: './Sys/BillNoRule/List',
             authority: ['BillNoRule_Read'],
           },
           {

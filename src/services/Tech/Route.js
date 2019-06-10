@@ -1,4 +1,5 @@
 import request from '@/utils/request';
+import { tsParameterProperty } from '@babel/types';
 
 export async function fakeQuery(params) {
   return request('/api/Route/getList', {
@@ -11,18 +12,12 @@ export async function fakeQuery(params) {
 }
 
 export async function fakeGet(params) {
-  return request('/api/Route/get', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'get',
-    },
-  });
+  return request(`/api/Route/${params.fInterID}`);
 }
 
 export async function fakeRemove(params) {
-  return request('/api/Route/delete', {
-    method: 'POST',
+  return request(`/api/Route/${params.fInterID}`, {
+    method: 'DELETE',
     body: {
       ...params,
       method: 'delete',
@@ -41,8 +36,8 @@ export async function fakeAdd(params) {
 }
 
 export async function fakeUpdate(params) {
-  return request('/api/Route/update', {
-    method: 'POST',
+  return request(`/api/Route/${params.fInterID}`, {
+    method: 'PUT',
     body: {
       ...params,
       method: 'update',
@@ -71,37 +66,29 @@ export async function fakeCheck(params) {
 }
 
 export async function fakeQuerySteps(params) {
-  return request('/api/Route/getSteps', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'getSteps',
-    },
-  });
+  return request(`/api/Route/Steps/${params.fInterID}`);
 }
 
 export async function fakeSaveSteps(params) {
-  return request('/api/Route/setSteps', {
+  return request(`/api/Route/Steps/${params.fInterID}`, {
     method: 'POST',
     body: {
-      ...params,
+      steps: params.steps,
       method: 'setSteps',
     },
   });
 }
 
 export async function fakeQueryParams(params) {
-  return request('/api/Route/getParams', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'getParams',
-    },
-  });
+  let url = `/api/Route/Params/${params.fInterID}`;
+  if (params.fEntryID) {
+    url += '?fEntryID=' + params.fEntryID;
+  }
+  return request(url);
 }
 
 export async function fakeSaveParams(params) {
-  return request('/api/Route/setParams', {
+  return request(`/api/Route/Params/${params.fInterID}`, {
     method: 'POST',
     body: {
       ...params,
