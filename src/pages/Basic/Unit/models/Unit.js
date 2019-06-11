@@ -1,4 +1,11 @@
-import { fakeQuery, fakeRemove, fakeAdd, fakeUpdate, fakeActive } from '@/services/Basic/Unit';
+import {
+  fakeQuery,
+  fakeRemove,
+  fakeAdd,
+  fakeUpdate,
+  fakeActive,
+  fakeSync,
+} from '@/services/Basic/Unit';
 
 export default {
   namespace: 'unitManage',
@@ -48,6 +55,14 @@ export default {
     },
     *active({ payload, callback }, { call, put }) {
       const response = yield call(fakeActive, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    *sync({ payload, callback }, { call, put }) {
+      const response = yield call(fakeSync, payload);
       yield put({
         type: 'saveData',
         payload: response,

@@ -79,13 +79,6 @@ export class UpdateForm extends PureComponent {
             initialValue: formVals.fPrecision,
           })(<InputNumber placeholder="请输入" min={0} max={4} />)}
         </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="启用">
-          {form.getFieldDecorator('fIsActive', {
-            rules: [{ required: false }],
-            valuePropName: 'checked',
-            initialValue: formVals.fIsActive,
-          })(<Switch />)}
-        </FormItem>
       </Modal>
     );
   }

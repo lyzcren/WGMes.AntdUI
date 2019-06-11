@@ -223,12 +223,6 @@ class TableList extends PureComponent {
       case 'remove':
         this.handleBatchDeleteClick();
         break;
-      case 'active':
-        this.handleBatchActiveClick();
-        break;
-      case 'deactive':
-        this.handleBatchDeactiveClick();
-        break;
       default:
         break;
     }
@@ -285,30 +279,6 @@ class TableList extends PureComponent {
       if (queryResult.status === 'ok') {
         message.success('修改成功');
         this.handleUpdateModalVisible();
-        // 成功后再次刷新列表
-        this.search();
-      } else if (queryResult.status === 'warning') {
-        message.warning(queryResult.message);
-      } else {
-        message.error(queryResult.message);
-      }
-    });
-  };
-
-  handleActive = (record, fIsActive) => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'unitManage/active',
-      payload: {
-        fItemID: record.fItemID,
-        fIsActive,
-      },
-    }).then(() => {
-      const {
-        unitManage: { queryResult },
-      } = this.props;
-      if (queryResult.status === 'ok') {
-        message.success('【' + record.fName + '】' + (fIsActive ? '启用' : '禁用') + '成功');
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
@@ -382,26 +352,10 @@ class TableList extends PureComponent {
     });
   };
 
-  handleBatchDeactiveClick = () => {
-    const { selectedRows } = this.state;
-
-    if (selectedRows.length === 0) return;
-    Modal.confirm({
-      title: '禁用记录',
-      content: '确定批量禁用记录吗？',
-      okText: '确认',
-      cancelText: '取消',
-      onOk: () => this.batchActive(selectedRows, false),
-    });
-  };
-
-  batchActive = (selectedRows, fIsActive) => {
-    const { dispatch } = this.props;
-    if (typeof selectedRows === 'object' && !Array.isArray(selectedRows)) {
-      selectedRows = [selectedRows];
-    }
-    selectedRows.forEach(selectedRow => {
-      this.handleActive(selectedRow, fIsActive);
+  handleSync = () => {
+    const { dispatch, form } = this.props;
+    dispatch({
+      type: 'unitManage/sync',
     });
   };
 
@@ -472,12 +426,6 @@ class TableList extends PureComponent {
         <Menu.Item key="remove" disabled={!hasAuthority('Unit_Delete')}>
           删除
         </Menu.Item>
-        <Menu.Item key="active" disabled={!hasAuthority('Unit_Active')}>
-          批量启用
-        </Menu.Item>
-        <Menu.Item key="deactive" disabled={!hasAuthority('Unit_Active')}>
-          批量禁用
-        </Menu.Item>
       </Menu>
     );
 
@@ -499,6 +447,9 @@ class TableList extends PureComponent {
                 <Authorized authority="Unit_Create">
                   <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
                     新建
+                  </Button>
+                  <Button icon="plus" type="primary" onClick={() => this.handleSync()}>
+                    从 K3 同步
                   </Button>
                 </Authorized>
                 <Authorized authority="Unit_Export">

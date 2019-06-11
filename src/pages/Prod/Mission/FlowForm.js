@@ -102,6 +102,9 @@ export class FlowForm extends PureComponent {
             initialValue: billNo.Flow,
           })(<Input readOnly />)}
         </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="单位">
+          {formVals.fUnitName}
+        </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="计划生产数量">
           <InputNumber placeholder="请输入" disabled value={formVals.fPlanQty} />
         </FormItem>

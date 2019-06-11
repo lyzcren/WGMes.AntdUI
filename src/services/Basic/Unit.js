@@ -50,3 +50,7 @@ export async function fakeActive(params) {
     },
   });
 }
+
+export async function fakeSync(params) {
+  return request('/api/Unit/sync');
+}

@@ -2,8 +2,6 @@ import React, { PureComponent, Fragment } from 'react';
 import { Switch, Popconfirm, Divider } from 'antd';
 import Authorized from '@/utils/Authorized';
 
-const activeData = ['启用', '禁用'];
-
 class ColumnConfig {
   columns = [
     {
@@ -26,23 +24,6 @@ class ColumnConfig {
       dataIndex: 'fPrecision',
     },
     {
-      title: '启用',
-      dataIndex: 'fIsActive',
-      filters: [
-        {
-          text: activeData[0],
-          value: 1,
-        },
-        {
-          text: activeData[1],
-          value: 0,
-        },
-      ],
-      render(val) {
-        return <Switch disabled checked={val} />;
-      },
-    },
-    {
       title: '操作',
       render: (text, record) => (
         <Fragment>
@@ -54,10 +35,6 @@ class ColumnConfig {
             <Popconfirm title="是否要删除此行？" onConfirm={() => this.delete(record)}>
               <a>删除</a>
             </Popconfirm>
-            <Divider type="vertical" />
-          </Authorized>
-          <Authorized authority="Unit_Active">
-            <a onClick={() => this.handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
           </Authorized>
         </Fragment>
       ),
@@ -74,12 +51,6 @@ class ColumnConfig {
   DeleteCallback = record => {};
   delete = record => {
     this.DeleteCallback(record);
-  };
-
-  // 删除方法
-  ActiveCallback = record => {};
-  handleActive = record => {
-    this.ActiveCallback(record);
   };
 }
 
