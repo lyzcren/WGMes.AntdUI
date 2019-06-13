@@ -81,12 +81,12 @@ class ColumnConfig {
       dataIndex: 'fUnitName',
       width: 120,
     },
-    {
-      title: '流程单号',
-      dataIndex: 'fFullBatchNo',
-      width: 220,
-      sorter: true,
-    },
+    // {
+    //   title: '流程单号',
+    //   dataIndex: 'fFullBatchNo',
+    //   width: 220,
+    //   sorter: true,
+    // },
     {
       title: '任务单号',
       dataIndex: 'fMoBillNo',

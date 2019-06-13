@@ -38,15 +38,23 @@ class Transfer extends PureComponent {
   state = {
     fBeginDate: '',
     fTransferDate: '',
+    // precision: 4,
+    // qtyFormat: '0.0000'
+    precision: 0,
+    qtyFormat: '0',
   };
-
-  OtherDefectRef = undefined;
 
   componentDidMount() {
     // ReactDOM.findDOMNode(this.refs.select).click();
     const {
-      data: { fInterID, fCurrentDeptID },
+      data: { fInterID, fCurrentDeptID, fPrecision },
     } = this.props;
+
+    // 根据单位的小数位数配置相关数量的小数位
+    if (fPrecision > 1) {
+      const precisionPart = '00000000'.slice(0, 2);
+      this.setState({ precision: fPrecision, qtyFormat: `0.${precisionPart}` });
+    }
     this.loadData(fInterID, fCurrentDeptID);
   }
 
@@ -105,6 +113,7 @@ class Transfer extends PureComponent {
       fBeginDate,
       fTransferDate,
     } = data;
+    const { qtyFormat, precision } = this.state;
 
     const description = (
       <DescriptionList className={styles.headerList} size="small" col="3">
@@ -115,11 +124,13 @@ class Transfer extends PureComponent {
         <Description term="规格型号">{fModel}</Description>
         <Description term="父件型号">{fParentModel}</Description>
         <Description term="单位">{fUnitName}</Description>
-        <Description term="流程单数量">{fFlowInputQty}</Description>
-        <Description term="投入数量">{fInputQty}</Description>
-        <Description term="合格数量">{fPassQty}</Description>
-        <Description term="盘点盈亏数量">{fInvCheckDeltaQty}</Description>
-        <Description term="取走数量">{fTakeQty}</Description>
+        <Description term="流程单数量">{numeral(fFlowInputQty).format(qtyFormat)}</Description>
+        <Description term="投入数量">{numeral(fInputQty).format(qtyFormat)}</Description>
+        <Description term="合格数量">{numeral(fPassQty).format(qtyFormat)}</Description>
+        <Description term="盘点盈亏数量">
+          {numeral(fInvCheckDeltaQty).format(qtyFormat)}
+        </Description>
+        <Description term="取走数量">{numeral(fTakeQty).format(qtyFormat)}</Description>
       </DescriptionList>
     );
     const menu = (
@@ -251,7 +262,9 @@ class Transfer extends PureComponent {
                           readOnly
                           style={{ width: '100%' }}
                           placeholder="请输入数量"
-                          min={1}
+                          min={Math.pow(0.1, precision)}
+                          step={Math.pow(0.1, precision)}
+                          precision={precision}
                         />
                       )}
                     </FormItem>

@@ -64,11 +64,13 @@ export class ScanForm extends PureComponent {
       transferModalVisible,
       flowScan: { data },
     } = this.props;
+    const { queryDeptID } = this.state;
     const fFullBatchNo = form.getFieldValue('fFullBatchNo');
     if (!data) {
       message.error(`未找到流程单【${fFullBatchNo}】.`);
+      form.resetFields();
     } else {
-      const { fStatusNumber, fRecordStatusNumber } = data;
+      const { fStatusNumber, fRecordStatusNumber, fCurrentDeptID, fCurrentDeptName } = data;
       // 判断是否可签收
       if (
         fStatusNumber === 'Reported' ||
@@ -80,8 +82,13 @@ export class ScanForm extends PureComponent {
         // handleSign(data);
         this.setState({ showSignField: true });
       } else if (fRecordStatusNumber === 'ManufProducing') {
-        transferModalVisible(data);
-        this.close();
+        if (queryDeptID !== fCurrentDeptID) {
+          message.warning(`当前流程单在【${fCurrentDeptName}】未转出.`);
+          form.resetFields();
+        } else {
+          transferModalVisible(data);
+          this.close();
+        }
       }
     }
   };

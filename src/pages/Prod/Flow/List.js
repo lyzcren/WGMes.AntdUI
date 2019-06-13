@@ -37,7 +37,6 @@ import { ScanForm } from './ScanForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
-import { GlobalConst, badgeStatusList } from '@/utils/GlobalConst';
 
 import styles from './List.less';
 import { tsImportType } from '@babel/types';
@@ -50,10 +49,11 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ flowManage, loading, basicData }) => ({
+@connect(({ flowManage, loading, basicData, user }) => ({
   flowManage,
   loading: loading.models.flowManage,
   basicData,
+  fIsOperator: user.currentUser.fIsOperator,
 }))
 @Form.create()
 class TableList extends PureComponent {
@@ -72,7 +72,7 @@ class TableList extends PureComponent {
     // expandForm: 是否展开更多查询条件
     expandForm: false,
     // 操作员查询条件
-    operatorForm: false,
+    operatorForm: this.props.fIsOperator,
     selectedRows: [],
     queryFilters: [],
     queryDeptID: null,
@@ -97,10 +97,18 @@ class TableList extends PureComponent {
     dispatch({
       type: 'flowManage/getPrintTemplates',
     });
+    dispatch({
+      type: 'basicData/getStatus',
+      payload: { number: 'recordStatus' },
+    });
+    dispatch({
+      type: 'basicData/getStatus',
+      payload: { number: 'flowStatus' },
+    });
     // 列配置相关方法
-    ColumnConfig.MissionModalVisibleCallback = record =>
+    ColumnConfig.missionModalVisibleCallback = record =>
       this.handleMissionModalVisible(true, record);
-    ColumnConfig.RouteModalVisibleCallback = record =>
+    ColumnConfig.routeModalVisibleCallback = record =>
       this.handleModalVisible({ key: 'route', flag: true }, record);
   }
 
@@ -145,17 +153,31 @@ class TableList extends PureComponent {
     // 查询条件处理
     const queryFilters = [];
     // 当前工序可签收
-    if (fieldsValue.queryDept && fieldsValue.queryStatusNumber === 'ManufWait4Sign')
+    if (fieldsValue.queryDept && fieldsValue.queryRecordStatusNumber === 'ManufWait4Sign') {
       queryFilters.push({ name: 'fNextDeptIDs', compare: '%*%', value: fieldsValue.queryDept });
+      queryFilters.push({ name: 'fRecordStatusNumber', compare: '<>', value: 'ManufProducing' });
+    }
     // 当前工序生产中
-    else if (fieldsValue.queryDept && fieldsValue.queryStatusNumber === 'ManufProducing')
+    else if (fieldsValue.queryDept && fieldsValue.queryRecordStatusNumber === 'ManufProducing') {
       queryFilters.push({ name: 'fCurrentDeptID', compare: '=', value: fieldsValue.queryDept });
+      queryFilters.push({
+        name: 'fRecordStatusNumber',
+        compare: '=',
+        value: fieldsValue.queryRecordStatusNumber,
+      });
+    }
     // 当前工序已完成
-    else if (fieldsValue.queryDept && fieldsValue.queryStatusNumber === 'ManufEndProduce')
-      queryFilters.push({ name: 'fFullBatchNo', compare: '%*%', value: fieldsValue.queryDept });
-    // 只选择部门，未选择状态，该部门在工艺路线内即可
-    else if (fieldsValue.queryDept)
+    else if (fieldsValue.queryDept && fieldsValue.queryRecordStatusNumber === 'ManufEndProduce') {
+      queryFilters.push({
+        name: 'FEndProduceDeptIDs',
+        compare: '%*%',
+        value: fieldsValue.queryDept,
+      });
+      // queryFilters.push({ name: 'fRecordStatusNumber', compare: '=', value: fieldsValue.queryRecordStatusNumber });
+    } else if (fieldsValue.queryDept) {
+      // 只选择部门，未选择状态，该部门在工艺路线内即可
       queryFilters.push({ name: 'fAllDeptIDs', compare: '%*%', value: fieldsValue.queryDept });
+    }
     // 无工序时查询流程单状态
     else if (fieldsValue.queryStatusNumber)
       queryFilters.push({
@@ -254,7 +276,7 @@ class TableList extends PureComponent {
     this.handleSelectRows([]);
   };
 
-  onDeptChange = (value, label, extra) => {
+  selectChange = () => {
     setTimeout(() => {
       this.search();
     }, 0);
@@ -281,6 +303,23 @@ class TableList extends PureComponent {
       }
       exportExcel('/api/flow/export', pagination, fileName);
     });
+  };
+
+  statusFilter = () => {
+    const {
+      basicData: {
+        status: { flowStatus },
+      },
+    } = this.props;
+    const badgeStatus = !flowStatus
+      ? []
+      : flowStatus.map(x => {
+          return {
+            text: <Badge color={x.fColor} text={x.fValue} />,
+            value: x.fKeyName,
+          };
+        });
+    return badgeStatus;
   };
 
   //应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
@@ -551,7 +590,11 @@ class TableList extends PureComponent {
   renderOperatorForm() {
     const {
       form: { getFieldDecorator },
-      basicData,
+      fIsOperator,
+      basicData: {
+        processDeptTree,
+        status: { recordStatus },
+      },
     } = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
@@ -563,23 +606,24 @@ class TableList extends PureComponent {
               })(
                 <TreeSelect
                   style={{ width: '100%' }}
-                  treeData={basicData.processDeptTree}
+                  treeData={processDeptTree}
                   treeDefaultExpandAll
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                  onChange={this.onDeptChange}
+                  onChange={this.selectChange}
                 />
               )}
             </FormItem>
           </Col>
           <Col md={6} sm={24}>
             <FormItem label="状态">
-              {getFieldDecorator('queryStatusNumber')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  {badgeStatusList(GlobalConst.ManufStatusArray).map(x => (
-                    <Option key={x.value} value={x.value}>
-                      {x.text}
-                    </Option>
-                  ))}
+              {getFieldDecorator('queryRecordStatusNumber')(
+                <Select placeholder="请选择" style={{ width: '100%' }} onChange={this.selectChange}>
+                  {recordStatus &&
+                    recordStatus.map(x => (
+                      <Option key={x.fKeyName} value={x.fKeyName}>
+                        <Badge color={x.fColor} text={x.fValue} />
+                      </Option>
+                    ))}
                 </Select>
               )}
             </FormItem>
@@ -597,9 +641,11 @@ class TableList extends PureComponent {
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
               </Button>
-              <a style={{ marginLeft: 8 }} onClick={this.toggleOperatorForm}>
-                切换
-              </a>
+              {!fIsOperator && (
+                <a style={{ marginLeft: 8 }} onClick={this.toggleOperatorForm}>
+                  切换
+                </a>
+              )}
               <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
                 展开 <Icon type="down" />
               </a>
@@ -613,6 +659,11 @@ class TableList extends PureComponent {
   renderSimpleForm() {
     const {
       form: { getFieldDecorator },
+      fIsOperator,
+      basicData: {
+        processDeptTree,
+        status: { flowStatus },
+      },
     } = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
@@ -630,12 +681,13 @@ class TableList extends PureComponent {
           <Col md={6} sm={24}>
             <FormItem label="状态">
               {getFieldDecorator('queryStatusNumber')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  {badgeStatusList(GlobalConst.FlowStatusArray).map(x => (
-                    <Option key={x.value} value={x.value}>
-                      {x.text}
-                    </Option>
-                  ))}
+                <Select placeholder="请选择" style={{ width: '100%' }} onChange={this.selectChange}>
+                  {flowStatus &&
+                    flowStatus.map(x => (
+                      <Option key={x.fKeyName} value={x.fKeyName}>
+                        <Badge color={x.fColor} text={x.fValue} />
+                      </Option>
+                    ))}
                 </Select>
               )}
             </FormItem>
@@ -648,9 +700,11 @@ class TableList extends PureComponent {
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
               </Button>
-              <a style={{ marginLeft: 8 }} onClick={this.toggleOperatorForm}>
-                切换
-              </a>
+              {!fIsOperator && (
+                <a style={{ marginLeft: 8 }} onClick={this.toggleOperatorForm}>
+                  切换
+                </a>
+              )}
               <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
                 展开 <Icon type="down" />
               </a>
@@ -664,6 +718,10 @@ class TableList extends PureComponent {
   renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
+      basicData: {
+        processDeptTree,
+        status: { flowStatus },
+      },
     } = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
@@ -688,12 +746,13 @@ class TableList extends PureComponent {
           <Col md={8} sm={24}>
             <FormItem label="状态">
               {getFieldDecorator('queryStatusNumber')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  {badgeStatusList(GlobalConst.FlowStatusArray).map(x => (
-                    <Option key={x.value} value={x.value}>
-                      {x.text}
-                    </Option>
-                  ))}
+                <Select placeholder="请选择" style={{ width: '100%' }} onChange={this.selectChange}>
+                  {flowStatus &&
+                    flowStatus.map(x => (
+                      <Option key={x.fKeyName} value={x.fKeyName}>
+                        <Badge color={x.fColor} text={x.fValue} />
+                      </Option>
+                    ))}
                 </Select>
               )}
             </FormItem>
@@ -777,8 +836,10 @@ class TableList extends PureComponent {
     };
     // 指定操作列
     ColumnConfig.renderOperation = this.renderOperation;
+    ColumnConfig.statusFilter = this.statusFilter();
 
-    const scrollX = ColumnConfig.columns
+    const columns = ColumnConfig.getColumns();
+    const scrollX = columns
       .map(c => {
         return c.width;
       })
@@ -863,7 +924,7 @@ class TableList extends PureComponent {
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
-                columns={ColumnConfig.columns}
+                columns={columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
                 scroll={{ x: scrollX }}

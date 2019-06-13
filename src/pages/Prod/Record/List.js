@@ -34,7 +34,6 @@ import { UpdateForm } from './UpdateForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
-import { GlobalConst, badgeStatusList } from '@/utils/GlobalConst';
 
 import styles from './List.less';
 
@@ -76,19 +75,39 @@ class TableList extends PureComponent {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    const params = { pagination: this.currentPagination };
     dispatch({
       type: 'recordManage/fetch',
-      payload: params,
+      payload: this.currentPagination,
     });
     dispatch({
       type: 'basicData/getProcessDeptTree',
     });
+    dispatch({
+      type: 'basicData/getStatus',
+      payload: { number: 'recordStatus' },
+    });
     // 列配置相关方法
-    ColumnConfig.MissionModalVisibleCallback = record =>
+    ColumnConfig.missionModalVisibleCallback = record =>
       this.handleMissionModalVisible(true, record);
     ColumnConfig.profileVisible = record => this.profileVisible(record);
   }
+
+  statusFilter = () => {
+    const {
+      basicData: {
+        status: { recordStatus },
+      },
+    } = this.props;
+    const badgeStatus = !recordStatus
+      ? []
+      : recordStatus.map(x => {
+          return {
+            text: <Badge color={x.fColor} text={x.fValue} />,
+            value: x.fKeyName,
+          };
+        });
+    return badgeStatus;
+  };
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
     const { dispatch } = this.props;
@@ -113,11 +132,9 @@ class TableList extends PureComponent {
       this.currentPagination.sorter[sorter.field] = sorter.order.replace('end', '');
     }
 
-    const params = { pagination: this.currentPagination };
-
     dispatch({
       type: 'recordManage/fetch',
-      payload: params,
+      payload: this.currentPagination,
     });
   };
 
@@ -150,9 +167,8 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters,
     };
-    const params = { pagination: this.currentPagination };
 
-    return params;
+    return this.currentPagination;
   };
 
   search = () => {
@@ -161,10 +177,10 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      const params = this.getSearchParam(fieldsValue);
+      const pagination = this.getSearchParam(fieldsValue);
       dispatch({
         type: 'recordManage/fetch',
-        payload: params,
+        payload: pagination,
       });
     });
     this.handleSelectRows([]);
@@ -184,11 +200,10 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters: [],
     };
-    const params = { pagination: this.currentPagination };
 
     dispatch({
       type: 'recordManage/fetch',
-      payload: params,
+      payload: this.currentPagination,
     });
     this.handleSelectRows([]);
   };
@@ -199,20 +214,20 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      let params = this.getSearchParam(fieldsValue);
-      const fileName = '生产记录.xls';
+      const pagination = this.getSearchParam(fieldsValue);
+      let fileName = '生产记录.xls';
       switch (e.key) {
         case 'currentPage':
-          params = { ...params, exportPage: true };
-          fileName = '生产记录-第' + params.pagination.current + '页.xls';
+          pagination.exportPage = true;
+          fileName = '生产记录-第' + pagination.current + '页.xls';
           break;
         case 'allPage':
-          params = { ...params, exportAll: true };
+          pagination.exportPage = false;
           break;
         default:
           break;
       }
-      exportExcel('/api/record/export', params, fileName);
+      exportExcel('/api/record/export', pagination, fileName);
     });
   };
 
@@ -334,7 +349,9 @@ class TableList extends PureComponent {
       handleSuccess: this.search,
     };
 
-    const scrollX = ColumnConfig.columns
+    ColumnConfig.statusFilter = this.statusFilter();
+    const columns = ColumnConfig.getColumns();
+    const scrollX = columns
       .map(c => {
         return c.width;
       })
@@ -368,7 +385,7 @@ class TableList extends PureComponent {
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
-                columns={ColumnConfig.columns}
+                columns={columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
                 scroll={{ x: scrollX }}

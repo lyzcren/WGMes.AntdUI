@@ -1,5 +1,6 @@
 import React, { PureComponent, Fragment } from 'react';
 import moment from 'moment';
+import numeral from 'numeral';
 import { connect } from 'dva';
 import {
   Layout,
@@ -40,11 +41,12 @@ const ButtonGroup = Button.Group;
 const { RangePicker } = DatePicker;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ flowTransfer, basicData, loading, menu }) => ({
+@connect(({ flowTransfer, basicData, loading, menu, user }) => ({
   flowTransfer,
   basicData,
   loading: loading.models.flowTransfer,
   menu,
+  fBindEmpID: user.currentUser.fBindEmpID,
 }))
 @Form.create()
 class Transfer extends PureComponent {
@@ -53,15 +55,23 @@ class Transfer extends PureComponent {
     moreDefectValue: '',
     fBeginDate: '',
     fTransferDate: '',
+    // precision: 4,
+    // qtyFormat: '0.0000'
+    precision: 0,
+    qtyFormat: '0',
   };
-
-  OtherDefectRef = undefined;
 
   componentDidMount() {
     // ReactDOM.findDOMNode(this.refs.select).click();
     const {
-      data: { fInterID, fCurrentDeptID },
+      data: { fInterID, fCurrentDeptID, fPrecision },
     } = this.props;
+
+    // 根据单位的小数位数配置相关数量的小数位
+    if (fPrecision > 1) {
+      const precisionPart = '00000000'.slice(0, 2);
+      this.setState({ precision: fPrecision, qtyFormat: `0.${precisionPart}` });
+    }
     this.loadData(fInterID, fCurrentDeptID);
   }
 
@@ -176,30 +186,42 @@ class Transfer extends PureComponent {
     });
   }
 
-  handleOtherDefectChange(value) {
-    this.setState({ moreDefectValue: value });
-    const { form, dispatch } = this.props;
-    const fieldsValue = form.getFieldsValue();
-    dispatch({
-      type: 'flowTransfer/changeDefect',
-      payload: { fDefectID: fieldsValue.fOtherDefectID, fValue: value },
-    }).then(() => {
-      const { flowTransfer } = this.props;
-      // console.log(flowTransfer);
-    });
-  }
+  // handleOtherDefectChange (value) {
+  //   value = value.replace(/\.$/g, '');
+  //   this.setState({ moreDefectValue: value });
+  //   const { form, dispatch } = this.props;
+  //   const fieldsValue = form.getFieldsValue();
+  //   dispatch({
+  //     type: 'flowTransfer/changeDefect',
+  //     payload: { fDefectID: fieldsValue.fOtherDefectID, fValue: value },
+  //   }).then(() => {
+  //     const { flowTransfer } = this.props;
+  //     // console.log(flowTransfer);
+  //   });
+  // }
 
   handleOtherDefectKeyPress(e) {
     if (e.key === 'Enter') {
       const { form, dispatch } = this.props;
       const fieldsValue = form.getFieldsValue();
       dispatch({
+        type: 'flowTransfer/changeDefect',
+        payload: {
+          fDefectID: fieldsValue.fOtherDefectID,
+          fValue: fieldsValue.fOtherDefectValue * 1.0,
+        },
+      }).then(() => {
+        const { flowTransfer } = this.props;
+        form.resetFields(['fOtherDefectValue']);
+        // console.log(flowTransfer);
+      });
+      dispatch({
         type: 'flowTransfer/addDefect',
-        payload: { fDefectID: fieldsValue.fOtherDefectID, fValue: e.target.value },
+        payload: { fDefectID: fieldsValue.fOtherDefectID, fValue: e.target.value * 1.0 },
       }).then(() => {
         const { flowTransfer } = this.props;
         // 使其他不良下拉框获取焦点
-        this.OtherDefectRef.rcSelect.focus();
+        this.otherDefectRef.rcSelect.focus();
         this.setState({ moreDefectValue: '' });
         form.resetFields(['fOtherDefectID']);
         // console.log(flowTransfer);
@@ -244,8 +266,9 @@ class Transfer extends PureComponent {
       loading,
       form: { getFieldDecorator },
       basicData: { defectData, operators },
+      fBindEmpID,
     } = this.props;
-    const { showMoreDefect, moreDefectValue } = this.state;
+    const { showMoreDefect, moreDefectValue, qtyFormat, precision } = this.state;
 
     const description = (
       <DescriptionList className={styles.headerList} size="small" col="3">
@@ -256,11 +279,13 @@ class Transfer extends PureComponent {
         <Description term="规格型号">{data.fModel}</Description>
         <Description term="父件型号">{data.fParentModel}</Description>
         <Description term="单位">{data.fUnitName}</Description>
-        <Description term="流程单数量">{data.fFlowInputQty}</Description>
-        <Description term="投入数量">{data.fInputQty}</Description>
-        <Description term="合格数量">{data.fPassQty}</Description>
-        <Description term="盘点盈亏数量">{data.fInvCheckDeltaQty}</Description>
-        <Description term="取走数量">{data.fTakeQty}</Description>
+        <Description term="流程单数量">{numeral(data.fFlowInputQty).format(qtyFormat)}</Description>
+        <Description term="投入数量">{numeral(data.fInputQty).format(qtyFormat)}</Description>
+        <Description term="合格数量">{numeral(data.fPassQty).format(qtyFormat)}</Description>
+        <Description term="盘点盈亏数量">
+          {numeral(data.fInvCheckDeltaQty).format(qtyFormat)}
+        </Description>
+        <Description term="取走数量">{numeral(data.fTakeQty).format(qtyFormat)}</Description>
       </DescriptionList>
     );
     const menu = (
@@ -319,6 +344,7 @@ class Transfer extends PureComponent {
                 <FormItem key="fOperatorID" label="操作员">
                   {getFieldDecorator('fOperatorID', {
                     rules: [{ required: true, message: '请选择操作员' }],
+                    initialValue: fBindEmpID,
                   })(
                     <Select
                       placeholder="请选择操作员"
@@ -452,7 +478,9 @@ class Transfer extends PureComponent {
                         onChange={val => this.handleFieldChange(val, d.fItemID)}
                         style={{ width: '100%' }}
                         placeholder="请输入数量"
-                        min={1}
+                        min={Math.pow(0.1, precision)}
+                        step={Math.pow(0.1, precision)}
+                        precision={precision}
                       />
                     )}
                   </FormItem>
@@ -474,7 +502,7 @@ class Transfer extends PureComponent {
                         }
                         placeholder="请选择不良"
                         autoFocus
-                        ref={c => (this.OtherDefectRef = c)}
+                        ref={c => (this.otherDefectRef = c)}
                       >
                         {defectData
                           .filter(x => !defectList.find(y => y.fItemID === x.fItemID))
@@ -489,13 +517,18 @@ class Transfer extends PureComponent {
                 </Col>
                 <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                   <FormItem key="fOtherDefectValue" label="数量">
-                    <NumericInput
-                      style={{ width: '100%' }}
-                      placeholder="请输入数量"
-                      value={moreDefectValue}
-                      onChange={val => this.handleOtherDefectChange(val)}
-                      onPressEnter={e => this.handleOtherDefectKeyPress(e)}
-                    />
+                    {getFieldDecorator('fOtherDefectValue', {
+                      rules: [{ required: false, message: '请输入数量' }],
+                    })(
+                      <NumericInput
+                        style={{ width: '100%' }}
+                        placeholder="请输入数量"
+                        title={'按回车确认添加'}
+                        // value={moreDefectValue}
+                        // onChange={val => this.handleOtherDefectChange(val)}
+                        onPressEnter={e => this.handleOtherDefectKeyPress(e)}
+                      />
+                    )}
                   </FormItem>
                 </Col>
               </Row>

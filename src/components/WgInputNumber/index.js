@@ -30,7 +30,7 @@ export class NumericInput extends React.Component {
   // '.' at the end or only '-' in the input box.
   onBlur = () => {
     const { value, onBlur, onChange } = this.props;
-    if (value.charAt(value.length - 1) === '.' || value === '-') {
+    if ((value !== undefined && value.charAt(value.length - 1) === '.') || value === '-') {
       onChange(value.slice(0, -1));
     }
     if (onBlur) {
@@ -39,8 +39,10 @@ export class NumericInput extends React.Component {
   };
 
   render() {
-    const { value } = this.props;
-    const title = value ? (
+    const { value, title } = this.props;
+    const inputTitle = title ? (
+      title
+    ) : value ? (
       <span className="numeric-input-title">{value !== '-' ? formatNumber(value) : '-'}</span>
     ) : (
       '请输入数量'
@@ -48,7 +50,7 @@ export class NumericInput extends React.Component {
     return (
       <Tooltip
         trigger={['focus']}
-        title={title}
+        title={inputTitle}
         placement="topLeft"
         overlayClassName="numeric-input"
       >

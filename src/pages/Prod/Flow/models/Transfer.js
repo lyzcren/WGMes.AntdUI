@@ -3,6 +3,7 @@ import { fakeGetDefect, fakeMachineData } from '@/services/basicData';
 import { fakeQueryParams } from '@/services/Tech/Route';
 import { defaultCipherList } from 'constants';
 import { exists } from 'fs';
+import numeral from 'numeral';
 
 export default {
   namespace: 'flowTransfer',
@@ -40,7 +41,7 @@ export default {
         payload: response,
       });
     },
-    *getParams({ payload, callback }, { call, put }) {
+    *getParams({ payload }, { call, put }) {
       const response = yield call(fakeQueryParams, payload);
       response.forEach(p => {
         if (!p.values.includes(p.fDefaultValue)) {
@@ -51,9 +52,8 @@ export default {
         type: 'saveParam',
         payload: response,
       });
-      if (callback) callback();
     },
-    *changeParam({ payload, callback }, { call, put, select }) {
+    *changeParam({ payload }, { call, put, select }) {
       const { fParamID, fValue } = payload;
       const { paramList } = yield select(state => state.flowTransfer);
       const existsOne = paramList.find(x => x.fParamID == fParamID);
@@ -64,30 +64,28 @@ export default {
         type: 'saveParam',
         payload: paramList,
       });
-      if (callback) callback();
     },
-    *getDefect({ payload, callback }, { call, put }) {
+    *getDefect({ payload }, { call, put }) {
       const response = yield call(fakeGetDefect, payload);
 
       yield put({
         type: 'saveDefect',
         payload: response,
       });
-      if (callback) callback();
     },
-    *changeDefect({ payload, callback }, { call, put }) {
+    *changeDefect({ payload }, { call, put }) {
       yield put({
         type: 'changeDefectReducer',
         payload,
       });
-      if (callback) callback();
     },
-    *addDefect({ payload, callback }, { call, put, select }) {
+    *addDefect({ payload }, { call, put, select }) {
       const { fDefectID, fValue } = payload;
       const { defectList } = yield select(state => state.flowTransfer);
       const { defectData } = yield select(state => state.basicData);
-      const existsOne = defectList.find(x => x.fItemID == fDefectID);
-      const findItem = defectData.find(x => (x.fItemID = fDefectID));
+      const existsOne = defectList.find(x => x.fItemID === fDefectID);
+      const findItem = defectData.find(x => x.fItemID === fDefectID);
+
       if (existsOne) {
         existsOne.fValue = fValue;
       } else if (findItem) {
@@ -99,15 +97,13 @@ export default {
         type: 'saveDefect',
         payload: defectList,
       });
-      if (callback) callback();
     },
-    *transfer({ payload, callback }, { call, put }) {
+    *transfer({ payload }, { call, put }) {
       const response = yield call(fakeTransfer, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
-      if (callback) callback();
     },
   },
 
@@ -157,7 +153,7 @@ export default {
       const defectQty = defect
         .filter(x => x.fValue)
         .map(x => x.fValue)
-        .reduce((sum, x) => (sum += x));
+        .reduce((sum, x) => (sum += x * 1.0));
       data.fDefectQty = defectQty;
       data.fPassQty = data.fInputQty + data.fInvCheckDeltaQty - data.fTakeQty - data.fDefectQty;
       return {

@@ -26,13 +26,7 @@ export async function fakeUpdate(params) {
 }
 
 export async function fakeGetProducingRecord(params) {
-  return request('/api/record/producingRecord', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'producingRecord',
-    },
-  });
+  return request(`/api/record/producingRecord/${params.fInterID}`);
 }
 
 export async function fakeTransfer(params) {
