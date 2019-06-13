@@ -158,6 +158,7 @@ export default {
     routeData: [],
     panes: [],
     breadcrumbNameMap: {},
+    refPanes: [],
     activeKey: '',
     path: '',
     selectedKeys: [],
@@ -179,10 +180,11 @@ export default {
       const { menuData, routeData, panes } = yield select(state => state.menu);
       const activeKey = path;
       const selectedKeys = getSelectedMenuKeys(activeKey, routeData);
-      const pane = panes.find(p => p.key === activeKey);
-      const componentMap = getComponentMaps(routeData).find(com => com.path == path);
+      let pane = panes.find(p => p.key === activeKey);
       if (!pane) {
+        const componentMap = getComponentMaps(routeData).find(com => com.path == path);
         if (componentMap) {
+          pane = componentMap;
           // 打开Tab页
           panes.push({ ...componentMap, key: activeKey, closable });
         } else {
@@ -211,7 +213,7 @@ export default {
     },
     *closeMenu({ payload }, { put, call, select }) {
       const { path, closable } = payload;
-      const { menuData, routeData, panes, activeKey } = yield select(state => state.menu);
+      const { menuData, routeData, panes, refPanes, activeKey } = yield select(state => state.menu);
       let newActiveKey = activeKey;
       const newPanes = panes.filter(pane => pane.key !== path);
       if (activeKey === path) {
@@ -223,6 +225,7 @@ export default {
         });
       }
       const selectedKeys = getSelectedMenuKeys(newActiveKey, routeData);
+      const newRefPanes = refPanes.filter(p => p !== null && newPanes.find(x => x.key === p.id));
 
       yield put({
         type: 'save',
@@ -232,6 +235,7 @@ export default {
           activeKey: newActiveKey,
           selectedKeys,
           panes: newPanes,
+          refPanes: newRefPanes,
         },
       });
     },
@@ -243,10 +247,18 @@ export default {
           routeData: [],
           panes: [],
           breadcrumbNameMap: {},
+          refPanes: [],
           activeKey: '',
           path: '',
           selectedKeys: [],
         },
+      });
+    },
+    *refPanes({ payload }, { put }) {
+      const { refPanes } = payload;
+      yield put({
+        type: 'save',
+        payload: { refPanes },
       });
     },
   },

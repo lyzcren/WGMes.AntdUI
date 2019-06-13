@@ -33,6 +33,7 @@ import Authorized from '@/utils/Authorized';
 import { SignForm } from './SignForm';
 import { ViewStepForm } from './ViewStepForm';
 import { ViewRecordForm } from './ViewRecordForm';
+import { ScanForm } from './ScanForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
@@ -63,6 +64,7 @@ class TableList extends PureComponent {
       sign: false,
       route: false,
       record: false,
+      scan: false,
     },
     formValues: {},
     // 当前操作选中列的数据
@@ -250,6 +252,12 @@ class TableList extends PureComponent {
     });
     this.setState({ queryDeptID: null });
     this.handleSelectRows([]);
+  };
+
+  onDeptChange = (value, label, extra) => {
+    setTimeout(() => {
+      this.search();
+    }, 0);
   };
 
   handleExport = e => {
@@ -558,6 +566,7 @@ class TableList extends PureComponent {
                   treeData={basicData.processDeptTree}
                   treeDefaultExpandAll
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                  onChange={this.onDeptChange}
                 />
               )}
             </FormItem>
@@ -783,6 +792,15 @@ class TableList extends PureComponent {
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
               <div className={styles.tableListOperator}>
+                <Button
+                  type="primary"
+                  icon="scan"
+                  onClick={() => {
+                    this.handleModalVisible({ key: 'scan', flag: true });
+                  }}
+                >
+                  扫描
+                </Button>
                 <Authorized authority="Flow_Export">
                   <Dropdown
                     overlay={
@@ -792,8 +810,9 @@ class TableList extends PureComponent {
                       </Menu>
                     }
                   >
-                    <Button>
-                      导出 <Icon type="down" />
+                    <Button icon="download">
+                      导出
+                      <Icon type="down" />
                     </Button>
                   </Dropdown>
                 </Authorized>
@@ -839,6 +858,8 @@ class TableList extends PureComponent {
               </div>
               <StandardTable
                 rowKey="fInterID"
+                bordered
+                // size='small'
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
@@ -873,6 +894,16 @@ class TableList extends PureComponent {
               fInterID={currentFormValues.fInterID}
             />
           ) : null}
+
+          <ScanForm
+            dispatch
+            disabled={!queryDeptID}
+            queryDeptID
+            handleSign={this.handleSign}
+            transferModalVisible={this.transferModalVisible}
+            handleModalVisible={flag => this.handleModalVisible({ key: 'scan', flag })}
+            modalVisible={modalVisible.scan}
+          />
         </GridContent>
       </div>
     );

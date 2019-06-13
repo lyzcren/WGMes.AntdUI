@@ -61,7 +61,7 @@ class TableList extends PureComponent {
         <div className={styles.contentLink}>
           <a href="http://www.rubylong.cn/download/gridreport6-webapp.exe">
             <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/MjEImQtenlyueSmVEfUD.svg" />{' '}
-            下载插件
+            打印插件
           </a>
           <a href="http://www.rubylong.cn/download/Grid++Report6.zip">
             <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/MjEImQtenlyueSmVEfUD.svg" />{' '}

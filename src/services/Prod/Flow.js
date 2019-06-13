@@ -11,6 +11,10 @@ export async function fakeQuery(params) {
   });
 }
 
+export async function fakeGet(params) {
+  return request(`/api/Flow?${stringify(params)}`);
+}
+
 export async function fakeGetDepts(params) {
   return request('/api/flow/nextDepts', {
     method: 'POST',

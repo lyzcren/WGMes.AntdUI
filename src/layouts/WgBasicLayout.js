@@ -1,4 +1,5 @@
 import React, { Suspense } from 'react';
+import ReactDOM from 'react-dom';
 import { Layout, Tabs } from 'antd';
 import DocumentTitle from 'react-document-title';
 import isEqual from 'lodash/isEqual';
@@ -154,16 +155,26 @@ class WgBasicLayout extends React.PureComponent {
     return <SettingDrawer />;
   };
 
-  onChange = activeKey => {
-    const { dispatch } = this.props;
+  saveRootRef = node => {
+    if (node === null) return;
+    const { dispatch, refPanes } = this.props;
+    const refTabs = [...refPanes, ReactDOM.findDOMNode(node)].filter(x => x !== undefined);
     dispatch({
-      type: 'menu/openMenu',
-      payload: { path: activeKey },
+      type: 'menu/refPanes',
+      payload: { refPanes: refTabs },
     });
   };
 
+  onChange = activeKey => {
+    this.add({ path: activeKey });
+  };
+
   onEdit = (targetKey, action) => {
-    this[action](targetKey);
+    if (action === 'remove') {
+      this.remove(targetKey);
+    } else {
+      this[action](targetKey);
+    }
   };
 
   add = ({ path }) => {
@@ -236,10 +247,12 @@ class WgBasicLayout extends React.PureComponent {
               <TabPane
                 tab={pane.name}
                 className={styles.tabContent}
+                id={pane.key}
                 key={pane.key}
                 closable={pane.closable}
+                ref={this.saveRootRef}
               >
-                <Route>{<pane.component {...pane} />}</Route>
+                <pane.component {...pane} />
               </TabPane>
             ))}
           </Tabs>
@@ -271,6 +284,7 @@ export default connect(({ global, setting, menu }) => ({
   panes: menu.panes,
   activeKey: menu.activeKey,
   path: menu.path,
+  refPanes: menu.refPanes,
   selectedKeys: menu.selectedKeys,
   breadcrumbNameMap: menu.breadcrumbNameMap,
   ...setting,
