@@ -18,13 +18,3 @@ export async function fakeGet(params) {
 export async function fakeSync(params) {
   return request('/api/Mission/sync');
 }
-
-export async function fakeGenFlow(params) {
-  return request('/api/Mission/genFlow', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'genFlow',
-    },
-  });
-}

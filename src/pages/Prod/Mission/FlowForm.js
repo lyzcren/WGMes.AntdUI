@@ -63,7 +63,7 @@ export class FlowForm extends PureComponent {
         message.success('开流程单成功');
         handleModalVisible(false);
         // 成功后再次刷新列表
-        if (handleSuccess) handleSuccess();
+        if (handleSuccess) handleSuccess(queryResult.model);
       } else if (queryResult.status === 'warning') {
         message.warning(queryResult.message);
       } else {

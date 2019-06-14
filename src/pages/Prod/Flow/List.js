@@ -77,6 +77,7 @@ class TableList extends PureComponent {
     queryFilters: [],
     queryDeptID: null,
     queryStatusNumber: null,
+    queryBatchNo: this.props.fBatchNo,
   };
 
   // 列表查询参数
@@ -87,10 +88,8 @@ class TableList extends PureComponent {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    dispatch({
-      type: 'flowManage/fetch',
-      payload: this.currentPagination,
-    });
+    this.searchWhereInit();
+
     dispatch({
       type: 'basicData/getProcessDeptTree',
     });
@@ -111,6 +110,29 @@ class TableList extends PureComponent {
     ColumnConfig.routeModalVisibleCallback = record =>
       this.handleModalVisible({ key: 'route', flag: true }, record);
   }
+
+  componentDidUpdate(preProps) {
+    const { fBatchNo } = this.props;
+    if (preProps.fBatchNo !== fBatchNo) {
+      this.searchWhereInit();
+    }
+  }
+
+  searchWhereInit = () => {
+    const { dispatch, fBatchNo } = this.props;
+    // 查询条件处理
+    const queryFilters = [];
+    if (fBatchNo) {
+      queryFilters.push({ name: 'fBatchNo', compare: '=', value: fBatchNo });
+      this.setState({ queryBatchNo: this.props.fBatchNo });
+    }
+    this.currentPagination = { ...this.currentPagination, queryFilters };
+
+    dispatch({
+      type: 'flowManage/fetch',
+      payload: this.currentPagination,
+    });
+  };
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
     const { dispatch } = this.props;
@@ -596,6 +618,7 @@ class TableList extends PureComponent {
         status: { recordStatus },
       },
     } = this.props;
+    const { queryBatchNo } = this.state;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
@@ -630,7 +653,9 @@ class TableList extends PureComponent {
           </Col>
           <Col md={6} sm={24}>
             <FormItem label="批号">
-              {getFieldDecorator('queryBatchNo')(<Input placeholder="请输入" />)}
+              {getFieldDecorator('queryBatchNo', {
+                initialValue: queryBatchNo,
+              })(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={6} sm={24}>
@@ -665,12 +690,16 @@ class TableList extends PureComponent {
         status: { flowStatus },
       },
     } = this.props;
+    const { queryBatchNo } = this.state;
+
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6} sm={24}>
             <FormItem label="批号">
-              {getFieldDecorator('queryBatchNo')(<Input placeholder="请输入" />)}
+              {getFieldDecorator('queryBatchNo', {
+                initialValue: queryBatchNo,
+              })(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={6} sm={24}>

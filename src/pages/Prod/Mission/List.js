@@ -33,6 +33,7 @@ import { FlowForm } from './FlowForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
+import { GenFlowSuccess } from './GenFlowSuccess';
 
 import styles from './List.less';
 
@@ -55,6 +56,7 @@ class TableList extends PureComponent {
     // 界面是否可见
     modalVisible: {
       update: false,
+      genFlowSuccess: false,
     },
     formValues: {},
     // 当前操作选中列的数据
@@ -80,7 +82,8 @@ class TableList extends PureComponent {
     // 列配置相关方法
     ColumnConfig.ProfileModalVisibleCallback = record =>
       this.handleProfileModalVisible(true, record);
-    ColumnConfig.FlowModalVisibleCallback = record => this.handleFlowModalVisible(true, record);
+    ColumnConfig.FlowModalVisibleCallback = record =>
+      this.handleModalVisible({ key: 'update', flag: true }, record);
     ColumnConfig.DeleteCallback = record => this.handleDelete(record);
   }
 
@@ -243,12 +246,26 @@ class TableList extends PureComponent {
     });
   };
 
-  handleFlowModalVisible = (flag, record) => {
+  handleModalVisible = ({ key, flag }, record) => {
     const { modalVisible } = this.state;
+    modalVisible[key] = !!flag;
     this.setState({
-      modalVisible: { ...modalVisible, update: !!flag },
+      modalVisible: { ...modalVisible },
       currentFormValues: record || {},
     });
+  };
+
+  handleGenFlowSuccess = model => {
+    const {
+      missionManage: { queryResult: status, message },
+    } = this.props;
+
+    if (model.length > 0) {
+      this.setState({ successFlows: model });
+      this.handleModalVisible({ key: 'genFlowSuccess', flag: true });
+    }
+
+    this.search();
   };
 
   renderSimpleForm() {
@@ -306,13 +323,9 @@ class TableList extends PureComponent {
       currentFormValues,
       authorityModalVisible,
       authorizeUserModalVisible,
+      successFlows,
     } = this.state;
 
-    const flowMethods = {
-      handleModalVisible: this.handleFlowModalVisible,
-      dispatch: this.props.dispatch,
-      handleSuccess: this.search,
-    };
     const scrollX = ColumnConfig.columns
       .map(c => {
         return c.width;
@@ -361,11 +374,23 @@ class TableList extends PureComponent {
           </Card>
           {currentFormValues && Object.keys(currentFormValues).length ? (
             <FlowForm
-              {...flowMethods}
+              dispatch={this.props.dispatch}
+              handleSuccess={this.handleGenFlowSuccess}
+              handleModalVisible={(flag, record) =>
+                this.handleModalVisible({ key: 'update', flag }, record)
+              }
               modalVisible={modalVisible.update}
               values={currentFormValues}
             />
           ) : null}
+          {successFlows && (
+            <GenFlowSuccess
+              dispatch={this.props.dispatch}
+              modalVisible={modalVisible.genFlowSuccess}
+              handleModalVisible={flag => this.handleModalVisible({ key: 'genFlowSuccess', flag })}
+              records={successFlows}
+            />
+          )}
         </GridContent>
       </div>
     );

@@ -68,7 +68,7 @@ export default {
       });
     },
     *getPrintTemplates({ payload }, { call, put }) {
-      const response = yield call(fakeQueryPrintTemplate, { number: 'prod-defectCheck' });
+      const response = yield call(fakeQueryPrintTemplate, { number: 'prodDefectCheck' });
       yield put({
         type: 'save',
         payload: { printTemplates: response },

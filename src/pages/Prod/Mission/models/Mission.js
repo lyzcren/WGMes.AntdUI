@@ -1,5 +1,5 @@
-import { fakeQuery, fakeGet, fakeSync, fakeGenFlow } from '@/services/Prod/Mission';
-// import { fakeAddFromMission } from '@/services/Prod/Flow';
+import { fakeQuery, fakeGet, fakeSync } from '@/services/Prod/Mission';
+import { fakeAddFromMission } from '@/services/Prod/Flow';
 
 export default {
   namespace: 'missionManage',
@@ -39,7 +39,7 @@ export default {
       if (callback) callback();
     },
     *genFlow({ payload }, { call, put }) {
-      const response = yield call(fakeGenFlow, payload);
+      const response = yield call(fakeAddFromMission, payload);
       yield put({
         type: 'saveData',
         payload: response,

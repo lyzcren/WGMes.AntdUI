@@ -73,7 +73,7 @@ export default {
       });
     },
     *getPrintTemplates({ payload }, { call, put }) {
-      const response = yield call(fakeQueryPrintTemplate, { number: 'prod-flow' });
+      const response = yield call(fakeQueryPrintTemplate, { number: 'prodFlow' });
       yield put({
         type: 'save',
         payload: { printTemplates: response },
