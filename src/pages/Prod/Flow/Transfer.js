@@ -54,7 +54,7 @@ class Transfer extends PureComponent {
     showMoreDefect: false,
     moreDefectValue: '',
     fBeginDate: '',
-    fTransferDate: '',
+    fTransferDateTime: '',
     // precision: 4,
     // qtyFormat: '0.0000'
     precision: 0,
@@ -123,7 +123,7 @@ class Transfer extends PureComponent {
       flowTransfer: { data },
       successCallback,
     } = this.props;
-    const { fBeginDate, fTransferDate } = this.state;
+    const { fBeginDate, fTransferDateTime } = this.state;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
@@ -131,7 +131,9 @@ class Transfer extends PureComponent {
       data.fMachineID = fieldsValue.fMachineID;
       data.fMoldID = fieldsValue.fMoldID;
       data.fBeginDate = fBeginDate ? fBeginDate.format('YYYY-MM-DD HH:mm:ss') : undefined;
-      data.fTransferDate = fTransferDate ? fTransferDate.format('YYYY-MM-DD HH:mm:ss') : undefined;
+      data.fTransferDateTime = fTransferDateTime
+        ? fTransferDateTime.format('YYYY-MM-DD HH:mm:ss')
+        : undefined;
       data.defects = [];
       data.params = [];
       for (let key in fieldsValue) {
@@ -257,7 +259,7 @@ class Transfer extends PureComponent {
       '--',
       value[1].format('YYYY-MM-DD HH:mm:ss')
     );
-    this.setState({ fBeginDate: value[0], fTransferDate: value[1] });
+    this.setState({ fBeginDate: value[0], fTransferDateTime: value[1] });
   };
 
   render() {

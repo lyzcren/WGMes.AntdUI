@@ -59,7 +59,7 @@ class ColumnConfig {
         width: 200,
         sorter: true,
         render: (val, record) => {
-          return <a onClick={() => this._missionModalVisibleCallback(record)}>{val}</a>;
+          return <a onClick={() => this.missionModalVisibleCallback(record)}>{val}</a>;
         },
       },
       {
@@ -99,7 +99,7 @@ class ColumnConfig {
         dataIndex: 'fRouteName',
         width: 150,
         render: (val, record) => {
-          return <a onClick={() => this._routeModalVisibleCallback(record)}>{val}</a>;
+          return <a onClick={() => this.routeModalVisibleCallback(record)}>{val}</a>;
         },
       },
       {

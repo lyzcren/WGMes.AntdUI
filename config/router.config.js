@@ -194,6 +194,20 @@ export default [
         ],
       },
       {
+        path: '/report',
+        name: 'report',
+        icon: 'area-chart',
+        authority: ['Output_Read'],
+        routes: [
+          {
+            path: '/report/output',
+            name: 'output',
+            component: './Rpt/Output/List',
+            authority: ['Output_Read'],
+          },
+        ],
+      },
+      {
         path: '/techStd',
         name: 'techStd',
         icon: 'cluster',

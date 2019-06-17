@@ -69,7 +69,7 @@ class ColumnConfig {
       },
       {
         title: '完工时间',
-        dataIndex: 'fTransferDate',
+        dataIndex: 'fTransferDateTime',
         width: 160,
         render: val => {
           return val ? moment(val).format('YYYY-MM-DD HH:mm') : '';

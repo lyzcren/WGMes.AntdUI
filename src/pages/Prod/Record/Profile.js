@@ -37,7 +37,7 @@ const { RangePicker } = DatePicker;
 class Transfer extends PureComponent {
   state = {
     fBeginDate: '',
-    fTransferDate: '',
+    fTransferDateTime: '',
     // precision: 4,
     // qtyFormat: '0.0000'
     precision: 0,
@@ -111,7 +111,7 @@ class Transfer extends PureComponent {
       fMachineName,
       fSignDate,
       fBeginDate,
-      fTransferDate,
+      fTransferDateTime,
     } = data;
     const { qtyFormat, precision } = this.state;
 
@@ -220,7 +220,7 @@ class Transfer extends PureComponent {
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <FormItem key="fBeginDate" label="生产时间">
                   {getFieldDecorator('fBeginDate', {
-                    initialValue: [moment(fBeginDate), moment(fTransferDate)],
+                    initialValue: [moment(fBeginDate), moment(fTransferDateTime)],
                   })(
                     <RangePicker
                       readOnly
@@ -235,7 +235,7 @@ class Transfer extends PureComponent {
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <FormItem key="fDuration" label="生产时长">
                   {getFieldDecorator('fDuration', {
-                    initialValue: getTimeDiff(new Date(fBeginDate), new Date(fTransferDate)),
+                    initialValue: getTimeDiff(new Date(fBeginDate), new Date(fTransferDateTime)),
                   })(<Input readOnly />)}
                 </FormItem>
               </Col>

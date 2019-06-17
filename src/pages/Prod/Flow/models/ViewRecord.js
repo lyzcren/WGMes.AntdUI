@@ -51,9 +51,9 @@ export default {
                 {'【' +
                   record.fOperatorName +
                   '】于 ' +
-                  moment(record.fTransferDate).format('YYYY-MM-DD HH:mm') +
+                  moment(record.fTransferDateTime).format('YYYY-MM-DD HH:mm') +
                   ' 完成，耗时【' +
-                  getTimeDiff(new Date(record.fBeginDate), new Date(record.fTransferDate)) +
+                  getTimeDiff(new Date(record.fBeginDate), new Date(record.fTransferDateTime)) +
                   '】' +
                   '，良率：' +
                   numeral((record.fPassQty * 100) / record.fInputQty).format('0.00') +
