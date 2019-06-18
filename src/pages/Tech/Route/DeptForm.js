@@ -120,14 +120,19 @@ export class DeptForm extends PureComponent {
     });
   }
 
-  handleFieldChange(e, fieldName, fEntryID) {
+  handleFieldChange(fieldName, value, fEntryID) {
+    const { dispatch } = this.props;
     const { depts } = this.state;
     const newData = depts.map(item => ({ ...item }));
     const target = this.getRowByKey(fEntryID, newData);
     if (target) {
-      target[fieldName] = e.target.depts;
+      target[fieldName] = value;
       this.setState({ depts: newData });
     }
+    dispatch({
+      type: 'routeProfile/changeStep',
+      payload: { depts: newData },
+    });
   }
 
   render() {
@@ -138,13 +143,13 @@ export class DeptForm extends PureComponent {
       basicData: { processDeptTree },
     } = this.props;
     const profileLoading = this.props.loading;
-    const { loading, depts } = this.state;
+    const { loading, depts, currentStep } = this.state;
 
     const columns = [
       {
         title: '部门',
         dataIndex: 'fDeptName',
-        key: 'fDeptName',
+        width: '50%',
         render: (text, record) => {
           return (
             <FormItem style={{ marginBottom: 0 }}>
@@ -156,11 +161,55 @@ export class DeptForm extends PureComponent {
                   style={{ width: '100%' }}
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                   treeData={processDeptTree}
-                  // defaultValue={record.fDeptID}
                   treeDefaultExpandAll
                   onChange={(depts, label) =>
                     this.handleDeptChange(depts, label[0], record.fEntryID)
                   }
+                />
+              )}
+            </FormItem>
+          );
+        },
+      },
+      {
+        title: '机台必选',
+        dataIndex: 'fRequireMachine',
+        width: 100,
+        render: (text, record) => {
+          return (
+            <FormItem style={{ marginBottom: 0 }}>
+              {getFieldDecorator(
+                `fRequireMachine_${currentStep}${record.fInterID}${record.fEntryID}`,
+                {
+                  initialValue: !!record.fRequireMachine,
+                  valuePropName: 'checked',
+                }
+              )(
+                <Switch
+                  onChange={checked => {
+                    this.handleFieldChange('fRequireMachine', checked, record.fEntryID);
+                  }}
+                />
+              )}
+            </FormItem>
+          );
+        },
+      },
+      {
+        title: '自动签收',
+        dataIndex: 'fAutoSign',
+        width: 100,
+        render: (text, record) => {
+          return (
+            <FormItem style={{ marginBottom: 0 }}>
+              {getFieldDecorator(`fAutoSign_${currentStep}${record.fInterID}${record.fEntryID}`, {
+                initialValue: !!record.fAutoSign,
+                valuePropName: 'checked',
+              })(
+                <Switch
+                  onChange={checked => {
+                    this.handleFieldChange('fAutoSign', checked, record.fEntryID);
+                  }}
                 />
               )}
             </FormItem>

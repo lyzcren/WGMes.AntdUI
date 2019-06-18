@@ -368,7 +368,7 @@ class Transfer extends PureComponent {
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <FormItem key="fMachineID" label="机台">
                   {getFieldDecorator('fMachineID', {
-                    rules: [{ required: true, message: '请选择机台' }],
+                    rules: [{ required: data.fRequireMachine, message: '请选择机台' }],
                   })(
                     <Select
                       placeholder="请选择机台"

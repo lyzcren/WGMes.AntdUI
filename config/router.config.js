@@ -197,13 +197,19 @@ export default [
         path: '/report',
         name: 'report',
         icon: 'area-chart',
-        authority: ['Output_Read'],
+        authority: ['Output_Read', 'PassRate_Read'],
         routes: [
           {
             path: '/report/output',
             name: 'output',
             component: './Rpt/Output/List',
             authority: ['Output_Read'],
+          },
+          {
+            path: '/report/passRate',
+            name: 'passRate',
+            component: './Rpt/PassRate/List',
+            authority: ['PassRate_Read'],
           },
         ],
       },

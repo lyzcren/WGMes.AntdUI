@@ -119,7 +119,13 @@ export default {
       let fEntryID = 1;
       steps.map((group, groupId) => {
         group.depts.map(dept => {
-          submitSteps.push({ fGroupID: groupId, fEntryID: dept.fEntryID, fDeptID: dept.fDeptID });
+          submitSteps.push({
+            fGroupID: groupId,
+            fEntryID: dept.fEntryID,
+            fDeptID: dept.fDeptID,
+            fRequireMachine: dept.fRequireMachine,
+            fAutoSign: dept.fAutoSign,
+          });
         });
       });
       const response = yield call(fakeSaveSteps, { ...payload, steps: submitSteps });

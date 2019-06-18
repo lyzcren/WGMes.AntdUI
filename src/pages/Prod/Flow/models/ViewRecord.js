@@ -61,7 +61,10 @@ export default {
               </span>
             );
           } else if (record.fStatus === 1) {
-            step.description = '签收于  ' + moment(record.fSignDate).format('YYYY-MM-DD HH:mm');
+            step.description =
+              (record.fSignUserName ? `【${record.fSignUserName}】` : '自动') +
+              '签收于  ' +
+              moment(record.fSignDate).format('YYYY-MM-DD HH:mm');
           } else {
           }
         }
