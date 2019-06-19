@@ -197,7 +197,7 @@ export default [
         path: '/report',
         name: 'report',
         icon: 'area-chart',
-        authority: ['Output_Read', 'PassRate_Read'],
+        authority: ['Output_Read', 'PassRate_Read', 'MissionExecution_Read'],
         routes: [
           {
             path: '/report/output',
@@ -210,6 +210,12 @@ export default [
             name: 'passRate',
             component: './Rpt/PassRate/List',
             authority: ['PassRate_Read'],
+          },
+          {
+            path: '/report/missionExecution',
+            name: 'missionExecution',
+            component: './Rpt/MissionExecution/List',
+            authority: ['MissionExecution_Read'],
           },
         ],
       },

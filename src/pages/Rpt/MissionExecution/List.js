@@ -31,9 +31,9 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ passRateManage, loading, basicData }) => ({
-  passRateManage,
-  loading: loading.models.passRateManage,
+@connect(({ missionExecutionManage, loading, basicData }) => ({
+  missionExecutionManage,
+  loading: loading.models.missionExecutionManage,
   basicData,
 }))
 @Form.create()
@@ -53,19 +53,18 @@ class TableList extends PureComponent {
   currentPagination = {
     current: 1,
     pageSize: 10,
+    groupByWorkShop: !!this.state.groupByWorkShop,
+    groupBySo: !!this.state.groupBySo,
+    groupByMo: !!this.state.groupByMo,
     groupByDate: !!this.state.groupByDate,
-    groupByWeek: !!this.state.groupByWeek,
-    groupByMonth: !!this.state.groupByMonth,
-    groupByMachine: !!this.state.groupByMachine,
     groupByMission: !!this.state.groupByMission,
-    groupByOperator: !!this.state.groupByOperator,
     groupByProduct: !!this.state.groupByProduct,
   };
 
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'passRateManage/fetch',
+      type: 'missionExecutionManage/fetch',
       payload: this.currentPagination,
     });
     dispatch({
@@ -90,12 +89,11 @@ class TableList extends PureComponent {
       filters,
       ...formValues,
       queryFilters,
+      groupByWorkShop: !!this.state.groupByWorkShop,
+      groupBySo: !!this.state.groupBySo,
+      groupByMo: !!this.state.groupByMo,
       groupByDate: !!this.state.groupByDate,
-      groupByWeek: !!this.state.groupByWeek,
-      groupByMonth: !!this.state.groupByMonth,
-      groupByMachine: !!this.state.groupByMachine,
       groupByMission: !!this.state.groupByMission,
-      groupByOperator: !!this.state.groupByOperator,
       groupByProduct: !!this.state.groupByProduct,
     };
     if (sorter.field) {
@@ -104,7 +102,7 @@ class TableList extends PureComponent {
     }
 
     dispatch({
-      type: 'passRateManage/fetch',
+      type: 'missionExecutionManage/fetch',
       payload: this.currentPagination,
     });
   };
@@ -121,13 +119,33 @@ class TableList extends PureComponent {
 
     // 查询条件处理
     const queryFilters = [];
-    if (fieldsValue.fDate) {
-      queryFilters.push({ name: 'fTransferDateTime', compare: '>=', value: fieldsValue.fDate[0] });
-      queryFilters.push({ name: 'fTransferDateTime', compare: '<=', value: fieldsValue.fDate[1] });
+    if (fieldsValue.fDate && fieldsValue.fDate[0] && fieldsValue.fDate[1]) {
+      queryFilters.push({
+        name: 'fDate',
+        compare: '>=',
+        value: fieldsValue.fDate[0].format('YYYY-MM-DD'),
+      });
+      queryFilters.push({
+        name: 'fDate',
+        compare: '<=',
+        value: fieldsValue.fDate[1].format('YYYY-MM-DD'),
+      });
     }
-    // 部门
-    if (fieldsValue.queryDept) {
-      queryFilters.push({ name: 'fDeptID', compare: '=', value: fieldsValue.queryDept });
+    if (
+      fieldsValue.fPlanFinishDate &&
+      fieldsValue.fPlanFinishDate[0] &&
+      fieldsValue.fPlanFinishDate[1]
+    ) {
+      queryFilters.push({
+        name: 'fPlanFinishDate',
+        compare: '>=',
+        value: fieldsValue.fPlanFinishDate[0].format('YYYY-MM-DD'),
+      });
+      queryFilters.push({
+        name: 'fPlanFinishDate',
+        compare: '<=',
+        value: fieldsValue.fPlanFinishDate[1].format('YYYY-MM-DD'),
+      });
     }
 
     this.setState({
@@ -139,12 +157,11 @@ class TableList extends PureComponent {
       ...this.currentPagination,
       current: 1,
       queryFilters,
+      groupByWorkShop: !!this.state.groupByWorkShop,
+      groupBySo: !!this.state.groupBySo,
+      groupByMo: !!this.state.groupByMo,
       groupByDate: !!this.state.groupByDate,
-      groupByWeek: !!this.state.groupByWeek,
-      groupByMonth: !!this.state.groupByMonth,
-      groupByMachine: !!this.state.groupByMachine,
       groupByMission: !!this.state.groupByMission,
-      groupByOperator: !!this.state.groupByOperator,
       groupByProduct: !!this.state.groupByProduct,
     };
 
@@ -159,7 +176,7 @@ class TableList extends PureComponent {
 
       const pagination = this.getSearchParam(fieldsValue);
       dispatch({
-        type: 'passRateManage/fetch',
+        type: 'missionExecutionManage/fetch',
         payload: pagination,
       });
     });
@@ -177,17 +194,16 @@ class TableList extends PureComponent {
       ...this.currentPagination,
       current: 1,
       queryFilters: [],
+      groupByWorkShop: !!this.state.groupByWorkShop,
+      groupBySo: !!this.state.groupBySo,
+      groupByMo: !!this.state.groupByMo,
       groupByDate: !!this.state.groupByDate,
-      groupByWeek: !!this.state.groupByWeek,
-      groupByMonth: !!this.state.groupByMonth,
-      groupByMachine: !!this.state.groupByMachine,
       groupByMission: !!this.state.groupByMission,
-      groupByOperator: !!this.state.groupByOperator,
       groupByProduct: !!this.state.groupByProduct,
     };
 
     dispatch({
-      type: 'passRateManage/fetch',
+      type: 'missionExecutionManage/fetch',
       payload: this.currentPagination,
     });
   };
@@ -220,26 +236,8 @@ class TableList extends PureComponent {
     this.setState({ ...state });
   }
 
-  changeGroupByDate(e) {
-    const {
-      target: { value },
-    } = e;
-    if (value === 'groupByDate') {
-      this.setState({ groupByDate: true, groupByWeek: false, groupByMonth: false });
-    } else if (value === 'groupByWeek') {
-      this.setState({ groupByDate: false, groupByWeek: true, groupByMonth: false });
-    } else if (value === 'groupByMonth') {
-      this.setState({ groupByDate: false, groupByWeek: false, groupByMonth: true });
-    } else {
-      this.setState({ groupByDate: false, groupByWeek: false, groupByMonth: false });
-    }
-    setTimeout(() => {
-      this.search();
-    }, 20);
-  }
-
   handleChangeDate = value => {
-    this.setState({ fBeginDate: value[0], fEndDate: value[1] });
+    // this.setState({ fBeginDate: value[0], fEndDate: value[1] });
   };
 
   renderSimpleForm() {
@@ -251,30 +249,27 @@ class TableList extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem label="日期">
+            <FormItem label="任务单日期">
               {getFieldDecorator('fDate', {
-                rules: [{ required: true, message: '请选择时间' }],
-                initialValue: [moment().add(-1, 'months'), moment()],
+                // initialValue: [moment().add(-1, 'months'), moment()],
               })(
                 <RangePicker
-                  showTime={{ format: 'HH:mm' }}
-                  format="YYYY-MM-DD HH:mm"
-                  placeholder={['开工时间', '完工时间']}
+                  format="YYYY-MM-DD"
+                  placeholder={['开始时间', '结束时间']}
                   onOk={this.handleChangeDate}
                 />
               )}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem label="部门">
-              {getFieldDecorator('queryDept', {
-                rules: [{ required: false, message: '请选择部门' }],
+            <FormItem label="计划完工日期">
+              {getFieldDecorator('fPlanFinishDate', {
+                // initialValue: [moment().add(-1, 'months'), moment()],
               })(
-                <TreeSelect
-                  style={{ width: '100%' }}
-                  treeData={processDeptTree}
-                  treeDefaultExpandAll
-                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                <RangePicker
+                  format="YYYY-MM-DD"
+                  placeholder={['开始时间', '结束时间']}
+                  onOk={this.handleChangeDate}
                 />
               )}
             </FormItem>
@@ -308,7 +303,7 @@ class TableList extends PureComponent {
 
   render() {
     const {
-      passRateManage: { data },
+      missionExecutionManage: { data },
       loading,
     } = this.props;
 
@@ -330,39 +325,35 @@ class TableList extends PureComponent {
               </div> */}
               <div className={styles.tableListGroup}>
                 <Form layout="inline">
-                  <FormItem label="时间分组">
-                    <Radio.Group
-                      defaultValue=""
-                      buttonStyle="solid"
-                      onChange={e => this.changeGroupByDate(e)}
-                    >
-                      <Radio.Button value="">无</Radio.Button>
-                      <Radio.Button value="groupByDate">日期</Radio.Button>
-                      <Radio.Button value="groupByWeek">周</Radio.Button>
-                      <Radio.Button value="groupByMonth">月</Radio.Button>
-                    </Radio.Group>
-                  </FormItem>
-                </Form>
-              </div>
-              <div className={styles.tableListGroup}>
-                <Form layout="inline">
                   <FormItem>分组汇总：</FormItem>
-                  <FormItem label="任务单">
+                  <FormItem label="车间">
+                    <Switch
+                      defaultChecked={!!this.state.groupByWorkShop}
+                      onChange={checked => this.changeGroupBy('groupByWorkShop', checked)}
+                    />
+                  </FormItem>
+                  <FormItem label="订单">
+                    <Switch
+                      defaultChecked={!!this.state.groupBySo}
+                      onChange={checked => this.changeGroupBy('groupBySo', checked)}
+                    />
+                  </FormItem>
+                  <FormItem label="ERP 任务单">
+                    <Switch
+                      defaultChecked={!!this.state.groupByMo}
+                      onChange={checked => this.changeGroupBy('groupByMo', checked)}
+                    />
+                  </FormItem>
+                  <FormItem label="生产任务单">
                     <Switch
                       defaultChecked={!!this.state.groupByMission}
                       onChange={checked => this.changeGroupBy('groupByMission', checked)}
                     />
                   </FormItem>
-                  <FormItem label="机台">
+                  <FormItem label="日期">
                     <Switch
-                      defaultChecked={!!this.state.groupByMachine}
-                      onChange={checked => this.changeGroupBy('groupByMachine', checked)}
-                    />
-                  </FormItem>
-                  <FormItem label="操作员">
-                    <Switch
-                      defaultChecked={!!this.state.groupByOperator}
-                      onChange={checked => this.changeGroupBy('groupByOperator', checked)}
+                      defaultChecked={!!this.state.groupByDate}
+                      onChange={checked => this.changeGroupBy('groupByDate', checked)}
                     />
                   </FormItem>
                   <FormItem label="物料">
