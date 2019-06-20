@@ -77,6 +77,7 @@ class TableList extends PureComponent {
     queryFilters: [],
     queryDeptID: null,
     queryStatusNumber: null,
+    queryRecordStatusNumber: null,
     queryBatchNo: this.props.fBatchNo,
   };
 
@@ -174,34 +175,35 @@ class TableList extends PureComponent {
     };
     // 查询条件处理
     const queryFilters = [];
-    // 当前工序可签收
-    if (fieldsValue.queryDept && fieldsValue.queryRecordStatusNumber === 'ManufWait4Sign') {
-      queryFilters.push({ name: 'fNextDeptIDs', compare: '%*%', value: fieldsValue.queryDept });
-      queryFilters.push({ name: 'fRecordStatusNumber', compare: '<>', value: 'ManufProducing' });
-    }
-    // 当前工序生产中
-    else if (fieldsValue.queryDept && fieldsValue.queryRecordStatusNumber === 'ManufProducing') {
-      queryFilters.push({ name: 'fCurrentDeptID', compare: '=', value: fieldsValue.queryDept });
-      queryFilters.push({
-        name: 'fRecordStatusNumber',
-        compare: '=',
-        value: fieldsValue.queryRecordStatusNumber,
-      });
-    }
-    // 当前工序已完成
-    else if (fieldsValue.queryDept && fieldsValue.queryRecordStatusNumber === 'ManufEndProduce') {
-      queryFilters.push({
-        name: 'FEndProduceDeptIDs',
-        compare: '%*%',
-        value: fieldsValue.queryDept,
-      });
-      // queryFilters.push({ name: 'fRecordStatusNumber', compare: '=', value: fieldsValue.queryRecordStatusNumber });
-    } else if (fieldsValue.queryDept) {
-      // 只选择部门，未选择状态，该部门在工艺路线内即可
-      queryFilters.push({ name: 'fAllDeptIDs', compare: '%*%', value: fieldsValue.queryDept });
+    if (fieldsValue.queryDept) {
+      // 当前工序可签收
+      if (fieldsValue.queryRecordStatusNumber === 'ManufWait4Sign') {
+        queryFilters.push({ name: 'fNextDeptIDs', compare: '%*%', value: fieldsValue.queryDept });
+        queryFilters.push({ name: 'fRecordStatusNumber', compare: '<>', value: 'ManufProducing' });
+      }
+      // 当前工序生产中
+      else if (fieldsValue.queryRecordStatusNumber === 'ManufProducing') {
+        queryFilters.push({ name: 'fCurrentDeptID', compare: '=', value: fieldsValue.queryDept });
+        queryFilters.push({
+          name: 'fRecordStatusNumber',
+          compare: '=',
+          value: fieldsValue.queryRecordStatusNumber,
+        });
+      }
+      // 当前工序已完成
+      else if (fieldsValue.queryDept && fieldsValue.queryRecordStatusNumber === 'ManufEndProduce') {
+        queryFilters.push({
+          name: 'FEndProduceDeptIDs',
+          compare: '%*%',
+          value: fieldsValue.queryDept,
+        });
+      } else {
+        // 只选择部门，未选择状态，该部门在工艺路线内即可
+        queryFilters.push({ name: 'fAllDeptIDs', compare: '%*%', value: fieldsValue.queryDept });
+      }
     }
     // 无工序时查询流程单状态
-    else if (fieldsValue.queryStatusNumber)
+    if (fieldsValue.queryStatusNumber)
       queryFilters.push({
         name: 'fStatusNumber',
         compare: '=',
@@ -239,6 +241,20 @@ class TableList extends PureComponent {
         compare: '%*%',
         value: fieldsValue.queryProductNumber,
       });
+    if (fieldsValue.queryModel)
+      queryFilters.push({ name: 'fProductModel', compare: '%*%', value: fieldsValue.queryModel });
+    if (fieldsValue.queryWorkShopName)
+      queryFilters.push({
+        name: 'fWorkShopName',
+        compare: '%*%',
+        value: fieldsValue.queryWorkShopName,
+      });
+    if (fieldsValue.queryWorkShopNumber)
+      queryFilters.push({
+        name: 'fWorkShopNumber',
+        compare: '%*%',
+        value: fieldsValue.queryWorkShopNumber,
+      });
 
     this.setState({
       formValues: values,
@@ -266,13 +282,13 @@ class TableList extends PureComponent {
         type: 'flowManage/fetch',
         payload: pagination,
       });
-      this.setState({ queryDeptID: fieldsValue.queryDept });
-      if (!fieldsValue.queryDept) {
-        this.setState({ queryStatusNumber: fieldsValue.queryStatusNumber });
-      }
+      this.setState({
+        queryDeptID: fieldsValue.queryDept,
+        queryStatusNumber: fieldsValue.queryStatusNumber,
+        queryRecordStatusNumber: fieldsValue.queryRecordStatusNumber,
+      });
       this.handleSelectRows([]);
     });
-    this.handleSelectRows([]);
   };
 
   handleFormReset = () => {
@@ -443,6 +459,19 @@ class TableList extends PureComponent {
       cancelText: '取消',
       onOk: () => selectedRows.forEach(row => this.sign(row, queryDeptID)),
     });
+  };
+
+  handleScanTransfer = record => {
+    const { operatorForm, queryDeptID } = this.state;
+    const { fCurrentDeptID, fCurrentDeptName } = record;
+    // 操作员查询界面，要求先选择部门后才能扫描转序（管理员查询界面则不需要）
+    if (!!operatorForm && !queryDeptID) {
+      message.warning(`扫描转序需先选择部门，请先选择部门.`);
+    } else if (!!operatorForm && queryDeptID !== fCurrentDeptID) {
+      message.warning(`请选择【${fCurrentDeptName}】工序再扫描转序.`);
+    } else {
+      this.transferModalVisible(record);
+    }
   };
 
   handleSign = record => {
@@ -618,14 +647,14 @@ class TableList extends PureComponent {
         status: { recordStatus },
       },
     } = this.props;
-    const { queryBatchNo } = this.state;
+    const { operatorForm, queryBatchNo } = this.state;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6} sm={24}>
             <FormItem label="部门">
               {getFieldDecorator('queryDept', {
-                rules: [{ required: true, message: '请选择部门' }],
+                rules: [{ required: !!operatorForm, message: '请选择部门' }],
               })(
                 <TreeSelect
                   style={{ width: '100%' }}
@@ -690,25 +719,28 @@ class TableList extends PureComponent {
         status: { flowStatus },
       },
     } = this.props;
-    const { queryBatchNo } = this.state;
+    const { operatorForm, queryBatchNo } = this.state;
 
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6} sm={24}>
-            <FormItem label="批号">
-              {getFieldDecorator('queryBatchNo', {
-                initialValue: queryBatchNo,
-              })(<Input placeholder="请输入" />)}
+            <FormItem label="部门">
+              {getFieldDecorator('queryDept', {
+                rules: [{ required: !!operatorForm, message: '请选择部门' }],
+              })(
+                <TreeSelect
+                  style={{ width: '100%' }}
+                  treeData={processDeptTree}
+                  treeDefaultExpandAll
+                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                  onChange={this.selectChange}
+                />
+              )}
             </FormItem>
           </Col>
           <Col md={6} sm={24}>
-            <FormItem label="任务单号">
-              {getFieldDecorator('queryMoBillNo')(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col>
-          <Col md={6} sm={24}>
-            <FormItem label="状态">
+            <FormItem label="流程单状态">
               {getFieldDecorator('queryStatusNumber')(
                 <Select placeholder="请选择" style={{ width: '100%' }} onChange={this.selectChange}>
                   {flowStatus &&
@@ -721,6 +753,18 @@ class TableList extends PureComponent {
               )}
             </FormItem>
           </Col>
+          <Col md={6} sm={24}>
+            <FormItem label="批号">
+              {getFieldDecorator('queryBatchNo', {
+                initialValue: queryBatchNo,
+              })(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          {/* <Col md={6} sm={24}>
+            <FormItem label="任务单号">
+              {getFieldDecorator('queryMoBillNo')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col> */}
           <Col md={6} sm={24}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
@@ -753,7 +797,7 @@ class TableList extends PureComponent {
       },
     } = this.props;
     return (
-      <Form onSubmit={this.handleSearch} layout="inline">
+      <Form onSubmit={this.handleSearch} layout="inline" style={{ marginRight: '30px' }}>
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
             <FormItem label="批号">
@@ -811,6 +855,21 @@ class TableList extends PureComponent {
           <Col md={8} sm={24}>
             <FormItem label="产品编码">
               {getFieldDecorator('queryProductNumber')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="规格型号">
+              {getFieldDecorator('queryModel')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="车间">
+              {getFieldDecorator('queryWorkShopName')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="车间编码">
+              {getFieldDecorator('queryWorkShopNumber')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
         </Row>
@@ -917,7 +976,7 @@ class TableList extends PureComponent {
                         </Menu>
                       }
                     >
-                      <Button>
+                      <Button icon="printer">
                         打印 <Icon type="down" />
                       </Button>
                     </Dropdown>
@@ -988,9 +1047,9 @@ class TableList extends PureComponent {
           <ScanForm
             dispatch
             disabled={!queryDeptID}
-            queryDeptID
+            queryDeptID={queryDeptID}
             handleSign={this.handleSign}
-            transferModalVisible={this.transferModalVisible}
+            handleScanTransfer={this.handleScanTransfer}
             handleModalVisible={flag => this.handleModalVisible({ key: 'scan', flag })}
             modalVisible={modalVisible.scan}
           />

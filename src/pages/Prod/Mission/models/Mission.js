@@ -1,5 +1,6 @@
-import { fakeQuery, fakeGet, fakeSync } from '@/services/Prod/Mission';
+import { fakeQuery, fakeGet, fakeRemove, fakeSync } from '@/services/Prod/Mission';
 import { fakeAddFromMission } from '@/services/Prod/Flow';
+import { fakeQueryPrintTemplate } from '@/services/Sys/PrintTemplate';
 
 export default {
   namespace: 'missionManage',
@@ -13,14 +14,15 @@ export default {
       status: 'ok',
       message: '',
     },
+    printTemplates: [],
   },
 
   effects: {
     *fetch({ payload }, { call, put }) {
       const response = yield call(fakeQuery, payload);
       yield put({
-        type: 'saveQueryData',
-        payload: response,
+        type: 'save',
+        payload: { data: response },
       });
     },
     *get({ payload }, { call, put }) {
@@ -30,13 +32,19 @@ export default {
         payload: response,
       });
     },
-    *sync({ payload, callback }, { call, put }) {
+    *remove({ payload }, { call, put }) {
+      const response = yield call(fakeRemove, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
+      });
+    },
+    *sync({ payload }, { call, put }) {
       const response = yield call(fakeSync, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
-      if (callback) callback();
     },
     *genFlow({ payload }, { call, put }) {
       const response = yield call(fakeAddFromMission, payload);
@@ -45,13 +53,20 @@ export default {
         payload: response,
       });
     },
+    *getPrintTemplates({ payload }, { call, put }) {
+      const response = yield call(fakeQueryPrintTemplate, { number: 'prodMission' });
+      yield put({
+        type: 'save',
+        payload: { printTemplates: response },
+      });
+    },
   },
 
   reducers: {
-    saveQueryData(state, action) {
+    save(state, action) {
       return {
         ...state,
-        data: action.payload,
+        ...action.payload,
       };
     },
     saveData(state, action) {

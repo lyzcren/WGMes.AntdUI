@@ -193,16 +193,24 @@ class ColumnConfig {
     {
       title: '操作',
       fixed: 'right',
-      width: 200,
+      width: 250,
       render: (text, record) => {
         return (
           <Fragment>
             <Authorized authority="Mission_Read">
               <a onClick={() => this.profileModalVisibleCallback(record)}>详情</a>
-              <Divider type="vertical" />
               {record.fAuxInHighLimitQty - record.fInputQty > 0 && (
-                <a onClick={() => this._flowModalVisibleCallback(record)}>开流程单</a>
+                <span>
+                  <Divider type="vertical" />
+                  <a onClick={() => this.flowModalVisibleCallback(record)}>开流程单</a>
+                </span>
               )}
+            </Authorized>
+            <Authorized authority="Mission_Delete">
+              <Divider type="vertical" />
+              <Popconfirm title="是否要删除此行？" onConfirm={() => this.deleteCallback(record)}>
+                <a>删除</a>
+              </Popconfirm>
             </Authorized>
           </Fragment>
         );
@@ -211,16 +219,11 @@ class ColumnConfig {
   ];
 
   // 详情方法
-  ProfileModalVisibleCallback = record => {};
-  profileModalVisibleCallback = record => {
-    this.ProfileModalVisibleCallback(record);
-  };
+  profileModalVisibleCallback = record => {};
 
   // 流程单方法
-  FlowModalVisibleCallback = record => {};
-  _flowModalVisibleCallback = record => {
-    this.FlowModalVisibleCallback(record);
-  };
+  flowModalVisibleCallback = record => {};
+  deleteCallback = record => {};
 }
 
 let columnConfig = new ColumnConfig();

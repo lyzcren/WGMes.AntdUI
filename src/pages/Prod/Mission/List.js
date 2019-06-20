@@ -39,6 +39,7 @@ import styles from './List.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
+const { RangePicker } = DatePicker;
 const getValue = obj =>
   Object.keys(obj)
     .map(key => obj[key])
@@ -79,12 +80,15 @@ class TableList extends PureComponent {
       type: 'missionManage/fetch',
       payload: this.currentPagination,
     });
+    dispatch({
+      type: 'missionManage/getPrintTemplates',
+    });
     // 列配置相关方法
-    ColumnConfig.ProfileModalVisibleCallback = record =>
+    ColumnConfig.profileModalVisibleCallback = record =>
       this.handleProfileModalVisible(true, record);
-    ColumnConfig.FlowModalVisibleCallback = record =>
+    ColumnConfig.flowModalVisibleCallback = record =>
       this.handleModalVisible({ key: 'update', flag: true }, record);
-    ColumnConfig.DeleteCallback = record => this.handleDelete(record);
+    ColumnConfig.deleteCallback = record => this.handleDelete(record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -127,10 +131,70 @@ class TableList extends PureComponent {
     };
     // 查询条件处理
     const queryFilters = [];
+    if (fieldsValue.fDate && fieldsValue.fDate[0] && fieldsValue.fDate[1]) {
+      queryFilters.push({
+        name: 'fDate',
+        compare: '>=',
+        value: fieldsValue.fDate[0].format('YYYY-MM-DD'),
+      });
+      queryFilters.push({
+        name: 'fDate',
+        compare: '<=',
+        value: fieldsValue.fDate[1].format('YYYY-MM-DD'),
+      });
+    }
     if (fieldsValue.querySOBillNo)
       queryFilters.push({ name: 'fSOBillNo', compare: '%*%', value: fieldsValue.querySOBillNo });
     if (fieldsValue.queryMOBillNo)
       queryFilters.push({ name: 'fMOBillNo', compare: '%*%', value: fieldsValue.queryMOBillNo });
+    if (
+      fieldsValue.fPlanFinishDate &&
+      fieldsValue.fPlanFinishDate[0] &&
+      fieldsValue.fPlanFinishDate[1]
+    ) {
+      queryFilters.push({
+        name: 'fPlanFinishDate',
+        compare: '>=',
+        value: fieldsValue.fPlanFinishDate[0].format('YYYY-MM-DD'),
+      });
+      queryFilters.push({
+        name: 'fPlanFinishDate',
+        compare: '<=',
+        value: fieldsValue.fPlanFinishDate[1].format('YYYY-MM-DD'),
+      });
+    }
+    if (fieldsValue.queryProductName)
+      queryFilters.push({
+        name: 'fProductName',
+        compare: '%*%',
+        value: fieldsValue.queryProductName,
+      });
+    if (fieldsValue.queryProductFullName)
+      queryFilters.push({
+        name: 'fProductFullName',
+        compare: '%*%',
+        value: fieldsValue.queryProductFullName,
+      });
+    if (fieldsValue.queryProductNumber)
+      queryFilters.push({
+        name: 'fProductNumber',
+        compare: '%*%',
+        value: fieldsValue.queryProductNumber,
+      });
+    if (fieldsValue.queryModel)
+      queryFilters.push({ name: 'fModel', compare: '%*%', value: fieldsValue.queryModel });
+    if (fieldsValue.queryWorkShopName)
+      queryFilters.push({
+        name: 'fWorkShopName',
+        compare: '%*%',
+        value: fieldsValue.queryWorkShopName,
+      });
+    if (fieldsValue.queryWorkShopNumber)
+      queryFilters.push({
+        name: 'fWorkShopNumber',
+        compare: '%*%',
+        value: fieldsValue.queryWorkShopNumber,
+      });
 
     this.setState({
       formValues: values,
@@ -202,6 +266,32 @@ class TableList extends PureComponent {
     });
   };
 
+  handleDelete = record => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'missionManage/remove',
+      payload: {
+        fInterID: record.fInterID,
+      },
+    }).then(() => {
+      this.setState({
+        selectedRows: [],
+      });
+      const {
+        missionManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success('【' + record.fMoBillNo + '】' + '删除成功');
+        // 成功后再次刷新列表
+        this.search();
+      } else if (queryResult.status === 'warning') {
+        message.warning(queryResult.message);
+      } else {
+        message.error(queryResult.message);
+      }
+    });
+  };
+
   handleExport = e => {
     const { dispatch, form } = this.props;
 
@@ -231,6 +321,28 @@ class TableList extends PureComponent {
       type: 'menu/openMenu',
       payload: { path: '/prod/mission/profile', data: record },
     });
+  };
+
+  //应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
+  webapp_start(templateId, interIds, type) {
+    var option = {
+      baseurl: 'http://' + window.location.host,
+      report: '/api/PrintTemplate/grf?id=' + templateId,
+      data: '/api/mission/getPrintData?id=' + interIds,
+      selfsql: false,
+      type: type,
+    };
+
+    //创建启动WEB报表客户端的URL协议参数
+    window.location.href = 'grwebapp://' + JSON.stringify(option);
+  }
+
+  handlePrint = e => {
+    const { dispatch, form } = this.props;
+    const { selectedRows } = this.state;
+
+    const templateId = e.key;
+    this.webapp_start(templateId, selectedRows.map(row => row.fInterID).join(','), 'preview');
   };
 
   toggleForm = () => {
@@ -273,11 +385,13 @@ class TableList extends PureComponent {
       form: { getFieldDecorator },
     } = this.props;
     return (
-      <Form onSubmit={this.handleSearch} layout="inline">
+      <Form onSubmit={this.handleSearch} layout="inline" style={{ marginRight: '30px' }}>
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem label="订单号">
-              {getFieldDecorator('querySOBillNo')(<Input placeholder="请输入" />)}
+            <FormItem label="任务单日期">
+              {getFieldDecorator('fDate', {
+                // initialValue: [moment().add(-1, 'months'), moment()],
+              })(<RangePicker format="YYYY-MM-DD" placeholder={['开始时间', '结束时间']} />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
@@ -293,7 +407,7 @@ class TableList extends PureComponent {
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
               </Button>
-              <a style={{ marginLeft: 8 }} onClick={this.toggleForm} hidden>
+              <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
                 展开 <Icon type="down" />
               </a>
             </span>
@@ -304,7 +418,84 @@ class TableList extends PureComponent {
   }
 
   renderAdvancedForm() {
-    return renderSimpleForm;
+    const {
+      form: { getFieldDecorator },
+    } = this.props;
+    return (
+      <Form onSubmit={this.handleSearch} layout="inline" style={{ marginRight: '30px' }}>
+        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+          <Col md={8} sm={24}>
+            <FormItem label="任务单日期">
+              {getFieldDecorator('fDate', {})(
+                <RangePicker format="YYYY-MM-DD" placeholder={['开始时间', '结束时间']} />
+              )}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="生产任务单号">
+              {getFieldDecorator('queryMOBillNo')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="订单号">
+              {getFieldDecorator('querySOBillNo')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="计划完工日期">
+              {getFieldDecorator('fPlanFinishDate', {})(
+                <RangePicker format="YYYY-MM-DD" placeholder={['开始时间', '结束时间']} />
+              )}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="车间">
+              {getFieldDecorator('queryWorkShopName')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="车间编码">
+              {getFieldDecorator('queryWorkShopNumber')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+        </Row>
+        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+          <Col md={8} sm={24}>
+            <FormItem label="产品名称">
+              {getFieldDecorator('queryProductName')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="产品全称">
+              {getFieldDecorator('queryProductFullName')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="产品编码">
+              {getFieldDecorator('queryProductNumber')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="规格型号">
+              {getFieldDecorator('queryModel')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+        </Row>
+        <div style={{ overflow: 'hidden' }}>
+          <div style={{ float: 'right', marginBottom: 24 }}>
+            <Button type="primary" htmlType="submit">
+              查询
+            </Button>
+            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
+              重置
+            </Button>
+            <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
+              收起 <Icon type="up" />
+            </a>
+          </div>
+        </div>
+      </Form>
+    );
   }
 
   renderForm() {
@@ -314,7 +505,7 @@ class TableList extends PureComponent {
 
   render() {
     const {
-      missionManage: { data, queryResult },
+      missionManage: { data, queryResult, printTemplates },
       loading,
     } = this.props;
     const {
@@ -354,11 +545,28 @@ class TableList extends PureComponent {
                       </Menu>
                     }
                   >
-                    <Button>
+                    <Button icon="download">
                       导出 <Icon type="down" />
                     </Button>
                   </Dropdown>
                 </Authorized>
+                {selectedRows.length > 0 && printTemplates && printTemplates.length > 0 ? (
+                  <Authorized authority="Mission_Print">
+                    <Dropdown
+                      overlay={
+                        <Menu onClick={this.handlePrint} selectedKeys={[]}>
+                          {printTemplates.map(val => {
+                            return <Menu.Item key={val.fInterID}>{val.fName}</Menu.Item>;
+                          })}
+                        </Menu>
+                      }
+                    >
+                      <Button icon="printer">
+                        打印 <Icon type="down" />
+                      </Button>
+                    </Dropdown>
+                  </Authorized>
+                ) : null}
               </div>
               <StandardTable
                 rowKey="fInterID"

@@ -105,7 +105,7 @@ export class GenFlowSuccess extends PureComponent {
               </Menu>
             }
           >
-            <Button>
+            <Button icon="printer">
               打印 <Icon type="down" />
             </Button>
           </Dropdown>

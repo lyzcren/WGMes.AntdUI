@@ -51,6 +51,7 @@ class TableList extends PureComponent {
     // expandForm: 是否展开更多查询条件
     expandForm: false,
     queryFilters: [],
+    groupByWorkShop: true,
     groupByDept: true,
   };
 
@@ -58,6 +59,7 @@ class TableList extends PureComponent {
   currentPagination = {
     current: 1,
     pageSize: 10,
+    groupByWorkShop: !!this.state.groupByWorkShop,
     groupByDept: !!this.state.groupByDept,
     groupByDate: !!this.state.groupByDate,
     groupByMachine: !!this.state.groupByMachine,
@@ -94,6 +96,7 @@ class TableList extends PureComponent {
       filters,
       ...formValues,
       queryFilters,
+      groupByWorkShop: !!this.state.groupByWorkShop,
       groupByDept: !!this.state.groupByDept,
       groupByDate: !!this.state.groupByDate,
       groupByMachine: !!this.state.groupByMachine,
@@ -142,6 +145,7 @@ class TableList extends PureComponent {
       ...this.currentPagination,
       current: 1,
       queryFilters,
+      groupByWorkShop: !!this.state.groupByWorkShop,
       groupByDept: !!this.state.groupByDept,
       groupByDate: !!this.state.groupByDate,
       groupByMachine: !!this.state.groupByMachine,
@@ -179,6 +183,7 @@ class TableList extends PureComponent {
       ...this.currentPagination,
       current: 1,
       queryFilters: [],
+      groupByWorkShop: !!this.state.groupByWorkShop,
       groupByDept: !!this.state.groupByDept,
       groupByDate: !!this.state.groupByDate,
       groupByMachine: !!this.state.groupByMachine,
@@ -314,6 +319,12 @@ class TableList extends PureComponent {
               <div className={styles.tableListGroup}>
                 <Form layout="inline">
                   <FormItem>分组汇总：</FormItem>
+                  <FormItem label="车间">
+                    <Switch
+                      defaultChecked={!!this.state.groupByWorkShop}
+                      onChange={checked => this.changeGroupBy('groupByWorkShop', checked)}
+                    />
+                  </FormItem>
                   <FormItem label="工序">
                     <Switch
                       defaultChecked={!!this.state.groupByDept}

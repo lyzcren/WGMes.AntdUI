@@ -5,6 +5,7 @@ import moment from 'moment';
 
 class ColumnConfig {
   getColumns = ({
+    groupByWorkShop,
     groupByDept,
     groupByDate,
     groupByMachine,
@@ -13,6 +14,21 @@ class ColumnConfig {
     groupByProduct,
   }) => {
     let columns = [];
+    if (groupByWorkShop) {
+      columns = [
+        ...columns,
+        {
+          title: '车间',
+          dataIndex: 'fWorkShopName',
+          width: 150,
+        },
+        {
+          title: '车间编码',
+          dataIndex: 'fWorkShopNumber',
+          width: 150,
+        },
+      ];
+    }
     if (groupByDept) {
       columns = [
         ...columns,
@@ -144,6 +160,11 @@ class ColumnConfig {
         title: '盘点盈亏数量',
         dataIndex: 'fInvCheckDeltaQty',
         width: 120,
+      },
+      {
+        title: '单位',
+        dataIndex: 'fUnitName',
+        width: 100,
       },
       {
         title: '生产时长',

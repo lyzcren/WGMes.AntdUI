@@ -29,7 +29,22 @@ export class ScanForm extends PureComponent {
     };
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    const { queryDeptID } = this.props;
+    this.state = {
+      queryDeptID,
+    };
+  }
+
+  componentDidUpdate() {
+    // const currentQueryDeptID = this.state.queryDeptID;
+    // const { queryDeptID } = this.props;
+    // if (currentQueryDeptID !== queryDeptID) {
+    //   this.state = {
+    //     queryDeptID
+    //   };
+    // }
+  }
 
   handleKeyPress(e) {
     if (e.key === 'Enter') {
@@ -61,6 +76,7 @@ export class ScanForm extends PureComponent {
   afterScan = () => {
     const {
       form,
+      handleScanTransfer,
       transferModalVisible,
       flowScan: { data },
     } = this.props;
@@ -70,7 +86,7 @@ export class ScanForm extends PureComponent {
       message.error(`未找到流程单【${fFullBatchNo}】.`);
       form.resetFields();
     } else {
-      const { fStatusNumber, fRecordStatusNumber, fCurrentDeptID, fCurrentDeptName } = data;
+      const { fStatusNumber, fRecordStatusNumber } = data;
       // 判断是否可签收
       if (
         fStatusNumber === 'Reported' ||
@@ -82,13 +98,9 @@ export class ScanForm extends PureComponent {
         // handleSign(data);
         this.setState({ showSignField: true });
       } else if (fRecordStatusNumber === 'ManufProducing') {
-        if (queryDeptID !== fCurrentDeptID) {
-          message.warning(`当前流程单在【${fCurrentDeptName}】未转出.`);
-          form.resetFields();
-        } else {
-          transferModalVisible(data);
-          this.close();
-        }
+        handleScanTransfer(data);
+        form.resetFields();
+        this.close();
       }
     }
   };

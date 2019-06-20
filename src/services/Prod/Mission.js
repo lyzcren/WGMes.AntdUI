@@ -15,6 +15,15 @@ export async function fakeGet(params) {
   return request(`/api/Mission/${params.fInterID}`);
 }
 
+export async function fakeRemove(params) {
+  return request(`/api/Mission/${params.fInterID}`, {
+    method: 'DELETE',
+    body: {
+      method: 'delete',
+    },
+  });
+}
+
 export async function fakeSync(params) {
   return request('/api/Mission/sync');
 }
