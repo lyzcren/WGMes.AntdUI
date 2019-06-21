@@ -239,6 +239,47 @@ export default {
         },
       });
     },
+    *closeAllMenu({ payload }, { put, call, select }) {
+      const { menuData, routeData, panes, refPanes, activeKey } = yield select(state => state.menu);
+      let newActiveKey = activeKey;
+      const newPanes = panes.filter(pane => pane.closable === false);
+
+      const lastIndex = newPanes ? newPanes.length - 1 : 0;
+      newActiveKey = newPanes[lastIndex].key;
+      const selectedKeys = getSelectedMenuKeys(newActiveKey, routeData);
+      const newRefPanes = refPanes.filter(p => p !== null && newPanes.find(x => x.key === p.id));
+
+      yield put({
+        type: 'save',
+        payload: {
+          ...payload,
+          path: newActiveKey,
+          activeKey: newActiveKey,
+          selectedKeys,
+          panes: newPanes,
+          refPanes: newRefPanes,
+        },
+      });
+    },
+    *closeOtherMenu({ payload }, { put, call, select }) {
+      const { menuData, routeData, panes, refPanes, activeKey } = yield select(state => state.menu);
+      let newActiveKey = activeKey;
+      const newPanes = panes.filter(pane => pane.key === activeKey || pane.closable === false);
+      const selectedKeys = getSelectedMenuKeys(newActiveKey, routeData);
+      const newRefPanes = refPanes.filter(p => p !== null && newPanes.find(x => x.key === p.id));
+
+      yield put({
+        type: 'save',
+        payload: {
+          ...payload,
+          path: newActiveKey,
+          activeKey: newActiveKey,
+          selectedKeys,
+          panes: newPanes,
+          refPanes: newRefPanes,
+        },
+      });
+    },
     *disposeMenu({ payload }, { put }) {
       yield put({
         type: 'save',

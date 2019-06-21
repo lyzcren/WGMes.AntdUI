@@ -570,6 +570,7 @@ class TableList extends PureComponent {
               </div>
               <StandardTable
                 rowKey="fInterID"
+                bordered
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}

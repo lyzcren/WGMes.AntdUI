@@ -550,7 +550,7 @@ class TableList extends PureComponent {
                       </Menu>
                     }
                   >
-                    <Button>
+                    <Button icon="download">
                       导出 <Icon type="down" />
                     </Button>
                   </Dropdown>
@@ -575,6 +575,7 @@ class TableList extends PureComponent {
               {data && data.list.length ? (
                 <StandardTable
                   rowKey="fItemID"
+                  bordered
                   defaultExpandAllRows={true}
                   selectedRows={selectedRows}
                   loading={loading}

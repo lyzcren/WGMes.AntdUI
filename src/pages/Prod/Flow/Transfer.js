@@ -24,7 +24,6 @@ import {
   DatePicker,
 } from 'antd';
 import { NumericInput } from '@/components/WgInputNumber';
-import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import WgPageHeaderWrapper from '@/components/WgPageHeaderWrapper';
 import DescriptionList from '@/components/DescriptionList';

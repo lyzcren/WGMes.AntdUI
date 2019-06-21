@@ -166,16 +166,16 @@ class ColumnConfig {
         dataIndex: 'fUnitName',
         width: 100,
       },
-      {
-        title: '生产时长',
-        dataIndex: 'fProduceMinute',
-        width: 100,
-      },
-      {
-        title: '停线时长',
-        dataIndex: 'fStopMinute',
-        width: 100,
-      },
+      // {
+      //   title: '生产时长',
+      //   dataIndex: 'fProduceMinute',
+      //   width: 100,
+      // },
+      // {
+      //   title: '停线时长',
+      //   dataIndex: 'fStopMinute',
+      //   width: 100,
+      // },
     ];
 
     return columns;

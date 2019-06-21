@@ -359,7 +359,7 @@ class TableList extends PureComponent {
                       </Menu>
                     }
                   >
-                    <Button>
+                    <Button icon="download">
                       导出 <Icon type="down" />
                     </Button>
                   </Dropdown>
@@ -367,6 +367,7 @@ class TableList extends PureComponent {
               </div>
               <StandardTable
                 rowKey="fInterID"
+                bordered
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}

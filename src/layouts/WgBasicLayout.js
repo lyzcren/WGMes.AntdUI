@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';
-import { Layout, Tabs } from 'antd';
+import { Layout, Tabs, Button, Icon, Dropdown, Menu } from 'antd';
 import DocumentTitle from 'react-document-title';
 import isEqual from 'lodash/isEqual';
 import memoizeOne from 'memoize-one';
@@ -193,6 +193,37 @@ class WgBasicLayout extends React.PureComponent {
     });
   };
 
+  closeAll() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/closeAllMenu',
+    });
+  }
+
+  handleDropdownMenu = e => {
+    const { dispatch, activeKey } = this.props;
+    switch (e.key) {
+      case 'closeCurrent':
+        this.remove(activeKey);
+        break;
+      case 'closeOther':
+        this.closeOther();
+        break;
+      case 'closeAll':
+        this.closeAll();
+        break;
+      default:
+        break;
+    }
+  };
+
+  closeOther() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/closeOtherMenu',
+    });
+  }
+
   render() {
     const {
       navTheme,
@@ -239,7 +270,42 @@ class WgBasicLayout extends React.PureComponent {
             onEdit={this.onEdit}
             tabBarStyle={{ backgroundColor: 'white', marginBottom: 0 }}
             // TODO: Tabs标签页右键菜单
-            // tabBarExtraContent={<Button type="primary">主操作</Button>}
+            tabBarExtraContent={
+              <span>
+                <div
+                  style={{
+                    backgroundColor: '#fff',
+                    border: '1px solid #e8e8e8',
+                    borderBottom: '1px solid #fff',
+                    borderRadius: '4px 4px 0 0',
+                    marginTop: '-2px',
+                  }}
+                >
+                  <Button
+                    icon="close"
+                    shape="circle"
+                    size="small"
+                    style={{ marginLeft: '5px', border: 0 }}
+                    onClick={() => this.closeAll()}
+                  />
+                  <Dropdown
+                    overlay={
+                      <Menu onClick={this.handleDropdownMenu} selectedKeys={[]}>
+                        <Menu.Item key="closeCurrent">关闭当前页</Menu.Item>
+                        <Menu.Item key="closeOther">关闭其他页</Menu.Item>
+                        <Menu.Item key="closeAll">关闭所有页</Menu.Item>
+                      </Menu>
+                    }
+                  >
+                    <Button
+                      icon="down"
+                      shape="circle"
+                      style={{ marginLeft: '5px', marginRight: '5px', border: 0 }}
+                    />
+                  </Dropdown>
+                </div>
+              </span>
+            }
             hideAdd
             type="editable-card"
           >

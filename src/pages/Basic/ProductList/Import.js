@@ -285,6 +285,7 @@ class TableList extends PureComponent {
               </div>
               <StandardTable
                 rowKey="fItemID"
+                bordered
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}

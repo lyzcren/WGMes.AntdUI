@@ -284,6 +284,7 @@ class TableList extends PureComponent {
               <div className={styles.tableListOperator} />
               <StandardTable
                 rowKey="fItemID"
+                bordered
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}

@@ -247,6 +247,7 @@ export class AuthorizeUserForm extends PureComponent {
         </Form>
         <StandardTable
           rowKey="fNumber"
+          bordered
           selectedRows={selectedRows}
           loading={loading}
           dataSource={authorizeUser}

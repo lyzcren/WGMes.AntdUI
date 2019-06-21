@@ -375,6 +375,7 @@ class TableList extends PureComponent {
               </div>
               <ReportTable
                 rowKey="rownumber"
+                bordered
                 loading={loading}
                 data={data}
                 columns={columns}
