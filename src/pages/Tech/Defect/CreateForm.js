@@ -80,6 +80,7 @@ export class CreateForm extends PureComponent {
               style={{ width: 300 }}
               dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
               treeData={basicData.processDeptTree}
+              multiple
               treeDefaultExpandAll
             />
           )}

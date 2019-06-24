@@ -12,8 +12,8 @@ export async function fakeQuery(params) {
 }
 
 export async function fakeRemove(params) {
-  return request('/api/Defect/delete', {
-    method: 'POST',
+  return request(`/api/Defect/${params.fItemID}`, {
+    method: 'DELETE',
     body: {
       ...params,
       method: 'delete',
@@ -32,8 +32,8 @@ export async function fakeAdd(params) {
 }
 
 export async function fakeUpdate(params) {
-  return request('/api/Defect/update', {
-    method: 'POST',
+  return request(`/api/Defect/${params.fItemID}`, {
+    method: 'PUT',
     body: {
       ...params,
       method: 'update',
@@ -42,7 +42,8 @@ export async function fakeUpdate(params) {
 }
 
 export async function fakeActive(params) {
-  return request('/api/Defect/active', {
+  console.log(params.fIsActive);
+  return request(`/api/Defect/active/${params.fItemID}?fIsActive=${params.fIsActive}`, {
     method: 'POST',
     body: {
       ...params,

@@ -20,8 +20,7 @@ class ColumnConfig {
     },
     {
       title: '部门',
-      dataIndex: 'fDeptName',
-      sorter: true,
+      dataIndex: 'fDeptNames',
     },
     {
       title: '启用',

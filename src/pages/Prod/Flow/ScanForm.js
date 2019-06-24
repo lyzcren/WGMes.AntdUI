@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Form, Input, Modal, message, Button } from 'antd';
+import { WgModal } from '@/components/WgModal';
 
 import styles from './ScanForm.less';
 
@@ -20,10 +21,8 @@ export class ScanForm extends PureComponent {
   constructor(props) {
     super(props);
 
-    const { menu, queryDeptID } = props;
-    const container = menu.refPanes.find(x => x.id === menu.activeKey);
+    const { queryDeptID } = props;
     this.state = {
-      container: container || document.body,
       queryDeptID,
       showSignField: false,
     };
@@ -134,7 +133,7 @@ export class ScanForm extends PureComponent {
       modalVisible,
       handleModalVisible,
     } = this.props;
-    const { container, showSignField } = this.state;
+    const { showSignField } = this.state;
 
     const footer = (
       <div>
@@ -151,17 +150,12 @@ export class ScanForm extends PureComponent {
     );
 
     return (
-      <Modal
+      <WgModal
         destroyOnClose
         title="扫描"
-        getContainer={() => container}
         visible={modalVisible}
         footer={footer}
         onCancel={() => handleModalVisible()}
-        maskStyle={{
-          position: 'absolute',
-          top: '108px',
-        }}
         wrapClassName={styles.modalWrap}
       >
         <FormItem label="">
@@ -194,7 +188,7 @@ export class ScanForm extends PureComponent {
             )}
           </FormItem>
         )}
-      </Modal>
+      </WgModal>
     );
   }
 }

@@ -3,6 +3,7 @@ import { connect } from 'dva';
 import moment from 'moment';
 import { Form, Input, Modal, Switch, Select, Tag, message } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
+import { WgModal } from '@/components/WgModal';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -54,7 +55,7 @@ export class SignForm extends PureComponent {
     const { formVals } = this.state;
 
     return (
-      <Modal
+      <WgModal
         destroyOnClose
         title={
           <div>
@@ -91,7 +92,7 @@ export class SignForm extends PureComponent {
             </Select>
           )}
         </FormItem>
-      </Modal>
+      </WgModal>
     );
   }
 }

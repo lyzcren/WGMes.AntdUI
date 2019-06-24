@@ -1,7 +1,7 @@
-import { fakeQuery, fakeRepair, fakeScrap } from '@/services/Prod/Defect';
+import { fakeQuery, fakeRepair, fakeScrap } from '@/services/Prod/ProdDefect';
 
 export default {
-  namespace: 'defectManage',
+  namespace: 'prodDefectManage',
 
   state: {
     data: {

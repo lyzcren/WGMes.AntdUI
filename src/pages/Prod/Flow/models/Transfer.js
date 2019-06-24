@@ -1,5 +1,5 @@
 import { fakeGetProducingRecord, fakeTransfer } from '@/services/Prod/Record';
-import { fakeGetDefect, fakeMachineData } from '@/services/basicData';
+import { fakeGetDeptDefect, fakeMachineData } from '@/services/basicData';
 import { fakeQueryParams } from '@/services/Tech/Route';
 import { defaultCipherList } from 'constants';
 import { exists } from 'fs';
@@ -66,7 +66,7 @@ export default {
       });
     },
     *getDefect({ payload }, { call, put }) {
-      const response = yield call(fakeGetDefect, payload);
+      const response = yield call(fakeGetDeptDefect, payload);
 
       yield put({
         type: 'saveDefect',

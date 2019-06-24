@@ -61,14 +61,12 @@ export async function fakeGetTechParamValues(params) {
   });
 }
 
+export async function fakeGetDeptDefect(params) {
+  return request(`/api/defect/getData/${params.fDeptID}`);
+}
+
 export async function fakeGetDefect(params) {
-  return request('/api/defect/getData', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'getData',
-    },
-  });
+  return request(`/api/defect/`);
 }
 
 export async function fakeGetOperatorList(params) {

@@ -7,9 +7,9 @@ import { formatMessage, FormattedMessage } from 'umi/locale';
 const FormItem = Form.Item;
 const { Option } = Select;
 
-@connect(({ defectManage, loading, basicData }) => ({
-  defectManage,
-  loading: loading.models.defectManage,
+@connect(({ prodDefectManage, loading, basicData }) => ({
+  prodDefectManage,
+  loading: loading.models.prodDefectManage,
   basicData,
 }))
 @Form.create()
@@ -60,11 +60,11 @@ export class RepairForm extends PureComponent {
   handleSubmit = submitData => {
     const { dispatch, handleModalVisible, handleSuccess } = this.props;
     dispatch({
-      type: 'defectManage/repair',
+      type: 'prodDefectManage/repair',
       payload: submitData,
     }).then(() => {
       const {
-        defectManage: {
+        prodDefectManage: {
           queryResult: { status, message, model },
         },
       } = this.props;

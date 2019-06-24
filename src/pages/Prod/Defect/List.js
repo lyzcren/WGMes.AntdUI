@@ -46,9 +46,9 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ defectManage, loading, basicData }) => ({
-  defectManage,
-  loading: loading.models.defectManage,
+@connect(({ prodDefectManage, loading, basicData }) => ({
+  prodDefectManage,
+  loading: loading.models.prodDefectManage,
   basicData,
 }))
 @Form.create()
@@ -76,7 +76,7 @@ class TableList extends PureComponent {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'defectManage/fetch',
+      type: 'prodDefectManage/fetch',
       payload: this.currentPagination,
     });
     dispatch({
@@ -108,7 +108,7 @@ class TableList extends PureComponent {
     }
 
     dispatch({
-      type: 'defectManage/fetch',
+      type: 'prodDefectManage/fetch',
       payload: this.currentPagination,
     });
   };
@@ -151,7 +151,7 @@ class TableList extends PureComponent {
 
       const pagination = this.getSearchParam(fieldsValue);
       dispatch({
-        type: 'defectManage/fetch',
+        type: 'prodDefectManage/fetch',
         payload: pagination,
       });
       this.handleSelectRows([]);
@@ -173,7 +173,7 @@ class TableList extends PureComponent {
     };
 
     dispatch({
-      type: 'defectManage/fetch',
+      type: 'prodDefectManage/fetch',
       payload: this.currentPagination,
     });
     this.handleSelectRows([]);
@@ -322,11 +322,11 @@ class TableList extends PureComponent {
   scrap = submitData => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'defectManage/scrap',
+      type: 'prodDefectManage/scrap',
       payload: submitData,
     }).then(() => {
       const {
-        defectManage: {
+        prodDefectManage: {
           queryResult: { status, message },
         },
       } = this.props;
@@ -344,7 +344,7 @@ class TableList extends PureComponent {
   render() {
     const {
       dispatch,
-      defectManage: { data, queryResult },
+      prodDefectManage: { data, queryResult },
       loading,
     } = this.props;
     const { selectedRows, modalVisible, repairModalVisible, currentFormValues } = this.state;

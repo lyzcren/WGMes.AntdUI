@@ -1043,7 +1043,6 @@ class TableList extends PureComponent {
               fInterID={currentFormValues.fInterID}
             />
           ) : null}
-
           <ScanForm
             dispatch
             disabled={!queryDeptID}

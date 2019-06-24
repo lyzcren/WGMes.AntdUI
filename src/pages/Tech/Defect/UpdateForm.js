@@ -99,12 +99,13 @@ export class UpdateForm extends PureComponent {
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="部门">
           {form.getFieldDecorator('fDeptID', {
             rules: [{ required: true, message: '请选择部门' }],
-            initialValue: formVals.fDeptID,
+            initialValue: formVals.fDeptIdList,
           })(
             <TreeSelect
               style={{ width: 300 }}
               dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
               treeData={basicData.processDeptTree}
+              multiple
               treeDefaultExpandAll
             />
           )}

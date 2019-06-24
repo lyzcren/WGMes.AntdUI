@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Form, Input, Modal, Radio, Switch, Select, message, Button } from 'antd';
 import { RouteSteps } from '@/components/WgRouteSteps/RouteSteps';
+import { WgModal } from '@/components/WgModal';
 
 /* eslint react/no-multi-comp:0 */
 @connect(({ viewStep, loading }) => ({
@@ -54,7 +55,7 @@ export class ViewStepForm extends PureComponent {
     );
 
     return (
-      <Modal
+      <WgModal
         // destroyOnClose
         title="工艺路线"
         visible={modalVisible}
@@ -62,7 +63,7 @@ export class ViewStepForm extends PureComponent {
         onCancel={() => handleModalVisible()}
       >
         <RouteSteps loading={loading} steps={steps} currentStep={currentStep} />
-      </Modal>
+      </WgModal>
     );
   }
 }
