@@ -34,6 +34,8 @@ import { SignForm } from './SignForm';
 import { ViewStepForm } from './ViewStepForm';
 import { ViewRecordForm } from './ViewRecordForm';
 import { ScanForm } from './ScanForm';
+import { TakeForm } from './TakeForm';
+import { ViewTakeForm } from './ViewTakeForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
@@ -64,6 +66,8 @@ class TableList extends PureComponent {
       sign: false,
       route: false,
       record: false,
+      take: false,
+      viewTake: false,
       scan: false,
     },
     formValues: {},
@@ -401,7 +405,10 @@ class TableList extends PureComponent {
 
     switch (key) {
       case 'take':
-        alert('取走');
+        this.handleModalVisible({ key: 'take', flag: true }, record);
+        break;
+      case 'viewTake':
+        this.handleModalVisible({ key: 'viewTake', flag: true }, record);
         break;
       case 'split':
         alert('分批');
@@ -524,6 +531,28 @@ class TableList extends PureComponent {
     });
   };
 
+  take = (fields, record) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'flowManage/take',
+      payload: fields,
+    }).then(() => {
+      const {
+        flowManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success('【' + record.fFullBatchNo + '】' + '取走成功');
+        this.handleModalVisible({ key: 'take', flag: false });
+        // 成功后再次刷新列表
+        this.search();
+      } else if (queryResult.status === 'warning') {
+        message.warning('【' + record.fFullBatchNo + '】' + queryResult.message);
+      } else {
+        message.error('【' + record.fFullBatchNo + '】' + queryResult.message);
+      }
+    });
+  };
+
   handleRefund = record => {};
 
   handleBatchReport = () => {
@@ -621,6 +650,7 @@ class TableList extends PureComponent {
               overlay={
                 <Menu onClick={({ key }) => this.moreMenuClick(key, record)}>
                   <Menu.Item key="take">取走</Menu.Item>
+                  <Menu.Item key="viewTake">取走记录</Menu.Item>
                   <Menu.Item key="refund">退回</Menu.Item>
                   <Menu.Item key="split">分批</Menu.Item>
                 </Menu>
@@ -1041,6 +1071,27 @@ class TableList extends PureComponent {
               }
               modalVisible={modalVisible.record}
               fInterID={currentFormValues.fInterID}
+            />
+          ) : null}
+          {currentFormValues && Object.keys(currentFormValues).length ? (
+            <TakeForm
+              dispatch
+              handleModalVisible={(flag, record) =>
+                this.handleModalVisible({ key: 'take', flag }, record)
+              }
+              handleSubmit={fields => this.take(fields, currentFormValues)}
+              modalVisible={modalVisible.take}
+              values={currentFormValues}
+            />
+          ) : null}
+          {currentFormValues && Object.keys(currentFormValues).length ? (
+            <ViewTakeForm
+              dispatch={dispatch}
+              handleModalVisible={(flag, record) =>
+                this.handleModalVisible({ key: 'viewTake', flag }, record)
+              }
+              modalVisible={modalVisible.viewTake}
+              values={currentFormValues}
             />
           ) : null}
           <ScanForm

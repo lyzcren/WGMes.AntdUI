@@ -6,6 +6,7 @@ import {
   fakeUpdate,
   fakeGetDepts,
   fakeGetRecord,
+  fakeTake,
 } from '@/services/Prod/Flow';
 import { fakeQueryPrintTemplate } from '@/services/Sys/PrintTemplate';
 
@@ -77,6 +78,13 @@ export default {
       yield put({
         type: 'save',
         payload: { printTemplates: response },
+      });
+    },
+    *take({ payload }, { call, put }) {
+      const response = yield call(fakeTake, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
       });
     },
   },

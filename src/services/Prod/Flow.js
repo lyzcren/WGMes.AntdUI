@@ -68,3 +68,17 @@ export async function fakeUpdate(params) {
     },
   });
 }
+
+export async function fakeTake(params) {
+  return request(`/api/flow/${params.fInterID}/take`, {
+    method: 'PUT',
+    body: {
+      ...params,
+      method: 'Take',
+    },
+  });
+}
+
+export async function fakeGetTake(params) {
+  return request(`/api/flow/${params.fInterID}/take`);
+}
