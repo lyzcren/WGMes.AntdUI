@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Form, Card, Steps, Input, Modal, Radio, Switch, Select, message, Button } from 'antd';
+import { Form, Card, Steps, Input, Modal, Radio, Switch, Select, message, Button, Tag } from 'antd';
 import { Link } from 'umi';
 import { WgModal } from '@/components/WgModal';
 
@@ -23,23 +23,23 @@ export class ViewRecordForm extends PureComponent {
   }
 
   componentDidMount() {
-    const { fInterID } = this.props;
+    const {
+      values: { fInterID },
+    } = this.props;
     this.loadData(fInterID);
+  }
+
+  componentDidUpdate(preProps) {
+    const {
+      values: { fInterID },
+    } = this.props;
+    if (preProps.values.fInterID !== fInterID) {
+      this.loadData(fInterID);
+    }
   }
 
   loadData(fInterID) {
     const { dispatch } = this.props;
-    // dispatch({
-    //   type: 'flowManage/record',
-    //   payload: {
-    //     fInterID,
-    //   }
-    // }).then(() => {
-    //   const {
-    //     flowManage: { records },
-    //   } = this.props;
-    //   console.log(records);
-    // });
     dispatch({
       type: 'viewRecord/initModel',
       payload: { fInterID },
@@ -60,6 +60,7 @@ export class ViewRecordForm extends PureComponent {
       loading,
       modalVisible,
       handleModalVisible,
+      values,
       viewRecord: { steps, currentStep },
     } = this.props;
     const footer = (
@@ -75,12 +76,15 @@ export class ViewRecordForm extends PureComponent {
         </Button>
       </div>
     );
-    // console.log(steps);
 
     return (
       <WgModal
-        // destroyOnClose
-        title="执行情况"
+        destroyOnClose
+        title={
+          <div>
+            流程单-执行情况 <Tag color="blue">{values.fFullBatchNo}</Tag>
+          </div>
+        }
         visible={modalVisible}
         footer={footer}
         width={650}

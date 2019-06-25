@@ -82,3 +82,13 @@ export async function fakeTake(params) {
 export async function fakeGetTake(params) {
   return request(`/api/flow/${params.fInterID}/take`);
 }
+
+export async function fakeRefund(params) {
+  return request(`/api/flow/${params.fInterID}/refund`, {
+    method: 'PUT',
+    body: {
+      ...params,
+      method: 'refund',
+    },
+  });
+}

@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Form, Input, Modal, Radio, Switch, Select, message, Button } from 'antd';
+import { Form, Input, Modal, Radio, Switch, Select, message, Button, Tag } from 'antd';
 import { RouteSteps } from '@/components/WgRouteSteps/RouteSteps';
 import { WgModal } from '@/components/WgModal';
 
@@ -36,6 +36,7 @@ export class ViewStepForm extends PureComponent {
     const {
       form,
       loading,
+      values,
       modalVisible,
       handleModalVisible,
       viewStep: { steps, currentStep },
@@ -44,7 +45,7 @@ export class ViewStepForm extends PureComponent {
       <div>
         <Button
           loading={false}
-          onClick={() => handleModalVisible(false)}
+          onClick={() => handleModalVisible(false, values)}
           prefixCls="ant-btn"
           ghost={false}
           block={false}
@@ -57,10 +58,14 @@ export class ViewStepForm extends PureComponent {
     return (
       <WgModal
         // destroyOnClose
-        title="工艺路线"
+        title={
+          <div>
+            流程单-工艺路线 <Tag color="blue">{values.fFullBatchNo}</Tag>
+          </div>
+        }
         visible={modalVisible}
         footer={footer}
-        onCancel={() => handleModalVisible()}
+        onCancel={() => handleModalVisible(false, values)}
       >
         <RouteSteps loading={loading} steps={steps} currentStep={currentStep} />
       </WgModal>

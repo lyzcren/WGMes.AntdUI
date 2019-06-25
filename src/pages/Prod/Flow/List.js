@@ -36,6 +36,7 @@ import { ViewRecordForm } from './ViewRecordForm';
 import { ScanForm } from './ScanForm';
 import { TakeForm } from './TakeForm';
 import { ViewTakeForm } from './ViewTakeForm';
+import { RefundForm } from './RefundForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
@@ -68,6 +69,7 @@ class TableList extends PureComponent {
       record: false,
       take: false,
       viewTake: false,
+      refund: false,
       scan: false,
     },
     formValues: {},
@@ -414,7 +416,7 @@ class TableList extends PureComponent {
         alert('分批');
         break;
       case 'refund':
-        this.handleRefund(record);
+        this.handleModalVisible({ key: 'refund', flag: true }, record);
         break;
       default:
         break;
@@ -552,8 +554,6 @@ class TableList extends PureComponent {
       }
     });
   };
-
-  handleRefund = record => {};
 
   handleBatchReport = () => {
     const { selectedRows } = this.state;
@@ -1061,16 +1061,17 @@ class TableList extends PureComponent {
               {...routeMethods}
               modalVisible={modalVisible.route}
               fInterID={currentFormValues.fRouteID}
+              values={currentFormValues}
             />
           ) : null}
           {currentFormValues && Object.keys(currentFormValues).length ? (
             <ViewRecordForm
               dispatch
-              handleModalVisible={(flag, record) =>
-                this.handleModalVisible({ key: 'record', flag }, record)
+              handleModalVisible={flag =>
+                this.handleModalVisible({ key: 'record', flag }, currentFormValues)
               }
               modalVisible={modalVisible.record}
-              fInterID={currentFormValues.fInterID}
+              values={currentFormValues}
             />
           ) : null}
           {currentFormValues && Object.keys(currentFormValues).length ? (
@@ -1092,6 +1093,19 @@ class TableList extends PureComponent {
               }
               modalVisible={modalVisible.viewTake}
               values={currentFormValues}
+            />
+          ) : null}
+          {currentFormValues && Object.keys(currentFormValues).length ? (
+            <RefundForm
+              dispatch={dispatch}
+              handleModalVisible={(flag, record) =>
+                this.handleModalVisible({ key: 'refund', flag }, record)
+              }
+              modalVisible={modalVisible.refund}
+              values={currentFormValues}
+              handleSucess={() => {
+                this.search();
+              }}
             />
           ) : null}
           <ScanForm
