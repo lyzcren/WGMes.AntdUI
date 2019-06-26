@@ -22,11 +22,11 @@ export default {
         if (dept.fOrder) {
           steps.push({ order: steps.length + 1, depts: [dept] });
         } else {
-          const findGroup = steps.find(step => step.fRouteGroupID === dept.fRouteGroupID);
+          const findGroup = steps.find(step => step.fGroupID === dept.fGroupID);
           if (!findGroup) {
             steps.push({
               order: steps.length + 1,
-              fRouteGroupID: dept.fRouteGroupID,
+              fGroupID: dept.fGroupID,
               depts: [dept],
             });
           } else {
@@ -39,13 +39,15 @@ export default {
       });
 
       steps.map(step => {
-        step.title = step.depts.map(dept => dept.fDeptName).join(' & ');
+        step.title = step.depts
+          .map(dept => dept.fDeptName + (dept.fIsReproduce ? '（重做）' : ''))
+          .join(' & ');
         if (step.depts.length === 1 && step.depts[0].fStatus === 2) {
           step.recordId = step.depts[0].fInterID;
         }
         if (step.depts.length === 1) {
           const record = step.depts[0];
-          if (record.fStatus === 2) {
+          if (record.fStatusNumber === 'ManufEndProduce') {
             step.description = (
               <span>
                 {'【' +
@@ -60,11 +62,13 @@ export default {
                   '%'}
               </span>
             );
-          } else if (record.fStatus === 1) {
+          } else if (record.fStatusNumber === 'ManufProducing') {
             step.description =
               (record.fSignUserName ? `【${record.fSignUserName}】` : '自动') +
               '签收于  ' +
               moment(record.fSignDate).format('YYYY-MM-DD HH:mm');
+          } else if (record.fStatusNumber === 'ManufRefund') {
+            step.description = '已退回';
           } else {
           }
         }

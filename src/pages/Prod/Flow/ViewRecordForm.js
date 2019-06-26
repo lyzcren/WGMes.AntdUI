@@ -30,12 +30,12 @@ export class ViewRecordForm extends PureComponent {
   }
 
   componentDidUpdate(preProps) {
-    const {
-      values: { fInterID },
-    } = this.props;
-    if (preProps.values.fInterID !== fInterID) {
-      this.loadData(fInterID);
-    }
+    // const {
+    //   values: { fInterID },
+    // } = this.props;
+    // if (preProps.values.fInterID !== fInterID) {
+    //   this.loadData(fInterID);
+    // }
   }
 
   loadData(fInterID) {
@@ -88,7 +88,8 @@ export class ViewRecordForm extends PureComponent {
         visible={modalVisible}
         footer={footer}
         width={650}
-        onCancel={() => handleModalVisible()}
+        onCancel={() => handleModalVisible(false, values)}
+        afterClose={() => handleModalVisible()}
       >
         <Card bordered={false} loading={loading}>
           <Steps direction="vertical" current={currentStep}>

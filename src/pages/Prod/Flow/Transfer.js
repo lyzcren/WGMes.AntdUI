@@ -63,14 +63,9 @@ class Transfer extends PureComponent {
   componentDidMount() {
     // ReactDOM.findDOMNode(this.refs.select).click();
     const {
-      data: { fInterID, fCurrentDeptID, fPrecision },
+      data: { fInterID, fCurrentDeptID },
     } = this.props;
 
-    // 根据单位的小数位数配置相关数量的小数位
-    if (fPrecision > 1) {
-      const precisionPart = '00000000'.slice(0, 2);
-      this.setState({ precision: fPrecision, qtyFormat: `0.${precisionPart}` });
-    }
     this.loadData(fInterID, fCurrentDeptID);
   }
 
@@ -84,7 +79,13 @@ class Transfer extends PureComponent {
   }
 
   loadData(fInterID) {
-    const { dispatch } = this.props;
+    const { dispatch, fPrecision } = this.props;
+    const precision = fPrecision ? fPrecision : 0;
+
+    // 根据单位的小数位数配置相关数量的小数位
+    const precisionPart = '00000000'.slice(0, precision);
+    this.setState({ precision, qtyFormat: `0.${precisionPart}` });
+
     dispatch({
       type: 'flowTransfer/initModel',
       payload: { fInterID },
@@ -106,12 +107,12 @@ class Transfer extends PureComponent {
         type: 'flowTransfer/getDefect',
         payload: { fDeptID },
       });
-      dispatch({
-        type: 'basicData/getDefectData',
-      });
-      dispatch({
-        type: 'basicData/getOperator',
-      });
+    });
+    dispatch({
+      type: 'basicData/getDefectData',
+    });
+    dispatch({
+      type: 'basicData/getOperator',
     });
   }
 

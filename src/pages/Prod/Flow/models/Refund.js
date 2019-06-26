@@ -5,7 +5,6 @@ export default {
 
   state: {
     records: [],
-    lastRecord: {},
 
     queryResult: {
       status: 'ok',
@@ -16,11 +15,10 @@ export default {
   effects: {
     *initModel({ payload }, { call, put }) {
       const response = yield call(fakeGetRecord, payload);
-      const lastRecord = [...response].reverse().find(x => x.fStatus > 1);
 
       yield put({
         type: 'save',
-        payload: { records: response, lastRecord: lastRecord ? lastRecord : {} },
+        payload: { records: response },
       });
     },
     *refund({ payload }, { call, put }) {

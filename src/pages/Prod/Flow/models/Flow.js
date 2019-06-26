@@ -5,7 +5,6 @@ import {
   fakeRemove,
   fakeUpdate,
   fakeGetDepts,
-  fakeGetRecord,
   fakeTake,
 } from '@/services/Prod/Flow';
 import { fakeQueryPrintTemplate } from '@/services/Sys/PrintTemplate';

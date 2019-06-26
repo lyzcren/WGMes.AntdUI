@@ -57,14 +57,7 @@ export class RefundForm extends PureComponent {
     this.loadData(fInterID);
   }
 
-  componentDidUpdate(preProps) {
-    const {
-      values: { fInterID },
-    } = this.props;
-    if (preProps.values.fInterID !== fInterID) {
-      this.loadData(fInterID);
-    }
-  }
+  componentDidUpdate(preProps) {}
 
   loadData(fInterID) {
     const { dispatch } = this.props;
@@ -73,15 +66,24 @@ export class RefundForm extends PureComponent {
       payload: { fInterID },
     }).then(() => {
       const {
-        flowRefund: { records, lastRecord },
+        flowRefund: { records },
       } = this.props;
-      const canReproduceRecords = records.filter(
-        (x, y) => y > records.indexOf(lastRecord) && x.fStatus > 1
-      );
+      const lastRecord = [...records]
+        .reverse()
+        .find(x => x.fStatusNumber === 'ManufEndProduce' && !x.fIsReproduce);
+      let canReproduceRecords = [];
+      if (lastRecord) {
+        canReproduceRecords = records.filter(
+          (x, y) =>
+            y > records.indexOf(lastRecord) &&
+            x.fStatusNumber === 'ManufEndProduce' &&
+            !x.fIsReproduce
+        );
+      }
       this.setState({
         records,
-        refundRecord: lastRecord,
-        reproduceRecords: [lastRecord],
+        refundRecord: lastRecord ? lastRecord : {},
+        reproduceRecords: lastRecord ? [lastRecord] : [],
         canReproduceRecords,
       });
     });
@@ -92,7 +94,10 @@ export class RefundForm extends PureComponent {
     const refundRecordId = e.target.value;
     const refundRecord = records.find(x => x.fInterID === refundRecordId);
     const canReproduceRecords = records.filter(
-      (x, y) => y > records.indexOf(refundRecord) && x.fStatus > 1
+      (x, y) =>
+        y > records.indexOf(refundRecord) &&
+        x.fStatusNumber === 'ManufEndProduce' &&
+        !x.fIsReproduce
     );
     this.setState({ refundRecord, reproduceRecords: [refundRecord], canReproduceRecords });
   };
@@ -163,8 +168,10 @@ export class RefundForm extends PureComponent {
         }
         visible={modalVisible}
         width={650}
+        okButtonProps={{ disabled: reproduceRecords.length <= 0 }}
         onOk={this.okHandle}
         onCancel={() => handleModalVisible(false, values)}
+        afterClose={() => handleModalVisible()}
       >
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="退回工序">
           <Radio.Group
@@ -173,7 +180,11 @@ export class RefundForm extends PureComponent {
             onChange={this.changeRefund}
           >
             {records.map(x => (
-              <Radio.Button key={x.fInterID} value={x.fInterID} disabled={x.fStatus <= 1}>
+              <Radio.Button
+                key={x.fInterID}
+                value={x.fInterID}
+                disabled={x.fIsReproduce || x.fStatusNumber !== 'ManufEndProduce'}
+              >
                 {x.fDeptName}
               </Radio.Button>
             ))}

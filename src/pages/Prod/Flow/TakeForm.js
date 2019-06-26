@@ -43,12 +43,11 @@ export class TakeForm extends PureComponent {
     const {
       values: { fInterID, fCurrentDeptID, fPrecision },
     } = this.props;
+    const precision = fPrecision ? fPrecision : 0;
 
     // 根据单位的小数位数配置相关数量的小数位
-    if (fPrecision > 1) {
-      const precisionPart = '00000000'.slice(0, 2);
-      this.setState({ precision: fPrecision, qtyFormat: `0.${precisionPart}` });
-    }
+    const precisionPart = '00000000'.slice(0, precision);
+    this.setState({ precision, qtyFormat: `0.${precisionPart}` });
   }
 
   okHandle = () => {

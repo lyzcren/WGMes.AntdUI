@@ -181,15 +181,23 @@ class TableList extends PureComponent {
     };
     // 查询条件处理
     const queryFilters = [];
-    if (fieldsValue.queryDept) {
+    if (fieldsValue.queryOperatorDept) {
       // 当前工序可签收
       if (fieldsValue.queryRecordStatusNumber === 'ManufWait4Sign') {
-        queryFilters.push({ name: 'fNextDeptIDs', compare: '%*%', value: fieldsValue.queryDept });
+        queryFilters.push({
+          name: 'fNextDeptIDs',
+          compare: '%*%',
+          value: fieldsValue.queryOperatorDept,
+        });
         queryFilters.push({ name: 'fRecordStatusNumber', compare: '<>', value: 'ManufProducing' });
       }
       // 当前工序生产中
       else if (fieldsValue.queryRecordStatusNumber === 'ManufProducing') {
-        queryFilters.push({ name: 'fCurrentDeptID', compare: '=', value: fieldsValue.queryDept });
+        queryFilters.push({
+          name: 'fCurrentDeptID',
+          compare: '=',
+          value: fieldsValue.queryOperatorDept,
+        });
         queryFilters.push({
           name: 'fRecordStatusNumber',
           compare: '=',
@@ -197,16 +205,24 @@ class TableList extends PureComponent {
         });
       }
       // 当前工序已完成
-      else if (fieldsValue.queryDept && fieldsValue.queryRecordStatusNumber === 'ManufEndProduce') {
+      else if (fieldsValue.queryRecordStatusNumber === 'ManufEndProduce') {
         queryFilters.push({
           name: 'FEndProduceDeptIDs',
           compare: '%*%',
-          value: fieldsValue.queryDept,
+          value: fieldsValue.queryOperatorDept,
         });
       } else {
         // 只选择部门，未选择状态，该部门在工艺路线内即可
-        queryFilters.push({ name: 'fAllDeptIDs', compare: '%*%', value: fieldsValue.queryDept });
+        queryFilters.push({
+          name: 'fAllDeptIDs',
+          compare: '%*%',
+          value: fieldsValue.queryOperatorDept,
+        });
       }
+    }
+    if (fieldsValue.queryDept) {
+      // 只选择部门，未选择状态，该部门在工艺路线内即可
+      queryFilters.push({ name: 'fAllDeptIDs', compare: '%*%', value: fieldsValue.queryDept });
     }
     // 无工序时查询流程单状态
     if (fieldsValue.queryStatusNumber)
@@ -683,8 +699,8 @@ class TableList extends PureComponent {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6} sm={24}>
             <FormItem label="部门">
-              {getFieldDecorator('queryDept', {
-                rules: [{ required: !!operatorForm, message: '请选择部门' }],
+              {getFieldDecorator('queryOperatorDept', {
+                rules: [{ required: true, message: '请选择部门' }],
               })(
                 <TreeSelect
                   style={{ width: '100%' }}
@@ -757,7 +773,7 @@ class TableList extends PureComponent {
           <Col md={6} sm={24}>
             <FormItem label="部门">
               {getFieldDecorator('queryDept', {
-                rules: [{ required: !!operatorForm, message: '请选择部门' }],
+                rules: [{ required: false, message: '请选择部门' }],
               })(
                 <TreeSelect
                   style={{ width: '100%' }}
@@ -1067,8 +1083,8 @@ class TableList extends PureComponent {
           {currentFormValues && Object.keys(currentFormValues).length ? (
             <ViewRecordForm
               dispatch
-              handleModalVisible={flag =>
-                this.handleModalVisible({ key: 'record', flag }, currentFormValues)
+              handleModalVisible={(flag, record) =>
+                this.handleModalVisible({ key: 'record', flag }, record)
               }
               modalVisible={modalVisible.record}
               values={currentFormValues}

@@ -3,7 +3,6 @@ import moment from 'moment';
 import numeral from 'numeral';
 import { Switch, Popconfirm, Divider, Badge } from 'antd';
 import Authorized from '@/utils/Authorized';
-import { GlobalConst, badgeStatusList } from '@/utils/GlobalConst';
 
 class ColumnConfig {
   getColumns = () => {
