@@ -92,3 +92,13 @@ export async function fakeRefund(params) {
     },
   });
 }
+
+export async function fakeChangeRoute(params) {
+  return request(`/api/flow/${params.fInterID}/changeRoute`, {
+    method: 'PUT',
+    body: {
+      ...params,
+      method: 'changeRoute',
+    },
+  });
+}

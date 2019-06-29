@@ -46,6 +46,7 @@ export default {
   'menu.prod.flow.transfer': '流程单转序',
   'menu.prod.record': '生产记录',
   'menu.prod.record.profile': '生产记录详情',
+  'menu.prod.inv': '在制品库存',
   'menu.prod.defect': '不良库存',
   'menu.prod.defectRepair': '返修记录',
   'menu.prod.defectScrap': '报废记录',

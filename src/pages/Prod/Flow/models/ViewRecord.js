@@ -69,6 +69,8 @@ export default {
               moment(record.fSignDate).format('YYYY-MM-DD HH:mm');
           } else if (record.fStatusNumber === 'ManufRefund') {
             step.description = '已退回';
+          } else if (record.fStatusNumber === 'ManufCancel') {
+            step.description = record.fStatusName;
           } else {
           }
         }

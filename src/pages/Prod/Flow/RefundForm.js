@@ -173,6 +173,9 @@ export class RefundForm extends PureComponent {
         onCancel={() => handleModalVisible(false, values)}
         afterClose={() => handleModalVisible()}
       >
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="当前工序">
+          {values.fCurrentDeptName}
+        </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="退回工序">
           <Radio.Group
             value={refundRecord.fInterID}

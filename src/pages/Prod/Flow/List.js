@@ -37,6 +37,7 @@ import { ScanForm } from './ScanForm';
 import { TakeForm } from './TakeForm';
 import { ViewTakeForm } from './ViewTakeForm';
 import { RefundForm } from './RefundForm';
+import { ChangeRouteForm } from './ChangeRouteForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
@@ -70,6 +71,7 @@ class TableList extends PureComponent {
       take: false,
       viewTake: false,
       refund: false,
+      changeRoute: false,
       scan: false,
     },
     formValues: {},
@@ -434,6 +436,9 @@ class TableList extends PureComponent {
       case 'refund':
         this.handleModalVisible({ key: 'refund', flag: true }, record);
         break;
+      case 'changeRoute':
+        this.handleModalVisible({ key: 'changeRoute', flag: true }, record);
+        break;
       default:
         break;
     }
@@ -446,11 +451,12 @@ class TableList extends PureComponent {
   };
 
   handleModalVisible = ({ key, flag }, record) => {
-    const { modalVisible } = this.state;
+    const { modalVisible, currentFormValues } = this.state;
     modalVisible[key] = !!flag;
+    currentFormValues[key] = record;
     this.setState({
       modalVisible: { ...modalVisible },
-      currentFormValues: record || {},
+      currentFormValues: { ...currentFormValues },
     });
   };
 
@@ -668,6 +674,7 @@ class TableList extends PureComponent {
                   <Menu.Item key="take">取走</Menu.Item>
                   <Menu.Item key="viewTake">取走记录</Menu.Item>
                   <Menu.Item key="refund">退回</Menu.Item>
+                  <Menu.Item key="changeRoute">变更工艺路线</Menu.Item>
                   <Menu.Item key="split">分批</Menu.Item>
                 </Menu>
               }
@@ -1065,32 +1072,32 @@ class TableList extends PureComponent {
               />
             </div>
           </Card>
-          {currentFormValues && Object.keys(currentFormValues).length ? (
+          {currentFormValues.sign && Object.keys(currentFormValues.sign).length ? (
             <SignForm
               {...signMethods}
               modalVisible={modalVisible.sign}
-              values={currentFormValues}
+              values={currentFormValues.sign}
             />
           ) : null}
-          {currentFormValues && Object.keys(currentFormValues).length ? (
+          {currentFormValues.route && Object.keys(currentFormValues.route).length ? (
             <ViewStepForm
               {...routeMethods}
               modalVisible={modalVisible.route}
-              fInterID={currentFormValues.fRouteID}
-              values={currentFormValues}
+              fInterID={currentFormValues.route.fRouteID}
+              values={currentFormValues.route}
             />
           ) : null}
-          {currentFormValues && Object.keys(currentFormValues).length ? (
+          {currentFormValues.record && Object.keys(currentFormValues.record).length ? (
             <ViewRecordForm
               dispatch
               handleModalVisible={(flag, record) =>
                 this.handleModalVisible({ key: 'record', flag }, record)
               }
               modalVisible={modalVisible.record}
-              values={currentFormValues}
+              values={currentFormValues.record}
             />
           ) : null}
-          {currentFormValues && Object.keys(currentFormValues).length ? (
+          {currentFormValues.take && Object.keys(currentFormValues.take).length ? (
             <TakeForm
               dispatch
               handleModalVisible={(flag, record) =>
@@ -1098,27 +1105,40 @@ class TableList extends PureComponent {
               }
               handleSubmit={fields => this.take(fields, currentFormValues)}
               modalVisible={modalVisible.take}
-              values={currentFormValues}
+              values={currentFormValues.take}
             />
           ) : null}
-          {currentFormValues && Object.keys(currentFormValues).length ? (
+          {currentFormValues.viewTake && Object.keys(currentFormValues.viewTake).length ? (
             <ViewTakeForm
               dispatch={dispatch}
               handleModalVisible={(flag, record) =>
                 this.handleModalVisible({ key: 'viewTake', flag }, record)
               }
               modalVisible={modalVisible.viewTake}
-              values={currentFormValues}
+              values={currentFormValues.viewTake}
             />
           ) : null}
-          {currentFormValues && Object.keys(currentFormValues).length ? (
+          {currentFormValues.refund && Object.keys(currentFormValues.refund).length ? (
             <RefundForm
               dispatch={dispatch}
               handleModalVisible={(flag, record) =>
                 this.handleModalVisible({ key: 'refund', flag }, record)
               }
               modalVisible={modalVisible.refund}
-              values={currentFormValues}
+              values={currentFormValues.refund}
+              handleSucess={() => {
+                this.search();
+              }}
+            />
+          ) : null}
+          {currentFormValues.changeRoute && Object.keys(currentFormValues.changeRoute).length ? (
+            <ChangeRouteForm
+              dispatch={dispatch}
+              handleModalVisible={(flag, record) =>
+                this.handleModalVisible({ key: 'changeRoute', flag }, record)
+              }
+              modalVisible={modalVisible.changeRoute}
+              values={currentFormValues.changeRoute}
               handleSucess={() => {
                 this.search();
               }}

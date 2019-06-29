@@ -55,6 +55,7 @@ export default [
           'Mission_Read',
           'Flow_Read',
           'Record_Read',
+          'Inv_Read',
           'ProdDefect_Read',
           'DefectRepair_Read',
           'DefectScrap_Read',
@@ -105,6 +106,12 @@ export default [
                 hideInMenu: true,
               },
             ],
+          },
+          {
+            path: '/prod/inv',
+            name: 'inv',
+            component: './Prod/Inv/List',
+            authority: ['Inv_Read'],
           },
           {
             path: '/prod/defect',

@@ -52,7 +52,7 @@ export class ViewRecordForm extends PureComponent {
       type: 'menu/openMenu',
       payload: { path: '/prod/record/profile', data: record },
     });
-    handleModalVisible(false);
+    handleModalVisible(false, values);
   }
 
   render() {
@@ -67,7 +67,7 @@ export class ViewRecordForm extends PureComponent {
       <div>
         <Button
           loading={false}
-          onClick={() => handleModalVisible(false)}
+          onClick={() => handleModalVisible(false, values)}
           prefixCls="ant-btn"
           ghost={false}
           block={false}
