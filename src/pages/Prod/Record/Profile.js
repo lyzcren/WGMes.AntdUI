@@ -38,9 +38,9 @@ class Transfer extends PureComponent {
   state = {
     fBeginDate: '',
     fTransferDateTime: '',
-    // precision: 4,
+    // qtyDecimal: 4,
     // qtyFormat: '0.0000'
-    precision: 0,
+    qtyDecimal: 0,
     qtyFormat: '0',
   };
 
@@ -62,12 +62,12 @@ class Transfer extends PureComponent {
   }
 
   loadData(fInterID) {
-    const { dispatch, fPrecision } = this.props;
-    const precision = fPrecision ? fPrecision : 0;
+    const { dispatch, fQtyDecimal } = this.props;
+    const qtyDecimal = fQtyDecimal ? fQtyDecimal : 0;
 
     // 根据单位的小数位数配置相关数量的小数位
-    const precisionPart = '00000000'.slice(0, precision);
-    this.setState({ precision, qtyFormat: `0.${precisionPart}` });
+    const qtyDecimalPart = '00000000'.slice(0, qtyDecimal);
+    this.setState({ qtyDecimal, qtyFormat: `0.${qtyDecimalPart}` });
 
     dispatch({
       type: 'recordProfile/initModel',
@@ -113,7 +113,7 @@ class Transfer extends PureComponent {
       fBeginDate,
       fTransferDateTime,
     } = data;
-    const { qtyFormat, precision } = this.state;
+    const { qtyFormat, qtyDecimal } = this.state;
 
     const description = (
       <DescriptionList className={styles.headerList} size="small" col="3">
@@ -262,9 +262,9 @@ class Transfer extends PureComponent {
                           readOnly
                           style={{ width: '100%' }}
                           placeholder="请输入数量"
-                          min={Math.pow(0.1, precision)}
-                          step={Math.pow(0.1, precision)}
-                          precision={precision}
+                          min={Math.pow(0.1, qtyDecimal)}
+                          step={Math.pow(0.1, qtyDecimal)}
+                          qtyDecimal={qtyDecimal}
                         />
                       )}
                     </FormItem>

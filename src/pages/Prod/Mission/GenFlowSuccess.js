@@ -4,7 +4,6 @@ import { formatMessage, FormattedMessage } from 'umi/locale';
 import { Form, Button, Row, Col, Icon, Steps, Card, Modal, Dropdown, Menu, Tag } from 'antd';
 import Result from '@/components/Result';
 import DescriptionList from '@/components/DescriptionList';
-import { WgModal } from '@/components/WgModal';
 import Authorized from '@/utils/Authorized';
 
 import styles from './List.less';
@@ -114,7 +113,7 @@ export class GenFlowSuccess extends PureComponent {
     );
 
     return (
-      <WgModal
+      <Modal
         destroyOnClose
         maskClosable={false}
         footer={null}
@@ -133,7 +132,7 @@ export class GenFlowSuccess extends PureComponent {
             style={{ marginBottom: 25 }}
           />
         </Card>
-      </WgModal>
+      </Modal>
     );
   }
 }

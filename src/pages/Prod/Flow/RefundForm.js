@@ -15,7 +15,6 @@ import {
   Checkbox,
 } from 'antd';
 import { Link } from 'umi';
-import { WgModal } from '@/components/WgModal';
 
 const { Step } = Steps;
 const { TextArea } = Input;
@@ -159,7 +158,7 @@ export class RefundForm extends PureComponent {
     const { records, refundRecord, reproduceRecords, canReproduceRecords } = this.state;
 
     return (
-      <WgModal
+      <Modal
         destroyOnClose
         title={
           <div>
@@ -235,7 +234,7 @@ export class RefundForm extends PureComponent {
             <TextArea style={{ minHeight: 32 }} placeholder="请输入原因" rows={3} />
           )}
         </FormItem>
-      </WgModal>
+      </Modal>
     );
   }
 }

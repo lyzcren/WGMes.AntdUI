@@ -4,7 +4,6 @@ import moment from 'moment';
 import numeral from 'numeral';
 import { Form, Table, Modal, Switch, Select, Tag, message, Button } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import { WgModal } from '@/components/WgModal';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -26,20 +25,20 @@ export class ViewTakeForm extends PureComponent {
 
     this.state = {
       formVals: props.values,
-      precision: 0,
+      qtyDecimal: 0,
     };
   }
 
   componentDidMount() {
     const {
       dispatch,
-      values: { fInterID, fPrecision },
+      values: { fInterID, fQtyDecimal },
     } = this.props;
-    const precision = fPrecision ? fPrecision : 0;
+    const qtyDecimal = fQtyDecimal ? fQtyDecimal : 0;
 
     // 根据单位的小数位数配置相关数量的小数位
-    const precisionPart = '00000000'.slice(0, precision);
-    this.setState({ precision, qtyFormat: `0.${precisionPart}` });
+    const qtyDecimalPart = '00000000'.slice(0, qtyDecimal);
+    this.setState({ qtyDecimal, qtyFormat: `0.${qtyDecimalPart}` });
 
     dispatch({
       type: 'viewTake/initModel',
@@ -55,7 +54,7 @@ export class ViewTakeForm extends PureComponent {
       values,
       viewTake: { records },
     } = this.props;
-    const { formVals, precision, qtyFormat } = this.state;
+    const { formVals, qtyDecimal, qtyFormat } = this.state;
 
     const columns = [
       {
@@ -97,7 +96,7 @@ export class ViewTakeForm extends PureComponent {
     );
 
     return (
-      <WgModal
+      <Modal
         destroyOnClose
         title={
           <div>
@@ -116,7 +115,7 @@ export class ViewTakeForm extends PureComponent {
           dataSource={records}
           pagination={false}
         />
-      </WgModal>
+      </Modal>
     );
   }
 }

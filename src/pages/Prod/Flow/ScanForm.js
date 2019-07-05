@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Form, Input, Modal, message, Button } from 'antd';
-import { WgModal } from '@/components/WgModal';
 
 import styles from './ScanForm.less';
 
@@ -150,7 +149,7 @@ export class ScanForm extends PureComponent {
     );
 
     return (
-      <WgModal
+      <Modal
         destroyOnClose
         title="扫描"
         visible={modalVisible}
@@ -188,7 +187,7 @@ export class ScanForm extends PureComponent {
             )}
           </FormItem>
         )}
-      </WgModal>
+      </Modal>
     );
   }
 }

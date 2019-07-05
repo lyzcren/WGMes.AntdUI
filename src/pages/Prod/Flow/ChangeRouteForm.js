@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Form, Steps, Input, Radio, Select, message, Tag, Checkbox } from 'antd';
-import { WgModal } from '@/components/WgModal';
+import { Form, Steps, Input, Radio, Select, message, Tag, Checkbox, Modal } from 'antd';
 
 const { TextArea } = Input;
 const FormItem = Form.Item;
@@ -119,7 +118,7 @@ export class ChangeRouteForm extends PureComponent {
     const { records, routeSteps } = this.state;
 
     return (
-      <WgModal
+      <Modal
         destroyOnClose
         title={
           <div>
@@ -180,7 +179,7 @@ export class ChangeRouteForm extends PureComponent {
             <TextArea style={{ minHeight: 32 }} placeholder="请输入原因" rows={3} />
           )}
         </FormItem>
-      </WgModal>
+      </Modal>
     );
   }
 }

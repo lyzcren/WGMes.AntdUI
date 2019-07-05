@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Form, Card, Steps, Input, Modal, Radio, Switch, Select, message, Button, Tag } from 'antd';
 import { Link } from 'umi';
-import { WgModal } from '@/components/WgModal';
 
 const { Step } = Steps;
 
@@ -78,7 +77,7 @@ export class ViewRecordForm extends PureComponent {
     );
 
     return (
-      <WgModal
+      <Modal
         destroyOnClose
         title={
           <div>
@@ -115,7 +114,7 @@ export class ViewRecordForm extends PureComponent {
             ))}
           </Steps>
         </Card>
-      </WgModal>
+      </Modal>
     );
   }
 }

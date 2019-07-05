@@ -3,7 +3,6 @@ import { connect } from 'dva';
 import moment from 'moment';
 import { Form, Input, Modal, Switch, Select, Tag, message, InputNumber } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import { WgModal } from '@/components/WgModal';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -32,7 +31,7 @@ export class TakeForm extends PureComponent {
 
     this.state = {
       formVals: props.values,
-      precision: 0,
+      qtyDecimal: 0,
     };
     dispatch({
       type: 'basicData/getOperator',
@@ -41,13 +40,13 @@ export class TakeForm extends PureComponent {
 
   componentDidMount() {
     const {
-      values: { fInterID, fCurrentDeptID, fPrecision },
+      values: { fInterID, fCurrentDeptID, fQtyDecimal },
     } = this.props;
-    const precision = fPrecision ? fPrecision : 0;
+    const qtyDecimal = fQtyDecimal ? fQtyDecimal : 0;
 
     // 根据单位的小数位数配置相关数量的小数位
-    const precisionPart = '00000000'.slice(0, precision);
-    this.setState({ precision, qtyFormat: `0.${precisionPart}` });
+    const qtyDecimalPart = '00000000'.slice(0, qtyDecimal);
+    this.setState({ qtyDecimal, qtyFormat: `0.${qtyDecimalPart}` });
   }
 
   okHandle = () => {
@@ -71,10 +70,10 @@ export class TakeForm extends PureComponent {
       basicData: { operators },
       fBindEmpID,
     } = this.props;
-    const { formVals, precision } = this.state;
+    const { formVals, qtyDecimal } = this.state;
 
     return (
-      <WgModal
+      <Modal
         destroyOnClose
         title={
           <div>
@@ -95,9 +94,9 @@ export class TakeForm extends PureComponent {
               style={{ width: '100%' }}
               placeholder="请输入数量"
               max={formVals.fCurrentPassQty}
-              min={Math.pow(0.1, precision)}
-              step={Math.pow(0.1, precision)}
-              precision={precision}
+              min={Math.pow(0.1, qtyDecimal)}
+              step={Math.pow(0.1, qtyDecimal)}
+              precision={qtyDecimal}
             />
           )}
         </FormItem>
@@ -127,7 +126,7 @@ export class TakeForm extends PureComponent {
             <TextArea style={{ minHeight: 32 }} placeholder="请输入原因" rows={3} />
           )}
         </FormItem>
-      </WgModal>
+      </Modal>
     );
   }
 }

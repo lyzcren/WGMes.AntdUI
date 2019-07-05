@@ -16,13 +16,7 @@ export async function fakeGet(params) {
 }
 
 export async function fakeGetDepts(params) {
-  return request('/api/flow/nextDepts', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'nextDepts',
-    },
-  });
+  return request(`/api/flow/${params.fInterID}/nextDepts`);
 }
 
 export async function fakeGetRecord(params) {
