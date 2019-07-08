@@ -72,10 +72,9 @@ class TableList extends PureComponent {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    const params = { pagination: this.currentPagination };
     dispatch({
       type: 'machineManage/fetch',
-      payload: params,
+      payload: this.currentPagination,
     });
     // 列配置相关方法
     ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdateModalVisible(true, record);
@@ -106,11 +105,9 @@ class TableList extends PureComponent {
       this.currentPagination.sorter[sorter.field] = sorter.order.replace('end', '');
     }
 
-    const params = { pagination: this.currentPagination };
-
     dispatch({
       type: 'machineManage/fetch',
-      payload: params,
+      payload: this.currentPagination,
     });
   };
 
@@ -141,9 +138,8 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters,
     };
-    const params = { pagination: this.currentPagination };
 
-    return params;
+    return this.currentPagination;
   };
 
   search = () => {
@@ -152,10 +148,10 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      const params = this.getSearchParam(fieldsValue);
+      const pagination = this.getSearchParam(fieldsValue);
       dispatch({
         type: 'machineManage/fetch',
-        payload: params,
+        payload: pagination,
       });
     });
     this.handleSelectRows([]);
@@ -175,11 +171,10 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters: [],
     };
-    const params = { pagination: this.currentPagination };
 
     dispatch({
       type: 'machineManage/fetch',
-      payload: params,
+      payload: this.currentPagination,
     });
     this.handleSelectRows([]);
   };
@@ -190,20 +185,19 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      let params = this.getSearchParam(fieldsValue);
+      let pagination = this.getSearchParam(fieldsValue);
       let fileName = '机台.xls';
       switch (e.key) {
         case 'currentPage':
-          params = { ...params, exportPage: true };
-          fileName = '机台-第' + params.pagination.current + '页.xls';
+          pagination.exportPage = true;
+          fileName = '机台-第' + pagination.current + '页.xls';
           break;
         case 'allPage':
-          params = { ...params, exportAll: true };
           break;
         default:
           break;
       }
-      exportExcel('/api/machine/export', params, fileName);
+      exportExcel('/api/machine/export', pagination, fileName);
     });
   };
 

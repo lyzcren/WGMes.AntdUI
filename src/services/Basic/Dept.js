@@ -12,18 +12,12 @@ export async function fakeQuery(params) {
 }
 
 export async function fakeGetType(params) {
-  return request('/api/Dept/GetType', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'GetType',
-    },
-  });
+  return request('/api/Dept/GetType');
 }
 
 export async function fakeRemove(params) {
-  return request('/api/Dept/delete', {
-    method: 'POST',
+  return request(`/api/Dept/${params.fItemID}`, {
+    method: 'DELETE',
     body: {
       ...params,
       method: 'delete',
@@ -42,8 +36,8 @@ export async function fakeAdd(params) {
 }
 
 export async function fakeUpdate(params) {
-  return request('/api/Dept/update', {
-    method: 'POST',
+  return request(`/api/Dept/${params.fItemID}`, {
+    method: 'PUT',
     body: {
       ...params,
       method: 'update',
@@ -52,8 +46,8 @@ export async function fakeUpdate(params) {
 }
 
 export async function fakeActive(params) {
-  return request('/api/Dept/active', {
-    method: 'POST',
+  return request(`/api/Dept/${params.fItemID}/active?fIsActive=${params.fIsActive}`, {
+    method: 'PUT',
     body: {
       ...params,
       method: 'active',
@@ -62,18 +56,12 @@ export async function fakeActive(params) {
 }
 
 export async function fakeGetParams(params) {
-  return request('/api/dept/getParams', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'getParams',
-    },
-  });
+  return request(`/api/dept/${params.fDeptID}/getParams`);
 }
 
 export async function fakeAddParams(params) {
-  return request('/api/dept/addParams', {
-    method: 'POST',
+  return request(`/api/dept/${params.fDeptID}/addParams`, {
+    method: 'PUT',
     body: {
       ...params,
       method: 'addParams',

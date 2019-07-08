@@ -72,6 +72,12 @@ export class UpdateForm extends PureComponent {
             rules: [{ required: true, message: '请输入名称', min: 1 }],
           })(<Input placeholder="请输入" />)}
         </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="编码">
+          {form.getFieldDecorator('fNumber', {
+            rules: [{ required: true, message: '请输入编码', min: 1 }],
+            initialValue: formVals.fNumber,
+          })(<Input placeholder="请输入" />)}
+        </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="部门">
           {form.getFieldDecorator('fDeptID', {
             rules: [{ required: true, message: '请选择部门' }],

@@ -356,11 +356,12 @@ class Transfer extends PureComponent {
                         option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                       }
                     >
-                      {operators.map(x => (
-                        <Option key={x.fItemID} value={x.fItemID}>
-                          {x.fName + ' - ' + x.fNumber}
-                        </Option>
-                      ))}
+                      {operators &&
+                        operators.map(x => (
+                          <Option key={x.fItemID} value={x.fItemID}>
+                            {x.fName + ' - ' + x.fNumber}
+                          </Option>
+                        ))}
                     </Select>
                   )}
                 </FormItem>
@@ -377,11 +378,12 @@ class Transfer extends PureComponent {
                         option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                       }
                     >
-                      {machineData.map(x => (
-                        <Option key={x.fItemID} value={x.fItemID}>
-                          {x.fName + ' - ' + x.fNumber}
-                        </Option>
-                      ))}
+                      {machineData &&
+                        machineData.map(x => (
+                          <Option key={x.fItemID} value={x.fItemID}>
+                            {x.fName + ' - ' + x.fNumber}
+                          </Option>
+                        ))}
                     </Select>
                   )}
                 </FormItem>

@@ -26,6 +26,10 @@ export class CreateForm extends PureComponent {
     dispatch({
       type: 'basicData/getProcessDeptTree',
     });
+    dispatch({
+      type: 'basicData/getBillNo',
+      payload: { fNumber: 'Machine' },
+    });
   }
 
   okHandle = () => {
@@ -38,7 +42,13 @@ export class CreateForm extends PureComponent {
   };
 
   render() {
-    const { modalVisible, form, handleSubmit, handleModalVisible, basicData } = this.props;
+    const {
+      modalVisible,
+      form,
+      handleSubmit,
+      handleModalVisible,
+      basicData: { processDeptTree, billNo },
+    } = this.props;
 
     return (
       <Modal
@@ -53,6 +63,12 @@ export class CreateForm extends PureComponent {
             rules: [{ required: true, message: '请输入名称', min: 1 }],
           })(<Input placeholder="请输入" />)}
         </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="编码">
+          {form.getFieldDecorator('fNumber', {
+            rules: [{ required: true, message: '请输入编码', min: 1 }],
+            initialValue: billNo.Machine,
+          })(<Input placeholder="请输入" />)}
+        </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="部门">
           {form.getFieldDecorator('fDeptID', {
             rules: [{ required: true, message: '请选择部门' }],
@@ -60,7 +76,7 @@ export class CreateForm extends PureComponent {
             <TreeSelect
               style={{ width: 300 }}
               dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-              treeData={basicData.processDeptTree}
+              treeData={processDeptTree}
               treeDefaultExpandAll
             />
           )}

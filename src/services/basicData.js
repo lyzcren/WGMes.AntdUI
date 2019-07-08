@@ -2,33 +2,15 @@ import { stringify } from 'qs';
 import request from '@/utils/request';
 
 export async function fakeDeptTreeData(params) {
-  return request('/api/Dept/GetTreeData', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'GetTreeData',
-    },
-  });
+  return request('/api/Dept/GetTreeData');
 }
 
 export async function fakeProcessDeptTree(params) {
-  return request('/api/Dept/GetProcessTree', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'GetProcessTree',
-    },
-  });
+  return request('/api/Dept/GetProcessTree');
 }
 
 export async function fakeMachineData(params) {
-  return request('/api/machine/GetData', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'GetTreeData',
-    },
-  });
+  return request(`/api/machine/GetData?fDeptID=${params.fDeptID}`);
 }
 
 export async function fakeGetRouteData(params) {
@@ -42,13 +24,7 @@ export async function fakeGetRouteData(params) {
 }
 
 export async function fakeGetTechParamData(params) {
-  return request('/api/Param/GetData', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'GetData',
-    },
-  });
+  return request('/api/Param');
 }
 
 export async function fakeGetTechParamValues(params) {
@@ -70,13 +46,11 @@ export async function fakeGetDefect(params) {
 }
 
 export async function fakeGetOperatorList(params) {
-  return request('/api/emp/getOperatorList', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'getOperatorList',
-    },
-  });
+  if (params && params.fDeptID) {
+    return request(`/api/emp/getOperatorList?fDeptID=${params.fDeptID}`);
+  } else {
+    return request(`/api/emp/getOperatorList`);
+  }
 }
 
 export async function fakeGetBillNo(params) {

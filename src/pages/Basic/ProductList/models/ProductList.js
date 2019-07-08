@@ -3,7 +3,7 @@ import {
   fakeQueryErp,
   fakeRemove,
   fakeAdd,
-  fakeUpdate,
+  fakeUpdateRoute,
   fakeActive,
   fakeSync,
   fakeIsSyncing,
@@ -75,8 +75,8 @@ export default {
       });
       if (callback) callback();
     },
-    *update({ payload, callback }, { call, put }) {
-      const response = yield call(fakeUpdate, payload);
+    *updateRoute({ payload, callback }, { call, put }) {
+      const response = yield call(fakeUpdateRoute, payload);
       yield put({
         type: 'saveData',
         payload: response,

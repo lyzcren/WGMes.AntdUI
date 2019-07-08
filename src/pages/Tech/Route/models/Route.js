@@ -62,7 +62,7 @@ export default {
       if (callback) callback();
     },
     *check({ payload, callback }, { call, put }) {
-      const response = yield call(fakeCheck, { ...payload, fStatus: 1 });
+      const response = yield call(fakeCheck, { ...payload, check: true });
       yield put({
         type: 'saveData',
         payload: response,
@@ -70,7 +70,7 @@ export default {
       if (callback) callback();
     },
     *uncheck({ payload, callback }, { call, put }) {
-      const response = yield call(fakeCheck, { ...payload, fStatus: 0 });
+      const response = yield call(fakeCheck, { ...payload, check: false });
       yield put({
         type: 'saveData',
         payload: response,

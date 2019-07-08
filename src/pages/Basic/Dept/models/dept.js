@@ -74,7 +74,6 @@ export default {
       if (callback) callback();
     },
     *getTreeData({ payload }, { call, put }) {
-      alert('getTreeData');
       const response = yield call(fakeGetTreeData, payload);
       yield put({
         type: 'saveTreeData',

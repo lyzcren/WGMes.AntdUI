@@ -129,18 +129,6 @@ export default [
             // ],
           },
           {
-            path: '/prod/defectRepair',
-            name: 'defectRepair',
-            component: './Prod/DefectRepair/List',
-            authority: ['DefectRepair_Read'],
-          },
-          {
-            path: '/prod/defectScrap',
-            name: 'defectScrap',
-            component: './Prod/DefectScrap/List',
-            authority: ['DefectScrap_Read'],
-          },
-          {
             path: '/prod/invCheck',
             name: 'invCheck',
             component: './Prod/InvCheck/List',
@@ -197,6 +185,18 @@ export default [
                 hideInMenu: true,
               },
             ],
+          },
+          {
+            path: '/prod/defectRepair',
+            name: 'defectRepair',
+            component: './Prod/DefectRepair/List',
+            authority: ['DefectRepair_Read'],
+          },
+          {
+            path: '/prod/defectScrap',
+            name: 'defectScrap',
+            component: './Prod/DefectScrap/List',
+            authority: ['DefectScrap_Read'],
           },
         ],
       },

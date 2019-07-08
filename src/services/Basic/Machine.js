@@ -12,8 +12,8 @@ export async function fakeQuery(params) {
 }
 
 export async function fakeRemove(params) {
-  return request('/api/Machine/delete', {
-    method: 'POST',
+  return request(`/api/Machine/${params.fItemID}`, {
+    method: 'DELETE',
     body: {
       ...params,
       method: 'delete',
@@ -32,8 +32,8 @@ export async function fakeAdd(params) {
 }
 
 export async function fakeUpdate(params) {
-  return request('/api/Machine/update', {
-    method: 'POST',
+  return request(`/api/Machine/${params.fItemID}`, {
+    method: 'PUT',
     body: {
       ...params,
       method: 'update',
@@ -42,8 +42,8 @@ export async function fakeUpdate(params) {
 }
 
 export async function fakeActive(params) {
-  return request('/api/Machine/active', {
-    method: 'POST',
+  return request(`/api/Machine/${params.fItemID}/active?fIsActive=${params.fIsActive}`, {
+    method: 'PUT',
     body: {
       ...params,
       method: 'active',

@@ -12,11 +12,11 @@ export async function fakeQuery(params) {
 }
 
 export async function fakeRemove(params) {
-  return request('/api/Param/delete', {
-    method: 'POST',
+  return request(`/api/Param/${params.fItemID}`, {
+    method: 'DELETE',
     body: {
       ...params,
-      method: 'delete',
+      method: 'post',
     },
   });
 }
@@ -32,8 +32,8 @@ export async function fakeAdd(params) {
 }
 
 export async function fakeUpdate(params) {
-  return request('/api/Param/update', {
-    method: 'POST',
+  return request(`/api/Param/${params.fItemID}`, {
+    method: 'PUT',
     body: {
       ...params,
       method: 'update',
@@ -42,8 +42,8 @@ export async function fakeUpdate(params) {
 }
 
 export async function fakeActive(params) {
-  return request('/api/Param/active', {
-    method: 'POST',
+  return request(`/api/Param/${params.fItemID}/active`, {
+    method: 'PUT',
     body: {
       ...params,
       method: 'active',
@@ -52,18 +52,12 @@ export async function fakeActive(params) {
 }
 
 export async function fakeQueryValue(params) {
-  return request('/api/Param/getValues', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'getValues',
-    },
-  });
+  return request(`/api/Param/${params.fItemID}/getValues`);
 }
 
 export async function fakeAddValue(params) {
-  return request('/api/Param/addValue', {
-    method: 'POST',
+  return request(`/api/Param/${params.fItemID}/addValue`, {
+    method: 'PUT',
     body: {
       ...params,
       method: 'addValue',
@@ -72,8 +66,8 @@ export async function fakeAddValue(params) {
 }
 
 export async function fakeUpdateValue(params) {
-  return request('/api/Param/UpdateValue', {
-    method: 'POST',
+  return request(`/api/Param/${params.fItemID}/UpdateValue`, {
+    method: 'PUT',
     body: {
       ...params,
       method: 'UpdateValue',

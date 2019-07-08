@@ -47,7 +47,7 @@ export default {
   'menu.prod.record': '生产记录',
   'menu.prod.record.profile': '生产记录详情',
   'menu.prod.inv': '在制品库存',
-  'menu.prod.defect': '不良库存',
+  'menu.prod.defect': '不良品库存',
   'menu.prod.defectRepair': '返修记录',
   'menu.prod.defectScrap': '报废记录',
   'menu.prod.invCheck': '在制品盘点',
@@ -65,7 +65,7 @@ export default {
   'menu.report.missionExecution': '执行情况',
   // 生产基础资料
   'menu.techStd': '工艺标准',
-  'menu.techStd.defect': '不良信息',
+  'menu.techStd.defect': '不良类型',
   'menu.techStd.param': '工艺参数',
   'menu.techStd.route': '工艺路线',
   'menu.techStd.route.profile': '工艺路线详情',

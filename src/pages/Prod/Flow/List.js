@@ -1103,7 +1103,7 @@ class TableList extends PureComponent {
               handleModalVisible={(flag, record) =>
                 this.handleModalVisible({ key: 'take', flag }, record)
               }
-              handleSubmit={fields => this.take(fields, currentFormValues)}
+              handleSubmit={fields => this.take(fields, currentFormValues.take)}
               modalVisible={modalVisible.take}
               values={currentFormValues.take}
             />

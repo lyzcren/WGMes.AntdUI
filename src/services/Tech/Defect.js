@@ -42,7 +42,6 @@ export async function fakeUpdate(params) {
 }
 
 export async function fakeActive(params) {
-  console.log(params.fIsActive);
   return request(`/api/Defect/active/${params.fItemID}?fIsActive=${params.fIsActive}`, {
     method: 'POST',
     body: {

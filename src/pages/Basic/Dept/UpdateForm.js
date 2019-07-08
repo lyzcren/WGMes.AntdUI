@@ -28,6 +28,7 @@ export class UpdateForm extends PureComponent {
       formVals: {
         fItemID: props.values.fItemID,
         fName: props.values.fName,
+        fNumber: props.values.fNumber,
         fEnName: props.values.fEnName,
         fParentID: props.values.fParentID,
         fTypeID: props.values.fTypeID,
@@ -70,6 +71,12 @@ export class UpdateForm extends PureComponent {
             rules: [{ required: true, message: '请输入名称', min: 1 }],
           })(<Input placeholder="请输入" />)}
         </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="编码">
+          {form.getFieldDecorator('fNumber', {
+            rules: [{ required: true, message: '请输入编码', min: 1 }],
+            initialValue: formVals.fNumber,
+          })(<Input placeholder="请输入" />)}
+        </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="英文名称">
           {form.getFieldDecorator('fEnName', {
             rules: [{ required: false, message: '请输入英文名称' }],
@@ -83,6 +90,7 @@ export class UpdateForm extends PureComponent {
           })(
             <TreeSelect
               placeholder="请选择"
+              style={{ width: '100%' }}
               dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
               treeData={treeData}
               treeDefaultExpandAll

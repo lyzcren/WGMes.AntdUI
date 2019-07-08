@@ -12,6 +12,11 @@ class ColumnConfig {
       sorter: true,
     },
     {
+      title: '编码',
+      dataIndex: 'fNumber',
+      sorter: true,
+    },
+    {
       title: '部门',
       dataIndex: 'fDeptName',
       sorter: true,

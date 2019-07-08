@@ -22,8 +22,8 @@ export async function fakeQueryErp(params) {
 }
 
 export async function fakeRemove(params) {
-  return request('/api/ProductList/delete', {
-    method: 'POST',
+  return request(`/api/ProductList/${params.fItemID}`, {
+    method: 'DELETE',
     body: {
       ...params,
       method: 'delete',
@@ -62,9 +62,9 @@ export async function fakeAdd(params) {
   });
 }
 
-export async function fakeUpdate(params) {
-  return request('/api/ProductList/update', {
-    method: 'POST',
+export async function fakeUpdateRoute(params) {
+  return request(`/api/ProductList/${params.fItemID}/route`, {
+    method: 'PUT',
     body: {
       ...params,
       method: 'update',
@@ -73,8 +73,8 @@ export async function fakeUpdate(params) {
 }
 
 export async function fakeActive(params) {
-  return request('/api/ProductList/active', {
-    method: 'POST',
+  return request(`/api/ProductList/${params.fItemID}/active?fIsActive=${params.fIsActive}`, {
+    method: 'PUT',
     body: {
       ...params,
       method: 'active',
