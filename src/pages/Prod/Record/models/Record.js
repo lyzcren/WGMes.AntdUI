@@ -1,4 +1,4 @@
-import { fakeQuery, fakeRemove, fakeAdd, fakeUpdate, fakeActive } from '@/services/Prod/Record';
+import { fakeQuery, fakeUpdate } from '@/services/Prod/Record';
 
 export default {
   namespace: 'recordManage',
@@ -22,32 +22,8 @@ export default {
         payload: response,
       });
     },
-    *add({ payload, callback }, { call, put }) {
-      const response = yield call(fakeAdd, payload);
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
-      if (callback) callback();
-    },
-    *remove({ payload, callback }, { call, put }) {
-      const response = yield call(fakeRemove, payload);
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
-      if (callback) callback();
-    },
     *update({ payload, callback }, { call, put }) {
       const response = yield call(fakeUpdate, payload);
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
-      if (callback) callback();
-    },
-    *active({ payload, callback }, { call, put }) {
-      const response = yield call(fakeActive, payload);
       yield put({
         type: 'saveData',
         payload: response,

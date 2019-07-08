@@ -5,7 +5,6 @@ import {
   fakeUpdate,
   fakeActive,
   fakeAddParams,
-  fakeGetTreeData,
   fakeGetType,
 } from '@/services/Basic/Dept';
 
@@ -72,13 +71,6 @@ export default {
         payload: response,
       });
       if (callback) callback();
-    },
-    *getTreeData({ payload }, { call, put }) {
-      const response = yield call(fakeGetTreeData, payload);
-      yield put({
-        type: 'saveTreeData',
-        payload: response,
-      });
     },
     *getType({ payload, callback }, { call, put }) {
       const response = yield call(fakeGetType, payload);

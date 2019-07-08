@@ -4,7 +4,7 @@ import moment from 'moment';
 import { Form, Input, Modal, Switch, Tag, Select } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import {
-  validatorPhone,
+  validatePhone,
   validatePassword,
   getPasswordStatus,
   passwordProgressMap,

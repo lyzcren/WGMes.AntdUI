@@ -3,7 +3,7 @@ import { connect } from 'dva';
 import { Form, Select, Input, Modal, Radio, Progress, Popover } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import {
-  validatorPhone,
+  validatePhone,
   validatePassword,
   getPasswordStatus,
   passwordProgressMap,
@@ -119,10 +119,7 @@ export class CreateForm extends PureComponent {
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="手机号码">
           {getFieldDecorator('fPhone', {
-            rules: [
-              { required: false, message: '请输入手机号码！' },
-              { validator: validatorPhone },
-            ],
+            rules: [{ required: false, message: '请输入手机号码！' }, { validator: validatePhone }],
           })(<Input placeholder="请输入" />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="操作员">

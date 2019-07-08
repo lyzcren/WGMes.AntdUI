@@ -2,7 +2,6 @@ import {
   fakeQuery,
   fakeSign,
   fakeReport,
-  fakeRemove,
   fakeUpdate,
   fakeGetDepts,
   fakeTake,
@@ -43,14 +42,6 @@ export default {
     },
     *report({ payload, callback }, { call, put }) {
       const response = yield call(fakeReport, payload);
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
-      if (callback) callback();
-    },
-    *remove({ payload, callback }, { call, put }) {
-      const response = yield call(fakeRemove, payload);
       yield put({
         type: 'saveData',
         payload: response,

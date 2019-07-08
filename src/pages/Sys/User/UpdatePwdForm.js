@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import { Form, Input, Modal, Progress, Popover } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import {
-  validatorPhone,
+  validatePhone,
   validatePassword,
   getPasswordStatus,
   passwordProgressMap,

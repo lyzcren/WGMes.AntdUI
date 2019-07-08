@@ -3,7 +3,6 @@ import {
   removeRole,
   addRole,
   updateRole,
-  activeRole,
   getAuth,
   setAuth,
   getCurrentAuth,
@@ -54,14 +53,6 @@ export default {
     },
     *update({ payload, callback }, { call, put }) {
       const response = yield call(updateRole, payload);
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
-      if (callback) callback();
-    },
-    *active({ payload, callback }, { call, put }) {
-      const response = yield call(activeRole, payload);
       yield put({
         type: 'saveData',
         payload: response,

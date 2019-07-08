@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import moment from 'moment';
 import { Form, Input, InputNumber, Modal, Switch, Tag, Col, Row } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import { validatorPhone } from '@/utils/validators';
+import { validatePhone } from '@/utils/validators';
 // import { getBillNoByRule } from '@/utils/utils';
 
 const FormItem = Form.Item;
