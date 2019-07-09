@@ -1,6 +1,7 @@
 import {
   fakeDeptTreeData,
   fakeProcessDeptTree,
+  fakeGetWorkShops,
   fakeMachineData,
   fakeGetRouteData,
   fakeGetTechParamData,
@@ -17,6 +18,7 @@ export default {
   state: {
     deptTreeData: [],
     processDeptTree: [],
+    workshops: [],
     machineData: [],
     routeData: [],
     paramData: [],
@@ -39,6 +41,13 @@ export default {
       yield put({
         type: 'saveProcessDeptTree',
         payload: response,
+      });
+    },
+    *getWorkShops({ payload }, { call, put }) {
+      const response = yield call(fakeGetWorkShops, payload);
+      yield put({
+        type: 'save',
+        payload: { workshops: response },
       });
     },
     *getMachineData({ payload }, { call, put }) {

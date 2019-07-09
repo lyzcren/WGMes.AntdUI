@@ -46,9 +46,10 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ deptManage, loading }) => ({
+@connect(({ deptManage, loading, basicData }) => ({
   deptManage,
   loading: loading.models.deptManage,
+  basicData,
 }))
 @Form.create()
 class TableList extends PureComponent {
@@ -77,6 +78,9 @@ class TableList extends PureComponent {
     });
     dispatch({
       type: 'deptManage/getType',
+    });
+    dispatch({
+      type: 'basicData/getWorkShops',
     });
     // 列配置相关方法
     ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdateModalVisible(true, record);
@@ -125,6 +129,8 @@ class TableList extends PureComponent {
     };
     // 查询条件处理
     const queryFilters = [];
+    if (fieldsValue.queryWorkShop)
+      queryFilters.push({ name: 'fWorkShop', compare: '=', value: fieldsValue.queryWorkShop });
     if (fieldsValue.queryName)
       queryFilters.push({ name: 'fName', compare: '%*%', value: fieldsValue.queryName });
     if (fieldsValue.queryIsActive)
@@ -437,16 +443,31 @@ class TableList extends PureComponent {
   renderSimpleForm() {
     const {
       form: { getFieldDecorator },
+      basicData: { workshops },
     } = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={8} sm={24}>
+          <Col md={6} sm={24}>
+            <FormItem label="车间">
+              {getFieldDecorator('queryWorkShop')(
+                <Select placeholder="请选择" style={{ width: '100%' }}>
+                  {workshops &&
+                    workshops.map(x => (
+                      <Option key={x.fNumber} value={x.fItemID}>
+                        {x.fName}
+                      </Option>
+                    ))}
+                </Select>
+              )}
+            </FormItem>
+          </Col>
+          <Col md={6} sm={24}>
             <FormItem label="名称">
               {getFieldDecorator('queryName')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
-          <Col md={8} sm={24}>
+          <Col md={6} sm={24}>
             <FormItem label="状态">
               {getFieldDecorator('queryIsActive')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
@@ -456,7 +477,7 @@ class TableList extends PureComponent {
               )}
             </FormItem>
           </Col>
-          <Col md={8} sm={24}>
+          <Col md={6} sm={24}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
                 查询

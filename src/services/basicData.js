@@ -9,6 +9,10 @@ export async function fakeProcessDeptTree(params) {
   return request('/api/Dept/GetProcessTree');
 }
 
+export async function fakeGetWorkShops(params) {
+  return request('/api/Dept/GetWorkShop');
+}
+
 export async function fakeMachineData(params) {
   return request(`/api/machine/GetData?fDeptID=${params.fDeptID}`);
 }

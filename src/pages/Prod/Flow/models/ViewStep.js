@@ -33,7 +33,7 @@ export default {
       const response = yield call(fakeQuerySteps, payload);
       // 查询工艺路线步骤
       let steps = [];
-      yield response.forEach(dept => {
+      response.forEach(dept => {
         let findGroup = steps.find(step => step.fGroupID === dept.fGroupID);
         if (!findGroup) {
           findGroup = { fGroupID: dept.fGroupID, depts: [] };
@@ -41,9 +41,9 @@ export default {
         }
         findGroup.depts.push(dept);
       });
-      steps = yield steps.sort(step => step.fGroupID);
+      steps = steps.sort((x, y) => x.fGroupID - y.fGroupID);
       if (steps.length <= 0) {
-        yield steps.push({ fGroupID: 1, depts: [] });
+        steps.push({ fGroupID: 1, depts: [] });
       }
       // 查询工艺路线表头数据
       const data = yield call(fakeGet, payload);
