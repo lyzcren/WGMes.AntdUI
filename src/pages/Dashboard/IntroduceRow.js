@@ -18,12 +18,10 @@ const topColResponsiveProps = {
   style: { marginBottom: 24 },
 };
 
-const rankingWorkshop = [{ id: 1, name: '前段' }, { id: 2, name: '后段' }];
-
-const IntroduceRow = memo(({ loading, visitData }) => (
-  <Tabs style={{ marginTop: -23 }}>
-    {rankingWorkshop.map(workshop => (
-      <TabPane tab={workshop.name} key={workshop.id}>
+const IntroduceRow = memo(({ loading, visitData, workshops, onTabChange }) => (
+  <Tabs style={{ marginTop: -23 }} onChange={onTabChange}>
+    {workshops.map(workshop => (
+      <TabPane tab={workshop.fName} key={workshop.fItemID}>
         <Row gutter={24}>
           <Col {...topColResponsiveProps}>
             <ChartCard
@@ -35,17 +33,22 @@ const IntroduceRow = memo(({ loading, visitData }) => (
                 </Tooltip>
               }
               loading={loading}
-              total={() => `${numeral(13640).format('0,0')} K`}
-              footer={<Field label={'今日投入数量'} value={`${numeral(123).format('0,0')} K`} />}
+              total={() => `${numeral(workshop.totalInputQty).format('0,0')}`}
+              footer={
+                <Field
+                  label={'今日投入数量'}
+                  value={`${numeral(workshop.todayInputQty).format('0,0')}`}
+                />
+              }
               contentHeight={46}
             >
               <Trend flag="up" style={{ marginRight: 16 }}>
                 周同比
-                <span className={styles.trendText}>12%</span>
+                <span className={styles.trendText}>--%</span>
               </Trend>
               <Trend flag="down">
                 日同比
-                <span className={styles.trendText}>11%</span>
+                <span className={styles.trendText}>--%</span>
               </Trend>
             </ChartCard>
           </Col>
@@ -60,8 +63,13 @@ const IntroduceRow = memo(({ loading, visitData }) => (
                   <Icon type="info-circle-o" />
                 </Tooltip>
               }
-              total={`${numeral(8846).format('0,0')} K`}
-              footer={<Field label={'今日完工数量'} value={`${numeral(1234).format('0,0')} K`} />}
+              total={`${numeral(workshop.totalPassQty).format('0,0')}`}
+              footer={
+                <Field
+                  label={'今日完工数量'}
+                  value={`${numeral(workshop.todayPassQty).format('0,0')}`}
+                />
+              }
               contentHeight={46}
             >
               <MiniArea color="#975FE4" data={visitData} />
@@ -77,8 +85,13 @@ const IntroduceRow = memo(({ loading, visitData }) => (
                   <Icon type="info-circle-o" />
                 </Tooltip>
               }
-              total={`${numeral(6562).format('0,0')} K`}
-              footer={<Field label={'今日汇报'} value={`${numeral(865).format('0,0')} K`} />}
+              total={`${numeral(workshop.totalReportQty).format('0,0')}`}
+              footer={
+                <Field
+                  label={'今日汇报'}
+                  value={`${numeral(workshop.todayReportQty).format('0,0')}`}
+                />
+              }
               contentHeight={46}
             >
               <MiniBar data={visitData} />
@@ -94,16 +107,20 @@ const IntroduceRow = memo(({ loading, visitData }) => (
                   <Icon type="info-circle-o" />
                 </Tooltip>
               }
-              total="75%"
+              total={`${numeral(
+                workshop.totalInputQty === 0
+                  ? 0
+                  : (workshop.totalPassQty / workshop.totalInputQty) * 100
+              ).format('0,0')}% `}
               footer={
                 <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                   <Trend flag="up" style={{ marginRight: 16 }}>
                     周同比
-                    <span className={styles.trendText}>8%</span>
+                    <span className={styles.trendText}>--%</span>
                   </Trend>
                   <Trend flag="down">
                     日同比
-                    <span className={styles.trendText}>4%</span>
+                    <span className={styles.trendText}>--%</span>
                   </Trend>
                 </div>
               }

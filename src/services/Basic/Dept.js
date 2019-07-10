@@ -25,6 +25,16 @@ export async function fakeRemove(params) {
   });
 }
 
+export async function fakeSync(params) {
+  return request('/api/Dept/Sync', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'Sync',
+    },
+  });
+}
+
 export async function fakeAdd(params) {
   return request('/api/Dept', {
     method: 'POST',

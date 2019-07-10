@@ -6,6 +6,7 @@ import {
   fakeActive,
   fakeAddParams,
   fakeGetType,
+  fakeSync,
 } from '@/services/Basic/Dept';
 
 export default {
@@ -32,53 +33,54 @@ export default {
         payload: response,
       });
     },
-    *add({ payload, callback }, { call, put }) {
+    *sync({ payload }, { call, put }) {
+      const response = yield call(fakeSync, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
+      });
+    },
+    *add({ payload }, { call, put }) {
       const response = yield call(fakeAdd, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
-      if (callback) callback();
     },
-    *remove({ payload, callback }, { call, put }) {
+    *remove({ payload }, { call, put }) {
       const response = yield call(fakeRemove, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
-      if (callback) callback();
     },
-    *update({ payload, callback }, { call, put }) {
+    *update({ payload }, { call, put }) {
       const response = yield call(fakeUpdate, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
-      if (callback) callback();
     },
-    *active({ payload, callback }, { call, put }) {
+    *active({ payload }, { call, put }) {
       const response = yield call(fakeActive, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
-      if (callback) callback();
     },
-    *addParams({ payload, callback }, { call, put }) {
+    *addParams({ payload }, { call, put }) {
       const response = yield call(fakeAddParams, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
-      if (callback) callback();
     },
-    *getType({ payload, callback }, { call, put }) {
+    *getType({ payload }, { call, put }) {
       const response = yield call(fakeGetType, payload);
       yield put({
         type: 'saveTypeData',
         payload: response,
       });
-      if (callback) callback();
     },
   },
 

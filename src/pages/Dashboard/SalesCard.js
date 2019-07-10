@@ -16,22 +16,6 @@ for (let i = 0; i < 12; i += 1) {
   });
 }
 
-const rankingDepartment = [
-  { id: 0, name: '总部' },
-  { id: 1, name: '基础1部' },
-  { id: 2, name: '基础2部' },
-  { id: 3, name: '绕线' },
-  { id: 4, name: '烘烤' },
-  { id: 5, name: '涂漆' },
-  { id: 6, name: '浸油' },
-  { id: 7, name: '切割' },
-  { id: 8, name: '切边框' },
-  { id: 9, name: '切线角' },
-  { id: 10, name: '烧制' },
-  { id: 11, name: '成型' },
-  { id: 12, name: '出库' },
-];
-
 const passRateListData = [
   { x: '1月', y: 89 },
   { x: '2月', y: 87 },
@@ -48,7 +32,15 @@ const passRateListData = [
 ];
 
 const SalesCard = memo(
-  ({ rangePickerValue, salesData, isActive, handleRangePickerChange, loading, selectDate }) => (
+  ({
+    processes,
+    rangePickerValue,
+    salesData,
+    isActive,
+    handleRangePickerChange,
+    loading,
+    selectDate,
+  }) => (
     <Card loading={loading} bordered={false} bodyStyle={{ padding: 0 }}>
       <div className={styles.salesCard}>
         <Tabs
@@ -78,8 +70,8 @@ const SalesCard = memo(
           size="large"
           tabBarStyle={{ marginBottom: 24 }}
         >
-          {rankingDepartment.map(dept => (
-            <TabPane tab={dept.name} key={dept.id}>
+          {processes.map(dept => (
+            <TabPane tab={dept.fName} key={dept.fItemID}>
               <Row>
                 <Col xl={16} lg={12} md={12} sm={24} xs={24}>
                   <div className={styles.salesBar}>

@@ -20,6 +20,7 @@ const OfflineData = React.lazy(() => import('./OfflineData'));
 }))
 class Analysis extends Component {
   state = {
+    workShopId: 0,
     salesType: 'all',
     currentTabKey: '',
     rangePickerValue: getTimeDistance('year'),
@@ -30,6 +31,11 @@ class Analysis extends Component {
     this.reqRef = requestAnimationFrame(() => {
       dispatch({
         type: 'chart/fetch',
+      }).then(() => {
+        const {
+          chart: { workshops },
+        } = this.props;
+        this.setState({ workShopId: workshops[0] ? workshops[0].fItemID : 0 });
       });
     });
   }
@@ -66,6 +72,10 @@ class Analysis extends Component {
     });
   };
 
+  handleWorkShopChange = workShopId => {
+    this.setState({ workShopId });
+  };
+
   selectDate = type => {
     const { dispatch } = this.props;
     this.setState({
@@ -93,9 +103,11 @@ class Analysis extends Component {
   };
 
   render() {
-    const { rangePickerValue, salesType, currentTabKey } = this.state;
+    const { workShopId, rangePickerValue, salesType, currentTabKey } = this.state;
     const { chart, loading } = this.props;
     const {
+      workshops,
+      processes,
       visitData,
       visitData2,
       salesData,
@@ -112,19 +124,8 @@ class Analysis extends Component {
     } else {
       salesPieData = salesType === 'online' ? salesTypeDataOnline : salesTypeDataOffline;
     }
-    const menu = (
-      <Menu>
-        <Menu.Item>操作一</Menu.Item>
-        <Menu.Item>操作二</Menu.Item>
-      </Menu>
-    );
-
-    const dropdownGroup = (
-      <span className={styles.iconGroup}>
-        <Dropdown overlay={menu} placement="bottomRight">
-          <Icon type="ellipsis" />
-        </Dropdown>
-      </span>
+    const filterProcesses = processes.filter(
+      x => workShopId <= 0 || x.fWorkShop === workShopId * 1
     );
 
     const activeKey = currentTabKey || (offlineData[0] && offlineData[0].name);
@@ -132,10 +133,16 @@ class Analysis extends Component {
     return (
       <GridContent>
         <Suspense fallback={<PageLoading />}>
-          <IntroduceRow loading={loading} visitData={visitData} />
+          <IntroduceRow
+            loading={loading}
+            workshops={workshops}
+            visitData={visitData}
+            onTabChange={this.handleWorkShopChange}
+          />
         </Suspense>
         <Suspense fallback={null}>
           <SalesCard
+            processes={filterProcesses}
             rangePickerValue={rangePickerValue}
             salesData={salesData}
             isActive={this.isActive}

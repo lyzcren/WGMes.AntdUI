@@ -12,6 +12,11 @@ class ColumnConfig {
       sorter: true,
     },
     {
+      title: '编码',
+      dataIndex: 'fNumber',
+      sorter: true,
+    },
+    {
       title: '英文名称',
       dataIndex: 'fEnName',
       sorter: true,

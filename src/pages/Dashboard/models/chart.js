@@ -1,9 +1,12 @@
 import { fakeChartData } from '@/services/api';
+import { fakeAnalysis } from '@/services/Chart/Analysis';
 
 export default {
   namespace: 'chart',
 
   state: {
+    workshops: [],
+    processes: [],
     visitData: [],
     visitData2: [],
     salesData: [],
@@ -19,8 +22,11 @@ export default {
 
   effects: {
     *fetch(_, { call, put }) {
-      // const response = yield call(fakeChartData);
+      const workshops = yield call(fakeAnalysis);
+      console.log(workshops);
       const response = {
+        workshops: workshops.workshops,
+        processes: workshops.processes,
         visitData: [
           { x: '2019-05-15', y: 7 },
           { x: '2019-05-16', y: 5 },

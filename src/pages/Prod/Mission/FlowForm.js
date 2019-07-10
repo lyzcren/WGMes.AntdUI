@@ -37,6 +37,9 @@ export class FlowForm extends PureComponent {
     dispatch({
       type: 'basicData/getRouteData',
     });
+    dispatch({
+      type: 'basicData/getWorkShops',
+    });
   }
 
   okHandle = () => {
@@ -78,10 +81,11 @@ export class FlowForm extends PureComponent {
       modalVisible,
       handleModalVisible,
       values,
-      basicData: { billNo, routeData },
+      basicData: { billNo, workshops, routeData },
     } = this.props;
     const { formVals } = this.state;
     const maxQty = formVals.fAuxInHighLimitQty - formVals.fInputQty;
+    const defaultWorkShop = workshops.find(x => x.fErpID === formVals.fWorkShop);
 
     return (
       <Modal
@@ -125,6 +129,21 @@ export class FlowForm extends PureComponent {
             rules: [{ required: true, message: '请输入每批数量' }],
             initialValue: maxQty,
           })(<InputNumber placeholder="请输入" min={1} max={maxQty} />)}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="车间">
+          {form.getFieldDecorator('fWorkShop', {
+            rules: [{ required: true, message: '请选择车间' }],
+            initialValue: defaultWorkShop ? defaultWorkShop.fItemID : null,
+          })(
+            <Select style={{ width: 300 }} dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}>
+              {workshops &&
+                workshops.map(x => (
+                  <Option key={x.fNumber} value={x.fItemID}>
+                    {x.fName}
+                  </Option>
+                ))}
+            </Select>
+          )}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="工艺路线">
           {form.getFieldDecorator('fRouteID', {

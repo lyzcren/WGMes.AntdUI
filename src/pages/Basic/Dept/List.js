@@ -243,6 +243,24 @@ class TableList extends PureComponent {
     });
   };
 
+  handleSync = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'deptManage/sync',
+    }).then(() => {
+      const {
+        deptManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success('同步成功');
+        // 成功后再次刷新列表
+        this.search();
+      } else {
+        message.warning(queryResult.message);
+      }
+    });
+  };
+
   handleModalVisible = flag => {
     const { modalVisible } = this.state;
     this.setState({
@@ -361,23 +379,22 @@ class TableList extends PureComponent {
       payload: {
         fItemID: record.fItemID,
       },
-      callback: () => {
-        this.setState({
-          selectedRows: [],
-        });
-        const {
-          deptManage: { queryResult },
-        } = this.props;
-        if (queryResult.status === 'ok') {
-          message.success('【' + record.fName + '】' + '删除成功');
-          // 成功后再次刷新列表
-          this.search();
-        } else if (queryResult.status === 'warning') {
-          message.warning(queryResult.message);
-        } else {
-          message.error(queryResult.message);
-        }
-      },
+    }).then(() => {
+      this.setState({
+        selectedRows: [],
+      });
+      const {
+        deptManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success('【' + record.fName + '】' + '删除成功');
+        // 成功后再次刷新列表
+        this.search();
+      } else if (queryResult.status === 'warning') {
+        message.warning(queryResult.message);
+      } else {
+        message.error(queryResult.message);
+      }
     });
   };
 
@@ -551,6 +568,11 @@ class TableList extends PureComponent {
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
               <div className={styles.tableListOperator}>
+                <Authorized authority="Dept_Create">
+                  <Button icon="plus" type="primary" onClick={() => this.handleSync()}>
+                    从 ERP 同步
+                  </Button>
+                </Authorized>
                 <Authorized authority="Dept_Create">
                   <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
                     新建
