@@ -198,6 +198,12 @@ export default [
             component: './Prod/DefectScrap/List',
             authority: ['DefectScrap_Read'],
           },
+          {
+            path: '/prod/take',
+            name: 'take',
+            component: './Prod/Take/List',
+            authority: ['Flow_Read'],
+          },
         ],
       },
       {

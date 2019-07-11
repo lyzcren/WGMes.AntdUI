@@ -4,8 +4,9 @@ import {
   fakeReport,
   fakeUpdate,
   fakeGetDepts,
-  fakeTake,
+  fakeSign4Reject,
 } from '@/services/Prod/Flow';
+import { fakeTake } from '@/services/Prod/Take';
 import { fakeQueryPrintTemplate } from '@/services/Sys/PrintTemplate';
 
 export default {
@@ -34,6 +35,14 @@ export default {
     },
     *sign({ payload, callback }, { call, put }) {
       const response = yield call(fakeSign, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    *sign4Reject({ payload, callback }, { call, put }) {
+      const response = yield call(fakeSign4Reject, payload);
       yield put({
         type: 'saveData',
         payload: response,

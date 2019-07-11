@@ -37,6 +37,7 @@ import { ScanForm } from './ScanForm';
 import { TakeForm } from './TakeForm';
 import { ViewTakeForm } from './ViewTakeForm';
 import { RefundForm } from './RefundForm';
+import { RejectForm } from './RejectForm';
 import { ChangeRouteForm } from './ChangeRouteForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
@@ -58,6 +59,7 @@ const getValue = obj =>
   loading: loading.models.flowManage,
   basicData,
   fIsOperator: user.currentUser.fIsOperator,
+  fIsAdmin: user.currentUser.fIsAdmin,
 }))
 @Form.create()
 class TableList extends PureComponent {
@@ -71,6 +73,7 @@ class TableList extends PureComponent {
       take: false,
       viewTake: false,
       refund: false,
+      reject: false,
       changeRoute: false,
       scan: false,
     },
@@ -80,7 +83,7 @@ class TableList extends PureComponent {
     // expandForm: 是否展开更多查询条件
     expandForm: false,
     // 操作员查询条件
-    operatorForm: this.props.fIsOperator,
+    operatorForm: !this.props.fIsAdmin && this.props.fIsOperator,
     selectedRows: [],
     queryFilters: [],
     queryDeptID: null,
@@ -436,6 +439,9 @@ class TableList extends PureComponent {
       case 'refund':
         this.handleModalVisible({ key: 'refund', flag: true }, record);
         break;
+      case 'reject':
+        this.handleModalVisible({ key: 'reject', flag: true }, record);
+        break;
       case 'changeRoute':
         this.handleModalVisible({ key: 'changeRoute', flag: true }, record);
         break;
@@ -555,6 +561,31 @@ class TableList extends PureComponent {
     });
   };
 
+  handleSign4Reject = record => {
+    const { dispatch } = this.props;
+    const { fCurrentRecordID } = record;
+    dispatch({
+      type: 'flowManage/sign4Reject',
+      payload: {
+        fRecordID: fCurrentRecordID,
+      },
+    }).then(() => {
+      const {
+        flowManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success('【' + record.fFullBatchNo + '】' + '签收成功');
+        this.handleModalVisible({ key: 'sign', flag: false });
+        // 成功后再次刷新列表
+        this.search();
+      } else if (queryResult.status === 'warning') {
+        message.warning('【' + record.fFullBatchNo + '】' + queryResult.message);
+      } else {
+        message.error('【' + record.fFullBatchNo + '】' + queryResult.message);
+      }
+    });
+  };
+
   take = (fields, record) => {
     const { dispatch } = this.props;
     dispatch({
@@ -630,62 +661,76 @@ class TableList extends PureComponent {
     return (
       <Fragment>
         <Authorized authority="Record_Read">
-          <a
-            disabled={record.fStatusNumber === 'BeforeProduce'}
-            onClick={() => this.viewRecord(record)}
-          >
-            执行情况
-          </a>
+          <a onClick={() => this.viewRecord(record)}>执行情况</a>
         </Authorized>
-        {record.fStatusNumber !== 'Reported' && record.fStatusNumber !== 'NonProduced' && (
+        {(record.fStatusNumber === 'BeforeProduce' ||
+          (record.fStatusNumber === 'Producing' &&
+            record.fRecordStatusNumber === 'ManufEndProduce')) && (
           <span>
-            {record.fStatusNumber !== 'EndProduce' &&
-              record.fRecordStatusNumber !== 'ManufProducing' && (
-                <span>
-                  <Authorized authority="Flow_Sign">
-                    <Divider type="vertical" />
-                    <a disabled={!canSign} onClick={() => this.handleSign(record)}>
-                      签收
-                    </a>
-                  </Authorized>
-                </span>
-              )}
-            {record.fRecordStatusNumber === 'ManufProducing' && (
-              <span>
-                <Authorized authority="Flow_Transfer">
-                  <Divider type="vertical" />
-                  <a disabled={!canTransfer} onClick={() => this.transferModalVisible(record)}>
-                    转序
-                  </a>
-                </Authorized>
-              </span>
-            )}
-            {record.fStatusNumber === 'EndProduce' && (
-              <span>
-                <Authorized authority="Flow_Report">
-                  <Divider type="vertical" />
-                  <a onClick={() => this.report([record])}>汇报</a>
-                </Authorized>
-              </span>
-            )}
-            <Dropdown
-              overlay={
-                <Menu onClick={({ key }) => this.moreMenuClick(key, record)}>
-                  <Menu.Item key="take">取走</Menu.Item>
-                  <Menu.Item key="viewTake">取走记录</Menu.Item>
-                  <Menu.Item key="refund">退回</Menu.Item>
-                  <Menu.Item key="changeRoute">变更工艺路线</Menu.Item>
-                  <Menu.Item key="split">分批</Menu.Item>
-                </Menu>
-              }
-            >
-              <a>
-                <Divider type="vertical" />
-                更多 <Icon type="down" />
+            <Authorized authority="Flow_Sign">
+              <Divider type="vertical" />
+              <a disabled={!canSign} onClick={() => this.handleSign(record)}>
+                签收
               </a>
-            </Dropdown>
+            </Authorized>
           </span>
         )}
+        {record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufReject' && (
+          <span>
+            <Authorized authority="Flow_Sign">
+              <Divider type="vertical" />
+              <a disabled={!canSign} onClick={() => this.handleSign4Reject(record)}>
+                签收(被拒)
+              </a>
+            </Authorized>
+          </span>
+        )}
+        {record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufProducing' && (
+          <span>
+            <Authorized authority="Flow_Transfer">
+              <Divider type="vertical" />
+              <a disabled={!canTransfer} onClick={() => this.transferModalVisible(record)}>
+                转序
+              </a>
+            </Authorized>
+          </span>
+        )}
+        {record.fStatusNumber === 'EndProduce' && (
+          <span>
+            <Authorized authority="Flow_Report">
+              <Divider type="vertical" />
+              <a onClick={() => this.report([record])}>汇报</a>
+            </Authorized>
+          </span>
+        )}
+        <Dropdown
+          overlay={
+            <Menu onClick={({ key }) => this.moreMenuClick(key, record)}>
+              {/* 生产中，可取走 */}
+              {record.fStatusNumber === 'Producing' && <Menu.Item key="take">取走</Menu.Item>}
+              <Menu.Item key="viewTake">取走记录</Menu.Item>
+              {/* 已签收生产中，且非首工序，可退回 */}
+              {record.fRecordStatusNumber === 'ManufProducing' &&
+                record.fEndProduceDeptIDList.length > 0 && <Menu.Item key="refund">退回</Menu.Item>}
+              {/* 未签收，可拒收 */}
+              {record.fStatusNumber === 'Producing' &&
+                record.fRecordStatusNumber === 'ManufEndProduce' && (
+                  <Menu.Item key="reject">拒收</Menu.Item>
+                )}
+              {/* 生产中，可变更工艺路线 */}
+              {record.fStatusNumber === 'Producing' && (
+                <Menu.Item key="changeRoute">变更工艺路线</Menu.Item>
+              )}
+              {/* 生产中，可分批 */}
+              {record.fStatusNumber === 'Producing' && <Menu.Item key="split">分批</Menu.Item>}
+            </Menu>
+          }
+        >
+          <a>
+            <Divider type="vertical" />
+            更多 <Icon type="down" />
+          </a>
+        </Dropdown>
       </Fragment>
     );
   };
@@ -695,6 +740,7 @@ class TableList extends PureComponent {
     const {
       form: { getFieldDecorator },
       fIsOperator,
+      fIsAdmin,
       basicData: {
         processDeptTree,
         status: { recordStatus },
@@ -748,7 +794,7 @@ class TableList extends PureComponent {
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
               </Button>
-              {!fIsOperator && (
+              {(fIsAdmin || !fIsOperator) && (
                 <a style={{ marginLeft: 8 }} onClick={this.toggleOperatorForm}>
                   切换
                 </a>
@@ -767,6 +813,7 @@ class TableList extends PureComponent {
     const {
       form: { getFieldDecorator },
       fIsOperator,
+      fIsAdmin,
       basicData: {
         processDeptTree,
         status: { flowStatus },
@@ -826,7 +873,7 @@ class TableList extends PureComponent {
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
               </Button>
-              {!fIsOperator && (
+              {(fIsAdmin || !fIsOperator) && (
                 <a style={{ marginLeft: 8 }} onClick={this.toggleOperatorForm}>
                   切换
                 </a>
@@ -1126,6 +1173,19 @@ class TableList extends PureComponent {
               }
               modalVisible={modalVisible.refund}
               values={currentFormValues.refund}
+              handleSucess={() => {
+                this.search();
+              }}
+            />
+          ) : null}
+          {currentFormValues.reject && Object.keys(currentFormValues.reject).length ? (
+            <RejectForm
+              dispatch={dispatch}
+              handleModalVisible={(flag, record) =>
+                this.handleModalVisible({ key: 'reject', flag }, record)
+              }
+              modalVisible={modalVisible.reject}
+              values={currentFormValues.reject}
               handleSucess={() => {
                 this.search();
               }}

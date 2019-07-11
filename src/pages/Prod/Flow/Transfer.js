@@ -388,13 +388,13 @@ class Transfer extends PureComponent {
                   )}
                 </FormItem>
               </Col>
-              <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
+              {/* <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <FormItem key="fMoldID" label="模具">
                   {getFieldDecorator('fMoldID', {
                     rules: [{ required: false, message: '请选择模具' }],
                   })(<Input placeholder="请输入" />)}
                 </FormItem>
-              </Col>
+              </Col> */}
             </Row>
           </Form>
           <Form layout="vertical">

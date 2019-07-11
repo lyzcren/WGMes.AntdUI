@@ -140,7 +140,7 @@ class ColumnConfig {
       {
         title: '操作',
         fixed: 'right',
-        width: 220,
+        width: 250,
         render: (text, record) => this.renderOperation(text, record),
       },
     ];

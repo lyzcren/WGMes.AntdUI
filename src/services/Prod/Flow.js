@@ -33,6 +33,16 @@ export async function fakeSign(params) {
   });
 }
 
+export async function fakeSign4Reject(params) {
+  return request('/api/record/sign4Reject', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'sign4Reject',
+    },
+  });
+}
+
 export async function fakeReport(params) {
   return request('/api/flow/report', {
     method: 'POST',
@@ -63,20 +73,6 @@ export async function fakeUpdate(params) {
   });
 }
 
-export async function fakeTake(params) {
-  return request(`/api/flow/${params.fInterID}/take`, {
-    method: 'PUT',
-    body: {
-      ...params,
-      method: 'Take',
-    },
-  });
-}
-
-export async function fakeGetTake(params) {
-  return request(`/api/flow/${params.fInterID}/take`);
-}
-
 export async function fakeRefund(params) {
   return request(`/api/flow/${params.fInterID}/refund`, {
     method: 'PUT',
@@ -87,7 +83,18 @@ export async function fakeRefund(params) {
   });
 }
 
+export async function fakeReject(params) {
+  return request(`/api/reject`, {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'reject',
+    },
+  });
+}
+
 export async function fakeChangeRoute(params) {
+  console.log(params);
   return request(`/api/flow/${params.fInterID}/changeRoute`, {
     method: 'PUT',
     body: {

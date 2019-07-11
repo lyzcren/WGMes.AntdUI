@@ -1,6 +1,6 @@
 import moment from 'moment';
 import numeral from 'numeral';
-import { fakeGetTake } from '@/services/Prod/Flow';
+import { fakeGetTake } from '@/services/Prod/Take';
 
 export default {
   namespace: 'viewTake',
