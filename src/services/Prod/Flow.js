@@ -92,14 +92,3 @@ export async function fakeReject(params) {
     },
   });
 }
-
-export async function fakeChangeRoute(params) {
-  console.log(params);
-  return request(`/api/flow/${params.fInterID}/changeRoute`, {
-    method: 'PUT',
-    body: {
-      ...params,
-      method: 'changeRoute',
-    },
-  });
-}

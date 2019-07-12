@@ -274,6 +274,7 @@ class TableList extends PureComponent {
                   style={{ width: '100%' }}
                   treeData={processDeptTree}
                   treeDefaultExpandAll
+                  allowClear={true}
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                 />
               )}
@@ -329,50 +330,55 @@ class TableList extends PureComponent {
               {/* <div className={styles.tableListOperator}>
               </div> */}
               <div className={styles.tableListGroup}>
-                <Form layout="inline">
-                  <FormItem label="时间分组">
-                    <Radio.Group
-                      defaultValue=""
-                      buttonStyle="solid"
-                      onChange={e => this.changeGroupByDate(e)}
-                    >
-                      <Radio.Button value="">无</Radio.Button>
-                      <Radio.Button value="groupByDate">日期</Radio.Button>
-                      <Radio.Button value="groupByWeek">周</Radio.Button>
-                      <Radio.Button value="groupByMonth">月</Radio.Button>
-                    </Radio.Group>
-                  </FormItem>
-                </Form>
+                <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+                  <Col md={8} sm={24}>
+                    <Form layout="inline">
+                      <FormItem label="时间分组">
+                        <Radio.Group
+                          defaultValue=""
+                          buttonStyle="solid"
+                          onChange={e => this.changeGroupByDate(e)}
+                        >
+                          <Radio.Button value="">无</Radio.Button>
+                          <Radio.Button value="groupByDate">日期</Radio.Button>
+                          <Radio.Button value="groupByWeek">周</Radio.Button>
+                          <Radio.Button value="groupByMonth">月</Radio.Button>
+                        </Radio.Group>
+                      </FormItem>
+                    </Form>
+                  </Col>
+                  <Col md={16} sm={24}>
+                    <Form layout="inline">
+                      <FormItem>分组汇总：</FormItem>
+                      <FormItem label="任务单">
+                        <Switch
+                          defaultChecked={!!this.state.groupByMission}
+                          onChange={checked => this.changeGroupBy('groupByMission', checked)}
+                        />
+                      </FormItem>
+                      <FormItem label="机台">
+                        <Switch
+                          defaultChecked={!!this.state.groupByMachine}
+                          onChange={checked => this.changeGroupBy('groupByMachine', checked)}
+                        />
+                      </FormItem>
+                      <FormItem label="操作员">
+                        <Switch
+                          defaultChecked={!!this.state.groupByOperator}
+                          onChange={checked => this.changeGroupBy('groupByOperator', checked)}
+                        />
+                      </FormItem>
+                      <FormItem label="物料">
+                        <Switch
+                          defaultChecked={!!this.state.groupByProduct}
+                          onChange={checked => this.changeGroupBy('groupByProduct', checked)}
+                        />
+                      </FormItem>
+                    </Form>
+                  </Col>
+                </Row>
               </div>
-              <div className={styles.tableListGroup}>
-                <Form layout="inline">
-                  <FormItem>分组汇总：</FormItem>
-                  <FormItem label="任务单">
-                    <Switch
-                      defaultChecked={!!this.state.groupByMission}
-                      onChange={checked => this.changeGroupBy('groupByMission', checked)}
-                    />
-                  </FormItem>
-                  <FormItem label="机台">
-                    <Switch
-                      defaultChecked={!!this.state.groupByMachine}
-                      onChange={checked => this.changeGroupBy('groupByMachine', checked)}
-                    />
-                  </FormItem>
-                  <FormItem label="操作员">
-                    <Switch
-                      defaultChecked={!!this.state.groupByOperator}
-                      onChange={checked => this.changeGroupBy('groupByOperator', checked)}
-                    />
-                  </FormItem>
-                  <FormItem label="物料">
-                    <Switch
-                      defaultChecked={!!this.state.groupByProduct}
-                      onChange={checked => this.changeGroupBy('groupByProduct', checked)}
-                    />
-                  </FormItem>
-                </Form>
-              </div>
+              <div className={styles.tableListGroup} />
               <ReportTable
                 rowKey="rownumber"
                 bordered

@@ -835,6 +835,7 @@ class TableList extends PureComponent {
                   treeDefaultExpandAll
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                   onChange={this.selectChange}
+                  allowClear={true}
                 />
               )}
             </FormItem>

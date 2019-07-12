@@ -31,9 +31,9 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ takeManage, loading, basicData }) => ({
-  takeManage,
-  loading: loading.models.takeManage,
+@connect(({ changeRouteManage, loading, basicData }) => ({
+  changeRouteManage,
+  loading: loading.models.changeRouteManage,
   basicData,
 }))
 @Form.create()
@@ -62,7 +62,7 @@ class TableList extends PureComponent {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'takeManage/fetch',
+      type: 'changeRouteManage/fetch',
       payload: this.currentPagination,
     });
     dispatch({
@@ -94,7 +94,7 @@ class TableList extends PureComponent {
     }
 
     dispatch({
-      type: 'takeManage/fetch',
+      type: 'changeRouteManage/fetch',
       payload: this.currentPagination,
     });
   };
@@ -112,11 +112,11 @@ class TableList extends PureComponent {
     const queryFilters = [];
     if (fieldsValue.queryBatchNo)
       queryFilters.push({ name: 'fFullBatchNo', compare: '%*%', value: fieldsValue.queryBatchNo });
-    if (fieldsValue.queryOperatorName)
+    if (fieldsValue.queryCreatorName)
       queryFilters.push({
-        name: 'fOperatorName',
+        name: 'fCreatorName',
         compare: '%*%',
-        value: fieldsValue.queryOperatorName,
+        value: fieldsValue.queryCreatorName,
       });
     if (fieldsValue.queryDept)
       queryFilters.push({ name: 'fDeptID', compare: '=', value: fieldsValue.queryDept });
@@ -143,7 +143,7 @@ class TableList extends PureComponent {
 
       const pagination = this.getSearchParam(fieldsValue);
       dispatch({
-        type: 'takeManage/fetch',
+        type: 'changeRouteManage/fetch',
         payload: pagination,
       });
       this.handleSelectRows([]);
@@ -165,7 +165,7 @@ class TableList extends PureComponent {
     };
 
     dispatch({
-      type: 'takeManage/fetch',
+      type: 'changeRouteManage/fetch',
       payload: this.currentPagination,
     });
     this.handleSelectRows([]);
@@ -181,12 +181,12 @@ class TableList extends PureComponent {
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          const fileName = '取走记录-第' + pagination.current + '页.xls';
-          exportExcel('/api/take/export', pagination, fileName);
+          const fileName = '工艺路线变更记录-第' + pagination.current + '页.xls';
+          exportExcel('/api/changeRoute/export', pagination, fileName);
           break;
         case 'allPage':
           pagination.exportPage = false;
-          exportExcel('/api/take/export', pagination, '取走记录.xls');
+          exportExcel('/api/changeRoute/export', pagination, '工艺路线变更记录.xls');
           break;
         default:
           break;
@@ -262,8 +262,8 @@ class TableList extends PureComponent {
             </FormItem>
           </Col>
           <Col md={6} sm={24}>
-            <FormItem label="操作员">
-              {getFieldDecorator('queryOperatorName')(<Input placeholder="请输入" />)}
+            <FormItem label="变更人">
+              {getFieldDecorator('queryCreatorName')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={6} sm={24}>
@@ -296,22 +296,11 @@ class TableList extends PureComponent {
   render() {
     const {
       dispatch,
-      takeManage: { data, queryResult },
+      changeRouteManage: { data, queryResult },
       loading,
     } = this.props;
-    const { selectedRows, currentFormValues } = this.state;
-    const menu = <Menu onClick={this.handleMenuClick} selectedKeys={[]} />;
+    const { selectedRows } = this.state;
 
-    const parentMethods = {
-      dispatch,
-      handleModalVisible: this.handleModalVisible,
-      handleSuccess: this.search,
-    };
-    const updateMethods = {
-      dispatch,
-      handleModalVisible: this.handleUpdateModalVisible,
-      handleSuccess: this.search,
-    };
     const scrollX = ColumnConfig.columns
       .map(c => {
         return c.width;

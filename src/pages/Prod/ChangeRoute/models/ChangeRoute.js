@@ -1,7 +1,7 @@
-import { fakeQuery } from '@/services/Prod/Take';
+import { fakeQuery } from '@/services/Prod/ChangeRoute';
 
 export default {
-  namespace: 'takeManage',
+  namespace: 'changeRouteManage',
 
   state: {
     data: {

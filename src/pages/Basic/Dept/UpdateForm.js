@@ -83,40 +83,48 @@ export class UpdateForm extends PureComponent {
             initialValue: formVals.fEnName,
           })(<Input placeholder="请输入" />)}
         </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="所属部门">
-          {form.getFieldDecorator('fParentID', {
-            rules: [{ required: true, message: '请输入所属部门' }],
-            initialValue: formVals.fParentID,
-          })(
-            <TreeSelect
-              placeholder="请选择"
-              style={{ width: '100%' }}
-              dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-              treeData={treeData}
-              treeDefaultExpandAll
-            />
-          )}
-        </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="类型">
-          {form.getFieldDecorator('fTypeID', {
-            initialValue: formVals.fTypeID,
-          })(
-            <Select placeholder="请选择" style={{ width: '100%' }}>
-              {typeData.map(x => (
-                <Option key={x.fKey} value={x.fKey}>
-                  {x.fValue}
-                </Option>
-              ))}
-            </Select>
-          )}
-        </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="启用">
-          {form.getFieldDecorator('fIsActive', {
-            rules: [{ required: false }],
-            valuePropName: 'checked',
-            initialValue: formVals.fIsActive,
-          })(<Switch />)}
-        </FormItem>
+        {formVals.fParentID > 0 && (
+          <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="所属部门">
+            {form.getFieldDecorator('fParentID', {
+              rules: [{ required: true, message: '请输入所属部门' }],
+              initialValue: formVals.fParentID,
+            })(
+              <TreeSelect
+                placeholder="请选择"
+                style={{ width: '100%' }}
+                dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                treeData={treeData}
+                treeDefaultExpandAll
+              />
+            )}
+          </FormItem>
+        )}
+        {formVals.fParentID > 0 && (
+          <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="类型">
+            {form.getFieldDecorator('fTypeID', {
+              initialValue: typeData.some(x => x.fKey === formVals.fTypeID)
+                ? formVals.fTypeID
+                : null,
+            })(
+              <Select placeholder="请选择" style={{ width: '100%' }}>
+                {typeData.map(x => (
+                  <Option key={x.fKey} value={x.fKey}>
+                    {x.fValue}
+                  </Option>
+                ))}
+              </Select>
+            )}
+          </FormItem>
+        )}
+        {formVals.fParentID > 0 && (
+          <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="启用">
+            {form.getFieldDecorator('fIsActive', {
+              rules: [{ required: false }],
+              valuePropName: 'checked',
+              initialValue: formVals.fIsActive,
+            })(<Switch />)}
+          </FormItem>
+        )}
       </Modal>
     );
   }

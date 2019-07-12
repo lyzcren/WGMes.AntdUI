@@ -344,6 +344,7 @@ class Create extends PureComponent {
                       placeholder="请选择"
                       style={{ width: 300 }}
                       treeDefaultExpandAll
+                      allowClear={true}
                       dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                       treeData={processDeptTree}
                       onChange={val => {

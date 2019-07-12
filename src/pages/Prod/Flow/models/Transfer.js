@@ -151,8 +151,7 @@ export default {
         defect.push({ fDefectID, fValue });
       }
       const defectQty = defect
-        .filter(x => x.fValue)
-        .map(x => x.fValue)
+        .map(x => (x.fValue ? x.fValue : 0))
         .reduce((sum, x) => (sum += x * 1.0));
       data.fDefectQty = defectQty;
       data.fPassQty = data.fInputQty + data.fInvCheckDeltaQty - data.fTakeQty - data.fDefectQty;

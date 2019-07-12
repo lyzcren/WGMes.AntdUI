@@ -178,6 +178,7 @@ class Transfer extends PureComponent {
   }
 
   handleFieldChange(fValue, fDefectID) {
+    fValue = fValue ? fValue : 0;
     const { dispatch } = this.props;
     dispatch({
       type: 'flowTransfer/changeDefect',

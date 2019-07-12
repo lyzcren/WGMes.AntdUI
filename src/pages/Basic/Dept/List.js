@@ -468,7 +468,7 @@ class TableList extends PureComponent {
           <Col md={6} sm={24}>
             <FormItem label="车间">
               {getFieldDecorator('queryWorkShop')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
+                <Select placeholder="请选择" style={{ width: '100%' }} allowClear={true}>
                   {workshops &&
                     workshops.map(x => (
                       <Option key={x.fNumber} value={x.fItemID}>

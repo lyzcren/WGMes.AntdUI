@@ -5,7 +5,6 @@ import moment from 'moment';
 
 class ColumnConfig {
   getColumns = ({
-    groupByWorkShop,
     groupByDept,
     groupByDate,
     groupByMachine,
@@ -14,21 +13,6 @@ class ColumnConfig {
     groupByProduct,
   }) => {
     let columns = [];
-    if (groupByWorkShop) {
-      columns = [
-        ...columns,
-        {
-          title: '车间',
-          dataIndex: 'fWorkShopName',
-          width: 150,
-        },
-        {
-          title: '车间编码',
-          dataIndex: 'fWorkShopNumber',
-          width: 150,
-        },
-      ];
-    }
     if (groupByDept) {
       columns = [
         ...columns,

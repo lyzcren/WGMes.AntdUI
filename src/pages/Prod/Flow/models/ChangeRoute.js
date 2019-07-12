@@ -1,4 +1,4 @@
-import { fakeGetRecord, fakeChangeRoute } from '@/services/Prod/Flow';
+import { fakeGetRecord, fakeChangeRoute } from '@/services/Prod/ChangeRoute';
 import { fakeQuerySteps } from '@/services/Tech/Route';
 
 export default {
