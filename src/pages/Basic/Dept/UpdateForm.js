@@ -32,6 +32,8 @@ export class UpdateForm extends PureComponent {
         fEnName: props.values.fEnName,
         fParentID: props.values.fParentID,
         fTypeID: props.values.fTypeID,
+        fPrefix: props.values.fPrefix,
+        fSuffix: props.values.fSuffix,
         fIsActive: props.values.fIsActive,
       },
     };
@@ -116,6 +118,18 @@ export class UpdateForm extends PureComponent {
             )}
           </FormItem>
         )}
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="流程单前缀">
+          {form.getFieldDecorator('fPrefix', {
+            rules: [{ required: false, message: '请输入流程单前缀' }],
+            initialValue: formVals.fPrefix,
+          })(<Input placeholder="请输入" />)}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="流程单后缀">
+          {form.getFieldDecorator('fSuffix', {
+            rules: [{ required: false, message: '请输入流程单后缀' }],
+            initialValue: formVals.fSuffix,
+          })(<Input placeholder="请输入" />)}
+        </FormItem>
         {formVals.fParentID > 0 && (
           <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="启用">
             {form.getFieldDecorator('fIsActive', {

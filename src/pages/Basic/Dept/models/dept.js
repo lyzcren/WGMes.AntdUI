@@ -28,9 +28,18 @@ export default {
   effects: {
     *fetch({ payload }, { call, put }) {
       const response = yield call(fakeQuery, payload);
+      let treeData = [];
+      if (response && response.length > 0) {
+        treeData = JSON.parse(JSON.stringify(response));
+        treeData.forEach(top => {
+          top.children.forEach(workshop => {
+            workshop.children = null;
+          });
+        });
+      }
       yield put({
-        type: 'saveQueryData',
-        payload: response,
+        type: 'save',
+        payload: { data: { list: response }, treeData },
       });
     },
     *sync({ payload }, { call, put }) {
@@ -85,22 +94,16 @@ export default {
   },
 
   reducers: {
-    saveQueryData(state, action) {
+    save(state, action) {
       return {
         ...state,
-        data: { list: action.payload },
+        ...action.payload,
       };
     },
     saveData(state, action) {
       return {
         ...state,
         queryResult: action.payload ? action.payload : {},
-      };
-    },
-    saveTreeData(state, action) {
-      return {
-        ...state,
-        treeData: action.payload.list,
       };
     },
     saveTypeData(state, action) {

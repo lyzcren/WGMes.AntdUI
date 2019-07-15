@@ -523,7 +523,7 @@ class TableList extends PureComponent {
 
   render() {
     const {
-      deptManage: { data, queryResult, typeData },
+      deptManage: { data, queryResult, treeData, typeData },
       loading,
       dispatch,
     } = this.props;
@@ -629,7 +629,7 @@ class TableList extends PureComponent {
           <CreateForm
             {...parentMethods}
             modalVisible={modalVisible.add}
-            treeData={data.list}
+            treeData={treeData}
             typeData={typeData}
           />
           {currentFormValues && Object.keys(currentFormValues).length ? (
@@ -637,7 +637,7 @@ class TableList extends PureComponent {
               {...updateMethods}
               updateModalVisible={modalVisible.update}
               values={currentFormValues}
-              treeData={data.list}
+              treeData={treeData}
               typeData={typeData}
             />
           ) : null}

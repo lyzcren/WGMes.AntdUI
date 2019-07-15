@@ -58,13 +58,8 @@ export async function fakeGetOperatorList(params) {
 }
 
 export async function fakeGetBillNo(params) {
-  return request('/api/billNoRule/Get', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'GetData',
-    },
-  });
+  let url = `/api/billNoRule?fNumber=${params.fNumber}`;
+  return request(url);
 }
 
 export async function fakeGetStatus(number) {

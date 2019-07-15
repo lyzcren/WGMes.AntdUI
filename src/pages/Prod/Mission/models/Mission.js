@@ -1,6 +1,7 @@
 import { fakeQuery, fakeGet, fakeRemove, fakeSync } from '@/services/Prod/Mission';
 import { fakeAddFromMission } from '@/services/Prod/Flow';
 import { fakeQueryPrintTemplate } from '@/services/Sys/PrintTemplate';
+import { fakeGetBillNo } from '@/services/basicData';
 
 export default {
   namespace: 'missionManage',
@@ -15,6 +16,7 @@ export default {
       message: '',
     },
     printTemplates: [],
+    billNo: {},
   },
 
   effects: {
@@ -58,6 +60,13 @@ export default {
       yield put({
         type: 'save',
         payload: { printTemplates: response },
+      });
+    },
+    *getBillNo({ payload }, { call, put }) {
+      const response = yield call(fakeGetBillNo, { fNumber: 'Flow' });
+      yield put({
+        type: 'save',
+        payload: { billNo: response },
       });
     },
   },

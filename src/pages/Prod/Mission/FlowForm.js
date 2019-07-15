@@ -25,22 +25,55 @@ export class FlowForm extends PureComponent {
 
     this.state = {
       formVals: props.values,
+      defaultWorkshop: null,
+      batchNoPrefix: '',
+      batchNoSuffix: '',
     };
   }
 
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'basicData/getBillNo',
-      payload: { fNumber: 'Flow' },
+      type: 'missionManage/getBillNo',
+    }).then(() => {
+      const {
+        missionManage: { billNo },
+      } = this.props;
+      this.setState({ batchNoPrefix: billNo.fPrefix, batchNoSuffix: billNo.fSuffix });
     });
     dispatch({
       type: 'basicData/getRouteData',
     });
     dispatch({
       type: 'basicData/getWorkShops',
+    }).then(() => {
+      const {
+        basicData: { workshops },
+      } = this.props;
+      const { formVals } = this.state;
+      const defaultWorkshop = workshops.find(x => x.fErpID === formVals.fWorkshop);
+      if (defaultWorkshop) this.changeWorkshop(defaultWorkshop);
     });
   }
+
+  changeWorkshop = workshop => {
+    const {
+      missionManage: { billNo },
+    } = this.props;
+    let batchNoPrefix = this.state.batchNoPrefix;
+    let batchNoSuffix = this.state.batchNoSuffix;
+    batchNoPrefix = workshop.fPrefix ? workshop.fPrefix : billNo.fPrefix;
+    batchNoSuffix = workshop.fSuffix ? workshop.fSuffix : billNo.fSuffix;
+    this.setState({ workshop, batchNoPrefix, batchNoSuffix });
+  };
+
+  onWorkshopChange = workshopId => {
+    const {
+      basicData: { workshops },
+    } = this.props;
+    const workshop = workshops.find(x => x.fItemID === workshopId);
+    if (workshop) this.changeWorkshop(workshop);
+  };
 
   okHandle = () => {
     const { form } = this.props;
@@ -81,11 +114,11 @@ export class FlowForm extends PureComponent {
       modalVisible,
       handleModalVisible,
       values,
-      basicData: { billNo, workshops, routeData },
+      basicData: { workshops, routeData },
+      missionManage: { billNo },
     } = this.props;
-    const { formVals } = this.state;
+    const { formVals, defaultWorkshop, batchNoPrefix, batchNoSuffix } = this.state;
     const maxQty = formVals.fAuxInHighLimitQty - formVals.fInputQty;
-    const defaultWorkShop = workshops.find(x => x.fErpID === formVals.fWorkShop);
 
     return (
       <Modal
@@ -103,7 +136,7 @@ export class FlowForm extends PureComponent {
       >
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="批号">
           {form.getFieldDecorator('fBatchNo', {
-            initialValue: billNo.Flow,
+            initialValue: batchNoPrefix + billNo.fCurrentNoWithoutFix + batchNoSuffix,
           })(<Input readOnly />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="单位">
@@ -131,11 +164,15 @@ export class FlowForm extends PureComponent {
           })(<InputNumber placeholder="请输入" min={1} max={maxQty} />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="车间">
-          {form.getFieldDecorator('fWorkShop', {
+          {form.getFieldDecorator('fWorkshop', {
             rules: [{ required: true, message: '请选择车间' }],
-            initialValue: defaultWorkShop ? defaultWorkShop.fItemID : null,
+            initialValue: defaultWorkshop ? defaultWorkshop.fItemID : null,
           })(
-            <Select style={{ width: 300 }} dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}>
+            <Select
+              style={{ width: 300 }}
+              dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+              onChange={this.onWorkshopChange}
+            >
               {workshops &&
                 workshops.map(x => (
                   <Option key={x.fNumber} value={x.fItemID}>
