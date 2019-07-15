@@ -12,14 +12,27 @@ import {
   Button,
   Dropdown,
   Menu,
-  TreeSelect,
+  InputNumber,
+  DatePicker,
+  Modal,
+  message,
+  Badge,
+  Divider,
+  Table,
+  Radio,
+  Popover,
+  Switch,
+  Progress,
+  notification,
+  Popconfirm,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
-import ColumnConfig from './ColumnConfig';
+import { default as ColumnConfig } from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
+import { hasAuthority } from '@/utils/authority';
 
 import styles from './List.less';
 
@@ -31,10 +44,9 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ changeRouteManage, loading, basicData }) => ({
-  changeRouteManage,
-  loading: loading.models.changeRouteManage,
-  basicData,
+@connect(({ missionInputManage, loading }) => ({
+  missionInputManage,
+  loading: loading.models.missionInputManage,
 }))
 @Form.create()
 class TableList extends PureComponent {
@@ -62,11 +74,27 @@ class TableList extends PureComponent {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'changeRouteManage/fetch',
+      type: 'missionInputManage/fetch',
       payload: this.currentPagination,
     });
+    // 列配置相关方法
+    ColumnConfig.handleViewMission = record => this.handleViewMission(record);
+    ColumnConfig.handleViewFlow = record => this.handleViewFlow(record.fBatchNo);
+  }
+
+  handleViewMission = record => {
+    const { dispatch } = this.props;
     dispatch({
-      type: 'basicData/getProcessDeptTree',
+      type: 'menu/openMenu',
+      payload: { path: '/prod/mission/profile', data: { fInterID: record.fMissionID } },
+    });
+  };
+
+  handleViewFlow(fBatchNo) {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/openMenu',
+      payload: { path: '/prod/flow', fBatchNo },
     });
   }
 
@@ -94,7 +122,7 @@ class TableList extends PureComponent {
     }
 
     dispatch({
-      type: 'changeRouteManage/fetch',
+      type: 'missionInputManage/fetch',
       payload: this.currentPagination,
     });
   };
@@ -110,22 +138,17 @@ class TableList extends PureComponent {
     };
     // 查询条件处理
     const queryFilters = [];
+    if (fieldsValue.queryMoBillNo)
+      queryFilters.push({ name: 'fMoBillNo', compare: '%*%', value: fieldsValue.queryMoBillNo });
     if (fieldsValue.queryBatchNo)
-      queryFilters.push({ name: 'fFullBatchNo', compare: '%*%', value: fieldsValue.queryBatchNo });
-    if (fieldsValue.queryCreatorName)
-      queryFilters.push({
-        name: 'fCreatorName',
-        compare: '%*%',
-        value: fieldsValue.queryCreatorName,
-      });
-    if (fieldsValue.queryDept)
-      queryFilters.push({ name: 'fDeptID', compare: '=', value: fieldsValue.queryDept });
+      queryFilters.push({ name: 'fBatchNo', compare: '%*%', value: fieldsValue.queryBatchNo });
 
     this.setState({
       formValues: values,
       queryFilters: queryFilters,
     });
 
+    const { pageSize, filters, sorter } = this.currentPagination;
     this.currentPagination = {
       ...this.currentPagination,
       current: 1,
@@ -143,7 +166,7 @@ class TableList extends PureComponent {
 
       const pagination = this.getSearchParam(fieldsValue);
       dispatch({
-        type: 'changeRouteManage/fetch',
+        type: 'missionInputManage/fetch',
         payload: pagination,
       });
       this.handleSelectRows([]);
@@ -158,6 +181,7 @@ class TableList extends PureComponent {
       queryFilters: [],
     });
 
+    const { pageSize, filters, sorter } = this.currentPagination;
     this.currentPagination = {
       ...this.currentPagination,
       current: 1,
@@ -165,7 +189,7 @@ class TableList extends PureComponent {
     };
 
     dispatch({
-      type: 'changeRouteManage/fetch',
+      type: 'missionInputManage/fetch',
       payload: this.currentPagination,
     });
     this.handleSelectRows([]);
@@ -181,12 +205,12 @@ class TableList extends PureComponent {
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          const fileName = '工艺路线变更记录-第' + pagination.current + '页.xls';
-          exportExcel('/api/changeRoute/export', pagination, fileName);
+          const fileName = '导出-第' + pagination.current + '页.xls';
+          exportExcel('/api/missionInput/export', pagination, fileName);
           break;
         case 'allPage':
           pagination.exportPage = false;
-          exportExcel('/api/changeRoute/export', pagination, '工艺路线变更记录.xls');
+          exportExcel('/api/missionInput/export', pagination, '导出.xls');
           break;
         default:
           break;
@@ -207,6 +231,9 @@ class TableList extends PureComponent {
 
     if (selectedRows.length === 0) return;
     switch (e.key) {
+      case 'remove':
+        this.handleBatchDeleteClick();
+        break;
       default:
         break;
     }
@@ -218,55 +245,61 @@ class TableList extends PureComponent {
     });
   };
 
-  handleModalVisible = flag => {
-    const { modalVisible } = this.state;
-    this.setState({
-      modalVisible: { ...modalVisible, add: !!flag },
+  handleDelete = record => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'missionInputManage/remove',
+      payload: {
+        fItemID: record.fItemID,
+      },
+    }).then(() => {
+      this.setState({
+        selectedRows: [],
+      });
+      const {
+        missionInputManage: { queryResult },
+      } = this.props;
+      this.showResult(queryResult, () => {
+        message.success('【' + record.fName + '】' + '删除成功');
+        // 成功后再次刷新列表
+        this.search();
+      });
     });
   };
 
-  handleUpdateModalVisible = (flag, record) => {
-    const { modalVisible } = this.state;
-    this.setState({
-      modalVisible: { ...modalVisible, update: !!flag },
-      currentFormValues: record || {},
-    });
-  };
+  showResult(queryResult, successCallback) {
+    const { status, message, model } = queryResult;
+
+    if (status === 'ok') {
+      if (successCallback) successCallback(model);
+      else {
+        message.success(message);
+      }
+    } else if (status === 'warning') {
+      message.warning(message);
+    } else {
+      message.error(message);
+    }
+  }
 
   renderSimpleForm() {
     const {
       form: { getFieldDecorator },
-      basicData: { processDeptTree },
     } = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={6} sm={24}>
-            <FormItem label="部门">
-              {getFieldDecorator('queryDept', {
-                rules: [{ required: false, message: '请选择部门' }],
-              })(
-                <TreeSelect
-                  style={{ width: '100%' }}
-                  treeData={processDeptTree}
-                  treeDefaultExpandAll
-                  allowClear={true}
-                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                />
-              )}
+          <Col md={8} sm={24}>
+            <FormItem label="任务单号">
+              {getFieldDecorator('queryMoBillNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
-          <Col md={6} sm={24}>
+          <Col md={8} sm={24}>
             <FormItem label="批号">
               {getFieldDecorator('queryBatchNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
-          <Col md={6} sm={24}>
-            <FormItem label="变更人">
-              {getFieldDecorator('queryCreatorName')(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col>
-          <Col md={6} sm={24}>
+          <Col md={8} sm={24}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
                 查询
@@ -293,13 +326,50 @@ class TableList extends PureComponent {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
+  expandedRowRender = record => {
+    const columns = [
+      {
+        title: '批号',
+        dataIndex: 'fFullBatchNo',
+        width: '20%',
+        render: (val, record) => {
+          return <a onClick={() => this.handleViewFlow(record.fFullBatchNo)}>{val}</a>;
+        },
+      },
+      {
+        title: '数量',
+        dataIndex: 'fInputQty',
+        width: '20%',
+      },
+      {
+        title: '',
+        dataIndex: 'non',
+      },
+    ];
+    return (
+      <Table
+        rowKey="fFullBatchNo"
+        columns={columns}
+        dataSource={record.details}
+        pagination={false}
+      />
+    );
+  };
+
   render() {
     const {
       dispatch,
-      changeRouteManage: { data, queryResult },
+      missionInputManage: { data, queryResult },
       loading,
     } = this.props;
-    const { selectedRows } = this.state;
+    const { selectedRows, modalVisible, updateModalVisible, currentFormValues } = this.state;
+    const menu = (
+      <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
+        <Menu.Item key="remove" disabled={!hasAuthority('MissionInput_Delete')}>
+          删除
+        </Menu.Item>
+      </Menu>
+    );
 
     const scrollX = ColumnConfig.columns
       .map(c => {
@@ -314,24 +384,8 @@ class TableList extends PureComponent {
           <Card bordered={false}>
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
-              <div className={styles.tableListOperator}>
-                <Authorized authority="Flow_Read">
-                  <Dropdown
-                    overlay={
-                      <Menu onClick={this.handleExport} selectedKeys={[]}>
-                        <Menu.Item key="currentPage">当前页</Menu.Item>
-                        <Menu.Item key="allPage">所有页</Menu.Item>
-                      </Menu>
-                    }
-                  >
-                    <Button icon="download">
-                      导出 <Icon type="down" />
-                    </Button>
-                  </Dropdown>
-                </Authorized>
-              </div>
               <StandardTable
-                rowKey="guid"
+                rowKey="id"
                 bordered
                 selectedRows={selectedRows}
                 loading={loading}
@@ -339,6 +393,7 @@ class TableList extends PureComponent {
                 columns={ColumnConfig.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
+                expandedRowRender={this.expandedRowRender}
                 scroll={{ x: scrollX }}
               />
             </div>

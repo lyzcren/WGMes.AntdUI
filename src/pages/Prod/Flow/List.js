@@ -135,7 +135,7 @@ class TableList extends PureComponent {
     // 查询条件处理
     const queryFilters = [];
     if (fBatchNo) {
-      queryFilters.push({ name: 'fBatchNo', compare: '=', value: fBatchNo });
+      queryFilters.push({ name: 'fFullBatchNo', compare: '%*%', value: fBatchNo });
       this.setState({ queryBatchNo: this.props.fBatchNo });
     }
     this.currentPagination = { ...this.currentPagination, queryFilters };

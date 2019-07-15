@@ -187,6 +187,12 @@ export default [
             ],
           },
           {
+            path: '/prod/missionInput',
+            name: 'missionInput',
+            component: './Prod/MissionInput/List',
+            authority: ['Mission_Read'],
+          },
+          {
             path: '/prod/defectRepair',
             name: 'defectRepair',
             component: './Prod/DefectRepair/List',

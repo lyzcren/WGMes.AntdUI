@@ -51,6 +51,15 @@ class ColumnConfig {
             <a onClick={() => this.updateModalVisible(record)}>修改</a>
             <Divider type="vertical" />
           </Authorized>
+          <Authorized authority="BillNoRule_Update">
+            <a
+              disabled={record.fTypeNumber !== 'WorkShop'}
+              onClick={() => this.updateFixModalVisible(record)}
+            >
+              编码规则
+            </a>
+            <Divider type="vertical" />
+          </Authorized>
           <Authorized authority="Dept_Delete">
             <Popconfirm title="是否要删除此行？" onConfirm={() => this.delete(record)}>
               <a>删除</a>
@@ -64,7 +73,7 @@ class ColumnConfig {
           <Authorized authority="Dept_Update">
             <a
               disabled={record.fTypeNumber != 'Process'}
-              onClick={() => this._handleTechParam(record)}
+              onClick={() => this.handleTechParam(record)}
             >
               工艺参数
             </a>
@@ -75,25 +84,11 @@ class ColumnConfig {
   ];
 
   // 修改方法
-  UpdateModalVisibleCallback = record => {};
-  updateModalVisible = record => {
-    this.UpdateModalVisibleCallback(record);
-  };
-
-  DeleteCallback = record => {};
-  delete = record => {
-    this.DeleteCallback(record);
-  };
-
-  ActiveCallback = record => {};
-  handleActive = record => {
-    this.ActiveCallback(record);
-  };
-
-  TechParamCallback = record => {};
-  _handleTechParam = record => {
-    this.TechParamCallback(record);
-  };
+  updateModalVisible = record => {};
+  updateFixModalVisible = record => {};
+  delete = record => {};
+  handleActive = record => {};
+  handleTechParam = record => {};
 }
 
 let columnConfig = new ColumnConfig();

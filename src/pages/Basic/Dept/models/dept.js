@@ -7,6 +7,7 @@ import {
   fakeAddParams,
   fakeGetType,
   fakeSync,
+  fakeUpdateFix,
 } from '@/services/Basic/Dept';
 
 export default {
@@ -65,6 +66,13 @@ export default {
     },
     *update({ payload }, { call, put }) {
       const response = yield call(fakeUpdate, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
+      });
+    },
+    *updateFix({ payload }, { call, put }) {
+      const response = yield call(fakeUpdateFix, payload);
       yield put({
         type: 'saveData',
         payload: response,

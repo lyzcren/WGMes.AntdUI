@@ -156,6 +156,7 @@ export default {
   state: {
     menuData: [],
     routeData: [],
+    routeHistory: [],
     panes: [],
     breadcrumbNameMap: {},
     refPanes: [],
@@ -177,7 +178,7 @@ export default {
     },
     *openMenu({ payload }, { put, call, select }) {
       const { name, path, closable } = payload;
-      const { menuData, routeData, panes } = yield select(state => state.menu);
+      const { menuData, routeData, routeHistory, panes } = yield select(state => state.menu);
       const activeKey = path;
       const selectedKeys = getSelectedMenuKeys(activeKey, routeData);
       let pane = panes.find(p => p.key === activeKey);
@@ -206,26 +207,35 @@ export default {
         }
       });
 
+      const newRouteHistory = [...routeHistory].filter(x => x !== path);
+      newRouteHistory.push(path);
+
       yield put({
         type: 'save',
-        payload: { ...payload, path, activeKey, selectedKeys, panes: newPanes },
+        payload: {
+          ...payload,
+          path,
+          activeKey,
+          selectedKeys,
+          panes: newPanes,
+          routeHistory: newRouteHistory,
+        },
       });
     },
     *closeMenu({ payload }, { put, call, select }) {
       const { path, closable } = payload;
-      const { menuData, routeData, panes, refPanes, activeKey } = yield select(state => state.menu);
+      const { menuData, routeData, routeHistory, panes, refPanes, activeKey } = yield select(
+        state => state.menu
+      );
       let newActiveKey = activeKey;
       const newPanes = panes.filter(pane => pane.key !== path);
-      if (activeKey === path) {
-        panes.forEach((pane, i) => {
-          if (pane.key === path) {
-            const lastIndex = i > 0 ? i - 1 : 0;
-            newActiveKey = newPanes[lastIndex].key;
-          }
-        });
-      }
       const selectedKeys = getSelectedMenuKeys(newActiveKey, routeData);
       const newRefPanes = refPanes.filter(p => p !== null && newPanes.find(x => x.key === p.id));
+
+      const newRouteHistory = [...routeHistory].filter(x => x !== path);
+      if (activeKey === path) {
+        newActiveKey = [...newRouteHistory].reverse()[0];
+      }
 
       yield put({
         type: 'save',
@@ -236,11 +246,14 @@ export default {
           selectedKeys,
           panes: newPanes,
           refPanes: newRefPanes,
+          routeHistory: newRouteHistory,
         },
       });
     },
     *closeAllMenu({ payload }, { put, call, select }) {
-      const { menuData, routeData, panes, refPanes, activeKey } = yield select(state => state.menu);
+      const { menuData, routeData, routeHistory, panes, refPanes, activeKey } = yield select(
+        state => state.menu
+      );
       let newActiveKey = activeKey;
       const newPanes = panes.filter(pane => pane.closable === false);
 
@@ -249,24 +262,7 @@ export default {
       const selectedKeys = getSelectedMenuKeys(newActiveKey, routeData);
       const newRefPanes = refPanes.filter(p => p !== null && newPanes.find(x => x.key === p.id));
 
-      yield put({
-        type: 'save',
-        payload: {
-          ...payload,
-          path: newActiveKey,
-          activeKey: newActiveKey,
-          selectedKeys,
-          panes: newPanes,
-          refPanes: newRefPanes,
-        },
-      });
-    },
-    *closeOtherMenu({ payload }, { put, call, select }) {
-      const { menuData, routeData, panes, refPanes, activeKey } = yield select(state => state.menu);
-      let newActiveKey = activeKey;
-      const newPanes = panes.filter(pane => pane.key === activeKey || pane.closable === false);
-      const selectedKeys = getSelectedMenuKeys(newActiveKey, routeData);
-      const newRefPanes = refPanes.filter(p => p !== null && newPanes.find(x => x.key === p.id));
+      const newRouteHistory = newPanes.map(x => x.key);
 
       yield put({
         type: 'save',
@@ -277,6 +273,31 @@ export default {
           selectedKeys,
           panes: newPanes,
           refPanes: newRefPanes,
+          routeHistory: newRouteHistory,
+        },
+      });
+    },
+    *closeOtherMenu({ payload }, { put, call, select }) {
+      const { menuData, routeData, routeHistory, panes, refPanes, activeKey } = yield select(
+        state => state.menu
+      );
+      let newActiveKey = activeKey;
+      const newPanes = panes.filter(pane => pane.key === activeKey || pane.closable === false);
+      const selectedKeys = getSelectedMenuKeys(newActiveKey, routeData);
+      const newRefPanes = refPanes.filter(p => p !== null && newPanes.find(x => x.key === p.id));
+
+      const newRouteHistory = newPanes.map(x => x.key);
+
+      yield put({
+        type: 'save',
+        payload: {
+          ...payload,
+          path: newActiveKey,
+          activeKey: newActiveKey,
+          selectedKeys,
+          panes: newPanes,
+          refPanes: newRefPanes,
+          routeHistory: newRouteHistory,
         },
       });
     },
@@ -286,6 +307,7 @@ export default {
         payload: {
           menuData: [],
           routeData: [],
+          routeHistory: [],
           panes: [],
           breadcrumbNameMap: {},
           refPanes: [],

@@ -31,6 +31,7 @@ import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { UpdateForm } from './UpdateForm';
 import { CreateForm } from './CreateForm';
+import { UpdateFixForm } from './UpdateFixForm';
 import { TechParamForm } from './TechParamForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
@@ -55,7 +56,7 @@ const getValue = obj =>
 class TableList extends PureComponent {
   state = {
     // 新增界面
-    modalVisible: { add: false, update: false, techParam: false },
+    modalVisible: { add: false, update: false, techParam: false, updateFix: false },
     formValues: {},
     currentFormValues: {},
     // 其他
@@ -83,10 +84,11 @@ class TableList extends PureComponent {
       type: 'basicData/getWorkShops',
     });
     // 列配置相关方法
-    ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdateModalVisible(true, record);
-    ColumnConfig.DeleteCallback = record => this.handleDelete(record);
-    ColumnConfig.ActiveCallback = record => this.handleActive(record, !record.fIsActive);
-    ColumnConfig.TechParamCallback = record => this.handleTechParamModalVisible(true, record);
+    ColumnConfig.updateModalVisible = record => this.handleUpdateModalVisible(true, record);
+    ColumnConfig.updateFixModalVisible = record => this.handleUpdateFixModalVisible(true, record);
+    ColumnConfig.delete = record => this.handleDelete(record);
+    ColumnConfig.handleActive = record => this.handleActive(record, !record.fIsActive);
+    ColumnConfig.handleTechParam = record => this.handleTechParamModalVisible(true, record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -276,6 +278,14 @@ class TableList extends PureComponent {
     });
   };
 
+  handleUpdateFixModalVisible = (flag, record) => {
+    const { modalVisible } = this.state;
+    this.setState({
+      modalVisible: { ...modalVisible, updateFix: !!flag },
+      currentFormValues: record || {},
+    });
+  };
+
   handleTechParamModalVisible = (flag, record) => {
     const { modalVisible } = this.state;
     this.setState({
@@ -308,6 +318,28 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'deptManage/update',
+      payload: fields,
+    }).then(() => {
+      const {
+        deptManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success('修改成功');
+        this.handleUpdateModalVisible();
+        // 成功后再次刷新列表
+        this.search();
+      } else if (queryResult.status === 'warning') {
+        message.warning(queryResult.message);
+      } else {
+        message.error(queryResult.message);
+      }
+    });
+  };
+
+  handleUpdateFix = fields => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'deptManage/updateFix',
       payload: fields,
     }).then(() => {
       const {
@@ -639,6 +671,14 @@ class TableList extends PureComponent {
               values={currentFormValues}
               treeData={treeData}
               typeData={typeData}
+            />
+          ) : null}
+          {currentFormValues && Object.keys(currentFormValues).length ? (
+            <UpdateFixForm
+              modalVisible={modalVisible.updateFix}
+              values={currentFormValues}
+              handleModalVisible={this.handleUpdateFixModalVisible}
+              handleSubmit={this.handleUpdateFix}
             />
           ) : null}
           {currentFormValues && Object.keys(currentFormValues).length ? (

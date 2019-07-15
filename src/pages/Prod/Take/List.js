@@ -342,7 +342,7 @@ class TableList extends PureComponent {
                 </Authorized>
               </div>
               <StandardTable
-                rowKey="fInterID"
+                rowKey="guid"
                 bordered
                 selectedRows={selectedRows}
                 loading={loading}

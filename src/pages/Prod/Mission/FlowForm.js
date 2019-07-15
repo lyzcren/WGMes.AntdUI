@@ -25,7 +25,7 @@ export class FlowForm extends PureComponent {
 
     this.state = {
       formVals: props.values,
-      defaultWorkshop: null,
+      workshop: null,
       batchNoPrefix: '',
       batchNoSuffix: '',
     };
@@ -117,7 +117,7 @@ export class FlowForm extends PureComponent {
       basicData: { workshops, routeData },
       missionManage: { billNo },
     } = this.props;
-    const { formVals, defaultWorkshop, batchNoPrefix, batchNoSuffix } = this.state;
+    const { formVals, workshop, batchNoPrefix, batchNoSuffix } = this.state;
     const maxQty = formVals.fAuxInHighLimitQty - formVals.fInputQty;
 
     return (
@@ -136,7 +136,10 @@ export class FlowForm extends PureComponent {
       >
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="批号">
           {form.getFieldDecorator('fBatchNo', {
-            initialValue: batchNoPrefix + billNo.fCurrentNoWithoutFix + batchNoSuffix,
+            initialValue:
+              billNo && billNo.fCurrentNoWithoutFix
+                ? batchNoPrefix + billNo.fCurrentNoWithoutFix + batchNoSuffix
+                : '',
           })(<Input readOnly />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="单位">
@@ -166,7 +169,7 @@ export class FlowForm extends PureComponent {
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="车间">
           {form.getFieldDecorator('fWorkshop', {
             rules: [{ required: true, message: '请选择车间' }],
-            initialValue: defaultWorkshop ? defaultWorkshop.fItemID : null,
+            initialValue: workshop ? workshop.fItemID : null,
           })(
             <Select
               style={{ width: 300 }}

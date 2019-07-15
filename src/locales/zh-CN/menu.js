@@ -58,6 +58,7 @@ export default {
   'menu.prod.defectCheck.create': '新增不良品盘点',
   'menu.prod.defectCheck.update': '修改不良品盘点',
   'menu.prod.defectCheck.profile': '查看不良品盘点',
+  'menu.prod.missionInput': '开流程单记录',
   'menu.prod.take': '取走记录',
   'menu.prod.changeRoute': '路线变更记录',
   // 报表管理

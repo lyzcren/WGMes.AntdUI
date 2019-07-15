@@ -36,9 +36,20 @@ export class RepairForm extends PureComponent {
         fProductNumber: props.selectedRows[0].fProductNumber,
         fModel: props.selectedRows[0].fModel,
       },
+      workshop: null,
     };
     dispatch({
       type: 'basicData/getRouteData',
+    });
+    dispatch({
+      type: 'basicData/getWorkShops',
+      // }).then(() => {
+      //   const {
+      //     basicData: { workshops },
+      //   } = this.props;
+      //   const { formVals } = this.state;
+      //   const workshop = workshops.find(x => x.fErpID === formVals.fWorkshop);
+      //   this.setState({ workshop });
     });
   }
 
@@ -52,7 +63,7 @@ export class RepairForm extends PureComponent {
       const list = records.map(item => {
         return { fInterID: item.fInterID, fQty: item.fCurrentQty };
       });
-      const submitData = { list, fRouteID: fieldsValue.fRouteID };
+      const submitData = { list, ...fieldsValue };
       this.handleSubmit(submitData);
     });
   };
@@ -69,7 +80,7 @@ export class RepairForm extends PureComponent {
         },
       } = this.props;
       if (status === 'ok') {
-        message.success('返修成功，返修流程单：' + model.join(', '));
+        message.success('返修成功，返修流程单：' + model.map(x => x.fFullBatchNo).join(', '));
         handleModalVisible(false);
         // 成功后再次刷新列表
         if (handleSuccess) handleSuccess();
@@ -87,9 +98,9 @@ export class RepairForm extends PureComponent {
       modalVisible,
       handleModalVisible,
       selectedRows,
-      basicData: { routeData },
+      basicData: { workshops, routeData },
     } = this.props;
-    const { formVals } = this.state;
+    const { formVals, workshop } = this.state;
 
     return (
       <Modal
@@ -112,6 +123,25 @@ export class RepairForm extends PureComponent {
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="规格型号">
           {formVals.fModel}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="车间">
+          {form.getFieldDecorator('fWorkshop', {
+            rules: [{ required: true, message: '请选择车间' }],
+            initialValue: workshop ? workshop.fItemID : null,
+          })(
+            <Select
+              style={{ width: 300 }}
+              dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+              onChange={this.onWorkshopChange}
+            >
+              {workshops &&
+                workshops.map(x => (
+                  <Option key={x.fNumber} value={x.fItemID}>
+                    {x.fName}
+                  </Option>
+                ))}
+            </Select>
+          )}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="工艺路线">
           {form.getFieldDecorator('fRouteID', {

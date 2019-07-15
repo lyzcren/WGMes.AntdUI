@@ -55,6 +55,16 @@ export async function fakeUpdate(params) {
   });
 }
 
+export async function fakeUpdateFix(params) {
+  return request(`/api/Dept/${params.fItemID}/fix`, {
+    method: 'PUT',
+    body: {
+      ...params,
+      method: 'update',
+    },
+  });
+}
+
 export async function fakeActive(params) {
   return request(`/api/Dept/${params.fItemID}/active?fIsActive=${params.fIsActive}`, {
     method: 'PUT',
