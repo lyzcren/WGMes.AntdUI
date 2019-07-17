@@ -36,6 +36,7 @@ import { ViewRecordForm } from './ViewRecordForm';
 import { ScanForm } from './ScanForm';
 import { TakeForm } from './TakeForm';
 import { ViewTakeForm } from './ViewTakeForm';
+import { SplitForm } from './SplitForm';
 import { RefundForm } from './RefundForm';
 import { RejectForm } from './RejectForm';
 import { ChangeRouteForm } from './ChangeRouteForm';
@@ -75,6 +76,7 @@ class TableList extends PureComponent {
       refund: false,
       reject: false,
       changeRoute: false,
+      split: false,
       scan: false,
     },
     formValues: {},
@@ -434,7 +436,7 @@ class TableList extends PureComponent {
         this.handleModalVisible({ key: 'viewTake', flag: true }, record);
         break;
       case 'split':
-        alert('分批');
+        this.handleModalVisible({ key: 'split', flag: true }, record);
         break;
       case 'refund':
         this.handleModalVisible({ key: 'refund', flag: true }, record);
@@ -1164,6 +1166,19 @@ class TableList extends PureComponent {
               }
               modalVisible={modalVisible.viewTake}
               values={currentFormValues.viewTake}
+            />
+          ) : null}
+          {currentFormValues.split && Object.keys(currentFormValues.split).length ? (
+            <SplitForm
+              dispatch={dispatch}
+              handleModalVisible={(flag, record) =>
+                this.handleModalVisible({ key: 'split', flag }, record)
+              }
+              modalVisible={modalVisible.split}
+              values={currentFormValues.split}
+              handleSucess={() => {
+                this.search();
+              }}
             />
           ) : null}
           {currentFormValues.refund && Object.keys(currentFormValues.refund).length ? (

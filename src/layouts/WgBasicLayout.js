@@ -155,16 +155,6 @@ class WgBasicLayout extends React.PureComponent {
     return <SettingDrawer />;
   };
 
-  saveRootRef = node => {
-    if (node === null) return;
-    const { dispatch, refPanes } = this.props;
-    const refTabs = [...refPanes, ReactDOM.findDOMNode(node)].filter(x => x !== undefined);
-    dispatch({
-      type: 'menu/refPanes',
-      payload: { refPanes: refTabs },
-    });
-  };
-
   onChange = activeKey => {
     this.add({ path: activeKey });
   };
@@ -316,7 +306,6 @@ class WgBasicLayout extends React.PureComponent {
                 id={pane.key}
                 key={pane.key}
                 closable={pane.closable}
-                ref={this.saveRootRef}
               >
                 <pane.component {...pane} />
               </TabPane>
@@ -350,7 +339,6 @@ export default connect(({ global, setting, menu }) => ({
   panes: menu.panes,
   activeKey: menu.activeKey,
   path: menu.path,
-  refPanes: menu.refPanes,
   selectedKeys: menu.selectedKeys,
   breadcrumbNameMap: menu.breadcrumbNameMap,
   ...setting,

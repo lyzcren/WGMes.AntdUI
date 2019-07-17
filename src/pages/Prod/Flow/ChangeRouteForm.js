@@ -151,14 +151,12 @@ export class ChangeRouteForm extends PureComponent {
             </Select>
           )}
         </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="已完工工序">
-          <Radio.Group buttonStyle="solid">
-            {records.map(x => (
-              <Radio.Button key={x.fInterID} value={x.fInterID} disabled>
-                {x.fDeptName}
-              </Radio.Button>
-            ))}
-          </Radio.Group>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="原工序">
+          {records.map(x => (
+            <Tag key={x.fEntryID} color={x.fStatusNumber === 'ManufEndProduce' ? 'green' : ''}>
+              {x.fDeptName}
+            </Tag>
+          ))}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="变更工序">
           {getFieldDecorator('fRouteEntryIDs', {

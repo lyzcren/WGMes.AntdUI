@@ -47,11 +47,11 @@ export class ViewRecordForm extends PureComponent {
 
   recordProfile(record) {
     const { dispatch, handleModalVisible } = this.props;
+    handleModalVisible(false, record);
     dispatch({
       type: 'menu/openMenu',
       payload: { path: '/prod/record/profile', data: record },
     });
-    handleModalVisible(false, values);
   }
 
   render() {
