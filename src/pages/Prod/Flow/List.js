@@ -660,79 +660,87 @@ class TableList extends PureComponent {
     const canTransfer =
       record.fRecordStatusNumber === 'ManufProducing' &&
       (!queryDeptID || record.fCurrentDeptID === queryDeptID);
+
+    const menus = [];
+    /* 生产中，可取走 */
+    if (record.fStatusNumber === 'Producing') menus.push(<Menu.Item key="take">取走</Menu.Item>);
+    if (record.fTotalTakeQty > 0) menus.push(<Menu.Item key="viewTake">取走记录</Menu.Item>);
+    /* 已签收生产中，且非首工序，可退回 */
+    if (record.fRecordStatusNumber === 'ManufProducing' && record.fEndProduceDeptIDList.length > 0)
+      menus.push(<Menu.Item key="refund">退回</Menu.Item>);
+    /* 未签收，可拒收 */
+    if (record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufEndProduce')
+      menus.push(<Menu.Item key="reject">拒收</Menu.Item>);
+    /* 生产中，可变更工艺路线 */
+    if (record.fStatusNumber === 'Producing')
+      menus.push(<Menu.Item key="changeRoute">变更工艺路线</Menu.Item>);
+    /* 生产中，可分批 */
+    if (record.fStatusNumber === 'Producing') menus.push(<Menu.Item key="split">分批</Menu.Item>);
+
+    const operators = [];
+    if (
+      record.fStatusNumber === 'BeforeProduce' ||
+      (record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufEndProduce') ||
+      record.fRecordStatusNumber === 'ManufRefund'
+    ) {
+      operators.push(
+        <Authorized key={'sign'} authority="Flow_Sign">
+          <Divider type="vertical" />
+          <a disabled={!canSign} onClick={() => this.handleSign(record)}>
+            签收
+          </a>
+        </Authorized>
+      );
+    }
+    if (record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufReject') {
+      operators.push(
+        <Authorized key={'sign4Reject'} authority="Flow_Sign">
+          <Divider type="vertical" />
+          <a disabled={!canSign} onClick={() => this.handleSign4Reject(record)}>
+            签收(被拒)
+          </a>
+        </Authorized>
+      );
+    }
+    if (record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufProducing') {
+      operators.push(
+        <Authorized key={'transfer'} authority="Flow_Transfer">
+          <Divider type="vertical" />
+          <a disabled={!canTransfer} onClick={() => this.transferModalVisible(record)}>
+            转序
+          </a>
+        </Authorized>
+      );
+    }
+    if (record.fStatusNumber === 'EndProduce') {
+      operators.push(
+        <Authorized key={'report'} authority="Flow_Report">
+          <Divider type="vertical" />
+          <a onClick={() => this.report([record])}>汇报</a>
+        </Authorized>
+      );
+    }
+
     return (
       <Fragment>
         <Authorized authority="Record_Read">
           <a onClick={() => this.viewRecord(record)}>执行情况</a>
         </Authorized>
-        {(record.fStatusNumber === 'BeforeProduce' ||
-          (record.fStatusNumber === 'Producing' &&
-            record.fRecordStatusNumber === 'ManufEndProduce')) && (
-          <span>
-            <Authorized authority="Flow_Sign">
+        {operators.map(x => x)}
+        {menus.length > 0 && (
+          <Dropdown
+            overlay={
+              <Menu onClick={({ key }) => this.moreMenuClick(key, record)}>
+                {menus.map(x => x)}
+              </Menu>
+            }
+          >
+            <a>
               <Divider type="vertical" />
-              <a disabled={!canSign} onClick={() => this.handleSign(record)}>
-                签收
-              </a>
-            </Authorized>
-          </span>
+              更多 <Icon type="down" />
+            </a>
+          </Dropdown>
         )}
-        {record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufReject' && (
-          <span>
-            <Authorized authority="Flow_Sign">
-              <Divider type="vertical" />
-              <a disabled={!canSign} onClick={() => this.handleSign4Reject(record)}>
-                签收(被拒)
-              </a>
-            </Authorized>
-          </span>
-        )}
-        {record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufProducing' && (
-          <span>
-            <Authorized authority="Flow_Transfer">
-              <Divider type="vertical" />
-              <a disabled={!canTransfer} onClick={() => this.transferModalVisible(record)}>
-                转序
-              </a>
-            </Authorized>
-          </span>
-        )}
-        {record.fStatusNumber === 'EndProduce' && (
-          <span>
-            <Authorized authority="Flow_Report">
-              <Divider type="vertical" />
-              <a onClick={() => this.report([record])}>汇报</a>
-            </Authorized>
-          </span>
-        )}
-        <Dropdown
-          overlay={
-            <Menu onClick={({ key }) => this.moreMenuClick(key, record)}>
-              {/* 生产中，可取走 */}
-              {record.fStatusNumber === 'Producing' && <Menu.Item key="take">取走</Menu.Item>}
-              <Menu.Item key="viewTake">取走记录</Menu.Item>
-              {/* 已签收生产中，且非首工序，可退回 */}
-              {record.fRecordStatusNumber === 'ManufProducing' &&
-                record.fEndProduceDeptIDList.length > 0 && <Menu.Item key="refund">退回</Menu.Item>}
-              {/* 未签收，可拒收 */}
-              {record.fStatusNumber === 'Producing' &&
-                record.fRecordStatusNumber === 'ManufEndProduce' && (
-                  <Menu.Item key="reject">拒收</Menu.Item>
-                )}
-              {/* 生产中，可变更工艺路线 */}
-              {record.fStatusNumber === 'Producing' && (
-                <Menu.Item key="changeRoute">变更工艺路线</Menu.Item>
-              )}
-              {/* 生产中，可分批 */}
-              {record.fStatusNumber === 'Producing' && <Menu.Item key="split">分批</Menu.Item>}
-            </Menu>
-          }
-        >
-          <a>
-            <Divider type="vertical" />
-            更多 <Icon type="down" />
-          </a>
-        </Dropdown>
       </Fragment>
     );
   };

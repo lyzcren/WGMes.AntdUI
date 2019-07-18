@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import moment from 'moment';
-import { Form, Input, Modal, Tag } from 'antd';
+import { Form, Input, Modal, Tag, Divider, Switch } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 
 const FormItem = Form.Item;
@@ -18,11 +18,7 @@ export class UpdateFixForm extends PureComponent {
     super(props);
 
     this.state = {
-      formVals: {
-        fItemID: props.values.fItemID,
-        fPrefix: props.values.fPrefix,
-        fSuffix: props.values.fSuffix,
-      },
+      formVals: {},
     };
   }
 
@@ -53,39 +49,49 @@ export class UpdateFixForm extends PureComponent {
         onCancel={() => handleModalVisible(false, values)}
         afterClose={() => handleModalVisible()}
       >
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="名称">
-          {values.fName}
-        </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="编码">
-          {values.fNumber}
-        </FormItem>
-        {values && values.fEnName && (
-          <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="英文名称">
-            {values.fEnName}
-          </FormItem>
-        )}
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="流程单前缀">
+        <Divider>流程单</Divider>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="前缀">
           {form.getFieldDecorator('fPrefix', {
             rules: [{ required: false, message: '请输入流程单前缀' }],
             initialValue: values.fPrefix,
           })(<Input placeholder="请输入" />)}
         </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="流程单后缀">
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="后缀">
           {form.getFieldDecorator('fSuffix', {
             rules: [{ required: false, message: '请输入流程单后缀' }],
             initialValue: values.fSuffix,
           })(<Input placeholder="请输入" />)}
         </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="返修单前缀">
+        <Divider>返修</Divider>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="前缀">
           {form.getFieldDecorator('fRepairPrefix', {
             rules: [{ required: false, message: '请输入返修单前缀' }],
             initialValue: values.fRepairPrefix,
           })(<Input placeholder="请输入" />)}
         </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="返修单后缀">
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="后缀">
           {form.getFieldDecorator('fRepairSuffix', {
             rules: [{ required: false, message: '请输入返修单后缀' }],
             initialValue: values.fRepairSuffix,
+          })(<Input placeholder="请输入" />)}
+        </FormItem>
+        <Divider>分批</Divider>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="继承原批号">
+          {form.getFieldDecorator('fSplitInheritBatchNo', {
+            initialValue: values.fSplitInheritBatchNo,
+            valuePropName: 'checked',
+          })(<Switch />)}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="前缀">
+          {form.getFieldDecorator('fSplitPrefix', {
+            rules: [{ required: false, message: '请输入分批单前缀' }],
+            initialValue: values.fSplitPrefix,
+          })(<Input placeholder="请输入" />)}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="后缀">
+          {form.getFieldDecorator('fSplitSuffix', {
+            rules: [{ required: false, message: '请输入分批单后缀' }],
+            initialValue: values.fSplitSuffix,
           })(<Input placeholder="请输入" />)}
         </FormItem>
       </Modal>

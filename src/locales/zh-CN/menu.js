@@ -61,6 +61,7 @@ export default {
   'menu.prod.missionInput': '开流程单记录',
   'menu.prod.take': '取走记录',
   'menu.prod.changeRoute': '路线变更记录',
+  'menu.prod.batchSplit': '分批记录',
   // 报表管理
   'menu.report': '报表管理',
   'menu.report.output': '产量报表',

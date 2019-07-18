@@ -155,6 +155,34 @@ class TableList extends PureComponent {
       queryFilters.push({ name: 'fFullBatchNo', compare: '%*%', value: fieldsValue.queryBatchNo });
     if (fieldsValue.queryMoBillNo)
       queryFilters.push({ name: 'fMoBillNo', compare: '%*%', value: fieldsValue.queryMoBillNo });
+    if (fieldsValue.queryStatusNumber)
+      queryFilters.push({
+        name: 'fStatusNumber',
+        compare: '=',
+        value: fieldsValue.queryStatusNumber,
+      });
+    if (fieldsValue.queryProductName)
+      queryFilters.push({
+        name: 'fProductName',
+        compare: '%*%',
+        value: fieldsValue.queryProductName,
+      });
+    if (fieldsValue.queryProductFullName)
+      queryFilters.push({
+        name: 'fProductFullName',
+        compare: '%*%',
+        value: fieldsValue.queryProductFullName,
+      });
+    if (fieldsValue.queryProductNumber)
+      queryFilters.push({
+        name: 'fProductNumber',
+        compare: '%*%',
+        value: fieldsValue.queryProductNumber,
+      });
+    if (fieldsValue.queryModel)
+      queryFilters.push({ name: 'fProductModel', compare: '%*%', value: fieldsValue.queryModel });
+    // if (fieldsValue.queryWorkShopName) queryFilters.push({ name: 'fWorkShopName', compare: '%*%', value: fieldsValue.queryWorkShopName });
+    // if (fieldsValue.queryWorkShopNumber) queryFilters.push({ name: 'fWorkShopNumber', compare: '%*%', value: fieldsValue.queryWorkShopNumber });
 
     this.setState({
       formValues: values,
@@ -321,7 +349,103 @@ class TableList extends PureComponent {
   }
 
   renderAdvancedForm() {
-    return renderSimpleForm;
+    const {
+      form: { getFieldDecorator },
+      basicData: {
+        processDeptTree,
+        status: { recordStatus },
+      },
+    } = this.props;
+    return (
+      <Form onSubmit={this.handleSearch} layout="inline" style={{ marginRight: '30px' }}>
+        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+          <Col md={8} sm={24}>
+            <FormItem label="部门">
+              {getFieldDecorator('queryDept', {
+                rules: [{ required: false, message: '请选择部门' }],
+              })(
+                <TreeSelect
+                  style={{ width: '100%' }}
+                  treeData={processDeptTree}
+                  treeDefaultExpandAll
+                  allowClear={true}
+                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                />
+              )}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="批号">
+              {getFieldDecorator('queryBatchNo')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="任务单号">
+              {getFieldDecorator('queryMoBillNo')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+        </Row>
+        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+          <Col md={8} sm={24}>
+            <FormItem label="状态">
+              {getFieldDecorator('queryStatusNumber')(
+                <Select placeholder="请选择" style={{ width: '100%' }} onChange={this.selectChange}>
+                  {recordStatus &&
+                    recordStatus.map(x => (
+                      <Option key={x.fKeyName} value={x.fKeyName}>
+                        <Badge color={x.fColor} text={x.fValue} />
+                      </Option>
+                    ))}
+                </Select>
+              )}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="产品名称">
+              {getFieldDecorator('queryProductName')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="产品全称">
+              {getFieldDecorator('queryProductFullName')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="产品编码">
+              {getFieldDecorator('queryProductNumber')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="规格型号">
+              {getFieldDecorator('queryModel')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          {/* <Col md={8} sm={24}>
+            <FormItem label="车间">
+              {getFieldDecorator('queryWorkShopName')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="车间编码">
+              {getFieldDecorator('queryWorkShopNumber')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col> */}
+        </Row>
+        <div style={{ overflow: 'hidden' }}>
+          <div style={{ float: 'right', marginBottom: 24 }}>
+            <Button type="primary" htmlType="submit">
+              查询
+            </Button>
+            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
+              重置
+            </Button>
+            <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
+              收起 <Icon type="up" />
+            </a>
+          </div>
+        </div>
+      </Form>
+    );
   }
 
   renderForm() {

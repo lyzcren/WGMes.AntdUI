@@ -165,7 +165,7 @@ export class SplitForm extends PureComponent {
       <div>
         <Button
           loading={false}
-          onClick={() => handleModalVisible(false)}
+          onClick={() => handleModalVisible(false, values)}
           prefixCls="ant-btn"
           ghost={false}
           block={false}
@@ -199,7 +199,7 @@ export class SplitForm extends PureComponent {
         {currentStep === 1 && (
           <Button
             type="primary"
-            loading={false}
+            loading={loading}
             onClick={this.okHandle}
             prefixCls="ant-btn"
             ghost={false}
@@ -228,7 +228,8 @@ export class SplitForm extends PureComponent {
               initialValue: text,
             })(
               <InputNumber
-                min={1}
+                min={Math.pow(0.1, fQtyDecimal)}
+                step={Math.pow(0.1, fQtyDecimal)}
                 precision={fQtyDecimal}
                 onChange={value => this.handleFieldChange(record.fEntryID, value)}
               />
@@ -243,6 +244,7 @@ export class SplitForm extends PureComponent {
     return (
       <Modal
         destroyOnClose
+        confirmLoading={loading}
         title={
           <div>
             流程单 - 分批 <Tag color="blue"> {values.fFullBatchNo}</Tag>

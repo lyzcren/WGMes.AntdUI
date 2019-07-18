@@ -62,7 +62,10 @@ class Transfer extends PureComponent {
   }
 
   loadData(fInterID) {
-    const { dispatch, fQtyDecimal } = this.props;
+    const {
+      dispatch,
+      data: { fQtyDecimal },
+    } = this.props;
     const qtyDecimal = fQtyDecimal ? fQtyDecimal : 0;
 
     // 根据单位的小数位数配置相关数量的小数位

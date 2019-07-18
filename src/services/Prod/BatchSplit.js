@@ -20,7 +20,17 @@ export async function fakeSplit(params) {
     method: 'POST',
     body: {
       ...params,
-      method: 'changeRoute',
+      method: 'batchSplit',
+    },
+  });
+}
+
+export async function fakeRemove(params) {
+  return request(`/api/batchSplit`, {
+    method: 'DELETE',
+    body: {
+      ...params,
+      method: 'batchSplit',
     },
   });
 }

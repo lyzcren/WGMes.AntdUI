@@ -216,6 +216,12 @@ export default [
             component: './Prod/ChangeRoute/List',
             authority: ['Flow_ChangeRoute'],
           },
+          {
+            path: '/prod/batchSplit',
+            name: 'batchSplit',
+            component: './Prod/BatchSplit/List',
+            authority: ['Flow_Split'],
+          },
         ],
       },
       {

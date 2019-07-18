@@ -11,7 +11,7 @@ const { TextArea } = Input;
 /* eslint react/no-multi-comp:0 */
 @connect(({ flowManage, loading, basicData, user }) => ({
   flowManage,
-  loading: loading.models.flowSign,
+  loading: loading.models.flowManage,
   basicData,
   fBindEmpID: user.currentUser.fBindEmpID,
 }))
@@ -63,6 +63,7 @@ export class TakeForm extends PureComponent {
   render() {
     const {
       form: { getFieldDecorator },
+      loading,
       modalVisible,
       handleModalVisible,
       values,
@@ -75,6 +76,7 @@ export class TakeForm extends PureComponent {
     return (
       <Modal
         destroyOnClose
+        confirmLoading={loading}
         title={
           <div>
             流程单-取走 <Tag color="blue">{formVals.fFullBatchNo}</Tag>

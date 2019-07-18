@@ -160,6 +160,7 @@ export class RefundForm extends PureComponent {
     return (
       <Modal
         destroyOnClose
+        confirmLoading={loading}
         title={
           <div>
             流程单-退回 <Tag color="blue">{values.fFullBatchNo}</Tag>

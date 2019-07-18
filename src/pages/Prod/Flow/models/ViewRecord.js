@@ -38,6 +38,8 @@ export default {
         }
       });
 
+      // console.log(steps);
+
       steps.map(step => {
         step.title = step.depts
           .map(dept => dept.fDeptName + (dept.fIsReproduce ? '（重做）' : ''))
@@ -67,9 +69,12 @@ export default {
               (record.fSignUserName ? `【${record.fSignUserName}】` : '自动') +
               '签收于  ' +
               moment(record.fSignDate).format('YYYY-MM-DD HH:mm');
-          } else if (record.fStatusNumber === 'ManufRefund') {
-            step.description = '已退回';
-          } else if (record.fStatusNumber === 'ManufCancel') {
+          } else if (
+            record.fStatusNumber === 'ManufCancel' ||
+            record.fStatusNumber === 'ManufRefund' ||
+            record.fStatusNumber === 'ManufSplit' ||
+            record.fStatusNumber === 'ManufCombine'
+          ) {
             step.description = record.fStatusName;
           } else {
           }

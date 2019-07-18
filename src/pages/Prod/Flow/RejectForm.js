@@ -101,6 +101,7 @@ export class RejectForm extends PureComponent {
     return (
       <Modal
         destroyOnClose
+        confirmLoading={loading}
         title={
           <div>
             流程单-拒收 <Tag color="blue">{values.fFullBatchNo}</Tag>
