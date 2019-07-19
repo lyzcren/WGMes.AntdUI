@@ -37,8 +37,8 @@ export async function addRole(params) {
 }
 
 export async function updateRole(params) {
-  return request('/api/role/update', {
-    method: 'POST',
+  return request(`/api/role/${params.fItemID}`, {
+    method: 'PUT',
     body: {
       ...params,
       method: 'update',

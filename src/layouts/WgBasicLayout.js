@@ -75,6 +75,21 @@ class WgBasicLayout extends React.PureComponent {
     } else {
       dispatch({
         type: 'user/fetchCurrent',
+      }).then(() => {
+        const {
+          user: {
+            currentUser: { indexPage },
+          },
+        } = this.props;
+        if (indexPage === 'flow') {
+          this.defaultPath = '/prod/flow';
+        } else if (indexPage === 'mission') {
+          this.defaultPath = '/prod/mission';
+        }
+        dispatch({
+          type: 'menu/openMenu',
+          payload: { path: this.defaultPath, closable: false },
+        });
       });
       dispatch({
         type: 'setting/getSetting',
@@ -82,10 +97,6 @@ class WgBasicLayout extends React.PureComponent {
       dispatch({
         type: 'menu/getMenuData',
         payload: { routes, authority },
-      });
-      dispatch({
-        type: 'menu/openMenu',
-        payload: { path: this.defaultPath, closable: false },
       });
     }
   }
@@ -332,7 +343,7 @@ class WgBasicLayout extends React.PureComponent {
   }
 }
 
-export default connect(({ global, setting, menu }) => ({
+export default connect(({ global, setting, menu, user }) => ({
   collapsed: global.collapsed,
   layout: setting.layout,
   menuData: menu.menuData,
@@ -341,6 +352,7 @@ export default connect(({ global, setting, menu }) => ({
   path: menu.path,
   selectedKeys: menu.selectedKeys,
   breadcrumbNameMap: menu.breadcrumbNameMap,
+  user,
   ...setting,
 }))(props => (
   <Media query="(max-width: 599px)">

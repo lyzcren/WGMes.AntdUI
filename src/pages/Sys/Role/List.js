@@ -43,6 +43,7 @@ const getValue = obj =>
     .map(key => obj[key])
     .join(',');
 const activeData = ['启用', '禁用'];
+const pageMapper = { mission: '生产任务单', flow: '流程单' };
 
 /* eslint react/no-multi-comp:0 */
 @connect(({ roleManage, loading }) => ({
@@ -81,6 +82,11 @@ class TableList extends PureComponent {
       sorter: true,
     },
     {
+      title: '编码',
+      dataIndex: 'fNumber',
+      sorter: true,
+    },
+    {
       title: '启用',
       dataIndex: 'fIsActive',
       filters: [
@@ -96,6 +102,12 @@ class TableList extends PureComponent {
       render(val) {
         return <Switch disabled checked={val} />;
       },
+    },
+    {
+      title: '默认界面',
+      dataIndex: 'fIndexPage',
+      sorter: true,
+      render: val => pageMapper[val],
     },
     {
       title: '操作',
@@ -119,10 +131,9 @@ class TableList extends PureComponent {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    const params = { pagination: this.currentPagination };
     dispatch({
       type: 'roleManage/fetch',
-      payload: params,
+      payload: this.currentPagination,
     });
 
     dispatch({
@@ -155,11 +166,9 @@ class TableList extends PureComponent {
       this.currentPagination.sorter[sorter.field] = sorter.order.replace('end', '');
     }
 
-    const params = { pagination: this.currentPagination };
-
     dispatch({
       type: 'roleManage/fetch',
-      payload: params,
+      payload: this.currentPagination,
     });
   };
 
@@ -196,11 +205,10 @@ class TableList extends PureComponent {
         current: 1,
         queryFilters,
       };
-      const params = { pagination: this.currentPagination };
 
       dispatch({
         type: 'roleManage/fetch',
-        payload: params,
+        payload: this.currentPagination,
       });
       this.handleSelectRows([]);
     });
@@ -220,11 +228,10 @@ class TableList extends PureComponent {
       current: 1,
       queryFilters: [],
     };
-    const params = { pagination: this.currentPagination };
 
     dispatch({
       type: 'roleManage/fetch',
-      payload: params,
+      payload: this.currentPagination,
     });
     this.handleSelectRows([]);
   };
@@ -324,8 +331,7 @@ class TableList extends PureComponent {
     dispatch({
       type: 'roleManage/add',
       payload: {
-        fName: fields.fName,
-        fIsActive: fields.fIsActive,
+        ...fields,
       },
     }).then(() => {
       const {
@@ -347,9 +353,7 @@ class TableList extends PureComponent {
     dispatch({
       type: 'roleManage/update',
       payload: {
-        fItemID: fields.fItemID,
-        fName: fields.fName,
-        fIsActive: fields.fIsActive,
+        ...fields,
       },
     }).then(() => {
       const {
@@ -639,12 +643,13 @@ class TableList extends PureComponent {
               />
             </div>
           </Card>
-          <CreateForm {...parentMethods} modalVisible={modalVisible} />
+          <CreateForm {...parentMethods} modalVisible={modalVisible} pageMapper={pageMapper} />
           {updateFormValues && Object.keys(updateFormValues).length ? (
             <UpdateForm
               {...updateMethods}
               updateModalVisible={updateModalVisible}
               values={updateFormValues}
+              pageMapper={pageMapper}
             />
           ) : null}
           {updateFormValues && Object.keys(updateFormValues).length ? (
