@@ -22,6 +22,7 @@ import {
 import ReportTable from '@/components/ReportTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
+import { exportExcel } from '@/utils/getExcel';
 import { default as ColumnConfig } from './ColumnConfig';
 
 import styles from './List.less';
@@ -225,6 +226,29 @@ class TableList extends PureComponent {
     this.setState({ fBeginDate: value[0], fEndDate: value[1] });
   };
 
+  handleExport = e => {
+    const { dispatch, form } = this.props;
+
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+
+      let pagination = this.getSearchParam(fieldsValue);
+      let fileName = '产量报表.xls';
+      switch (e.key) {
+        case 'currentPage':
+          pagination.exportPage = true;
+          fileName = '产量报表-第' + pagination.current + '页.xls';
+          break;
+        case 'allPage':
+          pagination.exportPage = false;
+          break;
+        default:
+          break;
+      }
+      exportExcel('/api/output/export', pagination, fileName);
+    });
+  };
+
   renderSimpleForm() {
     const {
       form: { getFieldDecorator },
@@ -271,6 +295,21 @@ class TableList extends PureComponent {
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
               </Button>
+              <Authorized authority="Output_Read">
+                <Dropdown
+                  overlay={
+                    <Menu onClick={this.handleExport} selectedKeys={[]}>
+                      <Menu.Item key="currentPage">当前页</Menu.Item>
+                      <Menu.Item key="allPage">所有页</Menu.Item>
+                    </Menu>
+                  }
+                >
+                  <Button icon="download" style={{ marginLeft: 8 }}>
+                    导出
+                    <Icon type="down" />
+                  </Button>
+                </Dropdown>
+              </Authorized>
               <a style={{ marginLeft: 8 }} onClick={this.toggleForm} hidden>
                 展开 <Icon type="down" />
               </a>
