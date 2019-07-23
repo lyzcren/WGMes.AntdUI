@@ -56,12 +56,13 @@ export class GenFlowSuccess extends PureComponent {
   };
 
   handleViewFlow(fBatchNo) {
-    const { dispatch } = this.props;
+    const { dispatch, handleModalVisible } = this.props;
 
     dispatch({
       type: 'menu/openMenu',
       payload: { path: '/prod/flow', fBatchNo },
     });
+    handleModalVisible(false);
   }
 
   render() {

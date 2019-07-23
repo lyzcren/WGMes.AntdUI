@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import moment from 'moment';
 import { Switch, Popconfirm, Divider } from 'antd';
 import Authorized from '@/utils/Authorized';
 
@@ -63,6 +64,19 @@ class ColumnConfig {
       dataIndex: 'fModel',
       width: 220,
       sorter: true,
+    },
+    {
+      title: '创建人',
+      dataIndex: 'fCreatorName',
+      width: 220,
+      sorter: true,
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'fCreateDate',
+      width: 220,
+      sorter: true,
+      render: val => (val ? moment(val).format('YYYY-MM-DD HH:mm') : ''),
     },
   ];
 }

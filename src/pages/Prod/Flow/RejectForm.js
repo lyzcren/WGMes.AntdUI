@@ -142,7 +142,7 @@ export class RejectForm extends PureComponent {
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="操作员">
           {getFieldDecorator('fOperatorID', {
             rules: [{ required: true, message: '请选择操作员' }],
-            initialValue: fBindEmpID,
+            initialValue: fBindEmpID ? fBindEmpID : null,
           })(
             <Select
               placeholder="请选择操作员"

@@ -39,6 +39,7 @@ import styles from './List.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
+const { RangePicker } = DatePicker;
 const getValue = obj =>
   Object.keys(obj)
     .map(key => "'" + obj[key] + "'")
@@ -149,10 +150,28 @@ class TableList extends PureComponent {
     };
     // 查询条件处理
     const queryFilters = [];
+    if (
+      fieldsValue.fTransferDateTime &&
+      fieldsValue.fTransferDateTime[0] &&
+      fieldsValue.fTransferDateTime[1]
+    ) {
+      queryFilters.push({
+        name: 'fTransferDateTime',
+        compare: '>=',
+        value: fieldsValue.fTransferDateTime[0].format('YYYY-MM-DD HH:mm:ss'),
+      });
+      queryFilters.push({
+        name: 'fTransferDateTime',
+        compare: '<=',
+        value: fieldsValue.fTransferDateTime[1].format('YYYY-MM-DD HH:mm:ss'),
+      });
+    }
     if (fieldsValue.queryDept)
       queryFilters.push({ name: 'fDeptID', compare: '=', value: fieldsValue.queryDept });
     if (fieldsValue.queryBatchNo)
       queryFilters.push({ name: 'fFullBatchNo', compare: '%*%', value: fieldsValue.queryBatchNo });
+    if (fieldsValue.querySoBillNo)
+      queryFilters.push({ name: 'fSoBillNo', compare: '%*%', value: fieldsValue.querySoBillNo });
     if (fieldsValue.queryMoBillNo)
       queryFilters.push({ name: 'fMoBillNo', compare: '%*%', value: fieldsValue.queryMoBillNo });
     if (fieldsValue.queryStatusNumber)
@@ -306,6 +325,13 @@ class TableList extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6} sm={24}>
+            <FormItem label="转序时间">
+              {getFieldDecorator('fTransferDateTime', {
+                // initialValue: [moment().add(-1, 'months'), moment()],
+              })(<RangePicker format="YYYY-MM-DD" placeholder={['开始时间', '结束时间']} />)}
+            </FormItem>
+          </Col>
+          <Col md={6} sm={24}>
             <FormItem label="部门">
               {getFieldDecorator('queryDept', {
                 rules: [{ required: false, message: '请选择部门' }],
@@ -325,11 +351,11 @@ class TableList extends PureComponent {
               {getFieldDecorator('queryBatchNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
-          <Col md={6} sm={24}>
+          {/* <Col md={6} sm={24}>
             <FormItem label="任务单号">
               {getFieldDecorator('queryMoBillNo')(<Input placeholder="请输入" />)}
             </FormItem>
-          </Col>
+          </Col> */}
           <Col md={6} sm={24}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
@@ -360,6 +386,13 @@ class TableList extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline" style={{ marginRight: '30px' }}>
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
+            <FormItem label="转序时间">
+              {getFieldDecorator('fTransferDateTime', {
+                // initialValue: [moment().add(-1, 'months'), moment()],
+              })(<RangePicker format="YYYY-MM-DD" placeholder={['开始时间', '结束时间']} />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
             <FormItem label="部门">
               {getFieldDecorator('queryDept', {
                 rules: [{ required: false, message: '请选择部门' }],
@@ -379,13 +412,18 @@ class TableList extends PureComponent {
               {getFieldDecorator('queryBatchNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
+        </Row>
+        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+          <Col md={8} sm={24}>
+            <FormItem label="订单号">
+              {getFieldDecorator('querySoBillNo')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
           <Col md={8} sm={24}>
             <FormItem label="任务单号">
               {getFieldDecorator('queryMoBillNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
-        </Row>
-        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
             <FormItem label="状态">
               {getFieldDecorator('queryStatusNumber')(
@@ -400,6 +438,8 @@ class TableList extends PureComponent {
               )}
             </FormItem>
           </Col>
+        </Row>
+        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
             <FormItem label="产品名称">
               {getFieldDecorator('queryProductName')(<Input placeholder="请输入" />)}

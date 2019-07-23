@@ -1,6 +1,7 @@
 import React, { PureComponent, Fragment } from 'react';
 import moment from 'moment';
 import numeral from 'numeral';
+import QRCode from 'qrcode.react';
 import { connect } from 'dva';
 import {
   Layout,
@@ -277,30 +278,47 @@ class Transfer extends PureComponent {
     const { showMoreDefect, moreDefectValue, qtyFormat, qtyDecimal } = this.state;
 
     const description = (
-      <DescriptionList className={styles.headerList} size="small" col="3">
-        <Description term="任务单号">{data.fMoBillNo}</Description>
-        <Description term="订单号">{data.fSoBillNo}</Description>
-        <Description term="产品编码">{data.fProductNumber}</Description>
-        <Description term="产品名称">{data.fProductName}</Description>
-        <Description term="规格型号">{data.fModel}</Description>
-        <Description term="父件型号">{data.fParentModel}</Description>
-        <Description term="单位">{data.fUnitName}</Description>
-        <Description term="流程单数量">{numeral(data.fFlowInputQty).format(qtyFormat)}</Description>
-        <Description term="投入数量">{numeral(data.fInputQty).format(qtyFormat)}</Description>
-        <Description term="合格数量">{numeral(data.fPassQty).format(qtyFormat)}</Description>
-        <Description term="盘点盈亏数量">
-          {numeral(data.fInvCheckDeltaQty).format(qtyFormat)}
-        </Description>
-        <Description term="取走数量">{numeral(data.fTakeQty).format(qtyFormat)}</Description>
-      </DescriptionList>
+      <div style={{ display: 'flex' }}>
+        {data.fFullBatchNo && (
+          <QRCode
+            style={{ flex: 'auto', marginRight: '20px' }}
+            value={data.fFullBatchNo}
+            // size={200}
+            fgColor="#000000"
+          />
+        )}
+        <DescriptionList
+          className={styles.headerList}
+          size="small"
+          col="3"
+          style={{ flex: 'auto' }}
+        >
+          <Description term="任务单号">{data.fMoBillNo}</Description>
+          <Description term="订单号">{data.fSoBillNo}</Description>
+          <Description term="产品编码">{data.fProductNumber}</Description>
+          <Description term="产品名称">{data.fProductName}</Description>
+          <Description term="规格型号">{data.fModel}</Description>
+          <Description term="父件型号">{data.fParentModel}</Description>
+          <Description term="单位">{data.fUnitName}</Description>
+          <Description term="流程单数量">
+            {numeral(data.fFlowInputQty).format(qtyFormat)}
+          </Description>
+          <Description term="投入数量">{numeral(data.fInputQty).format(qtyFormat)}</Description>
+          <Description term="合格数量">{numeral(data.fPassQty).format(qtyFormat)}</Description>
+          <Description term="盘点盈亏数量">
+            {numeral(data.fInvCheckDeltaQty).format(qtyFormat)}
+          </Description>
+          <Description term="取走数量">{numeral(data.fTakeQty).format(qtyFormat)}</Description>
+        </DescriptionList>
+      </div>
     );
-    const menu = (
-      <Menu>
-        <Menu.Item key="1">选项一</Menu.Item>
-        <Menu.Item key="2">选项二</Menu.Item>
-        <Menu.Item key="3">选项三</Menu.Item>
-      </Menu>
-    );
+    // const menu = (
+    //   <Menu>
+    //     <Menu.Item key="1">选项一</Menu.Item>
+    //     <Menu.Item key="2">选项二</Menu.Item>
+    //     <Menu.Item key="3">选项三</Menu.Item>
+    //   </Menu>
+    // );
 
     const action = (
       <Fragment>
@@ -308,11 +326,11 @@ class Transfer extends PureComponent {
           <Button type="primary" loading={loading} onClickCapture={() => this.transfer()}>
             转序
           </Button>
-          <Dropdown overlay={menu} placement="bottomRight">
+          {/* <Dropdown overlay={menu} placement="bottomRight">
             <Button>
               <Icon type="ellipsis" />
             </Button>
-          </Dropdown>
+          </Dropdown> */}
         </ButtonGroup>
         <Button onClick={() => this.close()}>关闭</Button>
       </Fragment>
@@ -350,7 +368,7 @@ class Transfer extends PureComponent {
                 <FormItem key="fOperatorID" label="操作员">
                   {getFieldDecorator('fOperatorID', {
                     rules: [{ required: true, message: '请选择操作员' }],
-                    initialValue: fBindEmpID,
+                    initialValue: fBindEmpID ? fBindEmpID : null,
                   })(
                     <Select
                       placeholder="请选择操作员"

@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import moment from 'moment';
-import { Switch, Popconfirm, Divider } from 'antd';
+import QRCode from 'qrcode.react';
+import { Switch, Popconfirm, Divider, Tooltip } from 'antd';
 import Authorized from '@/utils/Authorized';
 
 class ColumnConfig {
@@ -11,7 +12,19 @@ class ColumnConfig {
       width: 220,
       sorter: true,
       render: (val, record) => {
-        return <a onClick={() => this.handleViewFlow(record)}>{val}</a>;
+        return (
+          <div style={{ display: 'flex' }}>
+            <a onClick={() => this.handleViewFlow(record)}>{val}</a>
+            {val && (
+              <Tooltip
+                placement="topLeft"
+                title={<QRCode value={val} size={200} fgColor="#000000" />}
+              >
+                <QRCode style={{ marginLeft: '5px' }} value={val} size={19} fgColor="#000000" />
+              </Tooltip>
+            )}
+          </div>
+        );
       },
     },
     {

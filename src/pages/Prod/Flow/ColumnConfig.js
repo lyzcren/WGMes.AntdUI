@@ -1,6 +1,7 @@
 import React, { PureComponent, Fragment } from 'react';
 import numeral from 'numeral';
-import { Switch, Popconfirm, Divider, Badge } from 'antd';
+import QRCode from 'qrcode.react';
+import { Switch, Popconfirm, Divider, Badge, Tooltip } from 'antd';
 import Authorized from '@/utils/Authorized';
 import RadioButton from 'antd/lib/radio/radioButton';
 
@@ -18,6 +19,21 @@ class ColumnConfig {
         dataIndex: 'fFullBatchNo',
         width: 220,
         sorter: true,
+        render: (val, record) => {
+          return (
+            <div style={{ display: 'flex' }}>
+              <div>{val}</div>
+              {val && (
+                <Tooltip
+                  placement="topLeft"
+                  title={<QRCode value={val} size={200} fgColor="#000000" />}
+                >
+                  <QRCode style={{ marginLeft: '5px' }} value={val} size={19} fgColor="#000000" />
+                </Tooltip>
+              )}
+            </div>
+          );
+        },
       },
       {
         title: '良品数量',

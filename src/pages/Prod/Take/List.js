@@ -31,10 +31,11 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ takeManage, loading, basicData }) => ({
+@connect(({ takeManage, loading, basicData, menu }) => ({
   takeManage,
   loading: loading.models.takeManage,
   basicData,
+  menu,
 }))
 @Form.create()
 class TableList extends PureComponent {
@@ -68,6 +69,7 @@ class TableList extends PureComponent {
     dispatch({
       type: 'basicData/getProcessDeptTree',
     });
+    ColumnConfig.handleViewFlow = fFullBatchNo => this.handleViewFlow(fFullBatchNo);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -291,6 +293,14 @@ class TableList extends PureComponent {
   renderForm() {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
+  }
+
+  handleViewFlow(fBatchNo) {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/openMenu',
+      payload: { path: '/prod/flow', fBatchNo },
+    });
   }
 
   render() {

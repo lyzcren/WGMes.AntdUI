@@ -24,7 +24,6 @@ export class FlowForm extends PureComponent {
     super(props);
 
     this.state = {
-      formVals: props.values,
       workshop: null,
       batchNoPrefix: '',
       batchNoSuffix: '',
@@ -48,10 +47,10 @@ export class FlowForm extends PureComponent {
       type: 'basicData/getWorkShops',
     }).then(() => {
       const {
+        values,
         basicData: { workshops },
       } = this.props;
-      const { formVals } = this.state;
-      const defaultWorkshop = workshops.find(x => x.fErpID === formVals.fWorkshop);
+      const defaultWorkshop = workshops.find(x => x.fErpID === values.fWorkShop);
       if (defaultWorkshop) this.changeWorkshop(defaultWorkshop);
     });
   }
@@ -76,12 +75,12 @@ export class FlowForm extends PureComponent {
   };
 
   okHandle = () => {
-    const { form } = this.props;
+    const { form, values } = this.props;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       // form.resetFields();
       // 设置fItemId
-      fieldsValue.fInterID = this.state.formVals.fInterID;
+      fieldsValue.fInterID = values.fInterID;
       this.handleGenFlow(fieldsValue);
     });
   };
@@ -117,8 +116,8 @@ export class FlowForm extends PureComponent {
       basicData: { workshops, routeData },
       missionManage: { billNo },
     } = this.props;
-    const { formVals, workshop, batchNoPrefix, batchNoSuffix } = this.state;
-    const maxQty = formVals.fAuxInHighLimitQty - formVals.fInputQty;
+    const { workshop, batchNoPrefix, batchNoSuffix } = this.state;
+    const maxQty = values.fAuxInHighLimitQty - values.fInputQty;
 
     return (
       <Modal
@@ -126,7 +125,7 @@ export class FlowForm extends PureComponent {
         maskClosable={false}
         title={
           <div>
-            开流程单 <Tag color="blue">{formVals.fMoBillNo}</Tag>
+            开流程单 <Tag color="blue">{values.fMoBillNo}</Tag>
           </div>
         }
         visible={modalVisible}
@@ -143,16 +142,16 @@ export class FlowForm extends PureComponent {
           })(<Input readOnly />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="单位">
-          {formVals.fUnitName}
+          {values.fUnitName}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="计划生产数量">
-          <InputNumber placeholder="请输入" disabled value={formVals.fPlanQty} />
+          {values.fPlanQty}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="已投入数量">
-          <InputNumber placeholder="请输入" disabled value={formVals.fInputQty} />
+          {values.fInputQty}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="已完工数量">
-          <InputNumber placeholder="请输入" disabled value={formVals.fFinishQty} />
+          {values.fFinishQty}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="投入数量">
           {form.getFieldDecorator('fInputQty', {
@@ -167,11 +166,12 @@ export class FlowForm extends PureComponent {
           })(<InputNumber placeholder="请输入" min={1} max={maxQty} />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="车间">
-          {form.getFieldDecorator('fWorkshop', {
+          {form.getFieldDecorator('fWorkShop', {
             rules: [{ required: true, message: '请选择车间' }],
             initialValue: workshop ? workshop.fItemID : null,
           })(
             <Select
+              disabled
               style={{ width: 300 }}
               dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
               onChange={this.onWorkshopChange}
@@ -188,7 +188,7 @@ export class FlowForm extends PureComponent {
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="工艺路线">
           {form.getFieldDecorator('fRouteID', {
             rules: [{ required: true, message: '请选择工艺路线' }],
-            initialValue: formVals.fRouteID ? formVals.fRouteID : null,
+            initialValue: values.fRouteID ? values.fRouteID : null,
           })(
             <Select style={{ width: 300 }} dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}>
               {routeData.map(t => (

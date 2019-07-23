@@ -52,6 +52,7 @@
     "path-to-regexp": "^2.4.0",
     "peer": "^0.2.10",
     "prop-types": "^15.5.10",
+    "qrcode.react": "^0.9.3",
     "qs": "^6.6.0",
     "rc-animate": "^2.4.4",
     "react": "^16.6.3",

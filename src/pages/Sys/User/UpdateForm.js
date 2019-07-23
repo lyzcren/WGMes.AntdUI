@@ -100,7 +100,7 @@ export class UpdateForm extends PureComponent {
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="操作员">
           {getFieldDecorator('fBindEmpID', {
             rules: [{ required: false, message: '请选择操作员' }],
-            initialValue: formVals.fBindEmpID,
+            initialValue: formVals.fBindEmpID ? formVals.fBindEmpID : null,
           })(
             <Select
               style={{ width: '100%' }}

@@ -1,6 +1,7 @@
 import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
+import QRCode from 'qrcode.react';
 import {
   Row,
   Col,
@@ -14,6 +15,7 @@ import {
   Menu,
   message,
   Table,
+  Tooltip,
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
@@ -297,7 +299,19 @@ class TableList extends PureComponent {
         dataIndex: 'fFullBatchNo',
         width: '20%',
         render: (val, record) => {
-          return <a onClick={() => this.handleViewFlow(record.fFullBatchNo)}>{val}</a>;
+          return (
+            <div style={{ display: 'flex' }}>
+              <a onClick={() => this.handleViewFlow(record.fFullBatchNo)}>{val}</a>
+              {val && (
+                <Tooltip
+                  placement="topLeft"
+                  title={<QRCode value={val} size={200} fgColor="#000000" />}
+                >
+                  <QRCode style={{ marginLeft: '5px' }} value={val} size={19} fgColor="#000000" />
+                </Tooltip>
+              )}
+            </div>
+          );
         },
       },
       {

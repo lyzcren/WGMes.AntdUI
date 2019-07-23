@@ -126,8 +126,16 @@ class TableList extends PureComponent {
     // 查询条件处理
     const queryFilters = [];
     if (fieldsValue.fDate) {
-      queryFilters.push({ name: 'fTransferDateTime', compare: '>=', value: fieldsValue.fDate[0] });
-      queryFilters.push({ name: 'fTransferDateTime', compare: '<=', value: fieldsValue.fDate[1] });
+      queryFilters.push({
+        name: 'fTransferDateTime',
+        compare: '>=',
+        value: fieldsValue.fDate[0].format('YYYY-MM-DD HH:mm'),
+      });
+      queryFilters.push({
+        name: 'fTransferDateTime',
+        compare: '<=',
+        value: fieldsValue.fDate[1].format('YYYY-MM-DD HH:mm'),
+      });
     }
     // 部门
     if (fieldsValue.queryDept) {

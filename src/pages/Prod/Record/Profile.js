@@ -1,6 +1,7 @@
 import React, { PureComponent, Fragment } from 'react';
 import moment from 'moment';
 import numeral from 'numeral';
+import QRCode from 'qrcode.react';
 import { connect } from 'dva';
 import {
   Layout,
@@ -119,22 +120,32 @@ class Transfer extends PureComponent {
     const { qtyFormat, qtyDecimal } = this.state;
 
     const description = (
-      <DescriptionList className={styles.headerList} size="small" col="3">
-        <Description term="任务单号">{fMoBillNo}</Description>
-        <Description term="订单号">{fSoBillNo}</Description>
-        <Description term="产品编码">{fProductNumber}</Description>
-        <Description term="产品名称">{fProductName}</Description>
-        <Description term="规格型号">{fModel}</Description>
-        <Description term="父件型号">{fParentModel}</Description>
-        <Description term="单位">{fUnitName}</Description>
-        <Description term="流程单数量">{numeral(fFlowInputQty).format(qtyFormat)}</Description>
-        <Description term="投入数量">{numeral(fInputQty).format(qtyFormat)}</Description>
-        <Description term="合格数量">{numeral(fPassQty).format(qtyFormat)}</Description>
-        <Description term="盘点盈亏数量">
-          {numeral(fInvCheckDeltaQty).format(qtyFormat)}
-        </Description>
-        <Description term="取走数量">{numeral(fTakeQty).format(qtyFormat)}</Description>
-      </DescriptionList>
+      <div style={{ display: 'flex' }}>
+        {data.fFullBatchNo && (
+          <QRCode
+            style={{ flex: 'auto', marginRight: '20px' }}
+            value={data.fFullBatchNo}
+            // size={200}
+            fgColor="#000000"
+          />
+        )}
+        <DescriptionList className={styles.headerList} size="small" col="3">
+          <Description term="任务单号">{fMoBillNo}</Description>
+          <Description term="订单号">{fSoBillNo}</Description>
+          <Description term="产品编码">{fProductNumber}</Description>
+          <Description term="产品名称">{fProductName}</Description>
+          <Description term="规格型号">{fModel}</Description>
+          <Description term="父件型号">{fParentModel}</Description>
+          <Description term="单位">{fUnitName}</Description>
+          <Description term="流程单数量">{numeral(fFlowInputQty).format(qtyFormat)}</Description>
+          <Description term="投入数量">{numeral(fInputQty).format(qtyFormat)}</Description>
+          <Description term="合格数量">{numeral(fPassQty).format(qtyFormat)}</Description>
+          <Description term="盘点盈亏数量">
+            {numeral(fInvCheckDeltaQty).format(qtyFormat)}
+          </Description>
+          <Description term="取走数量">{numeral(fTakeQty).format(qtyFormat)}</Description>
+        </DescriptionList>
+      </div>
     );
     const menu = (
       <Menu>
