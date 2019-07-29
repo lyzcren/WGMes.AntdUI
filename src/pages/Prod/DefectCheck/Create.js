@@ -101,7 +101,7 @@ class Create extends PureComponent {
 
         this.setState({ details: currentDetail });
       } else {
-        message.warning('当前工序无在制品库存.');
+        message.warning('当前岗位无不良品库存.');
       }
     });
   }
@@ -319,7 +319,7 @@ class Create extends PureComponent {
 
     return (
       <WgPageHeaderWrapper
-        title={'在制品盘点单：' + billNo.DefectCheck}
+        title={'不良盘点单：' + billNo.DefectCheck}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }

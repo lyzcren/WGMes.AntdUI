@@ -46,14 +46,14 @@ class ColumnConfig {
             <a onClick={() => this.updateModalVisible(record)}>修改</a>
             <Divider type="vertical" />
           </Authorized>
+          <Authorized authority="Machine_Active">
+            <a onClick={() => this.handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
+            <Divider type="vertical" />
+          </Authorized>
           <Authorized authority="Machine_Delete">
             <Popconfirm title="是否要删除此行？" onConfirm={() => this.delete(record)}>
               <a>删除</a>
             </Popconfirm>
-            <Divider type="vertical" />
-          </Authorized>
-          <Authorized authority="Machine_Active">
-            <a onClick={() => this.handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
           </Authorized>
         </Fragment>
       ),

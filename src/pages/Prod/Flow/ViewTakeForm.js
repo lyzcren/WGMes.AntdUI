@@ -73,7 +73,7 @@ export class ViewTakeForm extends PureComponent {
         render: (val, record) => numeral(val).format(qtyFormat),
       },
       {
-        title: '取走工序',
+        title: '取走岗位',
         dataIndex: 'fDeptName',
       },
       {

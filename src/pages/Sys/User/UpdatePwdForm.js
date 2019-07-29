@@ -55,12 +55,15 @@ export class UpdatePwdForm extends PureComponent {
       callback();
     }
   };
-  checkPassword = (rule, value, callback) => {
+  checkPassword = e => {
     const { form } = this.props;
-    if (value) {
-      form.validateFields(['fConfirmPwd'], { force: true });
+
+    const confirmPwd = form.getFieldValue('fConfirmPwd');
+    if (confirmPwd) {
+      setTimeout(() => {
+        form.validateFields(['fConfirmPwd'], { force: true });
+      }, 100);
     }
-    callback();
   };
   passwordStatusMap = {
     ok: (
@@ -139,9 +142,6 @@ export class UpdatePwdForm extends PureComponent {
               rules: [
                 {
                   required: true,
-                  validator: this.checkPassword,
-                },
-                {
                   validator: validatePassword,
                 },
               ],
@@ -150,6 +150,7 @@ export class UpdatePwdForm extends PureComponent {
                 size="large"
                 type="password"
                 placeholder={formatMessage({ id: 'form.password.placeholder' })}
+                onChange={this.checkPassword}
               />
             )}
           </Popover>

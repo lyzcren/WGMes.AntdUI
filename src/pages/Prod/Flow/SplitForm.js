@@ -265,7 +265,7 @@ export class SplitForm extends PureComponent {
           <Tabs tabBarStyle={{ visible: false }} activeKey={currentStep.toString()}>
             <TabPane tab="基本分批情况" key="0">
               <Form>
-                <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="当前工序">
+                <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="当前岗位">
                   {values.fCurrentDeptName}
                 </FormItem>
                 <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="可分批数量">

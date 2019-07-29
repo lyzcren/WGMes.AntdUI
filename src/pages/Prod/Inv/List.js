@@ -305,7 +305,7 @@ class TableList extends PureComponent {
                       onChange={checked => this.changeGroupBy('groupByWorkShop', checked)}
                     />
                   </FormItem>
-                  <FormItem label="工序">
+                  <FormItem label="岗位">
                     <Switch
                       defaultChecked={!!this.state.groupByDept}
                       onChange={checked => this.changeGroupBy('groupByDept', checked)}

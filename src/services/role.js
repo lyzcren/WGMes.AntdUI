@@ -46,12 +46,22 @@ export async function updateRole(params) {
   });
 }
 
-export async function active(params) {
+export async function fakeActive(params) {
   return request('/api/role/active', {
-    method: 'POST',
+    method: 'PUT',
     body: {
       ...params,
       method: 'active',
+    },
+  });
+}
+
+export async function fakeDeactive(params) {
+  return request('/api/role/deactive', {
+    method: 'PUT',
+    body: {
+      ...params,
+      method: 'deactive',
     },
   });
 }

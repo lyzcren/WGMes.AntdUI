@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import moment from 'moment';
 import { Switch, Popconfirm, Divider } from 'antd';
 import Authorized from '@/utils/Authorized';
 
@@ -41,6 +42,19 @@ class ColumnConfig {
       },
     },
     {
+      title: '创建人',
+      dataIndex: 'fCreatorName',
+      width: 220,
+      sorter: true,
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'fCreateDate',
+      width: 220,
+      sorter: true,
+      render: val => moment(val).format('YYYY-MM-DD HH:mm:ss'),
+    },
+    {
       title: '操作',
       render: (text, record) => (
         <Fragment>
@@ -50,14 +64,14 @@ class ColumnConfig {
             <a onClick={() => this._valuesModalVisible(record)}>参数值</a>
             <Divider type="vertical" />
           </Authorized>
+          <Authorized authority="Param_Active">
+            <a onClick={() => this.handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
+            <Divider type="vertical" />
+          </Authorized>
           <Authorized authority="Param_Delete">
             <Popconfirm title="是否要删除此行？" onConfirm={() => this.delete(record)}>
               <a>删除</a>
             </Popconfirm>
-            <Divider type="vertical" />
-          </Authorized>
-          <Authorized authority="Param_Active">
-            <a onClick={() => this.handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
           </Authorized>
         </Fragment>
       ),

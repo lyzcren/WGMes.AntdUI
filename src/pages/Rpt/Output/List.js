@@ -362,7 +362,7 @@ class TableList extends PureComponent {
               <div className={styles.tableListGroup}>
                 <Form layout="inline">
                   <FormItem>分组汇总：</FormItem>
-                  <FormItem label="工序">
+                  <FormItem label="岗位">
                     <Switch
                       defaultChecked={!!this.state.groupByDept}
                       onChange={checked => this.changeGroupBy('groupByDept', checked)}

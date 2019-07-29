@@ -247,7 +247,7 @@ export class DeptForm extends PureComponent {
           onClick={this.newItem}
           icon="plus"
         >
-          新增工序
+          新增岗位
         </Button>
       </div>
     );

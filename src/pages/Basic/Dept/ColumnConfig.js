@@ -60,16 +60,6 @@ class ColumnConfig {
             </a>
             <Divider type="vertical" />
           </Authorized>
-          <Authorized authority="Dept_Delete">
-            <Popconfirm title="是否要删除此行？" onConfirm={() => this.delete(record)}>
-              <a>删除</a>
-            </Popconfirm>
-            <Divider type="vertical" />
-          </Authorized>
-          <Authorized authority="Dept_Active">
-            <a onClick={() => this.handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
-            <Divider type="vertical" />
-          </Authorized>
           <Authorized authority="Dept_Update">
             <a
               disabled={record.fTypeNumber != 'Process'}
@@ -77,6 +67,16 @@ class ColumnConfig {
             >
               工艺参数
             </a>
+            <Divider type="vertical" />
+          </Authorized>
+          <Authorized authority="Dept_Active">
+            <a onClick={() => this.handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
+            <Divider type="vertical" />
+          </Authorized>
+          <Authorized authority="Dept_Delete">
+            <Popconfirm title="是否要删除此行？" onConfirm={() => this.delete(record)}>
+              <a>删除</a>
+            </Popconfirm>
           </Authorized>
         </Fragment>
       ),

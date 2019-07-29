@@ -122,7 +122,7 @@ export class ChangeRouteForm extends PureComponent {
         destroyOnClose
         title={
           <div>
-            流程单-退回 <Tag color="blue">{values.fFullBatchNo}</Tag>
+            流程单-变更工艺路线 <Tag color="blue">{values.fFullBatchNo}</Tag>
           </div>
         }
         visible={modalVisible}
@@ -131,7 +131,7 @@ export class ChangeRouteForm extends PureComponent {
         onCancel={() => handleModalVisible(false, values)}
         afterClose={() => handleModalVisible()}
       >
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="当前工序">
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="当前岗位">
           {values.fCurrentDeptName}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="工艺路线">
@@ -151,16 +151,16 @@ export class ChangeRouteForm extends PureComponent {
             </Select>
           )}
         </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="原工序">
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="原岗位">
           {records.map(x => (
             <Tag key={x.fEntryID} color={x.fStatusNumber === 'ManufEndProduce' ? 'green' : ''}>
               {x.fDeptName}
             </Tag>
           ))}
         </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="变更工序">
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="变更岗位">
           {getFieldDecorator('fRouteEntryIDs', {
-            rules: [{ required: true, message: '请选择工序' }],
+            rules: [{ required: true, message: '请选择岗位' }],
             initialValue: routeSteps.map(x => x.fEntryID),
           })(
             <CheckboxGroup>

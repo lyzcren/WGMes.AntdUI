@@ -124,8 +124,8 @@ class TableList extends PureComponent {
     const queryFilters = [];
     if (fieldsValue.queryName)
       queryFilters.push({ name: 'fName', compare: '%*%', value: fieldsValue.queryName });
-    if (fieldsValue.queryIsActive)
-      queryFilters.push({ name: 'fIsActive', compare: '=', value: fieldsValue.queryIsActive });
+    // if (fieldsValue.queryIsActive)
+    //   queryFilters.push({ name: 'fIsActive', compare: '=', value: fieldsValue.queryIsActive });
 
     this.setState({
       formValues: values,
@@ -365,7 +365,7 @@ class TableList extends PureComponent {
               {getFieldDecorator('queryName')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
-          <Col md={8} sm={24}>
+          {/* <Col md={8} sm={24}>
             <FormItem label="状态">
               {getFieldDecorator('queryIsActive')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
@@ -374,7 +374,7 @@ class TableList extends PureComponent {
                 </Select>
               )}
             </FormItem>
-          </Col>
+          </Col> */}
           <Col md={8} sm={24}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
@@ -439,9 +439,9 @@ class TableList extends PureComponent {
               <div className={styles.tableListForm}>{this.renderForm()}</div>
               <div className={styles.tableListOperator}>
                 <Authorized authority="Unit_Create">
-                  <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+                  {/* <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
                     新建
-                  </Button>
+                  </Button> */}
                   <Button icon="plus" type="primary" onClick={() => this.handleSync()}>
                     从 K3 同步
                   </Button>

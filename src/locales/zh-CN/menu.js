@@ -65,7 +65,7 @@ export default {
   // 报表管理
   'menu.report': '报表管理',
   'menu.report.output': '产量报表',
-  'menu.report.passRate': '工序良率报表',
+  'menu.report.passRate': '岗位良率报表',
   'menu.report.missionExecution': '执行情况',
   // 生产基础资料
   'menu.techStd': '工艺标准',

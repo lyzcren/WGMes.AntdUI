@@ -9,6 +9,8 @@ import {
   fakeGetAuthorizeUser,
   fakeAuthorizeUser,
   fakeUnAuthorizeUser,
+  fakeActive,
+  fakeDeactive,
 } from '@/services/role';
 
 export default {
@@ -58,6 +60,20 @@ export default {
         payload: response,
       });
       if (callback) callback();
+    },
+    *active({ payload }, { call, put }) {
+      const response = yield call(fakeActive, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
+      });
+    },
+    *deactive({ payload }, { call, put }) {
+      const response = yield call(fakeDeactive, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
+      });
     },
     *getAuthority({ payload, callback }, { call, put }) {
       const response = yield call(getAuth, payload);

@@ -52,12 +52,15 @@ export class CreateForm extends PureComponent {
       callback();
     }
   };
-  checkPassword = (rule, value, callback) => {
+  checkPassword = e => {
     const { form } = this.props;
-    if (value) {
-      form.validateFields(['fConfirmPwd'], { force: true });
+
+    const confirmPwd = form.getFieldValue('fConfirmPwd');
+    if (confirmPwd) {
+      setTimeout(() => {
+        form.validateFields(['fConfirmPwd'], { force: true });
+      }, 100);
     }
-    callback();
   };
   passwordStatusMap = {
     ok: (
@@ -109,7 +112,7 @@ export class CreateForm extends PureComponent {
       >
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="用户名">
           {getFieldDecorator('fNumber', {
-            rules: [{ required: true, message: '请输入至少五个字符的用户名！', min: 5 }],
+            rules: [{ required: true, message: '请输入至少三个字符的用户名！', min: 3 }],
           })(<Input placeholder="请输入" />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="姓名">
@@ -174,9 +177,6 @@ export class CreateForm extends PureComponent {
               rules: [
                 {
                   required: true,
-                  validator: this.checkPassword,
-                },
-                {
                   validator: validatePassword,
                 },
               ],
@@ -185,6 +185,7 @@ export class CreateForm extends PureComponent {
                 size="large"
                 type="password"
                 placeholder={formatMessage({ id: 'form.password.placeholder' })}
+                onChange={this.checkPassword}
               />
             )}
           </Popover>

@@ -62,7 +62,7 @@ export default {
     *nextStep({}, { call, put, select }) {
       const { steps, currentStep, maxGroupID } = yield select(state => state.routeProfile);
       const step = steps[currentStep];
-      // 当前步骤未选择添加任何工序，不允许再加下一个步骤
+      // 当前步骤未选择添加任何岗位，不允许再加下一个步骤
       if (step.depts.length <= 0) {
         return;
       }

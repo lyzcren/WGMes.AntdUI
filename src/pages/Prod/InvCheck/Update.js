@@ -92,7 +92,7 @@ class Update extends PureComponent {
 
         this.setState({ details: currentDetail });
       } else {
-        message.warning('当前工序无在制品库存.');
+        message.warning('当前岗位无在制品库存.');
       }
     });
   }

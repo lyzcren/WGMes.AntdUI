@@ -332,11 +332,11 @@ class TableList extends PureComponent {
       if (err) return;
 
       let pagination = this.getSearchParam(fieldsValue);
-      let fileName = '工序良率报表.xls';
+      let fileName = '岗位良率报表.xls';
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          fileName = '工序良率报表-第' + pagination.current + '页.xls';
+          fileName = '岗位良率报表-第' + pagination.current + '页.xls';
           break;
         case 'allPage':
           pagination.exportPage = false;

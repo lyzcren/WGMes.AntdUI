@@ -86,7 +86,7 @@ export class CreateForm extends PureComponent {
             />
           )}
         </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="类型">
+        {/* <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="类型">
           {form.getFieldDecorator('fTypeID', {})(
             <Select placeholder="请选择" style={{ width: '100%' }}>
               {typeData.map(x => (
@@ -96,7 +96,7 @@ export class CreateForm extends PureComponent {
               ))}
             </Select>
           )}
-        </FormItem>
+        </FormItem> */}
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="启用">
           {form.getFieldDecorator('fIsActive', {
             valuePropName: 'checked',

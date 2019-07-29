@@ -113,10 +113,10 @@ export class RejectForm extends PureComponent {
         onCancel={() => handleModalVisible(false, values)}
         afterClose={() => handleModalVisible()}
       >
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="退回工序">
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="退回岗位">
           {values.fCurrentDeptName}
         </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="拒收工序">
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="拒收岗位">
           {getFieldDecorator('fRejectDeptID', {
             rules: [{ required: true, message: '请输入部门' }],
           })(

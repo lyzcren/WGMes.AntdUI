@@ -189,7 +189,7 @@ class TableList extends PureComponent {
     // 查询条件处理
     const queryFilters = [];
     if (fieldsValue.queryOperatorDept) {
-      // 当前工序可签收
+      // 当前岗位可签收
       if (fieldsValue.queryRecordStatusNumber === 'ManufWait4Sign') {
         queryFilters.push({
           name: 'fNextDeptIDs',
@@ -198,7 +198,7 @@ class TableList extends PureComponent {
         });
         queryFilters.push({ name: 'fRecordStatusNumber', compare: '<>', value: 'ManufProducing' });
       }
-      // 当前工序生产中
+      // 当前岗位生产中
       else if (fieldsValue.queryRecordStatusNumber === 'ManufProducing') {
         queryFilters.push({
           name: 'fCurrentDeptID',
@@ -211,7 +211,7 @@ class TableList extends PureComponent {
           value: fieldsValue.queryRecordStatusNumber,
         });
       }
-      // 当前工序已完成
+      // 当前岗位已完成
       else if (fieldsValue.queryRecordStatusNumber === 'ManufEndProduce') {
         queryFilters.push({
           name: 'FEndProduceDeptIDs',
@@ -231,7 +231,7 @@ class TableList extends PureComponent {
       // 只选择部门，未选择状态，该部门在工艺路线内即可
       queryFilters.push({ name: 'fAllDeptIDs', compare: '%*%', value: fieldsValue.queryDept });
     }
-    // 无工序时查询流程单状态
+    // 无岗位时查询流程单状态
     if (fieldsValue.queryStatusNumber)
       queryFilters.push({
         name: 'fStatusNumber',
@@ -507,7 +507,7 @@ class TableList extends PureComponent {
     if (!!operatorForm && !queryDeptID) {
       message.warning(`扫描转序需先选择部门，请先选择部门.`);
     } else if (!!operatorForm && queryDeptID !== fCurrentDeptID) {
-      message.warning(`请选择【${fCurrentDeptName}】工序再扫描转序.`);
+      message.warning(`请选择【${fCurrentDeptName}】岗位再扫描转序.`);
     } else {
       this.transferModalVisible(record);
     }
@@ -529,15 +529,17 @@ class TableList extends PureComponent {
           flowManage: { nextDepts },
         } = this.props;
         if (!nextDepts || nextDepts.length <= 0) {
-          message.warning('无可签收工序.');
-        } else if (nextDepts && nextDepts.length) {
+          message.warning('无可签收岗位.');
+        } else if (nextDepts.length === 1) {
+          this.sign(record, nextDepts[0].fDeptID, nextDepts[0].fDeptName);
+        } else if (nextDepts.length >= 2) {
           this.handleModalVisible({ key: 'sign', flag: true }, record);
         }
       });
     }
   };
 
-  sign = (record, fDeptID) => {
+  sign = (record, fDeptID, fDeptName) => {
     const { dispatch } = this.props;
     const { fInterID } = record;
     dispatch({
@@ -551,7 +553,13 @@ class TableList extends PureComponent {
         flowManage: { queryResult },
       } = this.props;
       if (queryResult.status === 'ok') {
-        message.success('【' + record.fFullBatchNo + '】' + '签收成功');
+        const msg =
+          '【' +
+          record.fFullBatchNo +
+          '】' +
+          '签收成功' +
+          (fDeptName ? '，签收岗位【' + fDeptName + '】' : '');
+        message.success(msg);
         this.handleModalVisible({ key: 'sign', flag: false });
         // 成功后再次刷新列表
         this.search();
@@ -652,7 +660,7 @@ class TableList extends PureComponent {
 
   renderOperation = (val, record) => {
     const { queryDeptID } = this.state;
-    // 指定部门则判断签收工序是否包含指定的部门，否则则判断当前是否有工序可签收
+    // 指定部门则判断签收岗位是否包含指定的部门，否则则判断当前是否有岗位可签收
     const canSign =
       record.fNextDeptIDList &&
       record.fRecordStatusNumber !== 'ManufProducing' &&
@@ -665,7 +673,7 @@ class TableList extends PureComponent {
     /* 生产中，可取走 */
     if (record.fStatusNumber === 'Producing') menus.push(<Menu.Item key="take">取走</Menu.Item>);
     if (record.fTotalTakeQty > 0) menus.push(<Menu.Item key="viewTake">取走记录</Menu.Item>);
-    /* 已签收生产中，且非首工序，可退回 */
+    /* 已签收生产中，且非首岗位，可退回 */
     if (record.fRecordStatusNumber === 'ManufProducing' && record.fEndProduceDeptIDList.length > 0)
       menus.push(<Menu.Item key="refund">退回</Menu.Item>);
     /* 未签收，可拒收 */
@@ -804,11 +812,11 @@ class TableList extends PureComponent {
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
               </Button>
-              {(fIsAdmin || !fIsOperator) && (
-                <a style={{ marginLeft: 8 }} onClick={this.toggleOperatorForm}>
-                  切换
-                </a>
-              )}
+              {/* {(fIsAdmin || !fIsOperator) && ( */}
+              <a style={{ marginLeft: 8 }} onClick={this.toggleOperatorForm}>
+                切换
+              </a>
+              {/* )} */}
               <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
                 展开 <Icon type="down" />
               </a>
@@ -884,11 +892,11 @@ class TableList extends PureComponent {
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
               </Button>
-              {(fIsAdmin || !fIsOperator) && (
-                <a style={{ marginLeft: 8 }} onClick={this.toggleOperatorForm}>
-                  切换
-                </a>
-              )}
+              {/* {(fIsAdmin || !fIsOperator) && ( */}
+              <a style={{ marginLeft: 8 }} onClick={this.toggleOperatorForm}>
+                切换
+              </a>
+              {/* )} */}
               <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
                 展开 <Icon type="down" />
               </a>

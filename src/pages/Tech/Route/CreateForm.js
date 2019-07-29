@@ -26,6 +26,10 @@ export class CreateForm extends PureComponent {
 
   componentDidMount() {
     const { dispatch } = this.props;
+    dispatch({
+      type: 'basicData/getBillNo',
+      payload: { fNumber: 'Route' },
+    });
   }
 
   okHandle = () => {
@@ -38,7 +42,13 @@ export class CreateForm extends PureComponent {
   };
 
   render() {
-    const { modalVisible, form, handleSubmit, handleModalVisible, basicData } = this.props;
+    const {
+      modalVisible,
+      form,
+      handleSubmit,
+      handleModalVisible,
+      basicData: { billNo },
+    } = this.props;
 
     return (
       <Modal
@@ -56,6 +66,7 @@ export class CreateForm extends PureComponent {
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="编码">
           {form.getFieldDecorator('fNumber', {
             rules: [{ required: true, message: '请输入编码', min: 1 }],
+            initialValue: billNo.Route,
           })(<Input placeholder="请输入" />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="备注">

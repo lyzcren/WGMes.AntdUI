@@ -702,6 +702,7 @@ class TableList extends PureComponent {
               values={updateRoleFormValues}
               queryResult={this.props.userManage.result}
               dispatch={this.props.dispatch}
+              loading={loading}
             />
           ) : null}
         </GridContent>

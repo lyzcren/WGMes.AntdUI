@@ -173,10 +173,10 @@ export class RefundForm extends PureComponent {
         onCancel={() => handleModalVisible(false, values)}
         afterClose={() => handleModalVisible()}
       >
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="当前工序">
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="当前岗位">
           {values.fCurrentDeptName}
         </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="退回工序">
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="退回岗位">
           <Radio.Group
             value={refundRecord.fInterID}
             buttonStyle="solid"
@@ -193,7 +193,7 @@ export class RefundForm extends PureComponent {
             ))}
           </Radio.Group>
         </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="重做工序">
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="重做岗位">
           <CheckboxGroup
             value={reproduceRecords.map(x => x.fInterID)}
             onChange={this.changeReproduce}

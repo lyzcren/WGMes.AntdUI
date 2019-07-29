@@ -22,15 +22,15 @@ class ColumnConfig {
         render: (val, record) => {
           return (
             <div style={{ display: 'flex' }}>
-              <div>{val}</div>
               {val && (
                 <Tooltip
                   placement="topLeft"
                   title={<QRCode value={val} size={200} fgColor="#000000" />}
                 >
-                  <QRCode style={{ marginLeft: '5px' }} value={val} size={19} fgColor="#000000" />
+                  <QRCode style={{ marginRight: '6px' }} value={val} size={19} fgColor="#666666" />
                 </Tooltip>
               )}
+              <div>{val}</div>
             </div>
           );
         },
@@ -65,7 +65,7 @@ class ColumnConfig {
         filters: this.statusFilter,
       },
       {
-        title: '当前工序',
+        title: '当前岗位',
         dataIndex: 'fCurrentDeptName',
         width: 150,
       },

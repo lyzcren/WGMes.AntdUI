@@ -14,15 +14,15 @@ class ColumnConfig {
       render: (val, record) => {
         return (
           <div style={{ display: 'flex' }}>
-            <a onClick={() => this.handleViewFlow(record)}>{val}</a>
             {val && (
               <Tooltip
                 placement="topLeft"
                 title={<QRCode value={val} size={200} fgColor="#000000" />}
               >
-                <QRCode style={{ marginLeft: '5px' }} value={val} size={19} fgColor="#000000" />
+                <QRCode style={{ marginRight: '6px' }} value={val} size={19} fgColor="#666666" />
               </Tooltip>
             )}
+            <a onClick={() => this.handleViewFlow(record)}>{val}</a>
           </div>
         );
       },

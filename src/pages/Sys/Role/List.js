@@ -375,10 +375,9 @@ class TableList extends PureComponent {
   handleActive = record => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'roleManage/update',
+      type: `roleManage/${!record.fIsActive ? 'active' : 'deactive'}`,
       payload: {
-        fItemID: record.fItemID,
-        fIsActive: !record.fIsActive,
+        ids: [record.fItemID],
       },
     }).then(() => {
       const {
@@ -444,21 +443,20 @@ class TableList extends PureComponent {
       payload: {
         fItemID: selectedRows.map(row => row.fItemID),
       },
-      callback: () => {
-        this.setState({
-          selectedRows: [],
-        });
-        const {
-          roleManage: { queryResult },
-        } = this.props;
-        if (queryResult.status === 'ok') {
-          if (queryResult.message) {
-            queryResult.message.map(m => message.warning(m));
-          }
-          // 成功后再次刷新列表
-          this.search();
+    }).then(() => {
+      this.setState({
+        selectedRows: [],
+      });
+      const {
+        roleManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        if (queryResult.message) {
+          queryResult.message.map(m => message.warning(m));
         }
-      },
+        // 成功后再次刷新列表
+        this.search();
+      }
     });
   };
 
@@ -494,30 +492,28 @@ class TableList extends PureComponent {
       selectedRows = [selectedRows];
     }
     dispatch({
-      type: 'roleManage/active',
+      type: `roleManage/${fIsActive ? 'active' : 'deactive'}`,
       payload: {
-        fItemID: selectedRows.map(row => row.fItemID),
-        fIsActive: fIsActive,
+        ids: selectedRows.map(row => row.fItemID),
       },
-      callback: () => {
-        this.setState({
-          selectedRows: [],
-        });
-        const {
-          roleManage: { queryResult },
-        } = this.props;
-        if (queryResult.status === 'ok') {
-          if (queryResult.message) {
-            queryResult.message.map(m =>
-              notification.error({
-                message: m,
-              })
-            );
-          }
-          // 成功后再次刷新列表
-          this.search();
+    }).then(() => {
+      this.setState({
+        selectedRows: [],
+      });
+      const {
+        roleManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        if (queryResult.message) {
+          queryResult.message.map(m =>
+            notification.error({
+              message: m,
+            })
+          );
         }
-      },
+        // 成功后再次刷新列表
+        this.search();
+      }
     });
   };
 
@@ -669,6 +665,7 @@ class TableList extends PureComponent {
               authorizeUser={this.props.roleManage.authorizeUser}
               queryResult={this.props.roleManage.queryResult}
               dispatch={this.props.dispatch}
+              loading={loading}
             />
           ) : null}
         </GridContent>

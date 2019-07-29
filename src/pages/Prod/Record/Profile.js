@@ -180,7 +180,7 @@ class Transfer extends PureComponent {
           </div>
         </Col>
         <Col xs={24} sm={12}>
-          <div className={styles.textSecondary}>工序</div>
+          <div className={styles.textSecondary}>岗位</div>
           <div className={styles.heading}>{fDeptName}</div>
         </Col>
       </Row>
