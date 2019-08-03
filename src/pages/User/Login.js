@@ -8,9 +8,10 @@ import styles from './Login.less';
 
 const { Tab, UserName, Password, IdCard, Mobile, Captcha, Submit } = Login;
 
-@connect(({ login, loading }) => ({
+@connect(({ login, loading, menu }) => ({
   login,
   submitting: loading.effects['login/login'],
+  menu,
 }))
 class LoginPage extends Component {
   state = {

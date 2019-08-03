@@ -332,9 +332,9 @@ class TableList extends PureComponent {
             </FormItem>
           </Col>
           <Col md={6} sm={24}>
-            <FormItem label="部门">
+            <FormItem label="岗位">
               {getFieldDecorator('queryDept', {
-                rules: [{ required: false, message: '请选择部门' }],
+                rules: [{ required: false, message: '请选择岗位' }],
               })(
                 <TreeSelect
                   style={{ width: '100%' }}
@@ -393,9 +393,9 @@ class TableList extends PureComponent {
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem label="部门">
+            <FormItem label="岗位">
               {getFieldDecorator('queryDept', {
-                rules: [{ required: false, message: '请选择部门' }],
+                rules: [{ required: false, message: '请选择岗位' }],
               })(
                 <TreeSelect
                   style={{ width: '100%' }}

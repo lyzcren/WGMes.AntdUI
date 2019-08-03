@@ -91,7 +91,7 @@ class Profile extends PureComponent {
         invCheckManage: { queryResult },
       } = this.props;
       this.showResult(queryResult, () => {
-        message.success('【' + fBillNo + '】' + '反审核成功');
+        message.success('【' + fBillNo + '】' + '审核成功');
         this.reload();
         // 成功后再次刷新列表
         if (handleSuccess) handleSuccess();
@@ -112,7 +112,7 @@ class Profile extends PureComponent {
         invCheckManage: { queryResult },
       } = this.props;
       this.showResult(queryResult, () => {
-        message.success('【' + fBillNo + '】' + '审核成功');
+        message.success('【' + fBillNo + '】' + '反审核成功');
         this.reload();
         // 成功后再次刷新列表
         if (handleSuccess) handleSuccess();
@@ -176,6 +176,20 @@ class Profile extends PureComponent {
 
     const columns = [
       {
+        title: '批次',
+        dataIndex: 'fFullBatchNo',
+        render: (val, record) => {
+          return <span style={{ color: record.fIsNew ? 'red' : '' }}>{val ? val : '-'}</span>;
+        },
+      },
+      {
+        title: '任务单号',
+        dataIndex: 'fMoBillNo',
+        render: (val, record) => {
+          return <span style={{ color: record.fIsNew ? 'red' : '' }}>{val}</span>;
+        },
+      },
+      {
         title: '产品',
         dataIndex: 'fProductName',
       },
@@ -186,10 +200,6 @@ class Profile extends PureComponent {
       {
         title: '规格型号',
         dataIndex: 'fProductModel',
-      },
-      {
-        title: '批次',
-        dataIndex: 'fFullBatchNo',
       },
       {
         title: '单位',
@@ -216,7 +226,7 @@ class Profile extends PureComponent {
     const description = (
       <DescriptionList className={styles.headerList} size="small" col="3">
         <Description term="单号">{fBillNo}</Description>
-        <Description term="部门">{fDeptName}</Description>
+        <Description term="岗位">{fDeptName}</Description>
         <Description term="日期">{moment(fDate).format('YYYY-MM-DD')}</Description>
         <Description term="备注">{fComments}</Description>
       </DescriptionList>

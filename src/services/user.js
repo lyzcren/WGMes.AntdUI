@@ -50,6 +50,16 @@ export async function updateUser(params) {
   });
 }
 
+export async function activeUser(params) {
+  return request(`/api/user/${params.fItemID}/active?fIsActive=${params.fIsActive}`, {
+    method: 'PUT',
+    body: {
+      ...params,
+      method: 'active',
+    },
+  });
+}
+
 export async function fakeGetAuthorizeRole(params) {
   return request('/api/user/GetAuthorizedRole', {
     method: 'POST',

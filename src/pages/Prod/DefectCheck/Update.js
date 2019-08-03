@@ -324,7 +324,7 @@ class Update extends PureComponent {
                 </FormItem>
               </Col>
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-                <FormItem label="部门">
+                <FormItem label="岗位">
                   {getFieldDecorator('fDeptName', {
                     initialValue: fDeptName,
                   })(<Input readOnly />)}

@@ -13,7 +13,7 @@ class ColumnConfig {
       },
     },
     {
-      title: '部门',
+      title: '岗位',
       dataIndex: 'fDeptName',
     },
     {

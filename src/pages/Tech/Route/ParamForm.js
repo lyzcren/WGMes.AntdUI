@@ -87,7 +87,7 @@ export class ParamForm extends PureComponent {
     const { loading, data, formVals } = this.state;
     const columns = [
       {
-        title: '部门',
+        title: '岗位',
         dataIndex: 'fDeptName',
         key: 'fDeptName',
         width: '40%',

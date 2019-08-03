@@ -166,7 +166,7 @@ export class FlowForm extends PureComponent {
           })(<InputNumber placeholder="请输入" min={1} max={maxQty} />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="车间">
-          {form.getFieldDecorator('fWorkShop', {
+          {/* {form.getFieldDecorator('fWorkShop', {
             rules: [{ required: true, message: '请选择车间' }],
             initialValue: workshop ? workshop.fItemID : null,
           })(
@@ -183,7 +183,8 @@ export class FlowForm extends PureComponent {
                   </Option>
                 ))}
             </Select>
-          )}
+          )} */}
+          {values.fWorkShopName}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="工艺路线">
           {form.getFieldDecorator('fRouteID', {

@@ -68,12 +68,12 @@ export class SignForm extends PureComponent {
       >
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="名称">
           {form.getFieldDecorator('fDeptID', {
-            rules: [{ required: true, message: '请输入部门' }],
+            rules: [{ required: true, message: '请输入岗位' }],
             initialValue: formVals.fDeptID,
           })(
             <Select
               style={{ width: '100%' }}
-              placeholder="请选择部门"
+              placeholder="请选择岗位"
               autoFocus
               dropdownMatchSelectWidth
               defaultOpen

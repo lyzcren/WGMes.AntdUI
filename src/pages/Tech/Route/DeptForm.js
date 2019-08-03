@@ -147,7 +147,7 @@ export class DeptForm extends PureComponent {
 
     const columns = [
       {
-        title: '部门',
+        title: '岗位',
         dataIndex: 'fDeptName',
         width: '50%',
         render: (text, record) => {

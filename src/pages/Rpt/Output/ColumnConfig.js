@@ -17,13 +17,13 @@ class ColumnConfig {
       columns = [
         ...columns,
         {
-          title: '部门',
+          title: '岗位',
           dataIndex: 'fDeptName',
           sorter: true,
           width: 150,
         },
         {
-          title: '部门编码',
+          title: '岗位编码',
           dataIndex: 'fDeptNumber',
           sorter: true,
           width: 150,

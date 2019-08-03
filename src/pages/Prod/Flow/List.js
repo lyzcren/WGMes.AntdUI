@@ -219,7 +219,7 @@ class TableList extends PureComponent {
           value: fieldsValue.queryOperatorDept,
         });
       } else {
-        // 只选择部门，未选择状态，该部门在工艺路线内即可
+        // 只选择岗位，未选择状态，该岗位在工艺路线内即可
         queryFilters.push({
           name: 'fAllDeptIDs',
           compare: '%*%',
@@ -228,7 +228,7 @@ class TableList extends PureComponent {
       }
     }
     if (fieldsValue.queryDept) {
-      // 只选择部门，未选择状态，该部门在工艺路线内即可
+      // 只选择岗位，未选择状态，该岗位在工艺路线内即可
       queryFilters.push({ name: 'fAllDeptIDs', compare: '%*%', value: fieldsValue.queryDept });
     }
     // 无岗位时查询流程单状态
@@ -489,7 +489,7 @@ class TableList extends PureComponent {
     if (selectedRows.length === 0) return;
 
     if (!queryDeptID) {
-      message.warning('批量签收须先选择部门.');
+      message.warning('批量签收须先选择岗位.');
     }
     Modal.confirm({
       title: '批量签收',
@@ -503,9 +503,9 @@ class TableList extends PureComponent {
   handleScanTransfer = record => {
     const { operatorForm, queryDeptID } = this.state;
     const { fCurrentDeptID, fCurrentDeptName } = record;
-    // 操作员查询界面，要求先选择部门后才能扫描转序（管理员查询界面则不需要）
+    // 操作员查询界面，要求先选择岗位后才能扫描转序（管理员查询界面则不需要）
     if (!!operatorForm && !queryDeptID) {
-      message.warning(`扫描转序需先选择部门，请先选择部门.`);
+      message.warning(`扫描转序需先选择岗位，请先选择岗位.`);
     } else if (!!operatorForm && queryDeptID !== fCurrentDeptID) {
       message.warning(`请选择【${fCurrentDeptName}】岗位再扫描转序.`);
     } else {
@@ -660,7 +660,7 @@ class TableList extends PureComponent {
 
   renderOperation = (val, record) => {
     const { queryDeptID } = this.state;
-    // 指定部门则判断签收岗位是否包含指定的部门，否则则判断当前是否有岗位可签收
+    // 指定岗位则判断签收岗位是否包含指定的岗位，否则则判断当前是否有岗位可签收
     const canSign =
       record.fNextDeptIDList &&
       record.fRecordStatusNumber !== 'ManufProducing' &&
@@ -689,6 +689,7 @@ class TableList extends PureComponent {
     if (
       record.fStatusNumber === 'BeforeProduce' ||
       (record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufEndProduce') ||
+      (record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufCancel') ||
       record.fRecordStatusNumber === 'ManufRefund'
     ) {
       operators.push(
@@ -769,9 +770,9 @@ class TableList extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6} sm={24}>
-            <FormItem label="部门">
+            <FormItem label="岗位">
               {getFieldDecorator('queryOperatorDept', {
-                rules: [{ required: true, message: '请选择部门' }],
+                rules: [{ required: true, message: '请选择岗位' }],
               })(
                 <TreeSelect
                   style={{ width: '100%' }}
@@ -843,9 +844,9 @@ class TableList extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6} sm={24}>
-            <FormItem label="部门">
+            <FormItem label="岗位">
               {getFieldDecorator('queryDept', {
-                rules: [{ required: false, message: '请选择部门' }],
+                rules: [{ required: false, message: '请选择岗位' }],
               })(
                 <TreeSelect
                   style={{ width: '100%' }}

@@ -67,7 +67,14 @@ export class UpdateForm extends PureComponent {
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="角色名">
           {form.getFieldDecorator('fName', {
             initialValue: values.fName,
-            rules: [{ required: true, message: '请输入角色名', min: 1 }],
+            rules: [
+              { required: true, message: '请输入角色名' },
+              // 正则匹配（提示错误，阻止表单提交）
+              {
+                pattern: /^[^\s]*$/,
+                message: '禁止输入空格',
+              },
+            ],
           })(<Input placeholder="请输入" />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="默认首页">

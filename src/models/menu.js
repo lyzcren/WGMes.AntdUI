@@ -166,17 +166,25 @@ export default {
 
   effects: {
     *getMenuData({ payload }, { put }) {
-      const { routes, authority } = payload;
+      const { routes, authority, defaultActiveKey } = payload;
       const menuData = filterMenuData(memoizeOneFormatter(routes, authority));
       const routeData = filterRouteData(memoizeOneFormatter(routes, authority));
       const breadcrumbNameMap = memoizeOneGetBreadcrumbNameMap(menuData);
+      const response = { menuData, routeData, breadcrumbNameMap };
+
+      const componentMap = getComponentMaps(routeData).find(com => com.path == defaultActiveKey);
+      if (componentMap) {
+        response.panes = [{ ...componentMap, key: defaultActiveKey, closable: false }];
+        response.activeKey = defaultActiveKey;
+      }
+
       yield put({
         type: 'save',
-        payload: { menuData, routeData, breadcrumbNameMap },
+        payload: response,
       });
     },
     *openMenu({ payload }, { put, call, select }) {
-      const { name, path, closable } = payload;
+      const { path, closable } = payload;
       const { menuData, routeData, routeHistory, panes } = yield select(state => state.menu);
       const activeKey = path;
       const selectedKeys = getSelectedMenuKeys(activeKey, routeData);
@@ -197,6 +205,7 @@ export default {
       }
 
       delete payload.path;
+      delete payload.closable;
       // 主要用于修改Tab页传入附加参数
       const newPanes = panes.map(p => {
         if (p.key === activeKey) {

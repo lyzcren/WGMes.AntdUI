@@ -340,9 +340,9 @@ class Create extends PureComponent {
                 </FormItem>
               </Col>
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-                <FormItem key="fDeptID" label="部门">
+                <FormItem key="fDeptID" label="岗位">
                   {getFieldDecorator('fDeptID', {
-                    rules: [{ required: true, message: '请选择部门' }],
+                    rules: [{ required: true, message: '请选择岗位' }],
                   })(
                     <TreeSelect
                       placeholder="请选择"

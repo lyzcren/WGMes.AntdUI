@@ -56,8 +56,6 @@ class WgBasicLayout extends React.PureComponent {
     this.getPageTitle = memoizeOne(this.getPageTitle);
     this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual);
     // const { location: { pathname } } = props;
-    // 首次进入界面默认加载标签页
-    this.defaultPath = '/dashboard/analysis';
 
     this.state = {};
   }
@@ -72,33 +70,40 @@ class WgBasicLayout extends React.PureComponent {
       dispatch({
         type: 'login/logout',
       });
-    } else {
-      dispatch({
-        type: 'user/fetchCurrent',
-      }).then(() => {
-        const {
-          user: {
-            currentUser: { indexPage },
-          },
-        } = this.props;
-        if (indexPage === 'flow') {
-          this.defaultPath = '/prod/flow';
-        } else if (indexPage === 'mission') {
-          this.defaultPath = '/prod/mission';
-        }
-        dispatch({
-          type: 'menu/openMenu',
-          payload: { path: this.defaultPath, closable: false },
-        });
-      });
-      dispatch({
-        type: 'setting/getSetting',
-      });
-      dispatch({
-        type: 'menu/getMenuData',
-        payload: { routes, authority },
-      });
+      return;
     }
+    dispatch({
+      type: 'menu/getMenuData',
+      payload: { routes, authority },
+    });
+
+    dispatch({
+      type: 'setting/getSetting',
+    });
+    dispatch({
+      type: 'user/fetchCurrent',
+    }).then(() => {
+      const {
+        user: {
+          currentUser: { indexPage },
+        },
+      } = this.props;
+      // 首次进入界面默认加载标签页
+      let defaultPath = '/dashboard/analysis';
+      if (indexPage === 'flow') {
+        defaultPath = '/prod/flow';
+      } else if (indexPage === 'mission') {
+        defaultPath = '/prod/mission';
+      }
+      // dispatch({
+      //   type: 'menu/getMenuData',
+      //   payload: { routes, authority, defaultActiveKey: defaultPath },
+      // })
+      dispatch({
+        type: 'menu/openMenu',
+        payload: { path: defaultPath, closable: false },
+      });
+    });
   }
 
   componentDidUpdate(preProps) {
@@ -239,6 +244,41 @@ class WgBasicLayout extends React.PureComponent {
 
     const isTop = PropsLayout === 'topmenu';
 
+    const tabBar = (
+      <div
+        style={{
+          backgroundColor: '#fff',
+          border: '1px solid #e8e8e8',
+          borderBottom: '1px solid #fff',
+          borderRadius: '4px 4px 0 0',
+          marginTop: '-2px',
+        }}
+      >
+        <Button
+          icon="close"
+          shape="circle"
+          size="small"
+          style={{ marginLeft: '5px', border: 0 }}
+          onClick={() => this.closeAll()}
+        />
+        <Dropdown
+          overlay={
+            <Menu onClick={this.handleDropdownMenu} selectedKeys={[]}>
+              <Menu.Item key="closeCurrent">关闭当前页</Menu.Item>
+              <Menu.Item key="closeOther">关闭其他页</Menu.Item>
+              <Menu.Item key="closeAll">关闭所有页</Menu.Item>
+            </Menu>
+          }
+        >
+          <Button
+            icon="down"
+            shape="circle"
+            style={{ marginLeft: '5px', marginRight: '5px', border: 0 }}
+          />
+        </Dropdown>
+      </div>
+    );
+
     const layout = (
       <Layout>
         {isTop && !isMobile ? null : (
@@ -271,42 +311,7 @@ class WgBasicLayout extends React.PureComponent {
             onEdit={this.onEdit}
             tabBarStyle={{ backgroundColor: 'white', marginBottom: 0 }}
             // TODO: Tabs标签页右键菜单
-            tabBarExtraContent={
-              <span>
-                <div
-                  style={{
-                    backgroundColor: '#fff',
-                    border: '1px solid #e8e8e8',
-                    borderBottom: '1px solid #fff',
-                    borderRadius: '4px 4px 0 0',
-                    marginTop: '-2px',
-                  }}
-                >
-                  <Button
-                    icon="close"
-                    shape="circle"
-                    size="small"
-                    style={{ marginLeft: '5px', border: 0 }}
-                    onClick={() => this.closeAll()}
-                  />
-                  <Dropdown
-                    overlay={
-                      <Menu onClick={this.handleDropdownMenu} selectedKeys={[]}>
-                        <Menu.Item key="closeCurrent">关闭当前页</Menu.Item>
-                        <Menu.Item key="closeOther">关闭其他页</Menu.Item>
-                        <Menu.Item key="closeAll">关闭所有页</Menu.Item>
-                      </Menu>
-                    }
-                  >
-                    <Button
-                      icon="down"
-                      shape="circle"
-                      style={{ marginLeft: '5px', marginRight: '5px', border: 0 }}
-                    />
-                  </Dropdown>
-                </div>
-              </span>
-            }
+            tabBarExtraContent={tabBar}
             hideAdd
             type="editable-card"
           >

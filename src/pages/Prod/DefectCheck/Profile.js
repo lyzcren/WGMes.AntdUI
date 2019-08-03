@@ -220,7 +220,7 @@ class Profile extends PureComponent {
     const description = (
       <DescriptionList className={styles.headerList} size="small" col="3">
         <Description term="单号">{fBillNo}</Description>
-        <Description term="部门">{fDeptName}</Description>
+        <Description term="岗位">{fDeptName}</Description>
         <Description term="日期">{moment(fDate).format('YYYY-MM-DD')}</Description>
         <Description term="备注">{fComments}</Description>
       </DescriptionList>

@@ -5,6 +5,7 @@ import {
   updateUser,
   fakeGetAuthorizeRole,
   fakeAuthorizeRole,
+  activeUser,
   fakeUnAuthorizeRole,
 } from '@/services/user';
 
@@ -53,6 +54,13 @@ export default {
         payload: response,
       });
       if (callback) callback();
+    },
+    *active({ payload }, { call, put }) {
+      const response = yield call(activeUser, payload);
+      yield put({
+        type: 'updateData',
+        payload: response,
+      });
     },
     *getAuthorizeRole({ payload, callback }, { call, put }) {
       const response = yield call(fakeGetAuthorizeRole, payload);

@@ -52,19 +52,33 @@ export class CreateForm extends PureComponent {
     return (
       <Modal
         destroyOnClose
-        title="新建部门"
+        title="新建岗位"
         visible={modalVisible}
         onOk={this.okHandle}
         onCancel={() => handleModalVisible()}
       >
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="名称">
           {form.getFieldDecorator('fName', {
-            rules: [{ required: true, message: '请输入名称', min: 1 }],
+            rules: [
+              { required: true, message: '请输入名称' },
+              // 正则匹配（提示错误，阻止表单提交）
+              {
+                pattern: /^[^\s]*$/,
+                message: '禁止输入空格',
+              },
+            ],
           })(<Input placeholder="请输入" />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="编码">
           {form.getFieldDecorator('fNumber', {
-            rules: [{ required: true, message: '请输入编码', min: 1 }],
+            rules: [
+              { required: true, message: '请输入编码' },
+              // 正则匹配（提示错误，阻止表单提交）
+              {
+                pattern: /^[^\s]*$/,
+                message: '禁止输入空格',
+              },
+            ],
             initialValue: billNo.Dept,
           })(<Input placeholder="请输入" />)}
         </FormItem>
@@ -73,9 +87,9 @@ export class CreateForm extends PureComponent {
             rules: [{ required: false, message: '请输入英文名称' }],
           })(<Input placeholder="请输入" />)}
         </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="所属部门">
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="所属车间">
           {form.getFieldDecorator('fParentID', {
-            rules: [{ required: true, message: '请输入所属部门' }],
+            rules: [{ required: true, message: '请输入所属车间' }],
           })(
             <TreeSelect
               placeholder="请选择"

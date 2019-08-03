@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Form, Steps, Input, Radio, Select, message, Tag, Checkbox, Modal } from 'antd';
+import { Form, Steps, Input, Radio, Select, message, Tag, Checkbox, Modal, Switch } from 'antd';
 
 const { TextArea } = Input;
 const FormItem = Form.Item;
@@ -77,8 +77,6 @@ export class ChangeRouteForm extends PureComponent {
       if (err) return;
 
       const { fInterID } = values;
-
-      console.log(values, fieldsValue);
 
       dispatch({
         type: 'flowChangeRoute/changeRoute',
@@ -171,6 +169,12 @@ export class ChangeRouteForm extends PureComponent {
               ))}
             </CheckboxGroup>
           )}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="取消当前岗位">
+          {getFieldDecorator('fCancelCurrentDept', {
+            valuePropName: 'checked',
+            initialValue: false,
+          })(<Switch />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label={'原因'}>
           {getFieldDecorator('fReason', {})(

@@ -466,7 +466,7 @@ class TableList extends PureComponent {
   handleActive = record => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'userManage/update',
+      type: 'userManage/active',
       payload: {
         fItemID: record.fItemID,
         fIsActive: !record.fIsActive,

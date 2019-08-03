@@ -7,15 +7,15 @@ export default {
     // steps: [{
     //   fGroupID: 1,
     //   fName: '',
-    //   depts: [{ fEntryID: 1, fDeptID: 1, fDeptName: '部门1' }, { fEntryID: 2, fDeptID: 3, fDeptName: '部门2' },],
+    //   depts: [{ fEntryID: 1, fDeptID: 1, fDeptName: '岗位1' }, { fEntryID: 2, fDeptID: 3, fDeptName: '岗位2' },],
     // }, {
     //   fGroupID: 2,
     //   fName: '',
-    //   depts: [{ fEntryID: 2, fDeptID: 3, fDeptName: '部门3' }, { fEntryID: 3, fDeptID: 3, fDeptName: '部门5' },],
+    //   depts: [{ fEntryID: 2, fDeptID: 3, fDeptName: '岗位3' }, { fEntryID: 3, fDeptID: 3, fDeptName: '岗位5' },],
     // }, {
     //   fGroupID: 3,
     //   fName: '',
-    //   depts: [{ fEntryID: 4, fDeptID: 1, fDeptName: '部门1' },],
+    //   depts: [{ fEntryID: 4, fDeptID: 1, fDeptName: '岗位1' },],
     // }],
     data: {},
     steps: [],

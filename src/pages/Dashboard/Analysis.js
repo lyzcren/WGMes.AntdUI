@@ -35,7 +35,7 @@ class Analysis extends Component {
         const {
           chart: { workshops },
         } = this.props;
-        this.setState({ workShopId: workshops[0] ? workshops[0].fItemID : 0 });
+        this.setState({ workShopId: workshops && workshops[0] ? workshops[0].fItemID : 0 });
       });
     });
   }
@@ -124,9 +124,9 @@ class Analysis extends Component {
     } else {
       salesPieData = salesType === 'online' ? salesTypeDataOnline : salesTypeDataOffline;
     }
-    const filterProcesses = processes.filter(
-      x => workShopId <= 0 || x.fWorkShop === workShopId * 1
-    );
+    const filterProcesses = !processes
+      ? []
+      : processes.filter(x => workShopId <= 0 || x.fWorkShop === workShopId * 1);
 
     const activeKey = currentTabKey || (offlineData[0] && offlineData[0].name);
 

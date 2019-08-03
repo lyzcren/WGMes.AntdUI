@@ -17,7 +17,7 @@ class ColumnConfig {
       sorter: true,
     },
     {
-      title: '部门',
+      title: '岗位',
       dataIndex: 'fDeptName',
       sorter: true,
     },

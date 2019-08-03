@@ -82,13 +82,27 @@ export class UpdateForm extends PureComponent {
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="用户名">
           {getFieldDecorator('fNumber', {
             initialValue: formVals.fNumber,
-            rules: [{ required: true, message: '请输入至少五个字符的用户名！', min: 5 }],
+            rules: [
+              { required: true, message: '请输入至少五个字符的用户名！' },
+              // 正则匹配（提示错误，阻止表单提交）
+              {
+                pattern: /^[^\s]*$/,
+                message: '禁止输入空格',
+              },
+            ],
           })(<Input placeholder="请输入" />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="姓名">
           {getFieldDecorator('fName', {
             initialValue: formVals.fName,
-            rules: [{ required: true, message: '请输入姓名', min: 1 }],
+            rules: [
+              { required: true, message: '请输入姓名' },
+              // 正则匹配（提示错误，阻止表单提交）
+              {
+                pattern: /^[^\s]*$/,
+                message: '禁止输入空格',
+              },
+            ],
           })(<Input placeholder="请输入" />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="手机号码">

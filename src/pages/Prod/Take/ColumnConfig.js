@@ -28,13 +28,13 @@ class ColumnConfig {
       },
     },
     {
-      title: '部门',
+      title: '岗位',
       dataIndex: 'fDeptName',
       width: 120,
       sorter: true,
     },
     {
-      title: '部门编码',
+      title: '岗位编码',
       dataIndex: 'fDeptNumber',
       width: 150,
       sorter: true,

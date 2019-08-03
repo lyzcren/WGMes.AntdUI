@@ -137,7 +137,7 @@ class TableList extends PureComponent {
         value: fieldsValue.fDate[1].format('YYYY-MM-DD HH:mm'),
       });
     }
-    // 部门
+    // 岗位
     if (fieldsValue.queryDept) {
       queryFilters.push({ name: 'fDeptID', compare: '=', value: fieldsValue.queryDept });
     }
@@ -281,9 +281,9 @@ class TableList extends PureComponent {
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem label="部门">
+            <FormItem label="岗位">
               {getFieldDecorator('queryDept', {
-                rules: [{ required: false, message: '请选择部门' }],
+                rules: [{ required: false, message: '请选择岗位' }],
               })(
                 <TreeSelect
                   style={{ width: '100%' }}

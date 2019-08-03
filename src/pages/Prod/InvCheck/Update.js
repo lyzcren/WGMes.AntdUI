@@ -17,6 +17,7 @@ import {
   Icon,
 } from 'antd';
 import WgPageHeaderWrapper from '@/components/WgPageHeaderWrapper';
+import { AddFromMissionForm } from './AddFromMissionForm';
 
 import styles from './List.less';
 
@@ -36,6 +37,10 @@ const ButtonGroup = Button.Group;
 @Form.create()
 class Update extends PureComponent {
   state = {
+    modalVisible: {
+      addFromMission: false,
+      scan: false,
+    },
     fInterID: null,
     fBillNo: '',
     fDate: Date.now(),
@@ -61,6 +66,48 @@ class Update extends PureComponent {
 
   loadData() {}
 
+  handleModalVisible = ({ key, flag }) => {
+    const { modalVisible } = this.state;
+    modalVisible[key] = !!flag;
+    this.setState({
+      modalVisible: { ...modalVisible },
+    });
+  };
+
+  scan = () => {};
+
+  addFromMission = () => {
+    const { form } = this.props;
+    form.validateFields(['fDeptID'], (err, fieldsValue) => {
+      if (err) return;
+
+      this.handleModalVisible({ key: 'addFromMission', flag: true });
+    });
+  };
+
+  handleAddFromMission = record => {
+    const { details } = this.state;
+    let entryId = 1;
+    details.map(x => {
+      if (x.fEntryID >= entryId) {
+        entryId = x.fEntryID + 1;
+      }
+    });
+    const newItem = {
+      ...record,
+      fMissionID: record.fInterID,
+      fRecordID: 0,
+      fInvQty: 0,
+      fDeltaQty: record.fQty,
+      fRowComments: null,
+      fEntryID: entryId,
+      fIsNew: true,
+      fProductModel: record.fModel,
+    };
+    details.push(newItem);
+    this.setState(details);
+  };
+
   handleDeptChange(val) {
     const { form, dispatch } = this.props;
     dispatch({
@@ -76,12 +123,8 @@ class Update extends PureComponent {
           const fQty = form.getFieldValue('fQty_' + x.fInterID);
           const fRowComments = form.getFieldValue('fRowComments_' + x.fInterID);
           return {
+            ...x,
             fRecordID: x.fInterID,
-            fProductName: x.fProductName,
-            fProductNumber: x.fProductNumber,
-            fProductModel: x.fProductModel,
-            fFullBatchNo: x.fFullBatchNo,
-            fUnitName: x.fUnitName,
             fQty: fQty !== undefined ? fQty : '',
             fInvQty: x.fInputQty,
             fDeltaQty: fQty !== undefined ? fQty - x.fInputQty : '',
@@ -194,7 +237,7 @@ class Update extends PureComponent {
       form: { getFieldDecorator },
     } = this.props;
 
-    const { fBillNo, fDeptName, fDate, fComments, details } = this.state;
+    const { modalVisible, fBillNo, fDeptName, fDate, fComments, details } = this.state;
 
     const menu = (
       <Menu>
@@ -208,6 +251,12 @@ class Update extends PureComponent {
     );
     const action = (
       <Fragment>
+        <ButtonGroup>
+          {/* <Button type="primary" onClickCapture={() => this.scan()}>
+            扫描
+        </Button> */}
+          <Button onClickCapture={() => this.addFromMission()}>从任务单添加</Button>
+        </ButtonGroup>
         <ButtonGroup>
           <Button type="primary" onClickCapture={() => this.save()}>
             保存
@@ -225,6 +274,20 @@ class Update extends PureComponent {
 
     const columns = [
       {
+        title: '批次',
+        dataIndex: 'fFullBatchNo',
+        render: (val, record) => {
+          return <span style={{ color: record.fIsNew ? 'red' : '' }}>{val ? val : '-'}</span>;
+        },
+      },
+      {
+        title: '任务单号',
+        dataIndex: 'fMoBillNo',
+        render: (val, record) => {
+          return <span style={{ color: record.fIsNew ? 'red' : '' }}>{val}</span>;
+        },
+      },
+      {
         title: '产品',
         dataIndex: 'fProductName',
       },
@@ -235,10 +298,6 @@ class Update extends PureComponent {
       {
         title: '规格型号',
         dataIndex: 'fProductModel',
-      },
-      {
-        title: '批次',
-        dataIndex: 'fFullBatchNo',
       },
       {
         title: '单位',
@@ -320,7 +379,7 @@ class Update extends PureComponent {
                 </FormItem>
               </Col>
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-                <FormItem label="部门">
+                <FormItem label="岗位">
                   {getFieldDecorator('fDeptName', {
                     initialValue: fDeptName,
                   })(<Input readOnly />)}
@@ -338,7 +397,13 @@ class Update extends PureComponent {
           </Form>
         </Card>
         <Card title="明细信息" style={{ marginBottom: 24 }} bordered={false}>
-          <Table rowKey="fEntryID" loading={loading} columns={columns} dataSource={details} />
+          <Table
+            rowKey="fEntryID"
+            loading={loading}
+            columns={columns}
+            dataSource={details}
+            pagination={false}
+          />
         </Card>
         <Card title="备注信息" bordered={false}>
           <Form layout="vertical">
@@ -351,6 +416,12 @@ class Update extends PureComponent {
             </Row>
           </Form>
         </Card>
+
+        <AddFromMissionForm
+          modalVisible={modalVisible.addFromMission}
+          closeMethod={() => this.handleModalVisible({ key: 'addFromMission', flag: false })}
+          handleAdd={this.handleAddFromMission}
+        />
       </WgPageHeaderWrapper>
     );
   }
