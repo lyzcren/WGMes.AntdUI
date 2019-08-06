@@ -654,7 +654,12 @@ class TableList extends PureComponent {
                   onChange={this.handleStandardTableChange}
                 />
               ) : (
-                '查询中，请稍后...'
+                <StandardTable
+                  rowKey="fItemID"
+                  bordered
+                  selectedRows={[]}
+                  columns={ColumnConfig.columns}
+                />
               )}
             </div>
           </Card>

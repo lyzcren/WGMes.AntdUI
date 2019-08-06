@@ -96,6 +96,11 @@ class ColumnConfig {
         },
       },
       {
+        title: '班次',
+        dataIndex: 'fWorkTimeName',
+        width: 150,
+      },
+      {
         title: '任务单号',
         dataIndex: 'fMoBillNo',
         width: 200,

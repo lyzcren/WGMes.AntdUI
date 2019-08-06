@@ -330,6 +330,12 @@ export default [
             component: './Basic/Emp/List',
             authority: ['Emp_Read'],
           },
+          {
+            path: '/basic/workTime',
+            name: 'workTime',
+            component: './Basic/WorkTime/List',
+            authority: ['WorkTime_Read'],
+          },
         ],
       },
       // sysConfig

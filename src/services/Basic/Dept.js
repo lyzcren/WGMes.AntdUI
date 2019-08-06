@@ -88,3 +88,7 @@ export async function fakeAddParams(params) {
     },
   });
 }
+
+export async function fakeGetWorkTimes(id) {
+  return request(`/api/dept/workTimes/${id}`);
+}

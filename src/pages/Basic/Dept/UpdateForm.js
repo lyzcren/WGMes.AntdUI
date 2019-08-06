@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import { connect } from 'dva';
 import moment from 'moment';
 import { Form, Input, Modal, Select, Switch, Tag, TreeSelect } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
@@ -13,6 +14,10 @@ const FormItem = Form.Item;
 const { Option } = Select;
 
 /* eslint react/no-multi-comp:0 */
+@connect(({ loading, basicData }) => ({
+  loading: loading.models.deptManage,
+  basicData,
+}))
 @Form.create()
 export class UpdateForm extends PureComponent {
   static defaultProps = {
@@ -37,6 +42,13 @@ export class UpdateForm extends PureComponent {
     };
   }
 
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'basicData/getWorkTime',
+    });
+  }
+
   okHandle = () => {
     const { form, handleSubmit } = this.props;
     form.validateFields((err, fieldsValue) => {
@@ -49,8 +61,17 @@ export class UpdateForm extends PureComponent {
   };
 
   render() {
-    const { form, treeData, updateModalVisible, handleModalVisible, values, typeData } = this.props;
+    const {
+      form,
+      treeData,
+      updateModalVisible,
+      handleModalVisible,
+      values,
+      typeData,
+      basicData: { workTimes },
+    } = this.props;
     const { formVals } = this.state;
+    const workTimeIds = values.workTimeList && values.workTimeList.map(x => x.fWorkTimeID);
 
     return (
       <Modal
@@ -130,6 +151,25 @@ export class UpdateForm extends PureComponent {
             )}
           </FormItem>
         )}
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="班次">
+          {form.getFieldDecorator('fWorkTimeIds', {
+            rules: [{ required: false, message: '请选择班次' }],
+            initialValue: workTimeIds,
+          })(
+            <Select
+              style={{ width: 300 }}
+              dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+              mode="multiple"
+            >
+              {workTimes &&
+                workTimes.map(workTime => (
+                  <Option key={workTime.fItemID} value={workTime.fItemID}>
+                    {workTime.fName}
+                  </Option>
+                ))}
+            </Select>
+          )}
+        </FormItem>
         {formVals.fParentID > 0 && (
           <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="启用">
             {form.getFieldDecorator('fIsActive', {

@@ -1,6 +1,7 @@
 import { fakeGetProducingRecord, fakeTransfer } from '@/services/Prod/Record';
 import { fakeGetDeptDefect, fakeMachineData } from '@/services/basicData';
 import { fakeQueryParams } from '@/services/Tech/Route';
+import { fakeGetWorkTimes } from '@/services/Basic/Dept';
 import { defaultCipherList } from 'constants';
 import { exists } from 'fs';
 import numeral from 'numeral';
@@ -14,6 +15,7 @@ export default {
     machineData: [],
     defectList: [],
     paramList: [],
+    workTimes: [],
 
     queryResult: {
       status: 'ok',
@@ -96,6 +98,14 @@ export default {
       put({
         type: 'saveDefect',
         payload: defectList,
+      });
+    },
+    *getWorkTimes({ payload }, { call, put }) {
+      const response = yield call(fakeGetWorkTimes, payload.fDeptID);
+
+      yield put({
+        type: 'save',
+        payload: { workTimes: response },
       });
     },
     *transfer({ payload }, { call, put }) {

@@ -10,6 +10,7 @@ import {
   fakeGetOperatorList,
   fakeGetBillNo,
   fakeGetStatus,
+  fakeGetWorkTime,
 } from '@/services/basicData';
 
 export default {
@@ -26,6 +27,7 @@ export default {
     operators: [],
     billNo: {},
     status: {},
+    workTimes: [],
   },
 
   effects: {
@@ -100,6 +102,13 @@ export default {
       yield put({
         type: 'save',
         payload: { status: newStatus },
+      });
+    },
+    *getWorkTime({ payload }, { call, put }) {
+      const response = yield call(fakeGetWorkTime, payload);
+      yield put({
+        type: 'save',
+        payload: { workTimes: response },
       });
     },
   },

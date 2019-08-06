@@ -27,6 +27,9 @@ export class CreateForm extends PureComponent {
       type: 'basicData/getBillNo',
       payload: { fNumber: 'Dept' },
     });
+    dispatch({
+      type: 'basicData/getWorkTime',
+    });
   }
 
   okHandle = () => {
@@ -46,7 +49,7 @@ export class CreateForm extends PureComponent {
       handleSubmit,
       handleModalVisible,
       typeData,
-      basicData: { billNo },
+      basicData: { billNo, workTimes },
     } = this.props;
 
     return (
@@ -98,6 +101,24 @@ export class CreateForm extends PureComponent {
               treeDefaultExpandAll
               dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
             />
+          )}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="班次">
+          {form.getFieldDecorator('fWorkTimeIds', {
+            rules: [{ required: false, message: '请选择班次' }],
+          })(
+            <Select
+              style={{ width: 300 }}
+              dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+              mode="multiple"
+            >
+              {workTimes &&
+                workTimes.map(workTime => (
+                  <Option key={workTime.fItemID} value={workTime.fItemID}>
+                    {workTime.fName}
+                  </Option>
+                ))}
+            </Select>
           )}
         </FormItem>
         {/* <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="类型">

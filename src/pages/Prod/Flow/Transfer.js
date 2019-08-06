@@ -111,6 +111,10 @@ class Transfer extends PureComponent {
         type: 'flowTransfer/getDefect',
         payload: { fDeptID },
       });
+      dispatch({
+        type: 'flowTransfer/getWorkTimes',
+        payload: { fDeptID },
+      });
     });
     dispatch({
       type: 'basicData/getDefectData',
@@ -138,6 +142,7 @@ class Transfer extends PureComponent {
       data.fTransferDateTime = fTransferDateTime
         ? fTransferDateTime.format('YYYY-MM-DD HH:mm:ss')
         : undefined;
+      data.fWorkTimeID = fieldsValue.fWorkTimeID;
       data.defects = [];
       data.params = [];
       for (let key in fieldsValue) {
@@ -269,7 +274,7 @@ class Transfer extends PureComponent {
 
   render() {
     const {
-      flowTransfer: { data, machineData, defectList, paramList },
+      flowTransfer: { data, machineData, defectList, paramList, workTimes },
       loading,
       form: { getFieldDecorator },
       basicData: { defectData, operators },
@@ -452,6 +457,22 @@ class Transfer extends PureComponent {
                       }}
                       onOk={this.handleChangeDate}
                     />
+                  )}
+                </FormItem>
+              </Col>
+              <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
+                <FormItem label="班次">
+                  {getFieldDecorator('fWorkTimeID', {
+                    rules: [{ required: false, message: '请选择班次' }],
+                  })(
+                    <Select>
+                      {workTimes &&
+                        workTimes.map(workTime => (
+                          <Option key={workTime.fWorkTimeID} value={workTime.fWorkTimeID}>
+                            {workTime.fWorkTimeName}
+                          </Option>
+                        ))}
+                    </Select>
                   )}
                 </FormItem>
               </Col>

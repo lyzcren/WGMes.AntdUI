@@ -112,10 +112,14 @@ class Transfer extends PureComponent {
       fDeptName,
       fFullBatchNo,
       fOperatorName,
+      fOperatorNumber,
       fMachineName,
+      fMachineNumber,
       fSignDate,
       fBeginDate,
       fTransferDateTime,
+      fWorkTimeName,
+      fWorkTimeNumber,
     } = data;
     const { qtyFormat, qtyDecimal } = this.state;
 
@@ -199,62 +203,33 @@ class Transfer extends PureComponent {
         loading={loading}
       >
         <Card title="基本信息" style={{ marginBottom: 24 }} bordered={false}>
-          <Form layout="vertical">
-            <Row gutter={16}>
-              <Col lg={6} md={12} sm={24}>
-                <FormItem key="fOperatorName" label="操作员">
-                  {getFieldDecorator('fOperatorName', {
-                    initialValue: fOperatorName,
-                  })(<Input readOnly />)}
-                </FormItem>
-              </Col>
-              <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-                <FormItem key="fMachineNumber" label="机台">
-                  {getFieldDecorator('fMachineNumber', {
-                    initialValue: fMachineName,
-                  })(<Input readOnly />)}
-                </FormItem>
-              </Col>
-              {/* <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-                <FormItem key="fMoldID" label="模具">
-                  {getFieldDecorator('fMoldID', {})(<Input readOnly placeholder="请输入" />)}
-                </FormItem>
-              </Col> */}
-            </Row>
-          </Form>
-          <Form layout="vertical">
-            <Row gutter={16}>
-              <Col lg={6} md={12} sm={24}>
-                <FormItem key="fSignDate" label="签收时间">
-                  {getFieldDecorator('fSignDate', {
-                    initialValue: moment(fSignDate),
-                  })(<DatePicker readOnly disabled format="YYYY-MM-DD HH:mm:ss" />)}
-                </FormItem>
-              </Col>
-              <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-                <FormItem key="fBeginDate" label="生产时间">
-                  {getFieldDecorator('fBeginDate', {
-                    initialValue: [moment(fBeginDate), moment(fTransferDateTime)],
-                  })(
-                    <RangePicker
-                      readOnly
-                      disabled
-                      showTime={{ format: 'HH:mm' }}
-                      format="YYYY-MM-DD HH:mm"
-                      placeholder={['开工时间', '完工时间']}
-                    />
-                  )}
-                </FormItem>
-              </Col>
-              <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-                <FormItem key="fDuration" label="生产时长">
-                  {getFieldDecorator('fDuration', {
-                    initialValue: getTimeDiff(new Date(fBeginDate), new Date(fTransferDateTime)),
-                  })(<Input readOnly />)}
-                </FormItem>
-              </Col>
-            </Row>
-          </Form>
+          <DescriptionList className={styles.headerList} size="small" col="4">
+            <Description term="操作员">{fOperatorName}</Description>
+            <Description term="操作员编码">{fOperatorNumber}</Description>
+            <Description term="机台">{fMachineName}</Description>
+            <Description term="机台编码">{fMachineNumber}</Description>
+            <Description term="签收时间">
+              {moment(fSignDate).format('YYYY-MM-DD HH:mm:ss')}
+            </Description>
+            <Description term="开始生产时间">
+              {moment(fBeginDate).format('YYYY-MM-DD HH:mm:ss')}
+            </Description>
+            <Description term="结束生产时间">
+              {moment(fTransferDateTime).format('YYYY-MM-DD HH:mm:ss')}
+            </Description>
+            <Description term="生产时长">
+              {getTimeDiff(new Date(fBeginDate), new Date(fTransferDateTime))}
+            </Description>
+            <Description term="班次">{fWorkTimeName}</Description>
+            <Description term="班次编码">{fWorkTimeNumber}</Description>
+            <Description term="流程单数量">{numeral(fFlowInputQty).format(qtyFormat)}</Description>
+            <Description term="投入数量">{numeral(fInputQty).format(qtyFormat)}</Description>
+            <Description term="合格数量">{numeral(fPassQty).format(qtyFormat)}</Description>
+            <Description term="盘点盈亏数量">
+              {numeral(fInvCheckDeltaQty).format(qtyFormat)}
+            </Description>
+            <Description term="取走数量">{numeral(fTakeQty).format(qtyFormat)}</Description>
+          </DescriptionList>
         </Card>
         {defectList && (
           <Card title="不良" style={{ marginBottom: 24 }} bordered={false}>

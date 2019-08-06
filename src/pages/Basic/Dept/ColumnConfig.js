@@ -1,5 +1,5 @@
 import React, { PureComponent, Fragment } from 'react';
-import { Switch, Popconfirm, Divider } from 'antd';
+import { Switch, Popconfirm, Divider, Tag } from 'antd';
 import Authorized from '@/utils/Authorized';
 
 const activeData = ['启用', '禁用'];
@@ -25,6 +25,20 @@ class ColumnConfig {
       title: '类型',
       dataIndex: 'fTypeName',
       sorter: true,
+    },
+    {
+      title: '班次',
+      dataIndex: 'workTimeList',
+      render(val) {
+        return (
+          val &&
+          val.map(x => (
+            <Tag key={x.fWorkTimeID} color={x.fIsActive ? 'green' : undefined}>
+              {x.fWorkTimeName}
+            </Tag>
+          ))
+        );
+      },
     },
     {
       title: '启用',

@@ -65,3 +65,7 @@ export async function fakeGetBillNo(params) {
 export async function fakeGetStatus(number) {
   return request(`/api/keyValue/${number}`);
 }
+
+export async function fakeGetWorkTime() {
+  return request(`/api/workTime/`);
+}
