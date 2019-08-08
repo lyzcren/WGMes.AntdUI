@@ -26,6 +26,10 @@ class ColumnConfig {
       dataIndex: 'fEndTime',
     },
     {
+      title: '最迟结束时间',
+      dataIndex: 'fLastEndTime',
+    },
+    {
       title: '启用',
       dataIndex: 'fIsActive',
       filters: [

@@ -5,6 +5,7 @@ import {
   fakeUpdate,
   fakeGetDepts,
   fakeSign4Reject,
+  fakeCancelTransfer,
 } from '@/services/Prod/Flow';
 import { fakeTake } from '@/services/Prod/Take';
 import { fakeQueryPrintTemplate } from '@/services/Sys/PrintTemplate';
@@ -40,6 +41,13 @@ export default {
         payload: response,
       });
       if (callback) callback();
+    },
+    *cancelTransfer({ payload }, { call, put }) {
+      const response = yield call(fakeCancelTransfer, payload);
+      yield put({
+        type: 'saveData',
+        payload: response,
+      });
     },
     *sign4Reject({ payload, callback }, { call, put }) {
       const response = yield call(fakeSign4Reject, payload);

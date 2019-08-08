@@ -67,7 +67,7 @@ class TableList extends PureComponent {
       payload: this.currentPagination,
     });
     dispatch({
-      type: 'basicData/getProcessDeptTree',
+      type: 'basicData/getAuthorizeProcessTree',
     });
     ColumnConfig.handleViewFlow = fFullBatchNo => this.handleViewFlow(fFullBatchNo);
   }
@@ -246,7 +246,7 @@ class TableList extends PureComponent {
   renderSimpleForm() {
     const {
       form: { getFieldDecorator },
-      basicData: { processDeptTree },
+      basicData: { authorizeProcessTree },
     } = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
@@ -258,7 +258,7 @@ class TableList extends PureComponent {
               })(
                 <TreeSelect
                   style={{ width: '100%' }}
-                  treeData={processDeptTree}
+                  treeData={authorizeProcessTree}
                   treeDefaultExpandAll
                   allowClear={true}
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}

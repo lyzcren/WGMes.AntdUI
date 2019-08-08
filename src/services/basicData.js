@@ -9,6 +9,10 @@ export async function fakeProcessDeptTree(params) {
   return request('/api/Dept/GetProcessTree');
 }
 
+export async function fakeGetAuthorizeProcessTree() {
+  return request('/api/Dept/AuthorizeProcessTree');
+}
+
 export async function fakeGetWorkShops(params) {
   return request('/api/Dept/GetWorkShop');
 }

@@ -103,7 +103,7 @@ class TableList extends PureComponent {
     this.searchWhereInit();
 
     dispatch({
-      type: 'basicData/getProcessDeptTree',
+      type: 'basicData/getAuthorizeProcessTree',
     });
     dispatch({
       type: 'flowManage/getPrintTemplates',
@@ -418,6 +418,15 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
 
     switch (key) {
+      case 'cancelTransfer':
+        Modal.confirm({
+          title: '取消转序',
+          content: '取消转序后生产记录回到“生产中”状态，确定取消转序吗？',
+          okText: '确认',
+          cancelText: '取消',
+          onOk: () => this.handleCancelTransfer(record),
+        });
+        break;
       case 'take':
         this.handleModalVisible({ key: 'take', flag: true }, record);
         break;
@@ -553,6 +562,30 @@ class TableList extends PureComponent {
     });
   };
 
+  handleCancelTransfer = record => {
+    const { dispatch } = this.props;
+    const { fCurrentRecordID } = record;
+    dispatch({
+      type: 'flowManage/cancelTransfer',
+      payload: {
+        id: fCurrentRecordID,
+      },
+    }).then(() => {
+      const {
+        flowManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success(`【${record.fFullBatchNo}】已成功取消转序.`);
+        // 成功后再次刷新列表
+        this.search();
+      } else if (queryResult.status === 'warning') {
+        message.warning('【' + record.fFullBatchNo + '】' + queryResult.message);
+      } else {
+        message.error('【' + record.fFullBatchNo + '】' + queryResult.message);
+      }
+    });
+  };
+
   handleSign4Reject = record => {
     const { dispatch } = this.props;
     const { fCurrentRecordID } = record;
@@ -652,19 +685,22 @@ class TableList extends PureComponent {
       (!queryDeptID || record.fCurrentDeptID === queryDeptID);
 
     const menus = [];
-    /* 生产中，可取走 */
+    // 转出中
+    if (record.fRecordStatusNumber === 'ManufTransfered')
+      menus.push(<Menu.Item key="cancelTransfer">取消转序</Menu.Item>);
+    // 生产中，可取走
     if (record.fStatusNumber === 'Producing') menus.push(<Menu.Item key="take">取走</Menu.Item>);
     if (record.fTotalTakeQty > 0) menus.push(<Menu.Item key="viewTake">取走记录</Menu.Item>);
-    /* 已签收生产中，且非首岗位，可退回 */
+    // 已签收生产中，且非首岗位，可退回
     if (record.fRecordStatusNumber === 'ManufProducing' && record.fEndProduceDeptIDList.length > 0)
       menus.push(<Menu.Item key="refund">退回</Menu.Item>);
-    /* 未签收，可拒收 */
+    // 未签收，可拒收
     if (record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufEndProduce')
       menus.push(<Menu.Item key="reject">拒收</Menu.Item>);
-    /* 生产中，可变更工艺路线 */
+    // 生产中，可变更工艺路线
     if (record.fStatusNumber === 'Producing')
       menus.push(<Menu.Item key="changeRoute">变更工艺路线</Menu.Item>);
-    /* 生产中，可分批 */
+    // 生产中，可分批
     if (record.fStatusNumber === 'Producing') menus.push(<Menu.Item key="split">分批</Menu.Item>);
 
     const operators = [];
@@ -742,7 +778,7 @@ class TableList extends PureComponent {
       fIsOperator,
       fIsAdmin,
       basicData: {
-        processDeptTree,
+        authorizeProcessTree,
         status: { flowStatus, recordStatus },
       },
     } = this.props;
@@ -777,7 +813,7 @@ class TableList extends PureComponent {
               })(
                 <TreeSelect
                   style={{ width: '100%' }}
-                  treeData={processDeptTree}
+                  treeData={authorizeProcessTree}
                   treeDefaultExpandAll
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                   onChange={this.selectChange}
@@ -834,7 +870,7 @@ class TableList extends PureComponent {
     const {
       form: { getFieldDecorator },
       basicData: {
-        processDeptTree,
+        authorizeProcessTree,
         status: { flowStatus, recordStatus },
       },
     } = this.props;
@@ -877,7 +913,7 @@ class TableList extends PureComponent {
               })(
                 <TreeSelect
                   style={{ width: '100%' }}
-                  treeData={processDeptTree}
+                  treeData={authorizeProcessTree}
                   treeDefaultExpandAll
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                   onChange={this.selectChange}
@@ -912,7 +948,7 @@ class TableList extends PureComponent {
               })(
                 <TreeSelect
                   style={{ width: '100%' }}
-                  treeData={processDeptTree}
+                  treeData={authorizeProcessTree}
                   treeDefaultExpandAll
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                   onChange={this.selectChange}

@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Form, Select, Input, Modal, Radio, Progress, Popover } from 'antd';
+import { Form, Select, TreeSelect, Input, Modal, Radio, Progress, Popover } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import {
   validatePhone,
@@ -31,6 +31,9 @@ export class CreateForm extends PureComponent {
     const { dispatch } = props;
     dispatch({
       type: 'basicData/getOperator',
+    });
+    dispatch({
+      type: 'basicData/getProcessDeptTree',
     });
   }
 
@@ -98,7 +101,7 @@ export class CreateForm extends PureComponent {
     const {
       form: { getFieldDecorator, getFieldValue },
       modalVisible,
-      basicData: { operators },
+      basicData: { operators, processDeptTree },
       handleAdd,
       handleModalVisible,
     } = this.props;
@@ -225,6 +228,19 @@ export class CreateForm extends PureComponent {
               size="large"
               type="password"
               placeholder={formatMessage({ id: 'form.confirm-password.placeholder' })}
+            />
+          )}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="授权岗位">
+          {getFieldDecorator('fDeptID', {
+            rules: [{ required: true, message: '请选择岗位' }],
+          })(
+            <TreeSelect
+              style={{ width: 300 }}
+              dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+              treeData={processDeptTree}
+              multiple
+              treeDefaultExpandAll
             />
           )}
         </FormItem>

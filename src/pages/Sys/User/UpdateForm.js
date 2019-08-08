@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
-import { Form, Input, Select, Modal, Radio, Progress, notification } from 'antd';
+import { Form, Input, Select, TreeSelect, Modal, Radio, Progress, notification } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import {
   validatePhone,
@@ -47,6 +47,9 @@ export class UpdateForm extends PureComponent {
     dispatch({
       type: 'basicData/getOperator',
     });
+    dispatch({
+      type: 'basicData/getProcessDeptTree',
+    });
   }
 
   okHandle = () => {
@@ -66,7 +69,7 @@ export class UpdateForm extends PureComponent {
       updateModalVisible,
       handleUpdateModalVisible,
       values,
-      basicData: { operators },
+      basicData: { operators, processDeptTree },
     } = this.props;
     const { formVals } = this.state;
 
@@ -146,6 +149,20 @@ export class UpdateForm extends PureComponent {
               <RadioButton value={1}>男</RadioButton>
               <RadioButton value={2}>女</RadioButton>
             </RadioGroup>
+          )}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="授权岗位">
+          {getFieldDecorator('fDeptID', {
+            rules: [{ required: true, message: '请选择岗位' }],
+            initialValue: values.deptList && values.deptList.map(x => x.fDeptID),
+          })(
+            <TreeSelect
+              style={{ width: 300 }}
+              dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+              treeData={processDeptTree}
+              multiple
+              treeDefaultExpandAll
+            />
           )}
         </FormItem>
       </Modal>

@@ -33,6 +33,15 @@ export async function fakeSign(params) {
   });
 }
 
+export async function fakeCancelTransfer(params) {
+  return request(`/api/record/cancelTransfer/${params.id}`, {
+    method: 'PUT',
+    body: {
+      method: 'cancelTransfer',
+    },
+  });
+}
+
 export async function fakeSign4Reject(params) {
   return request('/api/record/sign4Reject', {
     method: 'POST',

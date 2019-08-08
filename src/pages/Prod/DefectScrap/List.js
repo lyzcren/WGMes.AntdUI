@@ -8,6 +8,7 @@ import {
   Form,
   Input,
   Select,
+  TreeSelect,
   Icon,
   Button,
   Dropdown,
@@ -44,8 +45,9 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ defectScrapManage, loading }) => ({
+@connect(({ defectScrapManage, basicData, loading }) => ({
   defectScrapManage,
+  basicData,
   loading: loading.models.defectScrapManage,
 }))
 @Form.create()
@@ -76,6 +78,9 @@ class TableList extends PureComponent {
     dispatch({
       type: 'defectScrapManage/fetch',
       payload: this.currentPagination,
+    });
+    dispatch({
+      type: 'basicData/getAuthorizeProcessTree',
     });
     // 列配置相关方法
     ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdateModalVisible(true, record);
@@ -122,6 +127,8 @@ class TableList extends PureComponent {
     };
     // 查询条件处理
     const queryFilters = [];
+    if (fieldsValue.queryDept)
+      queryFilters.push({ name: 'fDeptID', compare: '=', value: fieldsValue.queryDept });
     if (fieldsValue.queryMoBillNo)
       queryFilters.push({ name: 'fMoBillNo', compare: '%*%', value: fieldsValue.queryMoBillNo });
 
@@ -295,10 +302,26 @@ class TableList extends PureComponent {
   renderSimpleForm() {
     const {
       form: { getFieldDecorator },
+      basicData: { authorizeProcessTree },
     } = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+          <Col md={6} sm={24}>
+            <FormItem label="岗位">
+              {getFieldDecorator('queryDept', {
+                rules: [{ required: false, message: '请选择岗位' }],
+              })(
+                <TreeSelect
+                  style={{ width: '100%' }}
+                  treeData={authorizeProcessTree}
+                  treeDefaultExpandAll
+                  allowClear={true}
+                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                />
+              )}
+            </FormItem>
+          </Col>
           <Col md={6} sm={24}>
             <FormItem label="任务单号">
               {getFieldDecorator('queryMoBillNo')(<Input placeholder="请输入" />)}

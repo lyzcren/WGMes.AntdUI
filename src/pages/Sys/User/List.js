@@ -24,6 +24,7 @@ import {
   Progress,
   notification,
   Popconfirm,
+  Tag,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
@@ -91,6 +92,20 @@ class TableList extends PureComponent {
     {
       title: '移动电话',
       dataIndex: 'fPhone',
+    },
+    {
+      title: '授权岗位',
+      dataIndex: 'deptList',
+      render: val => {
+        return (
+          val &&
+          val.map(x => (
+            <Tag key={x.fDeptID} color={x.fIsActive ? 'green' : undefined}>
+              {x.fDeptName}
+            </Tag>
+          ))
+        );
+      },
     },
     {
       title: '性别',

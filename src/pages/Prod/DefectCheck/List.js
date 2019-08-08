@@ -81,7 +81,7 @@ class TableList extends PureComponent {
       payload: this.currentPagination,
     });
     dispatch({
-      type: 'basicData/getProcessDeptTree',
+      type: 'basicData/getAuthorizeProcessTree',
     });
     dispatch({
       type: 'basicData/getStatus',
@@ -422,7 +422,7 @@ class TableList extends PureComponent {
     const {
       form: { getFieldDecorator },
       basicData: {
-        processDeptTree,
+        authorizeProcessTree,
         status: { defectCheckStatus },
       },
     } = this.props;
@@ -436,7 +436,7 @@ class TableList extends PureComponent {
               })(
                 <TreeSelect
                   style={{ width: '100%' }}
-                  treeData={processDeptTree}
+                  treeData={authorizeProcessTree}
                   treeDefaultExpandAll
                   allowClear={true}
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}

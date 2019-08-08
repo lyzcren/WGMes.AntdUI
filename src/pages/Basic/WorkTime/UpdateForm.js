@@ -46,6 +46,9 @@ export class UpdateForm extends PureComponent {
         id: this.state.formVals.fItemID,
         fBeginTime: fields.fBeginTime.format('YYYY-MM-DD HH:mm:ss'),
         fEndTime: fields.fEndTime.format('YYYY-MM-DD HH:mm:ss'),
+        fLastEndTime: fields.fLastEndTime
+          ? fields.fLastEndTime.format('YYYY-MM-DD HH:mm:ss')
+          : null,
       },
     }).then(() => {
       const {
@@ -100,6 +103,12 @@ export class UpdateForm extends PureComponent {
           {form.getFieldDecorator('fEndTime', {
             rules: [{ required: true, message: '请输入结束时间' }],
             initialValue: moment(values.fEndTime, timeFormat),
+          })(<TimePicker format={timeFormat} />)}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="最晚结束时间">
+          {form.getFieldDecorator('fLastEndTime', {
+            rules: [{ required: false, message: '请输入最晚结束时间' }],
+            initialValue: moment(values.fLastEndTime, timeFormat),
           })(<TimePicker format={timeFormat} />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="启用">

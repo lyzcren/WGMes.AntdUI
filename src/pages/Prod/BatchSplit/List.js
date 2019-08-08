@@ -16,6 +16,7 @@ import {
   message,
   Table,
   Tooltip,
+  TreeSelect,
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
@@ -34,8 +35,9 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ batchSplitManage, loading }) => ({
+@connect(({ batchSplitManage, basicData, loading }) => ({
   batchSplitManage,
+  basicData,
   loading: loading.models.batchSplitManage,
 }))
 @Form.create()
@@ -59,6 +61,9 @@ class TableList extends PureComponent {
     dispatch({
       type: 'batchSplitManage/fetch',
       payload: this.currentPagination,
+    });
+    dispatch({
+      type: 'basicData/getAuthorizeProcessTree',
     });
     ColumnConfig.handleViewFlow = record => this.handleViewFlow(record.fFullBatchNo);
   }
@@ -103,6 +108,8 @@ class TableList extends PureComponent {
     };
     // 查询条件处理
     const queryFilters = [];
+    if (fieldsValue.queryDept)
+      queryFilters.push({ name: 'fDeptID', compare: '=', value: fieldsValue.queryDept });
     if (fieldsValue.queryBatchNo)
       queryFilters.push({ name: 'fFullBatchNo', compare: '%*%', value: fieldsValue.queryBatchNo });
 
@@ -256,10 +263,26 @@ class TableList extends PureComponent {
   renderSimpleForm() {
     const {
       form: { getFieldDecorator },
+      basicData: { authorizeProcessTree },
     } = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+          <Col md={6} sm={24}>
+            <FormItem label="岗位">
+              {getFieldDecorator('queryDept', {
+                rules: [{ required: false, message: '请选择岗位' }],
+              })(
+                <TreeSelect
+                  style={{ width: '100%' }}
+                  treeData={authorizeProcessTree}
+                  treeDefaultExpandAll
+                  allowClear={true}
+                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                />
+              )}
+            </FormItem>
+          </Col>
           <Col md={8} sm={24}>
             <FormItem label="批号">
               {getFieldDecorator('queryBatchNo')(<Input placeholder="请输入" />)}
