@@ -84,8 +84,6 @@ class TableList extends PureComponent {
     currentFormValues: {},
     // expandForm: 是否展开更多查询条件
     expandForm: false,
-    // 操作员查询条件
-    operatorForm: !this.props.fIsAdmin && this.props.fIsOperator,
     selectedRows: [],
     queryFilters: [],
     queryDeptID: null,
@@ -188,50 +186,48 @@ class TableList extends PureComponent {
     };
     // 查询条件处理
     const queryFilters = [];
-    if (fieldsValue.queryOperatorDept) {
+    if (fieldsValue.queryCurrentDeptID) {
       // 当前岗位可签收
       if (fieldsValue.queryRecordStatusNumber === 'ManufWait4Sign') {
         queryFilters.push({
           name: 'fNextDeptIDs',
           compare: '%*%',
-          value: fieldsValue.queryOperatorDept,
+          value: fieldsValue.queryCurrentDeptID,
         });
-        queryFilters.push({ name: 'fRecordStatusNumber', compare: '<>', value: 'ManufProducing' });
-      }
-      // 当前岗位生产中
-      else if (fieldsValue.queryRecordStatusNumber === 'ManufProducing') {
+        queryFilters.push({ name: 'fRecordStatusNumber', compare: '=', value: 'ManufTransfered' });
+      } else if (fieldsValue.queryRecordStatusNumber) {
         queryFilters.push({
           name: 'fCurrentDeptID',
           compare: '=',
-          value: fieldsValue.queryOperatorDept,
+          value: fieldsValue.queryCurrentDeptID,
         });
         queryFilters.push({
           name: 'fRecordStatusNumber',
           compare: '=',
           value: fieldsValue.queryRecordStatusNumber,
         });
-      }
-      // 当前岗位已完成
-      else if (fieldsValue.queryRecordStatusNumber === 'ManufEndProduce') {
-        queryFilters.push({
-          name: 'FEndProduceDeptIDs',
-          compare: '%*%',
-          value: fieldsValue.queryOperatorDept,
-        });
       } else {
-        // 只选择岗位，未选择状态，该岗位在工艺路线内即可
         queryFilters.push({
-          name: 'fAllDeptIDs',
-          compare: '%*%',
-          value: fieldsValue.queryOperatorDept,
+          name: 'fCurrentDeptID',
+          compare: '=',
+          value: fieldsValue.queryCurrentDeptID,
         });
       }
     }
-    if (fieldsValue.queryDept) {
-      // 只选择岗位，未选择状态，该岗位在工艺路线内即可
-      queryFilters.push({ name: 'fAllDeptIDs', compare: '%*%', value: fieldsValue.queryDept });
-    }
-    // 无岗位时查询流程单状态
+    if (fieldsValue.queryAllDeptID)
+      queryFilters.push({ name: 'fAllDeptIDs', compare: '%*%', value: fieldsValue.queryAllDeptID });
+    if (fieldsValue.queryEndProduceDeptID)
+      queryFilters.push({
+        name: 'fEndProduceDeptIDs',
+        compare: '%*%',
+        value: fieldsValue.queryEndProduceDeptID,
+      });
+    if (fieldsValue.queryNextDeptID)
+      queryFilters.push({
+        name: 'fNextDeptIDs',
+        compare: '%*%',
+        value: fieldsValue.queryNextDeptID,
+      });
     if (fieldsValue.queryStatusNumber)
       queryFilters.push({
         name: 'fStatusNumber',
@@ -312,7 +308,7 @@ class TableList extends PureComponent {
         payload: pagination,
       });
       this.setState({
-        queryDeptID: fieldsValue.queryDept,
+        queryDeptID: fieldsValue.queryCurrentDeptID,
         queryStatusNumber: fieldsValue.queryStatusNumber,
         queryRecordStatusNumber: fieldsValue.queryRecordStatusNumber,
       });
@@ -418,13 +414,6 @@ class TableList extends PureComponent {
     });
   };
 
-  toggleOperatorForm = () => {
-    const { operatorForm } = this.state;
-    this.setState({
-      operatorForm: !operatorForm,
-    });
-  };
-
   moreMenuClick = (key, record) => {
     const { dispatch } = this.props;
 
@@ -501,16 +490,9 @@ class TableList extends PureComponent {
   };
 
   handleScanTransfer = record => {
-    const { operatorForm, queryDeptID } = this.state;
+    const { queryDeptID } = this.state;
     const { fCurrentDeptID, fCurrentDeptName } = record;
-    // 操作员查询界面，要求先选择岗位后才能扫描转序（管理员查询界面则不需要）
-    if (!!operatorForm && !queryDeptID) {
-      message.warning(`扫描转序需先选择岗位，请先选择岗位.`);
-    } else if (!!operatorForm && queryDeptID !== fCurrentDeptID) {
-      message.warning(`请选择【${fCurrentDeptName}】岗位再扫描转序.`);
-    } else {
-      this.transferModalVisible(record);
-    }
+    this.transferModalVisible(record);
   };
 
   handleSign = record => {
@@ -688,7 +670,7 @@ class TableList extends PureComponent {
     const operators = [];
     if (
       record.fStatusNumber === 'BeforeProduce' ||
-      (record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufEndProduce') ||
+      (record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufTransfered') ||
       (record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufCancel') ||
       record.fRecordStatusNumber === 'ManufRefund'
     ) {
@@ -754,25 +736,44 @@ class TableList extends PureComponent {
     );
   };
 
-  // 为操作员定制的查询条件
-  renderOperatorForm() {
+  renderSimpleForm() {
     const {
       form: { getFieldDecorator },
       fIsOperator,
       fIsAdmin,
       basicData: {
         processDeptTree,
-        status: { recordStatus },
+        status: { flowStatus, recordStatus },
       },
     } = this.props;
-    const { operatorForm, queryBatchNo } = this.state;
+    const { queryBatchNo } = this.state;
+
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={6} sm={24}>
-            <FormItem label="岗位">
-              {getFieldDecorator('queryOperatorDept', {
-                rules: [{ required: true, message: '请选择岗位' }],
+          <Col md={4} sm={24}>
+            <FormItem label="流程单状态">
+              {getFieldDecorator('queryStatusNumber')(
+                <Select
+                  placeholder="请选择"
+                  style={{ width: '100%' }}
+                  allowClear={true}
+                  onChange={this.selectChange}
+                >
+                  {flowStatus &&
+                    flowStatus.map(x => (
+                      <Option key={x.fKeyName} value={x.fKeyName}>
+                        <Badge color={x.fColor} text={x.fValue} />
+                      </Option>
+                    ))}
+                </Select>
+              )}
+            </FormItem>
+          </Col>
+          <Col md={4} sm={24}>
+            <FormItem label="当前岗位">
+              {getFieldDecorator('queryCurrentDeptID', {
+                rules: [{ required: false, message: '请选择岗位' }],
               })(
                 <TreeSelect
                   style={{ width: '100%' }}
@@ -780,14 +781,20 @@ class TableList extends PureComponent {
                   treeDefaultExpandAll
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                   onChange={this.selectChange}
+                  allowClear={true}
                 />
               )}
             </FormItem>
           </Col>
-          <Col md={6} sm={24}>
-            <FormItem label="状态">
+          <Col md={4} sm={24}>
+            <FormItem label="岗位状态">
               {getFieldDecorator('queryRecordStatusNumber')(
-                <Select placeholder="请选择" style={{ width: '100%' }} onChange={this.selectChange}>
+                <Select
+                  placeholder="请选择"
+                  style={{ width: '100%' }}
+                  allowClear={true}
+                  onChange={this.selectChange}
+                >
                   {recordStatus &&
                     recordStatus.map(x => (
                       <Option key={x.fKeyName} value={x.fKeyName}>
@@ -805,7 +812,7 @@ class TableList extends PureComponent {
               })(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
-          <Col md={6} sm={24}>
+          <Col md={4} sm={24}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
                 查询
@@ -813,91 +820,6 @@ class TableList extends PureComponent {
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
               </Button>
-              {/* {(fIsAdmin || !fIsOperator) && ( */}
-              <a style={{ marginLeft: 8 }} onClick={this.toggleOperatorForm}>
-                切换
-              </a>
-              {/* )} */}
-              <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-                展开 <Icon type="down" />
-              </a>
-            </span>
-          </Col>
-        </Row>
-      </Form>
-    );
-  }
-
-  renderSimpleForm() {
-    const {
-      form: { getFieldDecorator },
-      fIsOperator,
-      fIsAdmin,
-      basicData: {
-        processDeptTree,
-        status: { flowStatus },
-      },
-    } = this.props;
-    const { operatorForm, queryBatchNo } = this.state;
-
-    return (
-      <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={6} sm={24}>
-            <FormItem label="岗位">
-              {getFieldDecorator('queryDept', {
-                rules: [{ required: false, message: '请选择岗位' }],
-              })(
-                <TreeSelect
-                  style={{ width: '100%' }}
-                  treeData={processDeptTree}
-                  treeDefaultExpandAll
-                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                  onChange={this.selectChange}
-                  allowClear={true}
-                />
-              )}
-            </FormItem>
-          </Col>
-          <Col md={6} sm={24}>
-            <FormItem label="流程单状态">
-              {getFieldDecorator('queryStatusNumber')(
-                <Select placeholder="请选择" style={{ width: '100%' }} onChange={this.selectChange}>
-                  {flowStatus &&
-                    flowStatus.map(x => (
-                      <Option key={x.fKeyName} value={x.fKeyName}>
-                        <Badge color={x.fColor} text={x.fValue} />
-                      </Option>
-                    ))}
-                </Select>
-              )}
-            </FormItem>
-          </Col>
-          <Col md={6} sm={24}>
-            <FormItem label="批号">
-              {getFieldDecorator('queryBatchNo', {
-                initialValue: queryBatchNo,
-              })(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col>
-          {/* <Col md={6} sm={24}>
-            <FormItem label="任务单号">
-              {getFieldDecorator('queryMoBillNo')(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col> */}
-          <Col md={6} sm={24}>
-            <span className={styles.submitButtons}>
-              <Button type="primary" htmlType="submit">
-                查询
-              </Button>
-              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
-              </Button>
-              {/* {(fIsAdmin || !fIsOperator) && ( */}
-              <a style={{ marginLeft: 8 }} onClick={this.toggleOperatorForm}>
-                切换
-              </a>
-              {/* )} */}
               <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
                 展开 <Icon type="down" />
               </a>
@@ -913,7 +835,7 @@ class TableList extends PureComponent {
       form: { getFieldDecorator },
       basicData: {
         processDeptTree,
-        status: { flowStatus },
+        status: { flowStatus, recordStatus },
       },
     } = this.props;
     return (
@@ -934,10 +856,8 @@ class TableList extends PureComponent {
               {getFieldDecorator('querySoBillNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
-        </Row>
-        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem label="状态">
+            <FormItem label="流程单状态">
               {getFieldDecorator('queryStatusNumber')(
                 <Select placeholder="请选择" style={{ width: '100%' }} onChange={this.selectChange}>
                   {flowStatus &&
@@ -951,6 +871,57 @@ class TableList extends PureComponent {
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
+            <FormItem label="当前岗位">
+              {getFieldDecorator('queryCurrentDeptID', {
+                rules: [{ required: false, message: '请选择岗位' }],
+              })(
+                <TreeSelect
+                  style={{ width: '100%' }}
+                  treeData={processDeptTree}
+                  treeDefaultExpandAll
+                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                  onChange={this.selectChange}
+                  allowClear={true}
+                />
+              )}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="岗位状态">
+              {getFieldDecorator('queryRecordStatusNumber')(
+                <Select
+                  placeholder="请选择"
+                  style={{ width: '100%' }}
+                  allowClear={true}
+                  onChange={this.selectChange}
+                >
+                  {recordStatus &&
+                    recordStatus.map(x => (
+                      <Option key={x.fKeyName} value={x.fKeyName}>
+                        <Badge color={x.fColor} text={x.fValue} />
+                      </Option>
+                    ))}
+                </Select>
+              )}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="包含岗位">
+              {getFieldDecorator('queryAllDeptID', {
+                rules: [{ required: false, message: '请选择岗位' }],
+              })(
+                <TreeSelect
+                  style={{ width: '100%' }}
+                  treeData={processDeptTree}
+                  treeDefaultExpandAll
+                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                  onChange={this.selectChange}
+                  allowClear={true}
+                />
+              )}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
             <FormItem label="工艺路线">
               {getFieldDecorator('queryRouteName')(<Input placeholder="请输入" />)}
             </FormItem>
@@ -960,8 +931,6 @@ class TableList extends PureComponent {
               {getFieldDecorator('queryRouteNumber')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
-        </Row>
-        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
             <FormItem label="产品名称">
               {getFieldDecorator('queryProductName')(<Input placeholder="请输入" />)}
@@ -1011,12 +980,8 @@ class TableList extends PureComponent {
   }
 
   renderForm() {
-    const { expandForm, operatorForm } = this.state;
-    return expandForm
-      ? this.renderAdvancedForm()
-      : operatorForm
-      ? this.renderOperatorForm()
-      : this.renderSimpleForm();
+    const { expandForm } = this.state;
+    return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
   render() {

@@ -44,12 +44,15 @@ export default {
         step.title = step.depts
           .map(dept => dept.fDeptName + (dept.fIsReproduce ? '（重做）' : ''))
           .join(' & ');
-        if (step.depts.length === 1 && step.depts[0].fStatus === 2) {
+        if (step.depts.length === 1 && step.depts[0].fStatus > 1) {
           step.recordId = step.depts[0].fInterID;
         }
         if (step.depts.length === 1) {
           const record = step.depts[0];
-          if (record.fStatusNumber === 'ManufEndProduce') {
+          if (
+            record.fStatusNumber === 'ManufEndProduce' ||
+            record.fStatusNumber === 'ManufTransfered'
+          ) {
             step.description = (
               <span>
                 {'【' +

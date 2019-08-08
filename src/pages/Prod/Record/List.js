@@ -319,7 +319,10 @@ class TableList extends PureComponent {
   renderSimpleForm() {
     const {
       form: { getFieldDecorator },
-      basicData,
+      basicData: {
+        processDeptTree,
+        status: { recordStatus },
+      },
     } = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
@@ -331,14 +334,14 @@ class TableList extends PureComponent {
               })(<RangePicker format="YYYY-MM-DD" placeholder={['开始时间', '结束时间']} />)}
             </FormItem>
           </Col>
-          <Col md={6} sm={24}>
+          <Col md={4} sm={24}>
             <FormItem label="岗位">
               {getFieldDecorator('queryDept', {
                 rules: [{ required: false, message: '请选择岗位' }],
               })(
                 <TreeSelect
                   style={{ width: '100%' }}
-                  treeData={basicData.processDeptTree}
+                  treeData={processDeptTree}
                   treeDefaultExpandAll
                   allowClear={true}
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
@@ -346,17 +349,31 @@ class TableList extends PureComponent {
               )}
             </FormItem>
           </Col>
-          <Col md={6} sm={24}>
+          <Col md={4} sm={24}>
+            <FormItem label="状态">
+              {getFieldDecorator('queryStatusNumber')(
+                <Select
+                  placeholder="请选择"
+                  style={{ width: '100%' }}
+                  allowClear={true}
+                  onChange={this.selectChange}
+                >
+                  {recordStatus &&
+                    recordStatus.map(x => (
+                      <Option key={x.fKeyName} value={x.fKeyName}>
+                        <Badge color={x.fColor} text={x.fValue} />
+                      </Option>
+                    ))}
+                </Select>
+              )}
+            </FormItem>
+          </Col>
+          <Col md={4} sm={24}>
             <FormItem label="批号">
               {getFieldDecorator('queryBatchNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
-          {/* <Col md={6} sm={24}>
-            <FormItem label="任务单号">
-              {getFieldDecorator('queryMoBillNo')(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col> */}
-          <Col md={6} sm={24}>
+          <Col md={4} sm={24}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
                 查询

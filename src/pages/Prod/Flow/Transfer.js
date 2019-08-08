@@ -59,6 +59,8 @@ class Transfer extends PureComponent {
     // qtyFormat: '0.0000'
     qtyDecimal: 0,
     qtyFormat: '0',
+    fMachineID: undefined,
+    fWorkTimeID: undefined,
   };
 
   componentDidMount() {
@@ -186,6 +188,19 @@ class Transfer extends PureComponent {
     });
   }
 
+  handleOperatorChange = value => {
+    const {
+      basicData: { operators },
+    } = this.props;
+    const selectedOperator = operators.find(x => x.fItemID === value);
+    if (selectedOperator && selectedOperator.fMachineID) {
+      this.setState({ fMachineID: selectedOperator.fMachineID });
+    }
+    if (selectedOperator && selectedOperator.fWorkTimeID) {
+      this.setState({ fWorkTimeID: selectedOperator.fWorkTimeID });
+    }
+  };
+
   handleFieldChange(fValue, fDefectID) {
     fValue = fValue ? fValue : 0;
     const { dispatch } = this.props;
@@ -281,6 +296,26 @@ class Transfer extends PureComponent {
       fBindEmpID,
     } = this.props;
     const { showMoreDefect, moreDefectValue, qtyFormat, qtyDecimal } = this.state;
+    // 默认机台
+    const defaultMachineID =
+      machineData && machineData.find(x => x.fItemID === this.state.fMachineID)
+        ? this.state.fMachineID
+        : null;
+    // 默认班次
+    const defaultWorkTimeID =
+      workTimes && workTimes.find(x => x.fWorkTimeID === this.state.fWorkTimeID)
+        ? this.state.fWorkTimeID
+        : null;
+    const currentTime = new Date();
+    // 根据当前时间推算班次信息
+    const currentWorkTime =
+      workTimes &&
+      workTimes.find(
+        x =>
+          moment(x.currentBeginTime) <= moment(currentTime) &&
+          moment(x.currentEndTime) >= moment(currentTime)
+      );
+    const currentWorkTimeID = currentWorkTime ? currentWorkTime.fWorkTimeID : null;
 
     const description = (
       <div style={{ display: 'flex' }}>
@@ -382,6 +417,7 @@ class Transfer extends PureComponent {
                       filterOption={(input, option) =>
                         option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                       }
+                      onChange={this.handleOperatorChange}
                     >
                       {operators &&
                         operators.map(x => (
@@ -397,6 +433,7 @@ class Transfer extends PureComponent {
                 <FormItem key="fMachineID" label="机台">
                   {getFieldDecorator('fMachineID', {
                     rules: [{ required: data.fRequireMachine, message: '请选择机台' }],
+                    initialValue: defaultMachineID,
                   })(
                     <Select
                       placeholder="请选择机台"
@@ -464,6 +501,7 @@ class Transfer extends PureComponent {
                 <FormItem label="班次">
                   {getFieldDecorator('fWorkTimeID', {
                     rules: [{ required: false, message: '请选择班次' }],
+                    initialValue: defaultWorkTimeID ? defaultWorkTimeID : currentWorkTimeID,
                   })(
                     <Select>
                       {workTimes &&
