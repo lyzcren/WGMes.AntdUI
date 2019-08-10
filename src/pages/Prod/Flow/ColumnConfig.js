@@ -61,7 +61,12 @@ class ColumnConfig {
         title: '状态',
         dataIndex: 'fStatusNumber',
         width: 150,
-        render: (val, record) => <Badge color={record.fStatusColor} text={record.fStatusName} />,
+        render: (val, record) => {
+          if (record.fCancellation) {
+            return <Badge color={'#696969'} text={'已作废'} />;
+          }
+          return <Badge color={record.fStatusColor} text={record.fStatusName} />;
+        },
         filters: this.statusFilter,
       },
       {

@@ -427,6 +427,15 @@ class TableList extends PureComponent {
           onOk: () => this.handleCancelTransfer(record),
         });
         break;
+      case 'cancel':
+        Modal.confirm({
+          title: '作废流程单',
+          content: '确定作废吗？',
+          okText: '确认',
+          cancelText: '取消',
+          onOk: () => this.handleCancel(record),
+        });
+        break;
       case 'take':
         this.handleModalVisible({ key: 'take', flag: true }, record);
         break;
@@ -586,6 +595,30 @@ class TableList extends PureComponent {
     });
   };
 
+  handleCancel = record => {
+    const { dispatch } = this.props;
+    const { fInterID } = record;
+    dispatch({
+      type: 'flowManage/cancel',
+      payload: {
+        id: fInterID,
+      },
+    }).then(() => {
+      const {
+        flowManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success(`【${record.fFullBatchNo}】已作废.`);
+        // 成功后再次刷新列表
+        this.search();
+      } else if (queryResult.status === 'warning') {
+        message.warning('【' + record.fFullBatchNo + '】' + queryResult.message);
+      } else {
+        message.error('【' + record.fFullBatchNo + '】' + queryResult.message);
+      }
+    });
+  };
+
   handleSign4Reject = record => {
     const { dispatch } = this.props;
     const { fCurrentRecordID } = record;
@@ -677,31 +710,47 @@ class TableList extends PureComponent {
     const { queryDeptID } = this.state;
     // 指定岗位则判断签收岗位是否包含指定的岗位，否则则判断当前是否有岗位可签收
     const canSign =
+      !record.fCancellation &&
       record.fNextDeptIDList &&
       record.fRecordStatusNumber !== 'ManufProducing' &&
       (!queryDeptID || record.fNextDeptIDList.includes(queryDeptID));
     const canTransfer =
+      !record.fCancellation &&
       record.fRecordStatusNumber === 'ManufProducing' &&
       (!queryDeptID || record.fCurrentDeptID === queryDeptID);
 
     const menus = [];
     // 转出中
-    if (record.fRecordStatusNumber === 'ManufTransfered')
+    if (record.fRecordStatusNumber === 'ManufTransfered' && !record.fCancellation)
       menus.push(<Menu.Item key="cancelTransfer">取消转序</Menu.Item>);
     // 生产中，可取走
-    if (record.fStatusNumber === 'Producing') menus.push(<Menu.Item key="take">取走</Menu.Item>);
-    if (record.fTotalTakeQty > 0) menus.push(<Menu.Item key="viewTake">取走记录</Menu.Item>);
+    if (record.fStatusNumber === 'Producing' && !record.fCancellation)
+      menus.push(<Menu.Item key="take">取走</Menu.Item>);
+    if (record.fTotalTakeQty > 0 && !record.fCancellation)
+      menus.push(<Menu.Item key="viewTake">取走记录</Menu.Item>);
     // 已签收生产中，且非首岗位，可退回
-    if (record.fRecordStatusNumber === 'ManufProducing' && record.fEndProduceDeptIDList.length > 0)
+    if (
+      record.fRecordStatusNumber === 'ManufProducing' &&
+      record.fEndProduceDeptIDList.length > 0 &&
+      !record.fCancellation
+    )
       menus.push(<Menu.Item key="refund">退回</Menu.Item>);
     // 未签收，可拒收
-    if (record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufEndProduce')
+    if (
+      record.fStatusNumber === 'Producing' &&
+      record.fRecordStatusNumber === 'ManufEndProduce' &&
+      !record.fCancellation
+    )
       menus.push(<Menu.Item key="reject">拒收</Menu.Item>);
     // 生产中，可变更工艺路线
-    if (record.fStatusNumber === 'Producing')
+    if (record.fStatusNumber === 'Producing' && !record.fCancellation)
       menus.push(<Menu.Item key="changeRoute">变更工艺路线</Menu.Item>);
     // 生产中，可分批
-    if (record.fStatusNumber === 'Producing') menus.push(<Menu.Item key="split">分批</Menu.Item>);
+    if (record.fStatusNumber === 'Producing' && !record.fCancellation)
+      menus.push(<Menu.Item key="split">分批</Menu.Item>);
+    // 作废
+    if (record.fStatusNumber !== 'Reported' && !record.fCancellation)
+      menus.push(<Menu.Item key="cancel">作废</Menu.Item>);
 
     const operators = [];
     if (
@@ -719,7 +768,11 @@ class TableList extends PureComponent {
         </Authorized>
       );
     }
-    if (record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufReject') {
+    if (
+      !record.fCancellation &&
+      record.fStatusNumber === 'Producing' &&
+      record.fRecordStatusNumber === 'ManufReject'
+    ) {
       operators.push(
         <Authorized key={'sign4Reject'} authority="Flow_Sign">
           <Divider type="vertical" />
@@ -729,7 +782,11 @@ class TableList extends PureComponent {
         </Authorized>
       );
     }
-    if (record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufProducing') {
+    if (
+      !record.fCancellation &&
+      record.fStatusNumber === 'Producing' &&
+      record.fRecordStatusNumber === 'ManufProducing'
+    ) {
       operators.push(
         <Authorized key={'transfer'} authority="Flow_Transfer">
           <Divider type="vertical" />
@@ -739,7 +796,7 @@ class TableList extends PureComponent {
         </Authorized>
       );
     }
-    if (record.fStatusNumber === 'EndProduce') {
+    if (!record.fCancellation && record.fStatusNumber === 'EndProduce') {
       operators.push(
         <Authorized key={'report'} authority="Flow_Report">
           <Divider type="vertical" />

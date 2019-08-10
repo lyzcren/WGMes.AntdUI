@@ -142,11 +142,12 @@ export class UpdateForm extends PureComponent {
                 : null,
             })(
               <Select placeholder="请选择" style={{ width: '100%' }}>
-                {typeData.map(x => (
-                  <Option key={x.fKey} value={x.fKey}>
-                    {x.fValue}
-                  </Option>
-                ))}
+                {typeData &&
+                  typeData.map(x => (
+                    <Option key={x.fKey} value={x.fKey}>
+                      {x.fValue}
+                    </Option>
+                  ))}
               </Select>
             )}
           </FormItem>

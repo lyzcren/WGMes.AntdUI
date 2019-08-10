@@ -42,6 +42,15 @@ export async function fakeCancelTransfer(params) {
   });
 }
 
+export async function fakeCancel(params) {
+  return request(`/api/flow/cancel/${params.id}`, {
+    method: 'PUT',
+    body: {
+      method: 'fakeCancel',
+    },
+  });
+}
+
 export async function fakeSign4Reject(params) {
   return request('/api/record/sign4Reject', {
     method: 'POST',

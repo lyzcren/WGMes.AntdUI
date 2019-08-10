@@ -641,7 +641,7 @@ class TableList extends PureComponent {
               </div>
               {/* defaultExpandAllRows在Table首次初始化有数据时才会起作用，若不是会导致无法展开问题
             详见 https://github.com/ant-design/ant-design/issues/4145 */}
-              {data && data.list.length ? (
+              {data && data.list && data.list.length ? (
                 <StandardTable
                   rowKey="fItemID"
                   bordered
