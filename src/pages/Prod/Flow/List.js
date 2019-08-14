@@ -59,8 +59,7 @@ const getValue = obj =>
   flowManage,
   loading: loading.models.flowManage,
   basicData,
-  fIsOperator: user.currentUser.fIsOperator,
-  fIsAdmin: user.currentUser.fIsAdmin,
+  currentUser: user.currentUser,
 }))
 @Form.create()
 class TableList extends PureComponent {
@@ -526,13 +525,19 @@ class TableList extends PureComponent {
         },
       }).then(() => {
         const {
+          currentUser,
           flowManage: { nextDepts },
         } = this.props;
+        const filterDepts = currentUser.fIsAdmin
+          ? nextDepts
+          : nextDepts.filter(x => currentUser.deptList.find(y => x.fDeptID === y.fDeptID));
         if (!nextDepts || nextDepts.length <= 0) {
           message.warning('无可签收岗位.');
-        } else if (nextDepts.length === 1) {
-          this.sign(record, nextDepts[0].fDeptID, nextDepts[0].fDeptName);
-        } else if (nextDepts.length >= 2) {
+        } else if (!filterDepts || filterDepts.length <= 0) {
+          message.warning('当前岗位无法签收.');
+        } else if (filterDepts.length === 1) {
+          this.sign(record, filterDepts[0].fDeptID, filterDepts[0].fDeptName);
+        } else if (filterDepts.length >= 2) {
           this.handleModalVisible({ key: 'sign', flag: true }, record);
         }
       });
@@ -832,8 +837,6 @@ class TableList extends PureComponent {
   renderSimpleForm() {
     const {
       form: { getFieldDecorator },
-      fIsOperator,
-      fIsAdmin,
       basicData: {
         authorizeProcessTree,
         status: { flowStatus, recordStatus },
@@ -1096,10 +1099,6 @@ class TableList extends PureComponent {
       handleModalVisible: (flag, record) => this.handleModalVisible({ key: 'sign', flag }, record),
       handleSubmit: this.sign,
     };
-    const routeMethods = {
-      dispatch,
-      handleModalVisible: (flag, record) => this.handleModalVisible({ key: 'route', flag }, record),
-    };
     // 指定操作列
     ColumnConfig.renderOperation = this.renderOperation;
     ColumnConfig.statusFilter = this.statusFilter();
@@ -1206,7 +1205,10 @@ class TableList extends PureComponent {
           ) : null}
           {currentFormValues.route && Object.keys(currentFormValues.route).length ? (
             <ViewStepForm
-              {...routeMethods}
+              dispatch
+              handleModalVisible={(flag, record) =>
+                this.handleModalVisible({ key: 'route', flag }, record)
+              }
               modalVisible={modalVisible.route}
               fInterID={currentFormValues.route.fRouteID}
               values={currentFormValues.route}

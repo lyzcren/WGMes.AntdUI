@@ -65,6 +65,7 @@ export class ViewStepForm extends PureComponent {
         visible={modalVisible}
         footer={footer}
         onCancel={() => handleModalVisible(false, values)}
+        afterClose={() => handleModalVisible()}
       >
         <RouteSteps loading={loading} steps={steps} currentStep={currentStep} />
       </Modal>

@@ -153,8 +153,8 @@ export class DeptForm extends PureComponent {
         render: (text, record) => {
           return (
             <FormItem style={{ marginBottom: 0 }}>
-              {getFieldDecorator('fDeptID_' + record.fInterID, {
-                rules: [{ required: true, message: '请输入' }],
+              {getFieldDecorator('fDeptID_' + record.fInterID + '_' + record.fEntryID, {
+                // rules: [{ required: true, message: '请输入' }],
                 initialValue: record.fDeptID,
               })(
                 <TreeSelect

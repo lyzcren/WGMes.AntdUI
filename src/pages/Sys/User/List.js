@@ -79,23 +79,28 @@ class TableList extends PureComponent {
       title: '用户名',
       dataIndex: 'fNumber',
       sorter: true,
+      width: 180,
     },
     {
       title: '姓名',
       dataIndex: 'fName',
       sorter: true,
+      width: 160,
     },
     {
       title: '绑定操作员',
       dataIndex: 'fBindEmpName',
+      width: 180,
     },
     {
       title: '移动电话',
       dataIndex: 'fPhone',
+      width: 160,
     },
     {
       title: '授权岗位',
       dataIndex: 'deptList',
+      width: 420,
       render: val => {
         return (
           val &&
@@ -110,6 +115,7 @@ class TableList extends PureComponent {
     {
       title: '性别',
       dataIndex: 'fSex',
+      width: 120,
       filters: [
         {
           text: sex[0],
@@ -131,6 +137,7 @@ class TableList extends PureComponent {
     {
       title: '启用',
       dataIndex: 'fIsActive',
+      width: 120,
       filters: [
         {
           text: activeData[0],
@@ -147,6 +154,8 @@ class TableList extends PureComponent {
     },
     {
       title: '操作',
+      width: 300,
+      fixed: 'right',
       render: (text, record) => (
         <Fragment>
           <a onClick={() => this.handleUpdateModalVisible(true, record)}>修改</a>
@@ -640,6 +649,13 @@ class TableList extends PureComponent {
         <Menu.Item key="approval">批量审批</Menu.Item>
       </Menu>
     );
+    const scrollX = this.columns
+      .map(c => {
+        return c.width;
+      })
+      .reduce(function(sum, width, index) {
+        return sum + width;
+      });
 
     const parentMethods = {
       handleAdd: this.handleAdd,
@@ -691,6 +707,7 @@ class TableList extends PureComponent {
                 columns={this.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
+                scroll={{ x: scrollX }}
               />
             </div>
           </Card>

@@ -8,10 +8,11 @@ const FormItem = Form.Item;
 const { Option } = Select;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ flowManage, loading, basicData }) => ({
+@connect(({ flowManage, loading, basicData, user }) => ({
   flowManage,
   loading: loading.models.flowSign,
   basicData,
+  currentUser: user.currentUser,
 }))
 @Form.create()
 export class SignForm extends PureComponent {
@@ -45,6 +46,7 @@ export class SignForm extends PureComponent {
 
   render() {
     const {
+      currentUser,
       form,
       modalVisible,
       handleModalVisible,
@@ -52,6 +54,9 @@ export class SignForm extends PureComponent {
       flowManage: { nextDepts },
     } = this.props;
     const { formVals } = this.state;
+    const filterDepts = currentUser.fIsAdmin
+      ? nextDepts
+      : nextDepts.filter(x => currentUser.deptList.find(y => x.fDeptID === y.fDeptID));
 
     return (
       <Modal
@@ -83,7 +88,7 @@ export class SignForm extends PureComponent {
                 option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
               }
             >
-              {nextDepts.map(x => (
+              {filterDepts.map(x => (
                 <Option key={x.fDeptID} value={x.fDeptID}>
                   {x.fDeptName + ' - ' + x.fDeptNumber}
                 </Option>
