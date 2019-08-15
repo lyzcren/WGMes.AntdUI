@@ -60,6 +60,7 @@ class TableList extends PureComponent {
     updateFormValues: {},
     // 其他
     expandForm: false,
+    renderCreateForm: false,
     selectedRows: [],
     queryFilters: [],
   };
@@ -235,8 +236,10 @@ class TableList extends PureComponent {
   };
 
   handleModalVisible = flag => {
+    const { renderCreateForm } = this.state;
     this.setState({
       modalVisible: !!flag,
+      renderCreateForm: renderCreateForm || !!flag,
     });
   };
 
@@ -245,6 +248,10 @@ class TableList extends PureComponent {
       updateModalVisible: !!flag,
       updateFormValues: record || {},
     });
+  };
+
+  afterCreateFormClose = () => {
+    this.setState({ renderCreateForm: false });
   };
 
   handleAdd = fields => {
@@ -456,6 +463,7 @@ class TableList extends PureComponent {
     const {
       selectedRows,
       modalVisible,
+      renderCreateForm,
       updateModalVisible,
       updateFormValues,
       authorityModalVisible,
@@ -536,7 +544,13 @@ class TableList extends PureComponent {
               />
             </div>
           </Card>
-          <CreateForm {...parentMethods} modalVisible={modalVisible} />
+          {renderCreateForm && (
+            <CreateForm
+              {...parentMethods}
+              modalVisible={modalVisible}
+              afterClose={this.afterCreateFormClose}
+            />
+          )}
           {updateFormValues && Object.keys(updateFormValues).length ? (
             <UpdateForm
               {...updateMethods}

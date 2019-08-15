@@ -16,7 +16,7 @@ const { Tab, UserName, Password, IdCard, Mobile, Captcha, Submit } = Login;
 class LoginPage extends Component {
   state = {
     type: 'account',
-    autoLogin: true,
+    autoLogin: false,
   };
 
   onTabChange = type => {

@@ -39,6 +39,7 @@ export class CreateForm extends PureComponent {
   render() {
     const {
       modalVisible,
+      afterClose,
       form,
       handleAdd,
       handleModalVisible,
@@ -61,6 +62,7 @@ export class CreateForm extends PureComponent {
         visible={modalVisible}
         onOk={this.okHandle}
         onCancel={() => handleModalVisible()}
+        afterClose={afterClose}
       >
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="编码">
           {form.getFieldDecorator('fNumber', {

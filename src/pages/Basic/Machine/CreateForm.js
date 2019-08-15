@@ -44,6 +44,7 @@ export class CreateForm extends PureComponent {
   render() {
     const {
       modalVisible,
+      afterClose,
       form,
       handleSubmit,
       handleModalVisible,
@@ -57,6 +58,7 @@ export class CreateForm extends PureComponent {
         visible={modalVisible}
         onOk={this.okHandle}
         onCancel={() => handleModalVisible()}
+        afterClose={afterClose}
       >
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="名称">
           {form.getFieldDecorator('fName', {

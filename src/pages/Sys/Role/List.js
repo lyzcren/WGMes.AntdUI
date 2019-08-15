@@ -65,6 +65,7 @@ class TableList extends PureComponent {
     authorizeUserModalVisible: false,
     // 其他
     expandForm: false,
+    renderCreateForm: true,
     selectedRows: [],
     queryFilters: [],
   };
@@ -270,8 +271,10 @@ class TableList extends PureComponent {
   };
 
   handleModalVisible = flag => {
+    const { renderCreateForm } = this.state;
     this.setState({
       modalVisible: !!flag,
+      renderCreateForm: renderCreateForm || !!flag,
     });
   };
 
@@ -566,6 +569,10 @@ class TableList extends PureComponent {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
+  afterCreateFormClose = () => {
+    this.setState({ renderCreateForm: false });
+  };
+
   render() {
     const {
       roleManage: { data, queryResult },
@@ -578,6 +585,7 @@ class TableList extends PureComponent {
       updateFormValues,
       authorityModalVisible,
       authorizeUserModalVisible,
+      renderCreateForm,
     } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
@@ -639,7 +647,14 @@ class TableList extends PureComponent {
               />
             </div>
           </Card>
-          <CreateForm {...parentMethods} modalVisible={modalVisible} pageMapper={pageMapper} />
+          {renderCreateForm && (
+            <CreateForm
+              {...parentMethods}
+              modalVisible={modalVisible}
+              afterClose={this.afterCreateFormClose}
+              pageMapper={pageMapper}
+            />
+          )}
           {updateFormValues && Object.keys(updateFormValues).length ? (
             <UpdateForm
               {...updateMethods}

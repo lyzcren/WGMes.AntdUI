@@ -97,7 +97,7 @@ class TableList extends PureComponent {
     pageSize: 10,
   };
 
-  componentDidMount() {
+  componentDidMount () {
     const { dispatch } = this.props;
     this.searchWhereInit();
 
@@ -122,7 +122,7 @@ class TableList extends PureComponent {
       this.handleModalVisible({ key: 'route', flag: true }, record);
   }
 
-  componentDidUpdate(preProps) {
+  componentDidUpdate (preProps) {
     const { fBatchNo } = this.props;
     if (preProps.fBatchNo !== fBatchNo) {
       this.searchWhereInit();
@@ -376,16 +376,16 @@ class TableList extends PureComponent {
     const badgeStatus = !flowStatus
       ? []
       : flowStatus.map(x => {
-          return {
-            text: <Badge color={x.fColor} text={x.fValue} />,
-            value: x.fKeyName,
-          };
-        });
+        return {
+          text: <Badge color={x.fColor} text={x.fValue} />,
+          value: x.fKeyName,
+        };
+      });
     return badgeStatus;
   };
 
   //应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
-  webapp_start(templateId, interIds, type) {
+  webapp_start (templateId, interIds, type) {
     var option = {
       baseurl: 'http://' + window.location.host,
       report: '/api/PrintTemplate/grf?id=' + templateId,
@@ -723,6 +723,10 @@ class TableList extends PureComponent {
       !record.fCancellation &&
       record.fRecordStatusNumber === 'ManufProducing' &&
       (!queryDeptID || record.fCurrentDeptID === queryDeptID);
+    console.log(
+      record.fRecordStatusNumber === 'ManufProducing',
+      record.fEndProduceDeptIDList.length > 0,
+      !record.fCancellation);
 
     const menus = [];
     // 转出中
@@ -834,7 +838,7 @@ class TableList extends PureComponent {
     );
   };
 
-  renderSimpleForm() {
+  renderSimpleForm () {
     const {
       form: { getFieldDecorator },
       basicData: {
@@ -926,7 +930,7 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm() {
+  renderAdvancedForm () {
     const {
       form: { getFieldDecorator },
       basicData: {
@@ -1075,12 +1079,12 @@ class TableList extends PureComponent {
     );
   }
 
-  renderForm() {
+  renderForm () {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  render() {
+  render () {
     const {
       dispatch,
       flowManage: { data, queryResult, printTemplates },
@@ -1108,7 +1112,7 @@ class TableList extends PureComponent {
       .map(c => {
         return c.width;
       })
-      .reduce(function(sum, width, index) {
+      .reduce(function (sum, width, index) {
         return sum + width;
       });
     return (
