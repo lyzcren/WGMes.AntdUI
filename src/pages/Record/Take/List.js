@@ -13,6 +13,7 @@ import {
   Dropdown,
   Menu,
   TreeSelect,
+  message,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
@@ -31,9 +32,9 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ changeRouteManage, loading, basicData, menu }) => ({
-  changeRouteManage,
-  loading: loading.models.changeRouteManage,
+@connect(({ takeManage, loading, basicData, menu }) => ({
+  takeManage,
+  loading: loading.models.takeManage,
   basicData,
   menu,
 }))
@@ -63,13 +64,14 @@ class TableList extends PureComponent {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'changeRouteManage/fetch',
+      type: 'takeManage/fetch',
       payload: this.currentPagination,
     });
     dispatch({
       type: 'basicData/getAuthorizeProcessTree',
     });
     ColumnConfig.handleViewFlow = fFullBatchNo => this.handleViewFlow(fFullBatchNo);
+    ColumnConfig.handleRollback = record => this.handleRollback(record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -96,7 +98,7 @@ class TableList extends PureComponent {
     }
 
     dispatch({
-      type: 'changeRouteManage/fetch',
+      type: 'takeManage/fetch',
       payload: this.currentPagination,
     });
   };
@@ -114,11 +116,11 @@ class TableList extends PureComponent {
     const queryFilters = [];
     if (fieldsValue.queryBatchNo)
       queryFilters.push({ name: 'fFullBatchNo', compare: '%*%', value: fieldsValue.queryBatchNo });
-    if (fieldsValue.queryCreatorName)
+    if (fieldsValue.queryOperatorName)
       queryFilters.push({
-        name: 'fCreatorName',
+        name: 'fOperatorName',
         compare: '%*%',
-        value: fieldsValue.queryCreatorName,
+        value: fieldsValue.queryOperatorName,
       });
     if (fieldsValue.queryDept)
       queryFilters.push({ name: 'fDeptID', compare: '=', value: fieldsValue.queryDept });
@@ -145,7 +147,7 @@ class TableList extends PureComponent {
 
       const pagination = this.getSearchParam(fieldsValue);
       dispatch({
-        type: 'changeRouteManage/fetch',
+        type: 'takeManage/fetch',
         payload: pagination,
       });
       this.handleSelectRows([]);
@@ -167,7 +169,7 @@ class TableList extends PureComponent {
     };
 
     dispatch({
-      type: 'changeRouteManage/fetch',
+      type: 'takeManage/fetch',
       payload: this.currentPagination,
     });
     this.handleSelectRows([]);
@@ -183,12 +185,12 @@ class TableList extends PureComponent {
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          const fileName = '工艺路线变更记录-第' + pagination.current + '页.xls';
-          exportExcel('/api/changeRoute/export', pagination, fileName);
+          const fileName = '取走记录-第' + pagination.current + '页.xls';
+          exportExcel('/api/take/export', pagination, fileName);
           break;
         case 'allPage':
           pagination.exportPage = false;
-          exportExcel('/api/changeRoute/export', pagination, '工艺路线变更记录.xls');
+          exportExcel('/api/take/export', pagination, '取走记录.xls');
           break;
         default:
           break;
@@ -235,14 +237,6 @@ class TableList extends PureComponent {
     });
   };
 
-  handleViewFlow(fBatchNo) {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'menu/openMenu',
-      payload: { path: '/prod/flow', fBatchNo },
-    });
-  }
-
   renderSimpleForm() {
     const {
       form: { getFieldDecorator },
@@ -272,8 +266,8 @@ class TableList extends PureComponent {
             </FormItem>
           </Col>
           <Col md={6} sm={24}>
-            <FormItem label="变更人">
-              {getFieldDecorator('queryCreatorName')(<Input placeholder="请输入" />)}
+            <FormItem label="操作员">
+              {getFieldDecorator('queryOperatorName')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={6} sm={24}>
@@ -303,15 +297,54 @@ class TableList extends PureComponent {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
+  handleViewFlow(fBatchNo) {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/openMenu',
+      payload: { path: '/prod/flow', fBatchNo },
+    });
+  }
+
+  handleRollback(record) {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'takeManage/rollback',
+      payload: { guid: record.guid },
+    }).then(() => {
+      const {
+        takeManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success('已完成回滚.');
+      } else if (queryResult.status === 'warning') {
+        message.warning(queryResult.message);
+      } else {
+        message.error(queryResult.message);
+      }
+    });
+  }
+
   render() {
     const {
       dispatch,
-      changeRouteManage: { data, queryResult },
+      takeManage: { data, queryResult },
       loading,
     } = this.props;
-    const { selectedRows } = this.state;
+    const { selectedRows, currentFormValues } = this.state;
+    const menu = <Menu onClick={this.handleMenuClick} selectedKeys={[]} />;
 
-    const scrollX = ColumnConfig.columns
+    const parentMethods = {
+      dispatch,
+      handleModalVisible: this.handleModalVisible,
+      handleSuccess: this.search,
+    };
+    const updateMethods = {
+      dispatch,
+      handleModalVisible: this.handleUpdateModalVisible,
+      handleSuccess: this.search,
+    };
+    const columns = ColumnConfig.getColumns();
+    const scrollX = columns
       .map(c => {
         return c.width;
       })
@@ -325,7 +358,7 @@ class TableList extends PureComponent {
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
               <div className={styles.tableListOperator}>
-                <Authorized authority="Flow_Read">
+                <Authorized authority="RecordTake_Export">
                   <Dropdown
                     overlay={
                       <Menu onClick={this.handleExport} selectedKeys={[]}>
@@ -346,7 +379,7 @@ class TableList extends PureComponent {
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
-                columns={ColumnConfig.columns}
+                columns={columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
                 scroll={{ x: scrollX }}

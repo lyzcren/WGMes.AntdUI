@@ -3,6 +3,7 @@ import moment from 'moment';
 import QRCode from 'qrcode.react';
 import { Switch, Popconfirm, Divider, Tooltip } from 'antd';
 import Authorized from '@/utils/Authorized';
+import { hasAuthority } from '@/utils/authority';
 
 class ColumnConfig {
   columns = [
@@ -89,7 +90,38 @@ class ColumnConfig {
       render: val => (val ? moment(val).format('YYYY-MM-DD HH:mm') : ''),
     },
   ];
-  profileVisible = record => {};
+  getColumns = () => {
+    if (hasAuthority('RecordTake_Rollback')) {
+      const allColumns = [
+        ...this.columns,
+        {
+          title: '操作',
+          fixed: 'right',
+          width: 120,
+          render: (text, record) => {
+            const operators = [];
+            if (hasAuthority('RecordTake_Rollback') && !record.fCancellation) {
+              operators.push((text, record) => (
+                <Authorized key={'rollback'} authority="RecordTake_Rollback">
+                  <Popconfirm
+                    title="是否要回滚此记录？"
+                    onConfirm={() => this.handleRollback(record)}
+                  >
+                    <a>回滚</a>
+                  </Popconfirm>
+                </Authorized>
+              ));
+            }
+            return <Fragment>{operators.map(x => x(text, record))}</Fragment>;
+          },
+        },
+      ];
+      return allColumns;
+    } else {
+      return this.columns;
+    }
+  };
+  handleRollback = record => {};
 }
 
 let columnConfig = new ColumnConfig();

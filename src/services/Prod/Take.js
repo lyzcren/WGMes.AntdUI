@@ -28,3 +28,13 @@ export async function fakeTake(params) {
 export async function fakeGetTake(params) {
   return request(`/api/take/ListByFlow/${params.fInterID}`);
 }
+
+export async function fakeRollback(params) {
+  return request(`/api/take/rollback`, {
+    method: 'PUT',
+    body: {
+      ...params,
+      method: 'Take',
+    },
+  });
+}

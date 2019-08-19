@@ -1,4 +1,4 @@
-import { fakeQuery } from '@/services/Prod/Take';
+import { fakeQuery, fakeRollback } from '@/services/Prod/Take';
 
 export default {
   namespace: 'takeManage',
@@ -20,6 +20,13 @@ export default {
       yield put({
         type: 'save',
         payload: { data: response },
+      });
+    },
+    *rollback({ payload }, { call, put }) {
+      const response = yield call(fakeRollback, payload);
+      yield put({
+        type: 'save',
+        payload: { queryResult: response },
       });
     },
   },
