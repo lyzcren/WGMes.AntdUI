@@ -248,6 +248,12 @@ export default [
             component: './Rpt/MissionExecution/List',
             authority: ['MissionExecution_Read'],
           },
+          {
+            path: '/report/workTime',
+            name: 'workTime',
+            component: './Rpt/WorkTime/List',
+            authority: ['ReportWorkTime_Read'],
+          },
         ],
       },
       {

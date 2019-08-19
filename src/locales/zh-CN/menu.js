@@ -67,6 +67,7 @@ export default {
   'menu.report.output': '产量报表',
   'menu.report.passRate': '岗位良率报表',
   'menu.report.missionExecution': '执行情况',
+  'menu.report.workTime': '工时报表',
   // 生产基础资料
   'menu.techStd': '工艺标准',
   'menu.techStd.defect': '不良类型',
