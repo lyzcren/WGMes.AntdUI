@@ -80,6 +80,7 @@ class TableList extends PureComponent {
     // 列配置相关方法
     ColumnConfig.handleViewMission = record => this.handleViewMission(record);
     ColumnConfig.handleViewFlow = record => this.handleViewFlow(record.fBatchNo);
+    ColumnConfig.handleRollback = record => this.handleRollback(record);
   }
 
   handleViewMission = record => {
@@ -97,6 +98,40 @@ class TableList extends PureComponent {
       payload: { path: '/prod/flow', fBatchNo },
     });
   }
+
+  handleRollback(record) {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'missionInputManage/rollback',
+      payload: { id: record.id },
+    }).then(() => {
+      const {
+        missionInputManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success(`已成功撤销，批号【${record.fBatchNo}】.`);
+      } else if (queryResult.status === 'warning') {
+        message.warning(queryResult.message);
+      } else {
+        message.error(queryResult.message);
+      }
+    });
+  }
+
+  handleBatchRollback = () => {
+    const { selectedRows } = this.state;
+
+    if (selectedRows.length === 0) return;
+    Modal.confirm({
+      title: '撤销',
+      content: '确定撤销吗？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => {
+        selectedRows.map(x => this.handleRollback(x));
+      },
+    });
+  };
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
     const { dispatch } = this.props;
@@ -371,7 +406,8 @@ class TableList extends PureComponent {
       </Menu>
     );
 
-    const scrollX = ColumnConfig.columns
+    const columns = ColumnConfig.getColumns();
+    const scrollX = columns
       .map(c => {
         return c.width;
       })
@@ -384,13 +420,22 @@ class TableList extends PureComponent {
           <Card bordered={false}>
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
+              <div className={styles.tableListOperator}>
+                {selectedRows.length > 0 && (
+                  <span>
+                    <Authorized authority="MissionInput_Rollback">
+                      <Button onClick={this.handleBatchRollback}>撤销</Button>
+                    </Authorized>
+                  </span>
+                )}
+              </div>
               <StandardTable
                 rowKey="id"
                 bordered
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
-                columns={ColumnConfig.columns}
+                columns={columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
                 expandedRowRender={this.expandedRowRender}

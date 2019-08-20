@@ -152,7 +152,7 @@ export class TechParamForm extends PureComponent {
     if (record) {
       const item = data.find(x => x.guid == record.guid);
       item[fieldName] = value;
-      console.log(data);
+      // console.log(data);
       this.setState({ data });
     }
   }

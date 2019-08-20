@@ -23,7 +23,7 @@ export default {
   effects: {
     *fetch(_, { call, put }) {
       const workshops = yield call(fakeAnalysis);
-      console.log(workshops);
+      // console.log(workshops);
       const response = {
         workshops: workshops.workshops,
         processes: workshops.processes,

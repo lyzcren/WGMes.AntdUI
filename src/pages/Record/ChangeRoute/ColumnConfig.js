@@ -103,7 +103,7 @@ class ColumnConfig {
             if (hasAuthority('RecordTake_Rollback')) {
               operators.push((text, record) => (
                 <Authorized key={'transfer'} authority="RecordTake_Rollback">
-                  <a onClick={() => this.handleRollback(record)}>回滚</a>
+                  <a onClick={() => this.handleRollback(record)}>撤销</a>
                 </Authorized>
               ));
             }

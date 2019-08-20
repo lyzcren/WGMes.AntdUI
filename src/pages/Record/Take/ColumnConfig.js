@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import moment from 'moment';
 import QRCode from 'qrcode.react';
-import { Switch, Popconfirm, Divider, Tooltip } from 'antd';
+import { Switch, Popconfirm, Divider, Tooltip, Badge } from 'antd';
 import Authorized from '@/utils/Authorized';
 import { hasAuthority } from '@/utils/authority';
 
@@ -59,6 +59,18 @@ class ColumnConfig {
       sorter: true,
     },
     {
+      title: '状态',
+      dataIndex: 'fStatusNumber',
+      width: 150,
+      render: (val, record) => {
+        if (record.fCancellation) {
+          return <Badge color={'#696969'} text={'已撤销'} />;
+        }
+        return <Badge color={'green'} text={'正常'} />;
+      },
+      // filters: this.statusFilter,
+    },
+    {
       title: '物料名称',
       dataIndex: 'fProductName',
       width: 120,
@@ -89,6 +101,19 @@ class ColumnConfig {
       sorter: true,
       render: val => (val ? moment(val).format('YYYY-MM-DD HH:mm') : ''),
     },
+    {
+      title: '撤销人',
+      dataIndex: 'fCancellationUserName',
+      width: 220,
+      sorter: true,
+    },
+    {
+      title: '撤销时间',
+      dataIndex: 'fCancellationDate',
+      width: 220,
+      sorter: true,
+      render: val => (val ? moment(val).format('YYYY-MM-DD HH:mm') : ''),
+    },
   ];
   getColumns = () => {
     if (hasAuthority('RecordTake_Rollback')) {
@@ -104,10 +129,10 @@ class ColumnConfig {
               operators.push((text, record) => (
                 <Authorized key={'rollback'} authority="RecordTake_Rollback">
                   <Popconfirm
-                    title="是否要回滚此记录？"
+                    title="是否要撤销此记录？"
                     onConfirm={() => this.handleRollback(record)}
                   >
-                    <a>回滚</a>
+                    <a>撤销</a>
                   </Popconfirm>
                 </Authorized>
               ));

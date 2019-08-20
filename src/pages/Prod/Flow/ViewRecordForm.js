@@ -50,7 +50,7 @@ export class ViewRecordForm extends PureComponent {
     handleModalVisible(false, record);
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/record/profile', data: record },
+      payload: { path: '/record/record/profile', data: record },
     });
   }
 

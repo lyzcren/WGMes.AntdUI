@@ -723,11 +723,6 @@ class TableList extends PureComponent {
       !record.fCancellation &&
       record.fRecordStatusNumber === 'ManufProducing' &&
       (!queryDeptID || record.fCurrentDeptID === queryDeptID);
-    console.log(
-      record.fRecordStatusNumber === 'ManufProducing',
-      record.fEndProduceDeptIDList.length > 0,
-      !record.fCancellation
-    );
 
     const menus = [];
     // 转出中

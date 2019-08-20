@@ -40,3 +40,13 @@ export async function fakeUpdate(params) {
     },
   });
 }
+
+export async function fakeRollback(params) {
+  return request(`/api/missionInput/rollback/${params.id}`, {
+    method: 'PUT',
+    body: {
+      ...params,
+      method: 'missionInput',
+    },
+  });
+}

@@ -4,6 +4,7 @@ import {
   fakeAdd,
   fakeUpdate,
   fakeActive,
+  fakeRollback,
 } from '@/services/Prod/MissionInput';
 
 export default {
@@ -51,9 +52,22 @@ export default {
         payload: response,
       });
     },
+    *rollback({ payload }, { call, put }) {
+      const response = yield call(fakeRollback, payload);
+      yield put({
+        type: 'save',
+        payload: { queryResult: response },
+      });
+    },
   },
 
   reducers: {
+    save(state, action) {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
     saveQueryData(state, action) {
       return {
         ...state,

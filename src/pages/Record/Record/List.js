@@ -295,7 +295,7 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/record/profile', data: record },
+      payload: { path: '/record/record/profile', data: record },
     });
   };
 

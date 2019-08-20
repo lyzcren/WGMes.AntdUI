@@ -186,6 +186,12 @@ export default [
         ],
         routes: [
           {
+            path: '/record/missionInput',
+            name: 'missionInput',
+            component: './Record/MissionInput/List',
+            authority: ['Mission_Read'],
+          },
+          {
             path: '/record/record',
             name: 'record',
             component: './Record/Record/List',
@@ -199,24 +205,6 @@ export default [
                 hideInMenu: true,
               },
             ],
-          },
-          {
-            path: '/record/missionInput',
-            name: 'missionInput',
-            component: './Record/MissionInput/List',
-            authority: ['Mission_Read'],
-          },
-          {
-            path: '/record/defectRepair',
-            name: 'defectRepair',
-            component: './Record/DefectRepair/List',
-            authority: ['DefectRepair_Read'],
-          },
-          {
-            path: '/record/defectScrap',
-            name: 'defectScrap',
-            component: './Record/DefectScrap/List',
-            authority: ['DefectScrap_Read'],
           },
           {
             path: '/record/take',
@@ -235,6 +223,18 @@ export default [
             name: 'batchSplit',
             component: './Record/BatchSplit/List',
             authority: ['Flow_Split'],
+          },
+          {
+            path: '/record/defectRepair',
+            name: 'defectRepair',
+            component: './Record/DefectRepair/List',
+            authority: ['DefectRepair_Read'],
+          },
+          {
+            path: '/record/defectScrap',
+            name: 'defectScrap',
+            component: './Record/DefectScrap/List',
+            authority: ['DefectScrap_Read'],
           },
         ],
       },

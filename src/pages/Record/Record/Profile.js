@@ -83,7 +83,7 @@ class Transfer extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
-      payload: { path: '/prod/record/profile' },
+      payload: { path: '/record/record/profile' },
     });
   }
 

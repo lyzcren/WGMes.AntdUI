@@ -79,7 +79,6 @@ export class SplitForm extends PureComponent {
         message.warning('每批数量必须大于0.');
         return;
       }
-      console.log(fInterID, fieldsValue, details);
       dispatch({
         type: 'flowSplit/split',
         payload: {
