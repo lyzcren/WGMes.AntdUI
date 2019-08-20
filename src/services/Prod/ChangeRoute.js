@@ -28,3 +28,14 @@ export async function fakeChangeRoute(params) {
 export async function fakeGetTake(params) {
   return request(`/api/changeRoute/ListByFlow/${params.fInterID}`);
 }
+
+export async function fakeRollback(params) {
+  console.log(`/api/changeRoute/rollback/${params.guid}`);
+  return request(`/api/changeRoute/rollback/${params.guid}`, {
+    method: 'PUT',
+    body: {
+      ...params,
+      method: 'changeRoute',
+    },
+  });
+}

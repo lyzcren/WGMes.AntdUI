@@ -89,6 +89,19 @@ class ColumnConfig {
       sorter: true,
       render: val => moment(val).format('YYYY-MM-DD HH:mm:ss'),
     },
+    {
+      title: '撤销人',
+      dataIndex: 'fCancellationUserName',
+      width: 220,
+      sorter: true,
+    },
+    {
+      title: '撤销时间',
+      dataIndex: 'fCancellationDate',
+      width: 220,
+      sorter: true,
+      render: val => (val ? moment(val).format('YYYY-MM-DD HH:mm') : ''),
+    },
   ];
   getColumns = () => {
     if (hasAuthority('ChangeRoute_Rollback')) {
@@ -100,10 +113,15 @@ class ColumnConfig {
           width: 120,
           render: (text, record) => {
             const operators = [];
-            if (hasAuthority('RecordTake_Rollback')) {
+            if (hasAuthority('ChangeRoute_Rollback') && !record.fCancellation) {
               operators.push((text, record) => (
-                <Authorized key={'transfer'} authority="RecordTake_Rollback">
-                  <a onClick={() => this.handleRollback(record)}>撤销</a>
+                <Authorized key={'rollback'} authority="ChangeRoute_Rollback">
+                  <Popconfirm
+                    title="是否要撤销此记录？"
+                    onConfirm={() => this.handleRollback(record)}
+                  >
+                    <a>撤销</a>
+                  </Popconfirm>
                 </Authorized>
               ));
             }

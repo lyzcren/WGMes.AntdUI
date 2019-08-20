@@ -13,6 +13,8 @@ import {
   Dropdown,
   Menu,
   TreeSelect,
+  message,
+  Modal,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
@@ -70,6 +72,7 @@ class TableList extends PureComponent {
       type: 'basicData/getAuthorizeProcessTree',
     });
     ColumnConfig.handleViewFlow = fFullBatchNo => this.handleViewFlow(fFullBatchNo);
+    ColumnConfig.handleRollback = record => this.handleRollback(record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -243,6 +246,40 @@ class TableList extends PureComponent {
     });
   }
 
+  handleRollback(record) {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'changeRouteManage/rollback',
+      payload: { ...record },
+    }).then(() => {
+      const {
+        changeRouteManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success(`已成功撤销，批号【${record.fFullBatchNo}】.`);
+      } else if (queryResult.status === 'warning') {
+        message.warning(queryResult.message);
+      } else {
+        message.error(queryResult.message);
+      }
+    });
+  }
+
+  handleBatchRollback = () => {
+    const { selectedRows } = this.state;
+
+    if (selectedRows.length === 0) return;
+    Modal.confirm({
+      title: '撤销',
+      content: '确定撤销吗？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => {
+        selectedRows.map(x => this.handleRollback(x));
+      },
+    });
+  };
+
   renderSimpleForm() {
     const {
       form: { getFieldDecorator },
@@ -340,6 +377,13 @@ class TableList extends PureComponent {
                     </Button>
                   </Dropdown>
                 </Authorized>
+                {selectedRows.length > 0 && (
+                  <span>
+                    <Authorized authority="MissionInput_Rollback">
+                      <Button onClick={this.handleBatchRollback}>撤销</Button>
+                    </Authorized>
+                  </span>
+                )}
               </div>
               <StandardTable
                 rowKey="guid"
