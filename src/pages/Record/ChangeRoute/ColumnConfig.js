@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import moment from 'moment';
 import QRCode from 'qrcode.react';
-import { Switch, Popconfirm, Divider, Tooltip } from 'antd';
+import { Switch, Popconfirm, Divider, Tooltip, Badge } from 'antd';
 import Authorized from '@/utils/Authorized';
 import { hasAuthority } from '@/utils/authority';
 
@@ -57,6 +57,18 @@ class ColumnConfig {
       dataIndex: 'fReason',
       width: 120,
       sorter: true,
+    },
+    {
+      title: '状态',
+      dataIndex: 'fStatusNumber',
+      width: 150,
+      render: (val, record) => {
+        if (record.fCancellation) {
+          return <Badge color={'#696969'} text={'已撤销'} />;
+        }
+        return <Badge color={'green'} text={'正常'} />;
+      },
+      // filters: this.statusFilter,
     },
     {
       title: '物料名称',

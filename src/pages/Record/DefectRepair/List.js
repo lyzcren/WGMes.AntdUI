@@ -25,6 +25,7 @@ import {
   notification,
   Popconfirm,
   TreeSelect,
+  Table,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
@@ -83,7 +84,42 @@ class TableList extends PureComponent {
     dispatch({
       type: 'basicData/getAuthorizeProcessTree',
     });
+    ColumnConfig.handleRollback = record => this.handleRollback(record);
   }
+
+  handleRollback(record) {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'defectRepairManage/rollback',
+      payload: { id: record.fInterID },
+    }).then(() => {
+      const {
+        defectRepairManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success(`已成功撤销，批号【${record.fFullBatchNo}】.`);
+      } else if (queryResult.status === 'warning') {
+        message.warning(queryResult.message);
+      } else {
+        message.error(queryResult.message);
+      }
+    });
+  }
+
+  handleBatchRollback = () => {
+    const { selectedRows } = this.state;
+
+    if (selectedRows.length === 0) return;
+    Modal.confirm({
+      title: '撤销',
+      content: '确定撤销吗？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => {
+        selectedRows.map(x => this.handleRollback(x));
+      },
+    });
+  };
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
     const { dispatch } = this.props;
@@ -306,6 +342,49 @@ class TableList extends PureComponent {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
+  expandedRowRender = record => {
+    const columns = [
+      {
+        title: '岗位',
+        dataIndex: 'fDeptName',
+        width: 120,
+        sorter: true,
+      },
+      {
+        title: '岗位编码',
+        dataIndex: 'fDeptNumber',
+        width: 150,
+        sorter: true,
+      },
+      {
+        title: '不良名称',
+        dataIndex: 'fDefectName',
+        width: 120,
+        sorter: true,
+      },
+      {
+        title: '不良编码',
+        dataIndex: 'fDefectNumber',
+        width: 220,
+        sorter: true,
+      },
+      {
+        title: '数量',
+        dataIndex: 'fQty',
+        width: 120,
+        sorter: true,
+      },
+    ];
+    return (
+      <Table
+        rowKey="fDefectInvID"
+        columns={columns}
+        dataSource={record.details}
+        pagination={false}
+      />
+    );
+  };
+
   render() {
     const {
       dispatch,
@@ -332,7 +411,9 @@ class TableList extends PureComponent {
       handleModalVisible: this.handleUpdateModalVisible,
       handleSuccess: this.search,
     };
-    const scrollX = ColumnConfig.columns
+
+    const columns = ColumnConfig.getColumns();
+    const scrollX = columns
       .map(c => {
         return c.width;
       })
@@ -365,6 +446,13 @@ class TableList extends PureComponent {
                     </Button>
                   </Dropdown>
                 </Authorized>
+                {selectedRows.length > 0 && (
+                  <span>
+                    <Authorized authority="MissionInput_Rollback">
+                      <Button onClick={this.handleBatchRollback}>撤销</Button>
+                    </Authorized>
+                  </span>
+                )}
               </div>
               <StandardTable
                 rowKey="fInterID"
@@ -372,9 +460,10 @@ class TableList extends PureComponent {
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
-                columns={ColumnConfig.columns}
+                columns={columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
+                expandedRowRender={this.expandedRowRender}
                 scroll={{ x: scrollX }}
               />
             </div>

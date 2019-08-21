@@ -50,3 +50,13 @@ export async function fakeActive(params) {
     },
   });
 }
+
+export async function fakeRollback(params) {
+  return request(`/api/defectRepair/rollback/${params.id}`, {
+    method: 'PUT',
+    body: {
+      ...params,
+      method: 'rollback',
+    },
+  });
+}
