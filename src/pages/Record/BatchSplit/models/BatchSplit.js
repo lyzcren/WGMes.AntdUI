@@ -1,4 +1,4 @@
-import { fakeQuery, fakeRemove } from '@/services/Prod/BatchSplit';
+import { fakeQuery, fakeRemove, fakeRollback } from '@/services/Prod/BatchSplit';
 
 export default {
   namespace: 'batchSplitManage',
@@ -25,6 +25,13 @@ export default {
     *remove({ payload }, { call, put }) {
       const id = payload.fInterID;
       const response = yield call(fakeRemove, id);
+      yield put({
+        type: 'save',
+        payload: { queryResult: response },
+      });
+    },
+    *rollback({ payload }, { call, put }) {
+      const response = yield call(fakeRollback, payload);
       yield put({
         type: 'save',
         payload: { queryResult: response },

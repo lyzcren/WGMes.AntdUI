@@ -30,7 +30,6 @@ export async function fakeGetTake(params) {
 }
 
 export async function fakeRollback(params) {
-  console.log(`/api/changeRoute/rollback/${params.guid}`);
   return request(`/api/changeRoute/rollback/${params.guid}`, {
     method: 'PUT',
     body: {

@@ -17,6 +17,7 @@ import {
   Table,
   Tooltip,
   TreeSelect,
+  Modal,
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
@@ -66,6 +67,7 @@ class TableList extends PureComponent {
       type: 'basicData/getAuthorizeProcessTree',
     });
     ColumnConfig.handleViewFlow = record => this.handleViewFlow(record.fFullBatchNo);
+    ColumnConfig.handleRollback = record => this.handleRollback(record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -260,6 +262,40 @@ class TableList extends PureComponent {
     });
   }
 
+  handleRollback(record) {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'batchSplitManage/rollback',
+      payload: { id: record.id },
+    }).then(() => {
+      const {
+        batchSplitManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success(`已成功撤销，批号【${record.fFullBatchNo}】.`);
+      } else if (queryResult.status === 'warning') {
+        message.warning(queryResult.message);
+      } else {
+        message.error(queryResult.message);
+      }
+    });
+  }
+
+  handleBatchRollback = () => {
+    const { selectedRows } = this.state;
+
+    if (selectedRows.length === 0) return;
+    Modal.confirm({
+      title: '撤销',
+      content: '确定撤销吗？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => {
+        selectedRows.map(x => this.handleRollback(x));
+      },
+    });
+  };
+
   renderSimpleForm() {
     const {
       form: { getFieldDecorator },
@@ -372,7 +408,8 @@ class TableList extends PureComponent {
       </Menu>
     );
 
-    const scrollX = ColumnConfig.columns
+    const columns = ColumnConfig.getColumns();
+    const scrollX = columns
       .map(c => {
         return c.width;
       })
@@ -400,6 +437,13 @@ class TableList extends PureComponent {
                     </Button>
                   </Dropdown>
                 </Authorized>
+                {selectedRows.length > 0 && (
+                  <span>
+                    <Authorized authority="BatchSplit_Rollback">
+                      <Button onClick={this.handleBatchRollback}>撤销</Button>
+                    </Authorized>
+                  </span>
+                )}
               </div>
               <StandardTable
                 rowKey="id"
@@ -407,7 +451,7 @@ class TableList extends PureComponent {
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
-                columns={ColumnConfig.columns}
+                columns={columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
                 expandedRowRender={this.expandedRowRender}

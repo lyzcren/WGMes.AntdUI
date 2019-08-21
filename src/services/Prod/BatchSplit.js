@@ -34,3 +34,13 @@ export async function fakeRemove(params) {
     },
   });
 }
+
+export async function fakeRollback(params) {
+  return request(`/api/batchSplit/rollback/${params.id}`, {
+    method: 'PUT',
+    body: {
+      ...params,
+      method: 'batchSplit',
+    },
+  });
+}

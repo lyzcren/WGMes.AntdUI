@@ -3,6 +3,7 @@ import moment from 'moment';
 import QRCode from 'qrcode.react';
 import { Switch, Popconfirm, Divider, Tooltip } from 'antd';
 import Authorized from '@/utils/Authorized';
+import { hasAuthority } from '@/utils/authority';
 
 class ColumnConfig {
   columns = [
@@ -87,7 +88,52 @@ class ColumnConfig {
       sorter: true,
       render: val => moment(val).format('YYYY-MM-DD HH:mm:ss'),
     },
+    {
+      title: '撤销人',
+      dataIndex: 'fCancellationUserName',
+      width: 220,
+      sorter: true,
+    },
+    {
+      title: '撤销时间',
+      dataIndex: 'fCancellationDate',
+      width: 220,
+      sorter: true,
+      render: val => (val ? moment(val).format('YYYY-MM-DD HH:mm') : ''),
+    },
   ];
+  getColumns = () => {
+    if (hasAuthority('BatchSplit_Rollback')) {
+      const allColumns = [
+        ...this.columns,
+        {
+          title: '操作',
+          // fixed: 'right',
+          width: 120,
+          render: (text, record) => {
+            const operators = [];
+            if (hasAuthority('BatchSplit_Rollback') && !record.fCancellation) {
+              operators.push((text, record) => (
+                <Authorized key={'rollback'} authority="BatchSplit_Rollback">
+                  <Popconfirm
+                    title="是否要撤销此记录？"
+                    onConfirm={() => this.handleRollback(record)}
+                  >
+                    <a>撤销</a>
+                  </Popconfirm>
+                </Authorized>
+              ));
+            }
+            return <Fragment>{operators.map(x => x(text, record))}</Fragment>;
+          },
+        },
+      ];
+      return allColumns;
+    } else {
+      return this.columns;
+    }
+  };
+  handleRollback = record => {};
 
   handleViewFlow = () => {};
 }
