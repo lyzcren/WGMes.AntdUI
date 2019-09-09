@@ -801,14 +801,14 @@ class TableList extends PureComponent {
         </Authorized>
       );
     }
-    if (!record.fCancellation && record.fStatusNumber === 'EndProduce') {
-      operators.push(
-        <Authorized key={'report'} authority="Flow_Report">
-          <Divider type="vertical" />
-          <a onClick={() => this.report([record])}>汇报</a>
-        </Authorized>
-      );
-    }
+    // if (!record.fCancellation && record.fStatusNumber === 'EndProduce') {
+    //   operators.push(
+    //     <Authorized key={'report'} authority="Flow_Report">
+    //       <Divider type="vertical" />
+    //       <a onClick={() => this.report([record])}>汇报</a>
+    //     </Authorized>
+    //   );
+    // }
 
     return (
       <Fragment>
@@ -1171,14 +1171,14 @@ class TableList extends PureComponent {
                         合批
                       </Button>
                     </Authorized> */}
-                    <Authorized authority="Flow_Report">
+                    {/* <Authorized authority="Flow_Report">
                       <Button
                         disabled={queryStatusNumber !== 'EndProduce'}
                         onClick={this.handleBatchReport}
                       >
                         汇报
                       </Button>
-                    </Authorized>
+                    </Authorized> */}
                   </span>
                 )}
               </div>

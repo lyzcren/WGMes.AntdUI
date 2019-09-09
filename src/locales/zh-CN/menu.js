@@ -54,6 +54,10 @@ export default {
   'menu.prod.defectCheck.create': '新增不良品盘点',
   'menu.prod.defectCheck.update': '修改不良品盘点',
   'menu.prod.defectCheck.profile': '查看不良品盘点',
+  'menu.prod.report': '流程单汇报',
+  'menu.prod.report.create': '新增流程单汇报',
+  'menu.prod.report.update': '修改流程单汇报',
+  'menu.prod.report.profile': '查看流程单汇报',
   // 生产过程记录
   'menu.record.record': '生产记录',
   'menu.record.record.profile': '生产记录详情',

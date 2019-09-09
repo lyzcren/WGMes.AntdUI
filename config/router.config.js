@@ -171,6 +171,35 @@ export default [
               },
             ],
           },
+          {
+            path: '/prod/report',
+            name: 'report',
+            component: './Prod/Report/List',
+            authority: ['Report_Read'],
+            routes: [
+              {
+                path: '/prod/report/create',
+                name: 'create',
+                component: './Prod/Report/Create',
+                authority: ['Report_Create'],
+                hideInMenu: true,
+              },
+              {
+                path: '/prod/report/update',
+                name: 'update',
+                component: './Prod/Report/Update',
+                authority: ['Report_Update'],
+                hideInMenu: true,
+              },
+              {
+                path: '/prod/report/profile',
+                name: 'profile',
+                component: './Prod/Report/Profile',
+                authority: ['Report_Read'],
+                hideInMenu: true,
+              },
+            ],
+          },
         ],
       },
       {
