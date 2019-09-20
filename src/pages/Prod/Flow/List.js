@@ -104,9 +104,11 @@ class TableList extends PureComponent {
     dispatch({
       type: 'basicData/getAuthorizeProcessTree',
     });
-    dispatch({
-      type: 'flowManage/getPrintTemplates',
-    });
+    if (hasAuthority('Flow_Print')) {
+      dispatch({
+        type: 'flowManage/getPrintTemplates',
+      });
+    }
     dispatch({
       type: 'basicData/getStatus',
       payload: { number: 'recordStatus' },

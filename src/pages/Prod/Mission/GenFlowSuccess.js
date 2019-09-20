@@ -28,10 +28,12 @@ export class GenFlowSuccess extends PureComponent {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    dispatch({
-      type: 'printTemplate/getPrintTemplates',
-      payload: { number: 'prodFlow' },
-    });
+    if (hasAuthority('Flow_Print')) {
+      dispatch({
+        type: 'printTemplate/getPrintTemplates',
+        payload: { number: 'prodFlow' },
+      });
+    }
   }
 
   //应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能

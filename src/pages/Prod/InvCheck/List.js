@@ -87,9 +87,11 @@ class TableList extends PureComponent {
       type: 'basicData/getStatus',
       payload: { number: 'invCheckStatus' },
     });
-    dispatch({
-      type: 'invCheckManage/getPrintTemplates',
-    });
+    if (hasAuthority('InvCheck_Print')) {
+      dispatch({
+        type: 'invCheckManage/getPrintTemplates',
+      });
+    }
     // 指定操作列
     ColumnConfig.renderOperation = this.renderOperation;
     // 列配置相关方法

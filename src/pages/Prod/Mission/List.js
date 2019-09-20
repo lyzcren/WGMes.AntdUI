@@ -24,12 +24,14 @@ import {
   Progress,
   notification,
   Popconfirm,
+  Tag,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { FlowForm } from './FlowForm';
+import { SyncForm } from './SyncForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
@@ -46,8 +48,9 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ missionManage, loading, menu }) => ({
+@connect(({ missionManage, missionSync, loading, menu }) => ({
   missionManage,
+  missionSync,
   loading: loading.models.missionManage,
   menu,
 }))
@@ -58,6 +61,7 @@ class TableList extends PureComponent {
     modalVisible: {
       update: false,
       genFlowSuccess: false,
+      sync: false,
     },
     formValues: {},
     // 当前操作选中列的数据
@@ -66,6 +70,7 @@ class TableList extends PureComponent {
     expandForm: false,
     selectedRows: [],
     queryFilters: [],
+    checkSyncSecond: 1,
   };
 
   // 列表查询参数
@@ -80,15 +85,20 @@ class TableList extends PureComponent {
       type: 'missionManage/fetch',
       payload: this.currentPagination,
     });
-    dispatch({
-      type: 'missionManage/getPrintTemplates',
-    });
+    if (hasAuthority('Mission_Print')) {
+      dispatch({
+        type: 'missionManage/getPrintTemplates',
+      });
+    }
     // 列配置相关方法
     ColumnConfig.profileModalVisibleCallback = record =>
       this.handleProfileModalVisible(true, record);
     ColumnConfig.flowModalVisibleCallback = record =>
       this.handleModalVisible({ key: 'update', flag: true }, record);
     ColumnConfig.deleteCallback = record => this.handleDelete(record);
+
+    // 检查同步状态
+    this.Checkk3Syncing();
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -248,20 +258,49 @@ class TableList extends PureComponent {
     this.handleSelectRows([]);
   };
 
-  handleSync = () => {
+  handleSync = fieldsValue => {
+    const {
+      dispatch,
+      form,
+      missionSync: { isSyncing, totalCount, currentCount },
+    } = this.props;
+    if (isSyncing) {
+      message.warning('同步中，请稍后再试.');
+    }
+    dispatch({
+      type: 'missionSync/syncing',
+    });
+    dispatch({
+      type: 'missionSync/sync',
+      payload: {
+        fBeginDate: fieldsValue.fBeginDate ? fieldsValue.fBeginDate.format('YYYY-MM-DD') : null,
+        fEndDate: fieldsValue.fEndDate ? fieldsValue.fEndDate.format('YYYY-MM-DD') : null,
+      },
+    });
+
+    setTimeout(() => {
+      // 检查同步状态
+      this.Checkk3Syncing();
+    }, this.state.checkSyncSecond);
+  };
+
+  Checkk3Syncing = () => {
+    const lastSyncing = this.props.missionSync.isSyncing;
     const { dispatch, form } = this.props;
     dispatch({
-      type: 'missionManage/sync',
+      type: 'missionSync/isSyncing',
     }).then(() => {
       const {
-        missionManage: { queryResult },
+        missionSync: { isSyncing, totalCount, currentCount },
       } = this.props;
-      if (queryResult.status === 'ok') {
-        message.success('同步生产任务成功');
+      if (isSyncing) {
+        setTimeout(() => {
+          this.Checkk3Syncing();
+        }, this.state.checkSyncSecond);
+      } else if (lastSyncing != isSyncing) {
+        message.success(`已成功同步${totalCount}条记录`);
         // 成功后再次刷新列表
         this.search();
-      } else {
-        message.warning(queryResult.message);
       }
     });
   };
@@ -506,6 +545,7 @@ class TableList extends PureComponent {
   render() {
     const {
       missionManage: { data, queryResult, printTemplates },
+      missionSync: { isSyncing, totalCount, currentCount },
       loading,
     } = this.props;
     const {
@@ -532,10 +572,16 @@ class TableList extends PureComponent {
               <div className={styles.tableListForm}>{this.renderForm()}</div>
               <div className={styles.tableListOperator}>
                 <Authorized authority="Mission_Sync">
-                  <Button icon="plus" type="primary" onClick={() => this.handleSync()}>
+                  <Button
+                    icon="plus"
+                    type="primary"
+                    onClick={() => this.handleModalVisible({ key: 'sync', flag: true })}
+                    loading={isSyncing}
+                  >
                     从 K3 同步
                   </Button>
                 </Authorized>
+                {isSyncing && <Tag color="blue">{currentCount + ' / ' + totalCount}</Tag>}
                 <Authorized authority="Mission_Export">
                   <Dropdown
                     overlay={
@@ -600,6 +646,12 @@ class TableList extends PureComponent {
               records={successFlows}
             />
           )}
+          <SyncForm
+            dispatch
+            handleSync={this.handleSync}
+            handleModalVisible={flag => this.handleModalVisible({ key: 'sync', flag })}
+            modalVisible={modalVisible.sync}
+          />
         </GridContent>
       </div>
     );

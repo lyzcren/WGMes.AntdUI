@@ -87,9 +87,11 @@ class TableList extends PureComponent {
       type: 'basicData/getStatus',
       payload: { number: 'defectCheckStatus' },
     });
-    dispatch({
-      type: 'defectCheckManage/getPrintTemplates',
-    });
+    if (hasAuthority('DefectCheck_Print')) {
+      dispatch({
+        type: 'defectCheckManage/getPrintTemplates',
+      });
+    }
     // 指定操作列
     ColumnConfig.renderOperation = this.renderOperation;
     // 列配置相关方法

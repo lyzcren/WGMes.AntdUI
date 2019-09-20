@@ -25,5 +25,15 @@ export async function fakeRemove(params) {
 }
 
 export async function fakeSync(params) {
-  return request('/api/Mission/sync');
+  return request(`/api/Mission/sync`, {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'sync',
+    },
+  });
+}
+
+export async function fakeCheckSyncing(params) {
+  return request(`/api/mission/checkSyncing`);
 }
