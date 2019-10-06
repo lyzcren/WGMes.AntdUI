@@ -34,6 +34,7 @@ import Authorized from '@/utils/Authorized';
 import { default as ColumnConfig } from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
+import { print } from '@/utils/wgUtils';
 
 import styles from './List.less';
 
@@ -241,7 +242,8 @@ class TableList extends PureComponent {
     const { selectedRows } = this.state;
 
     const templateId = key;
-    this.webapp_start(templateId, record.fInterID, 'preview');
+    // this.webapp_start(templateId, record.fInterID, 'preview');
+    print('defectCheck', templateId, record.fInterID);
   };
 
   toggleForm = () => {

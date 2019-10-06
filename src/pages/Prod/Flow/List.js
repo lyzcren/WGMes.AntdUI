@@ -43,6 +43,7 @@ import { ChangeRouteForm } from './ChangeRouteForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
+import { print } from '@/utils/wgUtils';
 
 import styles from './List.less';
 import { tsImportType } from '@babel/types';
@@ -388,16 +389,15 @@ class TableList extends PureComponent {
 
   //应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
   webapp_start(templateId, interIds, type) {
-    var option = {
-      baseurl: 'http://' + window.location.host,
-      report: '/api/PrintTemplate/grf?id=' + templateId,
-      data: '/api/flow/getPrintData?id=' + interIds,
-      selfsql: false,
-      type: type,
-    };
-
-    //创建启动WEB报表客户端的URL协议参数
-    window.location.href = 'grwebapp://' + JSON.stringify(option);
+    // var option = {
+    //   baseurl: 'http://' + window.location.host,
+    //   report: '/api/PrintTemplate/grf?id=' + templateId,
+    //   data: '/api/flow/getPrintData?id=' + interIds,
+    //   selfsql: false,
+    //   type: type,
+    // };
+    // //创建启动WEB报表客户端的URL协议参数
+    // window.location.href = 'grwebapp://' + JSON.stringify(option);
   }
 
   handlePrint = e => {
@@ -405,7 +405,9 @@ class TableList extends PureComponent {
     const { selectedRows } = this.state;
 
     const templateId = e.key;
-    this.webapp_start(templateId, selectedRows.map(row => row.fInterID).join(','), 'preview');
+    // this.webapp_start(templateId, selectedRows.map(row => row.fInterID).join(','), 'preview');
+    var interIds = selectedRows.map(row => row.fInterID).join(',');
+    print('flow', templateId, interIds);
   };
 
   toggleForm = () => {

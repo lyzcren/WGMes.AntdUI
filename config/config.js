@@ -75,8 +75,7 @@ export default {
   proxy: {
     '/api/': {
       // 1、localhost
-      target: 'https://localhost:5001/',
-      // target: 'https://localhost:44328/',
+      target: 'http://localhost:8001/',
       // 2、docker proxy
       // target: 'https://172.22.144.221/',
       changeOrigin: true,

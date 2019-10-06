@@ -19,6 +19,10 @@ export async function fakeQueryGroupBy() {
   return request('/api/report/groupBys');
 }
 
+export async function fakeGet(params) {
+  return request('/api/report/' + params.id);
+}
+
 export async function fakeAdd(params) {
   return request('/api/report', {
     method: 'POST',

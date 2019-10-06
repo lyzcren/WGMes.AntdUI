@@ -5,6 +5,8 @@ import { Form, Button, Row, Col, Icon, Steps, Card, Modal, Dropdown, Menu, Tag }
 import Result from '@/components/Result';
 import DescriptionList from '@/components/DescriptionList';
 import Authorized from '@/utils/Authorized';
+import { hasAuthority } from '@/utils/authority';
+import { print } from '@/utils/wgUtils';
 
 import styles from './List.less';
 
@@ -54,7 +56,9 @@ export class GenFlowSuccess extends PureComponent {
     const { dispatch, form, records } = this.props;
 
     const templateId = e.key;
-    this.webapp_start(templateId, records.map(row => row.fInterID).join(','), 'preview');
+    // this.webapp_start(templateId, records.map(row => row.fInterID).join(','), 'preview');
+    var interIds = selectedRows.map(row => row.fInterID).join(',');
+    print('flow', templateId, interIds);
   };
 
   handleViewFlow(fBatchNo) {
