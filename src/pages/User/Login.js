@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 // import Link from 'umi/link';
-import { Checkbox, Alert } from 'antd';
+import { Checkbox, Alert, message } from 'antd';
 import Login from '@/components/Login';
 import styles from './Login.less';
 
@@ -81,7 +81,8 @@ class LoginPage extends Component {
             {login.status === 'error' &&
               login.type === 'account' &&
               !submitting &&
-              this.renderMessage(formatMessage({ id: 'app.login.message-invalid-credentials' }))}
+              // this.renderMessage(formatMessage({ id: 'app.login.message-invalid-credentials' }))}
+              this.renderMessage(login.message)}
             <UserName
               name="userName"
               autoFocus
@@ -166,9 +167,9 @@ class LoginPage extends Component {
               <Checkbox checked={autoLogin} onChange={this.changeAutoLogin}>
                 <FormattedMessage id="app.login.remember-me" />
               </Checkbox>
-              <a style={{ float: 'right' }} href="">
+              {/* <a style={{ float: 'right' }} href="">
                 <FormattedMessage id="app.login.forgot-password" />
-              </a>
+              </a> */}
             </div>
           )}
           <Submit loading={submitting}>

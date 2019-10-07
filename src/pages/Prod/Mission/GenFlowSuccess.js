@@ -57,7 +57,7 @@ export class GenFlowSuccess extends PureComponent {
 
     const templateId = e.key;
     // this.webapp_start(templateId, records.map(row => row.fInterID).join(','), 'preview');
-    var interIds = selectedRows.map(row => row.fInterID).join(',');
+    var interIds = records.map(row => row.fInterID).join(',');
     print('flow', templateId, interIds);
   };
 

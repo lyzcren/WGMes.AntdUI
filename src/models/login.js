@@ -11,6 +11,7 @@ export default {
 
   state: {
     status: undefined,
+    message: '',
   },
 
   effects: {
@@ -76,6 +77,7 @@ export default {
         ...state,
         status: payload.status,
         type: payload.type,
+        message: payload.message,
       };
     },
   },
