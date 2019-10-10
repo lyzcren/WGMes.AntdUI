@@ -9,6 +9,10 @@ export async function fakeQueryPrintTemplate(params) {
   return request(`/api/PrintTemplate/GetTemplates?number=${params.number}`);
 }
 
+export async function fakeQueryRootUrl() {
+  return request('/api/PrintTemplate/rootUrl');
+}
+
 export async function fakeRemovePrintTemplate(params) {
   return request(`/api/PrintTemplate/${params.id}`, {
     method: 'DELETE',

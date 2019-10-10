@@ -1,4 +1,4 @@
-export function print(module, grfId, id) {
+export function print(module, printUrl, grfId, id) {
   const w = window.open('about:blank');
-  w.location.href = 'http://localhost:8001/print/' + module + '/' + grfId + '/' + id;
+  w.location.href = printUrl + '/print/' + module + '/' + grfId + '/' + id;
 }

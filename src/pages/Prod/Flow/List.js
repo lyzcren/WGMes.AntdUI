@@ -407,7 +407,8 @@ class TableList extends PureComponent {
     const templateId = e.key;
     // this.webapp_start(templateId, selectedRows.map(row => row.fInterID).join(','), 'preview');
     var interIds = selectedRows.map(row => row.fInterID).join(',');
-    print('flow', templateId, interIds);
+    const { printUrl } = this.props.basicData;
+    print('flow', printUrl, templateId, interIds);
   };
 
   toggleForm = () => {

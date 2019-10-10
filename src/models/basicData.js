@@ -13,6 +13,7 @@ import {
   fakeGetStatus,
   fakeGetWorkTime,
 } from '@/services/basicData';
+import { fakeQueryRootUrl } from '@/services/Sys/PrintTemplate';
 
 export default {
   namespace: 'basicData',
@@ -118,6 +119,13 @@ export default {
       yield put({
         type: 'save',
         payload: { workTimes: response },
+      });
+    },
+    *getPrintRootUrl({ payload }, { call, put }) {
+      const response = yield call(fakeQueryRootUrl, payload);
+      yield put({
+        type: 'save',
+        payload: { printUrl: response.message },
       });
     },
   },

@@ -243,7 +243,8 @@ class TableList extends PureComponent {
 
     const templateId = key;
     // this.webapp_start(templateId, record.fInterID, 'preview');
-    print('defectCheck', templateId, record.fInterID);
+    const { printUrl } = this.props.basicData;
+    print('defectCheck', printUrl, templateId, record.fInterID);
   };
 
   toggleForm = () => {

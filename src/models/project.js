@@ -9,14 +9,14 @@ export default {
   },
 
   effects: {
-    *fetchNotice (_, { call, put }) {
+    *fetchNotice(_, { call, put }) {
       const response = yield call(queryProjectNotice);
       yield put({
         type: 'saveNotice',
         payload: Array.isArray(response) ? response : [],
       });
     },
-    *fetchServiceUri (_, { call, put }) {
+    *fetchServiceUri(_, { call, put }) {
       const response = yield call(queryServiceUri);
       yield put({
         type: 'saveUri',
@@ -26,13 +26,13 @@ export default {
   },
 
   reducers: {
-    saveNotice (state, action) {
+    saveNotice(state, action) {
       return {
         ...state,
         notice: action.payload,
       };
     },
-    saveUri (state, action) {
+    saveUri(state, action) {
       return {
         ...state,
         uri: action.payload,

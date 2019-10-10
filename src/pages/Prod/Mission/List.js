@@ -49,11 +49,12 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ missionManage, missionSync, loading, menu }) => ({
+@connect(({ missionManage, missionSync, loading, menu, basicData }) => ({
   missionManage,
   missionSync,
   loading: loading.models.missionManage,
   menu,
+  basicData,
 }))
 @Form.create()
 class TableList extends PureComponent {
@@ -383,7 +384,8 @@ class TableList extends PureComponent {
     const templateId = e.key;
     // this.webapp_start(templateId, selectedRows.map(row => row.fInterID).join(','), 'preview');
     var interIds = selectedRows.map(row => row.fInterID).join(',');
-    print('mission', templateId, interIds);
+    const { printUrl } = this.props.basicData;
+    print('mission', printUrl, templateId, interIds);
   };
 
   toggleForm = () => {

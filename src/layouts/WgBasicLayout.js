@@ -81,6 +81,9 @@ class WgBasicLayout extends React.PureComponent {
       type: 'setting/getSetting',
     });
     dispatch({
+      type: 'basicData/getPrintRootUrl',
+    });
+    dispatch({
       type: 'user/fetchCurrent',
     }).then(() => {
       const {
@@ -348,7 +351,7 @@ class WgBasicLayout extends React.PureComponent {
   }
 }
 
-export default connect(({ global, setting, menu, user }) => ({
+export default connect(({ global, setting, menu, user, basicData }) => ({
   collapsed: global.collapsed,
   layout: setting.layout,
   menuData: menu.menuData,
@@ -359,6 +362,7 @@ export default connect(({ global, setting, menu, user }) => ({
   breadcrumbNameMap: menu.breadcrumbNameMap,
   user,
   ...setting,
+  basicData,
 }))(props => (
   <Media query="(max-width: 599px)">
     {isMobile => <WgBasicLayout {...props} isMobile={isMobile} />}

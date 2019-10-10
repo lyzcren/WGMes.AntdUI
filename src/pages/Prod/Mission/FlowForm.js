@@ -157,13 +157,15 @@ export class FlowForm extends PureComponent {
           {form.getFieldDecorator('fInputQty', {
             rules: [{ required: true, message: '请输入投入数量' }],
             initialValue: maxQty,
-          })(<InputNumber placeholder="请输入" min={1} max={maxQty} />)}
+            // })(<InputNumber placeholder="请输入" min={1} max={maxQty} />)} 取消最大数量限制
+          })(<InputNumber placeholder="请输入" min={1} />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="每批数量">
           {form.getFieldDecorator('fBatchQty', {
             rules: [{ required: true, message: '请输入每批数量' }],
             initialValue: maxQty,
-          })(<InputNumber placeholder="请输入" min={1} max={maxQty} />)}
+            // })(<InputNumber placeholder="请输入" min={1} max={maxQty} />)} 取消最大数量限制
+          })(<InputNumber placeholder="请输入" min={1} />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="车间">
           {/* {form.getFieldDecorator('fWorkShop', {
