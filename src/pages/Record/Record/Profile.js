@@ -45,7 +45,7 @@ class Transfer extends PureComponent {
     qtyFormat: '0',
   };
 
-  componentDidMount() {
+  componentDidMount () {
     // ReactDOM.findDOMNode(this.refs.select).click();
     const {
       data: { fInterID, fCurrentDeptID },
@@ -53,7 +53,7 @@ class Transfer extends PureComponent {
     this.loadData(fInterID, fCurrentDeptID);
   }
 
-  componentDidUpdate(preProps) {
+  componentDidUpdate (preProps) {
     const {
       data: { fInterID, fCurrentDeptID },
     } = this.props;
@@ -62,7 +62,7 @@ class Transfer extends PureComponent {
     }
   }
 
-  loadData(fInterID) {
+  loadData (fInterID) {
     const {
       dispatch,
       data: { fQtyDecimal },
@@ -79,7 +79,7 @@ class Transfer extends PureComponent {
     });
   }
 
-  close() {
+  close () {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
@@ -87,7 +87,7 @@ class Transfer extends PureComponent {
     });
   }
 
-  render() {
+  render () {
     const {
       recordProfile: { data },
       loading,
@@ -209,16 +209,16 @@ class Transfer extends PureComponent {
             <Description term="机台">{fMachineName}</Description>
             <Description term="机台编码">{fMachineNumber}</Description>
             <Description term="签收时间">
-              {moment(fSignDate).format('YYYY-MM-DD HH:mm:ss')}
+              {fSignDate ? moment(fSignDate).format('YYYY-MM-DD HH:mm:ss') : ''}
             </Description>
             <Description term="开始生产时间">
-              {moment(fBeginDate).format('YYYY-MM-DD HH:mm:ss')}
+              {fBeginDate ? moment(fBeginDate).format('YYYY-MM-DD HH:mm:ss') : ''}
             </Description>
             <Description term="结束生产时间">
-              {moment(fTransferDateTime).format('YYYY-MM-DD HH:mm:ss')}
+              {fTransferDateTime ? moment(fTransferDateTime).format('YYYY-MM-DD HH:mm:ss') : ''}
             </Description>
             <Description term="生产时长">
-              {getTimeDiff(new Date(fBeginDate), new Date(fTransferDateTime))}
+              {fBeginDate && fTransferDateTime ? getTimeDiff(new Date(fBeginDate), new Date(fTransferDateTime)) : ''}
             </Description>
             <Description term="班次">{fWorkTimeName}</Description>
             <Description term="班次编码">{fWorkTimeNumber}</Description>

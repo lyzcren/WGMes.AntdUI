@@ -34,6 +34,8 @@ import { UpdateForm } from './UpdateForm';
 import { UpdatePwdForm } from './UpdatePwdForm';
 import { CreateForm } from './CreateForm';
 import { AuthorizeRoleForm } from './AuthorizeRoleForm';
+import { hasAuthority } from '@/utils/authority';
+import { print } from '@/utils/wgUtils';
 
 import styles from './List.less';
 
@@ -48,8 +50,9 @@ const sex = ['保密', '男', '女'];
 const activeData = ['启用', '禁用'];
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ userManage, loading }) => ({
+@connect(({ userManage, basicData, loading }) => ({
   userManage,
+  basicData,
   loading: loading.models.userManage,
 }))
 @Form.create()
@@ -130,7 +133,7 @@ class TableList extends PureComponent {
           value: 2,
         },
       ],
-      render(val) {
+      render (val) {
         return sex[val];
       },
     },
@@ -148,7 +151,7 @@ class TableList extends PureComponent {
           value: 0,
         },
       ],
-      render(val) {
+      render (val) {
         return <Switch disabled checked={val} />;
       },
     },
@@ -181,13 +184,18 @@ class TableList extends PureComponent {
     },
   ];
 
-  componentDidMount() {
+  componentDidMount () {
     const { dispatch } = this.props;
     const params = { pagination: this.currentPagination };
     dispatch({
       type: 'userManage/fetch',
       payload: params,
     });
+    if (hasAuthority('User_Print')) {
+      dispatch({
+        type: 'userManage/getPrintTemplates',
+      });
+    }
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -422,7 +430,7 @@ class TableList extends PureComponent {
   handleUpdatePwd = fields => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'userManage/update',
+      type: 'userManage/updatePwd',
       payload: {
         fItemID: fields.fItemID,
         fPwd: fields.fPwd,
@@ -507,10 +515,22 @@ class TableList extends PureComponent {
     });
   };
 
-  renderSimpleForm() {
+  handlePrint = e => {
+    const { dispatch, form } = this.props;
+    const { selectedRows } = this.state;
+
+    const templateId = e.key;
+    // this.webapp_start(templateId, selectedRows.map(row => row.fInterID).join(','), 'preview');
+    var ids = selectedRows.map(row => row.fItemID).join(',');
+    const { printUrl } = this.props.basicData;
+    print('user', printUrl, templateId, ids);
+  };
+
+  renderSimpleForm () {
     const {
       form: { getFieldDecorator },
     } = this.props;
+    const { selectedRows } = this.state;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
@@ -547,7 +567,7 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm() {
+  renderAdvancedForm () {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -621,15 +641,15 @@ class TableList extends PureComponent {
     );
   }
 
-  renderForm() {
+  renderForm () {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  render() {
+  render () {
     const {
       form,
-      userManage: { data },
+      userManage: { data, printTemplates },
       loading,
       dispatch,
     } = this.props;
@@ -653,7 +673,7 @@ class TableList extends PureComponent {
       .map(c => {
         return c.width;
       })
-      .reduce(function(sum, width, index) {
+      .reduce(function (sum, width, index) {
         return sum + width;
       });
 
@@ -685,6 +705,23 @@ class TableList extends PureComponent {
                     新建
                   </Button>
                 </Authorized>
+                {selectedRows.length > 0 && printTemplates && printTemplates.length > 0 ? (
+                  <Authorized authority="User_Print">
+                    <Dropdown
+                      overlay={
+                        <Menu onClick={this.handlePrint} selectedKeys={[]}>
+                          {printTemplates.map(val => {
+                            return <Menu.Item key={val.fInterID}>{val.fName}</Menu.Item>;
+                          })}
+                        </Menu>
+                      }
+                    >
+                      <Button icon="printer">
+                        打印 <Icon type="down" />
+                      </Button>
+                    </Dropdown>
+                  </Authorized>
+                ) : null}
                 {selectedRows.length > 0 && (
                   <span>
                     <Authorized authority="User_Delete">

@@ -45,14 +45,14 @@ const ButtonGroup = Button.Group;
 class Profile extends PureComponent {
   state = {};
 
-  componentDidMount() {
+  componentDidMount () {
     const {
       data: { fInterID },
     } = this.props;
     this.loadData(fInterID);
   }
 
-  componentDidUpdate(preProps) {
+  componentDidUpdate (preProps) {
     const {
       dispatch,
       data: { fInterID },
@@ -62,7 +62,7 @@ class Profile extends PureComponent {
     }
   }
 
-  loadData(fInterID) {
+  loadData (fInterID) {
     const { dispatch } = this.props;
     dispatch({
       type: 'missionProfile/initModel',
@@ -70,7 +70,7 @@ class Profile extends PureComponent {
     });
   }
 
-  close() {
+  close () {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
@@ -78,7 +78,7 @@ class Profile extends PureComponent {
     });
   }
 
-  render() {
+  render () {
     const {
       missionProfile: { data, steps, currentStep },
       loading,
@@ -89,9 +89,9 @@ class Profile extends PureComponent {
       <DescriptionList className={styles.headerList} size="small" col="3">
         <Description term="任务单号">{data.fMoBillNo}</Description>
         <Description term="订单号">{data.fSoBillNo}</Description>
-        <Description term="日期">{moment(data.fDate).format('YYYY-MM-DD')}</Description>
+        <Description term="日期">{data.fDate ? moment(data.fDate).format('YYYY-MM-DD') : ''}</Description>
         <Description term="计划完工日期">
-          {moment(data.fPlanFinishDate).format('YYYY-MM-DD')}
+          {data.fPlanFinishDate ? moment(data.fPlanFinishDate).format('YYYY-MM-DD') : ''}
         </Description>
         <Description term="工艺路线">{data.fRoutingName}</Description>
         <Description term="产品名称">{data.fProductName}</Description>
@@ -153,13 +153,13 @@ class Profile extends PureComponent {
             <Description term="车间编号">{data.fWorkShopNumber}</Description>
             <Description term="工艺路线">{data.fRoutingName}</Description>
             <Description term="制单日期">
-              {moment(data.fCreateDate).format('YYYY-MM-DD')}
+              {data.fCreateDate ? moment(data.fCreateDate).format('YYYY-MM-DD') : ''}
             </Description>
             <Description term="审核日期">
-              {moment(data.fCheckDate).format('YYYY-MM-DD')}
+              {data.fCheckDate ? moment(data.fCheckDate).format('YYYY-MM-DD') : ''}
             </Description>
             <Description term="同步日期">
-              {moment(data.fErpSyncDate).format('YYYY-MM-DD')}
+              {data.fErpSyncDate ? moment(data.fErpSyncDate).format('YYYY-MM-DD') : ''}
             </Description>
             <Description term="备注">{data.fComments}</Description>
           </DescriptionList>

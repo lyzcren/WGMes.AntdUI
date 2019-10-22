@@ -46,14 +46,14 @@ const ButtonGroup = Button.Group;
 class TableList extends PureComponent {
   state = {};
 
-  componentDidMount() {
+  componentDidMount () {
     const {
       data: { fInterID },
     } = this.props;
     this.loadData(fInterID);
   }
 
-  componentDidUpdate(preProps) {
+  componentDidUpdate (preProps) {
     const {
       dispatch,
       data: { fInterID },
@@ -63,7 +63,7 @@ class TableList extends PureComponent {
     }
   }
 
-  loadData(fInterID) {
+  loadData (fInterID) {
     const { dispatch } = this.props;
     dispatch({
       type: 'routeProfile/initModel',
@@ -71,7 +71,7 @@ class TableList extends PureComponent {
     });
   }
 
-  save() {
+  save () {
     const {
       dispatch,
       data: { fInterID },
@@ -93,7 +93,7 @@ class TableList extends PureComponent {
     });
   }
 
-  check(isCheck = true) {
+  check (isCheck = true) {
     const {
       dispatch,
       data: { fInterID },
@@ -116,7 +116,7 @@ class TableList extends PureComponent {
     });
   }
 
-  close() {
+  close () {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
@@ -124,28 +124,28 @@ class TableList extends PureComponent {
     });
   }
 
-  nextStep() {
+  nextStep () {
     const { dispatch } = this.props;
     dispatch({
       type: 'routeProfile/nextStep',
     });
   }
 
-  prevStep() {
+  prevStep () {
     const { dispatch } = this.props;
     dispatch({
       type: 'routeProfile/prevStep',
     });
   }
 
-  deleteStep() {
+  deleteStep () {
     const { dispatch } = this.props;
     dispatch({
       type: 'routeProfile/deleteStep',
     });
   }
 
-  render() {
+  render () {
     const {
       routeProfile: { data, steps, currentStep },
       loading,
@@ -158,7 +158,7 @@ class TableList extends PureComponent {
         <Description term="编码">{data.fNumber}</Description>
         <Description term="创建人">{data.fCreatorName}</Description>
         <Description term="创建时间">
-          {moment(data.fCreateDate).format('YYYY-MM-DD HH:mm:ss')}
+          {data.fCreateDate ? moment(data.fCreateDate).format('YYYY-MM-DD HH:mm:ss') : ''}
         </Description>
         <Description term="备注">{data.fComments}</Description>
       </DescriptionList>

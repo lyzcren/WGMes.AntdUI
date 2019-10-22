@@ -50,6 +50,16 @@ export async function updateUser(params) {
   });
 }
 
+export async function updatePwd(params) {
+  return request('/api/user/updatePwd', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'update',
+    },
+  });
+}
+
 export async function activeUser(params) {
   return request(`/api/user/${params.fItemID}/active?fIsActive=${params.fIsActive}`, {
     method: 'PUT',

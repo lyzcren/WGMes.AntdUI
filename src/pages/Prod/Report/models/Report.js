@@ -6,6 +6,7 @@ import {
   fakeCheck,
   fakeQueryGroupBy,
 } from '@/services/Prod/Report';
+import { fakeQueryPrintTemplate } from '@/services/Sys/PrintTemplate';
 
 export default {
   namespace: 'reportManage',
@@ -19,6 +20,7 @@ export default {
       status: 'ok',
       message: '',
     },
+    printTemplates: [],
   },
 
   effects: {
@@ -62,6 +64,13 @@ export default {
       yield put({
         type: 'save',
         payload: { groupBys: response },
+      });
+    },
+    *getPrintTemplates({ payload }, { call, put }) {
+      const response = yield call(fakeQueryPrintTemplate, { number: 'prodReport' });
+      yield put({
+        type: 'save',
+        payload: { printTemplates: response },
       });
     },
   },
