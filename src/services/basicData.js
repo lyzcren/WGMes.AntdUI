@@ -66,7 +66,7 @@ export async function fakeGetBillNo(params) {
   return request(url);
 }
 
-export async function fakeGetStatus(number) {
+export async function fakeKeyValues(number) {
   return request(`/api/keyValue/${number}`);
 }
 

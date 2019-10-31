@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
+import { connect } from 'dva';
 import moment from 'moment';
-import { Form, Input, Modal, Switch, Tag } from 'antd';
+import { Form, Input, Modal, Switch, Tag, Select } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import {
   validatePhone,
@@ -10,8 +11,12 @@ import {
 } from '@/utils/validators';
 
 const FormItem = Form.Item;
+const { Option } = Select;
 
 /* eslint react/no-multi-comp:0 */
+@connect(({ basicData }) => ({
+  basicData,
+}))
 @Form.create()
 export class UpdateForm extends PureComponent {
   static defaultProps = {
@@ -28,6 +33,13 @@ export class UpdateForm extends PureComponent {
     };
   }
 
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'basicData/getParamType',
+    });
+  }
+
   okHandle = () => {
     const { form, handleSubmit } = this.props;
     form.validateFields((err, fieldsValue) => {
@@ -40,7 +52,13 @@ export class UpdateForm extends PureComponent {
   };
 
   render() {
-    const { form, updateModalVisible, handleModalVisible, values } = this.props;
+    const {
+      form,
+      basicData: { paramType },
+      updateModalVisible,
+      handleModalVisible,
+      values,
+    } = this.props;
     const { formVals } = this.state;
 
     return (
@@ -88,6 +106,23 @@ export class UpdateForm extends PureComponent {
             valuePropName: 'checked',
             initialValue: formVals.fIsActive,
           })(<Switch />)}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="类型">
+          {form.getFieldDecorator('fType', {
+            initialValue: formVals.fType,
+          })(
+            <Select
+              style={{ width: '100%' }}
+              placeholder="请选择"
+              onChange={val => console.log(val)}
+            >
+              {paramType.map(x => (
+                <Option key={x.fKey} value={x.fKey}>
+                  {x.fValue}
+                </Option>
+              ))}
+            </Select>
+          )}
         </FormItem>
       </Modal>
     );

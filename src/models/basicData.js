@@ -10,7 +10,7 @@ import {
   fakeGetDefect,
   fakeGetOperatorList,
   fakeGetBillNo,
-  fakeGetStatus,
+  fakeKeyValues,
   fakeGetWorkTime,
 } from '@/services/basicData';
 import { fakeQueryRootUrl } from '@/services/Sys/PrintTemplate';
@@ -31,6 +31,7 @@ export default {
     billNo: {},
     status: {},
     workTimes: [],
+    paramType: [],
   },
 
   effects: {
@@ -106,7 +107,7 @@ export default {
     },
     *getStatus({ payload }, { call, put, select }) {
       const { number } = payload;
-      const response = yield call(fakeGetStatus, number);
+      const response = yield call(fakeKeyValues, number);
       const newStatus = yield select(state => state.basicData.status);
       newStatus[number] = response;
       yield put({
@@ -126,6 +127,13 @@ export default {
       yield put({
         type: 'save',
         payload: { printUrl: response.message },
+      });
+    },
+    *getParamType({}, { call, put }) {
+      const response = yield call(fakeKeyValues, 'ParamType');
+      yield put({
+        type: 'save',
+        payload: { paramType: response },
       });
     },
   },

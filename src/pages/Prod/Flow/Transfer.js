@@ -32,6 +32,7 @@ import Authorized from '@/utils/Authorized';
 import { hasAuthority } from '@/utils/authority';
 
 import styles from './List.less';
+import { isArray } from 'util';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -154,7 +155,8 @@ class Transfer extends PureComponent {
             fValue: fieldsValue[key],
           });
         } else if (key.indexOf('paramsID') === 0) {
-          data.params.push({ fParamID: key.replace('paramsID', ''), fValue: fieldsValue[key] });
+          const paramValue = isArray(fieldsValue[key]) ? fieldsValue[key] : [fieldsValue[key]];
+          data.params.push({ fParamID: key.replace('paramsID', ''), fValue: paramValue });
         }
       }
 
@@ -645,6 +647,7 @@ class Transfer extends PureComponent {
                       initialValue: d.fDefaultValue,
                     })(
                       <Select
+                        mode={d.fTypeNumber === 'TagSelect' ? 'tags' : ''}
                         showSearch
                         filterOption={(input, option) =>
                           option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0

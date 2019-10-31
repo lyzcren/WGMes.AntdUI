@@ -32,16 +32,16 @@ class Profile extends PureComponent {
     fDeptID: null,
     fComments: '',
     details: [],
-    handleSuccess: () => { },
+    handleSuccess: () => {},
   };
 
-  componentDidMount () {
+  componentDidMount() {
     const { handleSuccess } = this.props;
     this.setState({ handleSuccess });
     this.reload();
   }
 
-  componentDidProfile (preProps) {
+  componentDidProfile(preProps) {
     const preRecord = preProps.record;
     const { record } = this.props;
     if (preRecord.fInterID !== record.fInterID) {
@@ -49,7 +49,7 @@ class Profile extends PureComponent {
     }
   }
 
-  reload () {
+  reload() {
     const {
       dispatch,
       record: { fInterID },
@@ -68,7 +68,7 @@ class Profile extends PureComponent {
     });
   }
 
-  handleUpdate () {
+  handleUpdate() {
     const { dispatch } = this.props;
     const { handleSuccess } = this.state;
     dispatch({
@@ -120,7 +120,7 @@ class Profile extends PureComponent {
     });
   };
 
-  showResult (queryResult, successCallback) {
+  showResult(queryResult, successCallback) {
     const { status, message, model } = queryResult;
 
     if (status === 'ok') {
@@ -135,7 +135,7 @@ class Profile extends PureComponent {
     }
   }
 
-  close () {
+  close() {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
@@ -143,7 +143,7 @@ class Profile extends PureComponent {
     });
   }
 
-  render () {
+  render() {
     const {
       loading,
       form: { getFieldDecorator },
@@ -167,8 +167,8 @@ class Profile extends PureComponent {
           {fStatus === 0 ? (
             <Button onClickCapture={() => this.check()}>审核</Button>
           ) : (
-              <Button onClickCapture={() => this.uncheck()}>反审核</Button>
-            )}
+            <Button onClickCapture={() => this.uncheck()}>反审核</Button>
+          )}
         </ButtonGroup>
         <Button onClick={() => this.close()}>关闭</Button>
       </Fragment>

@@ -133,7 +133,7 @@ class TableList extends PureComponent {
           value: 2,
         },
       ],
-      render (val) {
+      render(val) {
         return sex[val];
       },
     },
@@ -151,7 +151,7 @@ class TableList extends PureComponent {
           value: 0,
         },
       ],
-      render (val) {
+      render(val) {
         return <Switch disabled checked={val} />;
       },
     },
@@ -184,7 +184,7 @@ class TableList extends PureComponent {
     },
   ];
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props;
     const params = { pagination: this.currentPagination };
     dispatch({
@@ -526,7 +526,7 @@ class TableList extends PureComponent {
     print('user', printUrl, templateId, ids);
   };
 
-  renderSimpleForm () {
+  renderSimpleForm() {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -567,7 +567,7 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm () {
+  renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -641,12 +641,12 @@ class TableList extends PureComponent {
     );
   }
 
-  renderForm () {
+  renderForm() {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  render () {
+  render() {
     const {
       form,
       userManage: { data, printTemplates },
@@ -673,7 +673,7 @@ class TableList extends PureComponent {
       .map(c => {
         return c.width;
       })
-      .reduce(function (sum, width, index) {
+      .reduce(function(sum, width, index) {
         return sum + width;
       });
 

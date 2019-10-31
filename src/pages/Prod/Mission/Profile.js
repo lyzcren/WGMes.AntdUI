@@ -45,14 +45,14 @@ const ButtonGroup = Button.Group;
 class Profile extends PureComponent {
   state = {};
 
-  componentDidMount () {
+  componentDidMount() {
     const {
       data: { fInterID },
     } = this.props;
     this.loadData(fInterID);
   }
 
-  componentDidUpdate (preProps) {
+  componentDidUpdate(preProps) {
     const {
       dispatch,
       data: { fInterID },
@@ -62,7 +62,7 @@ class Profile extends PureComponent {
     }
   }
 
-  loadData (fInterID) {
+  loadData(fInterID) {
     const { dispatch } = this.props;
     dispatch({
       type: 'missionProfile/initModel',
@@ -70,7 +70,7 @@ class Profile extends PureComponent {
     });
   }
 
-  close () {
+  close() {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
@@ -78,7 +78,7 @@ class Profile extends PureComponent {
     });
   }
 
-  render () {
+  render() {
     const {
       missionProfile: { data, steps, currentStep },
       loading,
@@ -89,7 +89,9 @@ class Profile extends PureComponent {
       <DescriptionList className={styles.headerList} size="small" col="3">
         <Description term="任务单号">{data.fMoBillNo}</Description>
         <Description term="订单号">{data.fSoBillNo}</Description>
-        <Description term="日期">{data.fDate ? moment(data.fDate).format('YYYY-MM-DD') : ''}</Description>
+        <Description term="日期">
+          {data.fDate ? moment(data.fDate).format('YYYY-MM-DD') : ''}
+        </Description>
         <Description term="计划完工日期">
           {data.fPlanFinishDate ? moment(data.fPlanFinishDate).format('YYYY-MM-DD') : ''}
         </Description>

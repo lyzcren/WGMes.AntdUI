@@ -199,12 +199,13 @@ class ColumnConfig {
           <Fragment>
             <Authorized authority="Mission_Read">
               <a onClick={() => this.profileModalVisibleCallback(record)}>详情</a>
-              {record.fAuxInHighLimitQty - record.fInputQty > 0 && (
+              {
+                // record.fAuxInHighLimitQty - record.fInputQty > 0 &&
                 <span>
                   <Divider type="vertical" />
                   <a onClick={() => this.flowModalVisibleCallback(record)}>开流程单</a>
                 </span>
-              )}
+              }
             </Authorized>
             <Authorized authority="Mission_Delete">
               <Divider type="vertical" />

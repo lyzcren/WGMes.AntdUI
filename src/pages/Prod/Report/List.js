@@ -75,7 +75,7 @@ class TableList extends PureComponent {
     pageSize: 10,
   };
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
       type: 'reportManage/fetch',
@@ -205,7 +205,7 @@ class TableList extends PureComponent {
     });
   };
 
-  showResult (queryResult, successCallback) {
+  showResult(queryResult, successCallback) {
     const { status, message, model } = queryResult;
 
     if (status === 'ok') {
@@ -244,7 +244,7 @@ class TableList extends PureComponent {
   };
 
   //应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
-  webapp_start (templateId, interId, type) {
+  webapp_start(templateId, interId, type) {
     var option = {
       baseurl: 'http://' + window.location.host,
       report: '/api/PrintTemplate/grf?id=' + templateId,
@@ -404,9 +404,7 @@ class TableList extends PureComponent {
     } = this.props;
     return (
       <Fragment>
-        <a onClick={() => this.handleProfile(record)}>
-          详情
-      </a>
+        <a onClick={() => this.handleProfile(record)}>详情</a>
         <Authorized authority="Report_Update">
           <a disabled={record.fStatus != 0} onClick={() => this.handleUpdate(record)}>
             修改
@@ -417,8 +415,8 @@ class TableList extends PureComponent {
           {record.fStatus === 0 ? (
             <a onClick={() => this.handleCheck(record)}>审核</a>
           ) : (
-              <a onClick={() => this.handleUnCheck(record)}>反审核</a>
-            )}
+            <a onClick={() => this.handleUnCheck(record)}>反审核</a>
+          )}
         </Authorized>
         <Authorized authority="Report_Delete">
           <Divider type="vertical" />
@@ -448,7 +446,7 @@ class TableList extends PureComponent {
     );
   };
 
-  renderSimpleForm () {
+  renderSimpleForm() {
     const {
       form: { getFieldDecorator },
       basicData: {
@@ -482,16 +480,16 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm () {
+  renderAdvancedForm() {
     return renderSimpleForm;
   }
 
-  renderForm () {
+  renderForm() {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  handleAdd () {
+  handleAdd() {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
@@ -499,7 +497,7 @@ class TableList extends PureComponent {
     });
   }
 
-  handleProfile (record) {
+  handleProfile(record) {
     message.warning('功能开发中，程序猿们正在努力。');
     return;
     const { dispatch } = this.props;
@@ -509,7 +507,7 @@ class TableList extends PureComponent {
     });
   }
 
-  handleUpdate (record) {
+  handleUpdate(record) {
     message.warning('功能开发中，程序猿们正在努力。');
     return;
     const { dispatch } = this.props;
@@ -564,7 +562,7 @@ class TableList extends PureComponent {
     );
   };
 
-  render () {
+  render() {
     const {
       dispatch,
       reportManage: { data, queryResult },
@@ -583,7 +581,7 @@ class TableList extends PureComponent {
       .map(c => {
         return c.width;
       })
-      .reduce(function (sum, width, index) {
+      .reduce(function(sum, width, index) {
         return sum + width;
       });
     return (
@@ -637,7 +635,7 @@ class TableList extends PureComponent {
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
                 expandedRowRender={this.expandedRowRender}
-              // scroll={{ x: scrollX }}
+                // scroll={{ x: scrollX }}
               />
             </div>
           </Card>

@@ -18,6 +18,11 @@ class ColumnConfig {
       sorter: true,
     },
     {
+      title: '参数类型',
+      dataIndex: 'fTypeName',
+      sorter: true,
+    },
+    {
       title: '参数值',
       dataIndex: 'values',
       render(val) {

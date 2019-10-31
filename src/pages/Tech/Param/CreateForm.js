@@ -1,11 +1,12 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Form, Input, Modal, Radio, Switch } from 'antd';
+import { Form, Input, Modal, Radio, Switch, Select } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 
 import styles from './List.less';
 
 const FormItem = Form.Item;
+const { Option } = Select;
 
 /* eslint react/no-multi-comp:0 */
 @connect(({ basicData }) => ({
@@ -23,14 +24,22 @@ export class CreateForm extends PureComponent {
     });
   };
 
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'basicData/getParamType',
+    });
+  }
+
   render() {
     const {
-      basicData: { billNo },
+      basicData: { billNo, paramType },
       modalVisible,
       form,
       handleSubmit,
       handleModalVisible,
     } = this.props;
+
     return (
       <Modal
         destroyOnClose
@@ -70,6 +79,21 @@ export class CreateForm extends PureComponent {
             valuePropName: 'checked',
             initialValue: true,
           })(<Switch />)}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="类型">
+          {form.getFieldDecorator('fType', {})(
+            <Select
+              style={{ width: '100%' }}
+              placeholder="请选择"
+              onChange={val => console.log(val)}
+            >
+              {paramType.map(x => (
+                <Option key={x.fKey} value={x.fKey}>
+                  {x.fValue}
+                </Option>
+              ))}
+            </Select>
+          )}
         </FormItem>
       </Modal>
     );

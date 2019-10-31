@@ -58,12 +58,12 @@ export default {
   'menu.prod.report.create': '新增流程单汇报',
   'menu.prod.report.update': '修改流程单汇报',
   'menu.prod.report.profile': '查看流程单汇报',
-  // 生产过程记录
+  // 过程查询
+  'menu.record': '过程查询',
   'menu.record.record': '生产记录',
   'menu.record.record.profile': '生产记录详情',
   'menu.record.defectRepair': '返修记录',
   'menu.record.defectScrap': '报废记录',
-  'menu.record': '生产过程记录',
   'menu.record.missionInput': '开流程单记录',
   'menu.record.take': '取走记录',
   'menu.record.changeRoute': '路线变更记录',

@@ -27,14 +27,14 @@ export default {
   },
 
   effects: {
-    *fetch ({ payload }, { call, put }) {
+    *fetch({ payload }, { call, put }) {
       const response = yield call(queryUser, payload);
       yield put({
         type: 'query',
         payload: response,
       });
     },
-    *add ({ payload, callback }, { call, put }) {
+    *add({ payload, callback }, { call, put }) {
       const response = yield call(addUser, payload);
       yield put({
         type: 'saveData',
@@ -42,7 +42,7 @@ export default {
       });
       if (callback) callback();
     },
-    *remove ({ payload, callback }, { call, put }) {
+    *remove({ payload, callback }, { call, put }) {
       const response = yield call(removeUser, payload);
       yield put({
         type: 'saveData',
@@ -50,7 +50,7 @@ export default {
       });
       if (callback) callback();
     },
-    *update ({ payload, callback }, { call, put }) {
+    *update({ payload, callback }, { call, put }) {
       const response = yield call(updateUser, payload);
       yield put({
         type: 'saveData',
@@ -58,42 +58,42 @@ export default {
       });
       if (callback) callback();
     },
-    *updatePwd ({ payload }, { call, put }) {
+    *updatePwd({ payload }, { call, put }) {
       const response = yield call(updatePwd, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
     },
-    *active ({ payload }, { call, put }) {
+    *active({ payload }, { call, put }) {
       const response = yield call(activeUser, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
     },
-    *getAuthorizeRole ({ payload }, { call, put }) {
+    *getAuthorizeRole({ payload }, { call, put }) {
       const response = yield call(fakeGetAuthorizeRole, payload);
       yield put({
         type: 'saveAuthorizeRole',
         payload: response,
       });
     },
-    *authorizeRole ({ payload, callback }, { call, put }) {
+    *authorizeRole({ payload, callback }, { call, put }) {
       const response = yield call(fakeAuthorizeRole, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
     },
-    *unAuthorizeRole ({ payload }, { call, put }) {
+    *unAuthorizeRole({ payload }, { call, put }) {
       const response = yield call(fakeUnAuthorizeRole, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
     },
-    *getPrintTemplates ({ payload }, { call, put }) {
+    *getPrintTemplates({ payload }, { call, put }) {
       const response = yield call(fakeQueryPrintTemplate, { number: 'sysUser' });
       yield put({
         type: 'save',
@@ -103,25 +103,25 @@ export default {
   },
 
   reducers: {
-    save (state, action) {
+    save(state, action) {
       return {
         ...state,
         ...action.payload,
       };
     },
-    query (state, action) {
+    query(state, action) {
       return {
         ...state,
         data: action.payload,
       };
     },
-    saveData (state, action) {
+    saveData(state, action) {
       return {
         ...state,
         result: action.payload ? action.payload : {},
       };
     },
-    saveAuthorizeRole (state, action) {
+    saveAuthorizeRole(state, action) {
       return {
         ...state,
         authorizeRole: action.payload,
