@@ -282,6 +282,18 @@ class TableList extends PureComponent {
         compare: '%*%',
         value: fieldsValue.queryWorkShopNumber,
       });
+    if (fieldsValue.queryMesSelf001)
+      queryFilters.push({
+        name: 'fMesSelf001',
+        compare: '%*%',
+        value: fieldsValue.queryMesSelf001,
+      });
+    if (fieldsValue.queryMesSelf002)
+      queryFilters.push({
+        name: 'fMesSelf002',
+        compare: '%*%',
+        value: fieldsValue.queryMesSelf002,
+      });
 
     this.setState({
       formValues: values,
@@ -1060,6 +1072,16 @@ class TableList extends PureComponent {
           <Col md={8} sm={24}>
             <FormItem label="车间编码">
               {getFieldDecorator('queryWorkShopNumber')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="底色编号">
+              {getFieldDecorator('queryMesSelf001')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="父件型号">
+              {getFieldDecorator('queryMesSelf002')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
         </Row>
