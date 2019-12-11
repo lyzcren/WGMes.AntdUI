@@ -51,9 +51,7 @@ class QuickLayout extends React.PureComponent {
         <div className={styles.lang}>
           <SelectLang />
         </div>
-        <div className={styles.content}>
-          {children}
-        </div>
+        <div className={styles.content}>{children}</div>
       </div>
     );
   }

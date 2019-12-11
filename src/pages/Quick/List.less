@@ -66,9 +66,9 @@
 .h4 {
   color: white;
   font-weight: lighter;
-  font-family: "Oswald";
+  font-family: 'Oswald';
 }
-.h2{
+.h2 {
   font-size: 1.8em;
   display: block;
   // font-size: 1.5em;
@@ -126,7 +126,6 @@
   }
 }
 
-
 .right_header {
   &:extend(.wrapper);
   align-items: left;
@@ -134,137 +133,312 @@
   height: 30vh;
 }
 
-
 .quick_button {
-    display: block;
-    width: 160px;
-    height: 60px;
-    z-index: 1;
+  display: block;
+  width: 160px;
+  height: 60px;
+  z-index: 1;
 }
 .quick_button:after {
-    content: '';
-    background: linear-gradient(120deg, #36563C,#86C166,#00896C);
-    background-size: 100% 100%;
-    -webkit-clip-path: polygon(0% 100%, 4px 100%, 4px 4px, 156px 4px, 156px 56px, 4px 56px, 4px 100%, 100% 100%, 100% 0%, 0% 0%);
-    -moz-animation: gradient 3s ease-in-out infinite, border 1s forwards ease-in-out reverse;
-    -webkit-animation: gradient 3s ease-in-out infinite, border 1s forwards ease-in-out reverse;
-    animation: gradient 3s ease-in-out infinite, border 1s forwards ease-in-out reverse;
+  content: '';
+  background: linear-gradient(120deg, #36563c, #86c166, #00896c);
+  background-size: 100% 100%;
+  -webkit-clip-path: polygon(
+    0% 100%,
+    4px 100%,
+    4px 4px,
+    156px 4px,
+    156px 56px,
+    4px 56px,
+    4px 100%,
+    100% 100%,
+    100% 0%,
+    0% 0%
+  );
+  -moz-animation: gradient 3s ease-in-out infinite, border 1s forwards ease-in-out reverse;
+  -webkit-animation: gradient 3s ease-in-out infinite, border 1s forwards ease-in-out reverse;
+  animation: gradient 3s ease-in-out infinite, border 1s forwards ease-in-out reverse;
 }
 .quick_button > span {
-    display: block;
-    background: linear-gradient(120deg, #36563C, #86C166,#00896C);
-    background-size: 100% 100%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    -moz-animation: gradient 3s ease-in-out infinite;
-    -webkit-animation: gradient 3s ease-in-out infinite;
-    animation: gradient 3s ease-in-out infinite;
-    /* helpers */
+  display: block;
+  background: linear-gradient(120deg, #36563c, #86c166, #00896c);
+  background-size: 100% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-animation: gradient 3s ease-in-out infinite;
+  -webkit-animation: gradient 3s ease-in-out infinite;
+  animation: gradient 3s ease-in-out infinite;
+  /* helpers */
 }
 .absolute-centering,
 .quick_button,
 .quick_button:after {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
 }
 .text-formatting,
 .quick_button {
-    text-transform: uppercase;
-    text-decoration: none;
-    text-align: center;
-    letter-spacing: 2px;
-    line-height: 60px;
-    font-family: 'Squada One', cursive;
-    font-size: 24px;
-    /* motion */
+  text-transform: uppercase;
+  text-decoration: none;
+  text-align: center;
+  letter-spacing: 2px;
+  line-height: 60px;
+  font-family: 'Squada One', cursive;
+  font-size: 24px;
+  /* motion */
 }
 @-moz-keyframes gradient {
-    0% {
-        background-position: 14% 0%;
-    }
-    50% {
-        background-position: 87% 100%;
-    }
-    100% {
-        background-position: 14% 0%;
-    }
+  0% {
+    background-position: 14% 0%;
+  }
+  50% {
+    background-position: 87% 100%;
+  }
+  100% {
+    background-position: 14% 0%;
+  }
 }
 @-webkit-keyframes gradient {
-    0% {
-        background-position: 14% 0%;
-    }
-    50% {
-        background-position: 87% 100%;
-    }
-    100% {
-        background-position: 14% 0%;
-    }
+  0% {
+    background-position: 14% 0%;
+  }
+  50% {
+    background-position: 87% 100%;
+  }
+  100% {
+    background-position: 14% 0%;
+  }
 }
 @keyframes gradient {
-    0% {
-        background-position: 14% 0%;
-    }
-    50% {
-        background-position: 87% 100%;
-    }
-    100% {
-        background-position: 14% 0%;
-    }
+  0% {
+    background-position: 14% 0%;
+  }
+  50% {
+    background-position: 87% 100%;
+  }
+  100% {
+    background-position: 14% 0%;
+  }
 }
 @-moz-keyframes border {
-    0% {
-        -webkit-clip-path: polygon(0% 100%, 4px 100%, 4px 4px, 156px 4px, 156px 56px, 4px 56px, 4px 100%, 100% 100%, 100% 0%, 0% 0%);
-    }
-    25% {
-        -webkit-clip-path: polygon(0% 100%, 4px 100%, 4px 4px, 156px 4px, 156px 56px, 156px 56px, 156px 100%, 100% 100%, 100% 0%, 0% 0%);
-    }
-    50% {
-        -webkit-clip-path: polygon(0% 100%, 4px 100%, 4px 4px, 156px 4px, 156px 4px, 156px 4px, 156px 4px, 156px 4px, 100% 0%, 0% 0%);
-    }
-    75% {
-        -webkit-clip-path: polygon(0% 100%, 4px 100%, 4px 4px, 4px 4px, 4px 4px, 4px 4px, 4px 4px, 4px 4px, 4px 0%, 0% 0%);
-    }
-    100% {
-        -webkit-clip-path: polygon(0% 100%, 4px 100%, 4px 100%, 4px 100%, 4px 100%, 4px 100%, 4px 100%, 4px 100%, 4px 100%, 0% 100%);
-    }
+  0% {
+    -webkit-clip-path: polygon(
+      0% 100%,
+      4px 100%,
+      4px 4px,
+      156px 4px,
+      156px 56px,
+      4px 56px,
+      4px 100%,
+      100% 100%,
+      100% 0%,
+      0% 0%
+    );
+  }
+  25% {
+    -webkit-clip-path: polygon(
+      0% 100%,
+      4px 100%,
+      4px 4px,
+      156px 4px,
+      156px 56px,
+      156px 56px,
+      156px 100%,
+      100% 100%,
+      100% 0%,
+      0% 0%
+    );
+  }
+  50% {
+    -webkit-clip-path: polygon(
+      0% 100%,
+      4px 100%,
+      4px 4px,
+      156px 4px,
+      156px 4px,
+      156px 4px,
+      156px 4px,
+      156px 4px,
+      100% 0%,
+      0% 0%
+    );
+  }
+  75% {
+    -webkit-clip-path: polygon(
+      0% 100%,
+      4px 100%,
+      4px 4px,
+      4px 4px,
+      4px 4px,
+      4px 4px,
+      4px 4px,
+      4px 4px,
+      4px 0%,
+      0% 0%
+    );
+  }
+  100% {
+    -webkit-clip-path: polygon(
+      0% 100%,
+      4px 100%,
+      4px 100%,
+      4px 100%,
+      4px 100%,
+      4px 100%,
+      4px 100%,
+      4px 100%,
+      4px 100%,
+      0% 100%
+    );
+  }
 }
 @-webkit-keyframes border {
-    0% {
-        -webkit-clip-path: polygon(0% 100%, 4px 100%, 4px 4px, 156px 4px, 156px 56px, 4px 56px, 4px 100%, 100% 100%, 100% 0%, 0% 0%);
-    }
-    25% {
-        -webkit-clip-path: polygon(0% 100%, 4px 100%, 4px 4px, 156px 4px, 156px 56px, 156px 56px, 156px 100%, 100% 100%, 100% 0%, 0% 0%);
-    }
-    50% {
-        -webkit-clip-path: polygon(0% 100%, 4px 100%, 4px 4px, 156px 4px, 156px 4px, 156px 4px, 156px 4px, 156px 4px, 100% 0%, 0% 0%);
-    }
-    75% {
-        -webkit-clip-path: polygon(0% 100%, 4px 100%, 4px 4px, 4px 4px, 4px 4px, 4px 4px, 4px 4px, 4px 4px, 4px 0%, 0% 0%);
-    }
-    100% {
-        -webkit-clip-path: polygon(0% 100%, 4px 100%, 4px 100%, 4px 100%, 4px 100%, 4px 100%, 4px 100%, 4px 100%, 4px 100%, 0% 100%);
-    }
+  0% {
+    -webkit-clip-path: polygon(
+      0% 100%,
+      4px 100%,
+      4px 4px,
+      156px 4px,
+      156px 56px,
+      4px 56px,
+      4px 100%,
+      100% 100%,
+      100% 0%,
+      0% 0%
+    );
+  }
+  25% {
+    -webkit-clip-path: polygon(
+      0% 100%,
+      4px 100%,
+      4px 4px,
+      156px 4px,
+      156px 56px,
+      156px 56px,
+      156px 100%,
+      100% 100%,
+      100% 0%,
+      0% 0%
+    );
+  }
+  50% {
+    -webkit-clip-path: polygon(
+      0% 100%,
+      4px 100%,
+      4px 4px,
+      156px 4px,
+      156px 4px,
+      156px 4px,
+      156px 4px,
+      156px 4px,
+      100% 0%,
+      0% 0%
+    );
+  }
+  75% {
+    -webkit-clip-path: polygon(
+      0% 100%,
+      4px 100%,
+      4px 4px,
+      4px 4px,
+      4px 4px,
+      4px 4px,
+      4px 4px,
+      4px 4px,
+      4px 0%,
+      0% 0%
+    );
+  }
+  100% {
+    -webkit-clip-path: polygon(
+      0% 100%,
+      4px 100%,
+      4px 100%,
+      4px 100%,
+      4px 100%,
+      4px 100%,
+      4px 100%,
+      4px 100%,
+      4px 100%,
+      0% 100%
+    );
+  }
 }
 @keyframes border {
-    0% {
-        -webkit-clip-path: polygon(0% 100%, 4px 100%, 4px 4px, 156px 4px, 156px 56px, 4px 56px, 4px 100%, 100% 100%, 100% 0%, 0% 0%);
-    }
-    25% {
-        -webkit-clip-path: polygon(0% 100%, 4px 100%, 4px 4px, 156px 4px, 156px 56px, 156px 56px, 156px 100%, 100% 100%, 100% 0%, 0% 0%);
-    }
-    50% {
-        -webkit-clip-path: polygon(0% 100%, 4px 100%, 4px 4px, 156px 4px, 156px 4px, 156px 4px, 156px 4px, 156px 4px, 100% 0%, 0% 0%);
-    }
-    75% {
-        -webkit-clip-path: polygon(0% 100%, 4px 100%, 4px 4px, 4px 4px, 4px 4px, 4px 4px, 4px 4px, 4px 4px, 4px 0%, 0% 0%);
-    }
-    100% {
-        -webkit-clip-path: polygon(0% 100%, 4px 100%, 4px 100%, 4px 100%, 4px 100%, 4px 100%, 4px 100%, 4px 100%, 4px 100%, 0% 100%);
-    }
+  0% {
+    -webkit-clip-path: polygon(
+      0% 100%,
+      4px 100%,
+      4px 4px,
+      156px 4px,
+      156px 56px,
+      4px 56px,
+      4px 100%,
+      100% 100%,
+      100% 0%,
+      0% 0%
+    );
+  }
+  25% {
+    -webkit-clip-path: polygon(
+      0% 100%,
+      4px 100%,
+      4px 4px,
+      156px 4px,
+      156px 56px,
+      156px 56px,
+      156px 100%,
+      100% 100%,
+      100% 0%,
+      0% 0%
+    );
+  }
+  50% {
+    -webkit-clip-path: polygon(
+      0% 100%,
+      4px 100%,
+      4px 4px,
+      156px 4px,
+      156px 4px,
+      156px 4px,
+      156px 4px,
+      156px 4px,
+      100% 0%,
+      0% 0%
+    );
+  }
+  75% {
+    -webkit-clip-path: polygon(
+      0% 100%,
+      4px 100%,
+      4px 4px,
+      4px 4px,
+      4px 4px,
+      4px 4px,
+      4px 4px,
+      4px 4px,
+      4px 0%,
+      0% 0%
+    );
+  }
+  100% {
+    -webkit-clip-path: polygon(
+      0% 100%,
+      4px 100%,
+      4px 100%,
+      4px 100%,
+      4px 100%,
+      4px 100%,
+      4px 100%,
+      4px 100%,
+      4px 100%,
+      0% 100%
+    );
+  }
 }
 
 .text_gradient {
@@ -275,13 +449,24 @@
   text-align: center;
   text-transform: uppercase;
 }
-@supports ((background-clip: text) or (-webkit-background-clip: text)) and ((text-fill-color: transparent) or (-webkit-text-fill-color: transparent)) {
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and
+  ((text-fill-color: transparent) or (-webkit-text-fill-color: transparent)) {
   .text_gradient {
-      background-image: linear-gradient(90deg, #f79533 0%, #f37055 15%, #ef4e7b 30%, #a166ab 44%, #5073b8 58%, #1098ad 72%, #07b39b 86%, #6dba82 100%);
-      background-size: cover;
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-fill-color: transparent;
+    background-image: linear-gradient(
+      90deg,
+      #f79533 0%,
+      #f37055 15%,
+      #ef4e7b 30%,
+      #a166ab 44%,
+      #5073b8 58%,
+      #1098ad 72%,
+      #07b39b 86%,
+      #6dba82 100%
+    );
+    background-size: cover;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-fill-color: transparent;
   }
 }

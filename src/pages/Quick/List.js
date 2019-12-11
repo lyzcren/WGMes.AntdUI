@@ -22,9 +22,9 @@ class LoginPage extends Component {
     autoLogin: false,
   };
 
-  componentDidMount(){
+  componentDidMount() {
     setTimeout(() => {
-      if(!screenfull.isFullscreen)  screenfull.request();
+      if (!screenfull.isFullscreen) screenfull.request();
     }, 100);
   }
 
@@ -73,7 +73,6 @@ class LoginPage extends Component {
     <Alert style={{ marginBottom: 24 }} message={content} type="error" showIcon />
   );
 
-
   render() {
     const { login, submitting } = this.props;
     const { type, autoLogin } = this.state;
@@ -81,55 +80,70 @@ class LoginPage extends Component {
     return (
       <div className={styles.main}>
         <Col span={13}>
-          <Row gutter={{xs: 8, sm: 16, md: 24}}>
-            <div className={styles.headWrapper}></div>
+          <Row gutter={{ xs: 8, sm: 16, md: 24 }}>
+            <div className={styles.headWrapper} />
           </Row>
           <Row gutter={8}>
             <Col span={3}>
-                        <div style={{height: '80px'}} />
+              <div style={{ height: '80px' }} />
             </Col>
             <Col span={6}>
-                        <QuickButton title={"签收"} />
+              <QuickButton title={'签收'} />
             </Col>
             <Col span={6}>
-                        <QuickButton title={"转序"}  />
+              <QuickButton title={'转序'} />
             </Col>
             <Col span={6}>
-                      <QuickButton title={"打印"}  />
+              <QuickButton title={'打印'} />
             </Col>
           </Row>
           <Row gutter={8}>
             <Col span={3}>
-                        <div style={{height: '80px'}} />
+              <div style={{ height: '80px' }} />
             </Col>
             <Col span={6}>
-                        <QuickButton title={"拒签"} />
+              <QuickButton title={'拒签'} />
             </Col>
             <Col span={6}>
-                        <QuickButton title={"退回"}  />
+              <QuickButton title={'退回'} />
             </Col>
             <Col span={6}>
-                      <QuickButton title={"取走"}  />
+              <QuickButton title={'取走'} />
             </Col>
           </Row>
         </Col>
         <Col span={3} />
         <Col span={6}>
-          <Row gutter={{xs: 8, sm: 16, md: 24}}>
-            <div className={styles.right_header}>
-            </div>
+          <Row gutter={{ xs: 8, sm: 16, md: 24 }}>
+            <div className={styles.right_header} />
           </Row>
           <Row gutter={8}>
-            <h2 className={styles.text_gradient}><span><Icon type="double-right" /> 岗位： <b>贴膜</b></span></h2>
+            <h2 className={styles.text_gradient}>
+              <span>
+                <Icon type="double-right" /> 岗位： <b>贴膜</b>
+              </span>
+            </h2>
           </Row>
           <Row gutter={8}>
-            <h2 className={styles.text_gradient}><span><Icon type="double-right" /> 机台： <b>贴膜1号机</b></span></h2>
+            <h2 className={styles.text_gradient}>
+              <span>
+                <Icon type="double-right" /> 机台： <b>贴膜1号机</b>
+              </span>
+            </h2>
           </Row>
           <Row gutter={8}>
-            <h2 className={styles.text_gradient}><span><Icon type="double-right" /> 班次： <b>早班</b></span></h2>
+            <h2 className={styles.text_gradient}>
+              <span>
+                <Icon type="double-right" /> 班次： <b>早班</b>
+              </span>
+            </h2>
           </Row>
           <Row gutter={8}>
-            <h2 className={styles.text_gradient}><span><Icon type="double-right" /> 操作员： <b>张三三</b></span></h2>
+            <h2 className={styles.text_gradient}>
+              <span>
+                <Icon type="double-right" /> 操作员： <b>张三三</b>
+              </span>
+            </h2>
           </Row>
         </Col>
       </div>
@@ -137,9 +151,13 @@ class LoginPage extends Component {
   }
 }
 
-class QuickButton extends Component{
-  render(){
-  return  <a className={styles.quick_button} href="#" target="_blank"><span>{this.props.title}</span></a>;
+class QuickButton extends Component {
+  render() {
+    return (
+      <a className={styles.quick_button} href="#" target="_blank">
+        <span>{this.props.title}</span>
+      </a>
+    );
   }
 }
 

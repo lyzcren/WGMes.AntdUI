@@ -73,6 +73,24 @@ class ColumnConfig {
       width: 220,
     },
     {
+      title: '父件型号',
+      dataIndex: 'fMesSelf002',
+      sorter: true,
+      width: 120,
+    },
+    {
+      title: '底色编号',
+      dataIndex: 'fMesSelf001',
+      sorter: true,
+      width: 120,
+    },
+    {
+      title: '内部订单号',
+      dataIndex: 'fMesSelf003',
+      sorter: true,
+      width: 120,
+    },
+    {
       title: '工艺路线',
       dataIndex: 'fRoutingName',
       width: 150,

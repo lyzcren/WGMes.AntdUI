@@ -207,6 +207,24 @@ class TableList extends PureComponent {
         compare: '%*%',
         value: fieldsValue.queryWorkShopNumber,
       });
+    if (fieldsValue.queryMesSelf001)
+      queryFilters.push({
+        name: 'fMesSelf001',
+        compare: '%*%',
+        value: fieldsValue.queryMesSelf001,
+      });
+    if (fieldsValue.queryMesSelf002)
+      queryFilters.push({
+        name: 'fMesSelf002',
+        compare: '%*%',
+        value: fieldsValue.queryMesSelf002,
+      });
+    if (fieldsValue.queryMesSelf003)
+      queryFilters.push({
+        name: 'fMesSelf003',
+        compare: '%*%',
+        value: fieldsValue.queryMesSelf003,
+      });
 
     this.setState({
       formValues: values,
@@ -521,6 +539,21 @@ class TableList extends PureComponent {
           <Col md={8} sm={24}>
             <FormItem label="规格型号">
               {getFieldDecorator('queryModel')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="底色编号">
+              {getFieldDecorator('queryMesSelf001')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="父件型号">
+              {getFieldDecorator('queryMesSelf002')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="内部订单号">
+              {getFieldDecorator('queryMesSelf003')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
         </Row>

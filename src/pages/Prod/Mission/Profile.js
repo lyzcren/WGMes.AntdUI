@@ -136,7 +136,9 @@ class Profile extends PureComponent {
             <Description term="编码">{data.fProductNumber}</Description>
             <Description term="规格型号">{data.fModel}</Description>
             <Description term="分类">{data.fErpClsName}</Description>
-            <Description term="父件型号">{data.fParentModel}</Description>
+            <Description term="父件型号">{data.fMesSelf002}</Description>
+            <Description term="底色编号">{data.fMesSelf001}</Description>
+            <Description term="内部订单号">{data.fMesSelf003}</Description>
           </DescriptionList>
         </Card>
         <Card title="数量信息" style={{ marginBottom: 24 }} bordered={false}>

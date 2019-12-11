@@ -20,9 +20,7 @@ export default [
   {
     path: '/quickOps',
     component: '../layouts/QuickLayout',
-    routes: [
-      { path: '/quickOps', component: './Quick/List' },
-    ],
+    routes: [{ path: '/quickOps', component: './Quick/List' }],
   },
   // app
   {

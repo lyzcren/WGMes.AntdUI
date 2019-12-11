@@ -41,8 +41,8 @@ export default {
             return;
           }
         }
-        // yield put(routerRedux.replace(redirect || '/'));
-        yield put(routerRedux.replace('/quickOps'));
+        yield put(routerRedux.replace(redirect || '/'));
+        // yield put(routerRedux.replace('/quickOps'));
       }
     },
 

@@ -341,6 +341,8 @@ class Transfer extends PureComponent {
           <Description term="产品名称">{data.fProductName}</Description>
           <Description term="规格型号">{data.fModel}</Description>
           <Description term="父件型号">{data.fMesSelf002}</Description>
+          <Description term="底色编号">{data.fMesSelf001}</Description>
+          <Description term="内部订单号">{data.fMesSelf003}</Description>
           <Description term="单位">{data.fUnitName}</Description>
           <Description term="流程单数量">
             {numeral(data.fFlowInputQty).format(qtyFormat)}
@@ -351,7 +353,6 @@ class Transfer extends PureComponent {
             {numeral(data.fInvCheckDeltaQty).format(qtyFormat)}
           </Description>
           <Description term="取走数量">{numeral(data.fTakeQty).format(qtyFormat)}</Description>
-          <Description term="底色编号">{data.fMesSelf001}</Description>
         </DescriptionList>
       </div>
     );
