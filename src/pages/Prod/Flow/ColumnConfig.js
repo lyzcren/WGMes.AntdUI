@@ -174,7 +174,7 @@ class ColumnConfig {
         title: '内部订单号',
         dataIndex: 'fMesSelf003',
         sorter: true,
-        width: 120,
+        width: 140,
       },
       {
         title: '操作',

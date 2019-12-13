@@ -8,9 +8,9 @@ import styles from './Login.less';
 
 const { Tab, UserName, Password, IdCard, Mobile, Captcha, Submit } = Login;
 
-@connect(({ login, loading, menu }) => ({
-  login,
-  submitting: loading.effects['login/login'],
+@connect(({ user, loading, menu }) => ({
+  user,
+  submitting: loading.effects['user/login'],
   menu,
 }))
 class LoginPage extends Component {
@@ -31,7 +31,7 @@ class LoginPage extends Component {
         } else {
           const { dispatch } = this.props;
           dispatch({
-            type: 'login/getCaptcha',
+            type: 'user/getCaptcha',
             payload: values.mobile,
           })
             .then(resolve)
@@ -45,12 +45,12 @@ class LoginPage extends Component {
     if (!err) {
       const { dispatch } = this.props;
       dispatch({
-        type: 'login/login',
+        type: 'user/login',
         payload: {
           ...values,
           type,
         },
-      }).then(() => {});
+      });
     }
   };
 
@@ -65,7 +65,7 @@ class LoginPage extends Component {
   );
 
   render() {
-    const { login, submitting } = this.props;
+    const { user, submitting } = this.props;
     const { type, autoLogin } = this.state;
     return (
       <div className={styles.main}>
@@ -78,11 +78,11 @@ class LoginPage extends Component {
           }}
         >
           <Tab key="account" tab={formatMessage({ id: 'app.login.tab-login-credentials' })}>
-            {login.status === 'error' &&
-              login.type === 'account' &&
+            {user.status === 'error' &&
+              user.type === 'account' &&
               !submitting &&
               // this.renderMessage(formatMessage({ id: 'app.login.message-invalid-credentials' }))}
-              this.renderMessage(login.message)}
+              this.renderMessage(user.message)}
             <UserName
               name="userName"
               autoFocus
@@ -109,8 +109,8 @@ class LoginPage extends Component {
             />
           </Tab>
           <Tab key="idcard" tab={formatMessage({ id: 'app.login.tab-login-idcard' })}>
-            {login.status === 'error' &&
-              login.type === 'idcard' &&
+            {user.status === 'error' &&
+              user.type === 'idcard' &&
               !submitting &&
               this.renderMessage('卡号错误')}
             <IdCard

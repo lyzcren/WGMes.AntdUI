@@ -43,7 +43,7 @@ const getValue = obj =>
     .map(key => obj[key])
     .join(',');
 const activeData = ['启用', '禁用'];
-const pageMapper = { mission: '生产任务单', flow: '流程单' };
+const pageMapper = { mission: '生产任务单', flow: '流程单', quickOps: '快速操作' };
 
 /* eslint react/no-multi-comp:0 */
 @connect(({ roleManage, loading }) => ({

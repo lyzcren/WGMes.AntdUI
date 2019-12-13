@@ -11,12 +11,11 @@ import ButtonGroup from 'antd/lib/button/button-group';
 
 const { Tab, UserName, Password, IdCard, Mobile, Captcha, Submit } = Login;
 
-@connect(({ login, loading, menu }) => ({
-  login,
-  submitting: loading.effects['login/login'],
+@connect(({ user, loading, menu }) => ({
+  user,
   menu,
 }))
-class LoginPage extends Component {
+class QuickOpsPage extends Component {
   state = {
     type: 'account',
     autoLogin: false,
@@ -74,7 +73,7 @@ class LoginPage extends Component {
   );
 
   render() {
-    const { login, submitting } = this.props;
+    const { login } = this.props;
     const { type, autoLogin } = this.state;
 
     return (
@@ -161,4 +160,4 @@ class QuickButton extends Component {
   }
 }
 
-export default LoginPage;
+export default QuickOpsPage;

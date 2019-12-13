@@ -8,7 +8,7 @@ function checkStatus(request) {
     // @HACK
     /* eslint-disable no-underscore-dangle */
     window.g_app._store.dispatch({
-      type: 'login/logout',
+      type: 'user/logout',
     });
     return false;
   }
@@ -27,7 +27,7 @@ function checkStatus(request) {
           message: `登录信息过期，请重新登录`,
         });
         window.g_app._store.dispatch({
-          type: 'login/logout',
+          type: 'user/logout',
         });
       } else {
         notification.error({

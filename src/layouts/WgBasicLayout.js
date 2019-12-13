@@ -66,9 +66,10 @@ class WgBasicLayout extends React.PureComponent {
       route: { routes, authority },
     } = this.props;
     const token = getToken();
+    console.log(token);
     if (!token) {
       dispatch({
-        type: 'login/logout',
+        type: 'user/logout',
       });
       return;
     }
@@ -85,28 +86,7 @@ class WgBasicLayout extends React.PureComponent {
     });
     dispatch({
       type: 'user/fetchCurrent',
-    }).then(() => {
-      const {
-        user: {
-          currentUser: { indexPage },
-        },
-      } = this.props;
-      // 首次进入界面默认加载标签页
-      let defaultPath = '/dashboard/analysis';
-      if (indexPage === 'flow') {
-        defaultPath = '/prod/flow';
-      } else if (indexPage === 'mission') {
-        defaultPath = '/prod/mission';
-      }
-      // dispatch({
-      //   type: 'menu/getMenuData',
-      //   payload: { routes, authority, defaultActiveKey: defaultPath },
-      // })
-      dispatch({
-        type: 'menu/openMenu',
-        payload: { path: defaultPath, closable: false },
-      });
-    });
+    }).then(this.reloadIndexPage);
   }
 
   componentDidUpdate(preProps) {
@@ -117,6 +97,30 @@ class WgBasicLayout extends React.PureComponent {
       this.handleMenuCollapse(false);
     }
   }
+
+  reloadIndexPage = () => {
+    const {
+      dispatch,
+      user: {
+        currentUser: { indexPage },
+      },
+    } = this.props;
+    // 首次进入界面默认加载标签页
+    let defaultPath = '/dashboard/analysis';
+    if (indexPage === 'flow') {
+      defaultPath = '/prod/flow';
+    } else if (indexPage === 'mission') {
+      defaultPath = '/prod/mission';
+    }
+    // dispatch({
+    //   type: 'menu/getMenuData',
+    //   payload: { routes, authority, defaultActiveKey: defaultPath },
+    // })
+    dispatch({
+      type: 'menu/openMenu',
+      payload: { path: defaultPath, closable: false },
+    });
+  };
 
   getContext() {
     const { location, breadcrumbNameMap } = this.props;

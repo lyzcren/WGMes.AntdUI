@@ -154,7 +154,7 @@ export default function request(url, option) {
         // @HACK
         /* eslint-disable no-underscore-dangle */
         window.g_app._store.dispatch({
-          type: 'login/logout',
+          type: 'user/logout',
         });
         return;
       }
@@ -173,7 +173,7 @@ export default function request(url, option) {
               message: `登录信息过期，请重新登录`,
             });
             window.g_app._store.dispatch({
-              type: 'login/logout',
+              type: 'user/logout',
             });
           } else {
             notification.error({
