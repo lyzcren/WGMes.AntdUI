@@ -67,17 +67,24 @@ class Transfer extends PureComponent {
   componentDidMount() {
     // ReactDOM.findDOMNode(this.refs.select).click();
     const {
-      data: { fInterID, fCurrentDeptID },
+      location: {
+        data: { fInterID, fCurrentDeptID },
+        fMachineID,
+        fWorkTimeID,
+      },
     } = this.props;
 
     this.loadData(fInterID, fCurrentDeptID);
+    this.setState({ fMachineID, fWorkTimeID });
   }
 
   componentDidUpdate(preProps) {
     const {
-      data: { fInterID, fCurrentDeptID },
+      location: {
+        data: { fInterID, fCurrentDeptID },
+      },
     } = this.props;
-    if (fInterID !== preProps.data.fInterID) {
+    if (fInterID !== preProps.location.data.fInterID) {
       this.loadData(fInterID, fCurrentDeptID);
     }
   }
@@ -85,7 +92,9 @@ class Transfer extends PureComponent {
   loadData(fInterID) {
     const {
       dispatch,
-      data: { fQtyDecimal },
+      location: {
+        data: { fQtyDecimal },
+      },
     } = this.props;
     const qtyDecimal = fQtyDecimal ? fQtyDecimal : 0;
 
@@ -296,6 +305,7 @@ class Transfer extends PureComponent {
       form: { getFieldDecorator },
       basicData: { defectData, operators },
       fBindEmpID,
+      location: { fEmpID },
     } = this.props;
     const { showMoreDefect, moreDefectValue, qtyFormat, qtyDecimal } = this.state;
     // 默认机台
@@ -412,7 +422,7 @@ class Transfer extends PureComponent {
                 <FormItem key="fOperatorID" label="操作员">
                   {getFieldDecorator('fOperatorID', {
                     rules: [{ required: true, message: '请选择操作员' }],
-                    initialValue: fBindEmpID ? fBindEmpID : null,
+                    initialValue: fEmpID ? fEmpID : fBindEmpID ? fBindEmpID : null,
                   })(
                     <Select
                       placeholder="请选择操作员"

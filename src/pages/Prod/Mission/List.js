@@ -31,6 +31,7 @@ import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { FlowForm } from './FlowForm';
+import { BatchFlowForm } from './BatchFlowForm';
 import { SyncForm } from './SyncForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
@@ -62,6 +63,7 @@ class TableList extends PureComponent {
     // 界面是否可见
     modalVisible: {
       update: false,
+      batchFlow: false,
       genFlowSuccess: false,
       sync: false,
     },
@@ -374,6 +376,13 @@ class TableList extends PureComponent {
     });
   };
 
+  handleBatchFlow = () => {
+    const { selectedRows } = this.state;
+    if (selectedRows.length === 0) return;
+
+    this.handleModalVisible({ key: 'batchFlow', flag: true }, selectedRows);
+  };
+
   handleProfileModalVisible = (flag, record) => {
     const { dispatch } = this.props;
     dispatch({
@@ -634,21 +643,28 @@ class TableList extends PureComponent {
                   </Dropdown>
                 </Authorized>
                 {selectedRows.length > 0 && printTemplates && printTemplates.length > 0 ? (
-                  <Authorized authority="Mission_Print">
-                    <Dropdown
-                      overlay={
-                        <Menu onClick={this.handlePrint} selectedKeys={[]}>
-                          {printTemplates.map(val => {
-                            return <Menu.Item key={val.fInterID}>{val.fName}</Menu.Item>;
-                          })}
-                        </Menu>
-                      }
-                    >
-                      <Button icon="printer">
-                        打印 <Icon type="down" />
+                  <span>
+                    <Authorized authority="Mission_Print">
+                      <Dropdown
+                        overlay={
+                          <Menu onClick={this.handlePrint} selectedKeys={[]}>
+                            {printTemplates.map(val => {
+                              return <Menu.Item key={val.fInterID}>{val.fName}</Menu.Item>;
+                            })}
+                          </Menu>
+                        }
+                      >
+                        <Button icon="printer">
+                          打印 <Icon type="down" />
+                        </Button>
+                      </Dropdown>
+                    </Authorized>
+                    <Authorized authority="Flow_Create">
+                      <Button icon="profile" onClick={this.handleBatchFlow}>
+                        开流程单
                       </Button>
-                    </Dropdown>
-                  </Authorized>
+                    </Authorized>
+                  </span>
                 ) : null}
               </div>
               <StandardTable
@@ -689,6 +705,17 @@ class TableList extends PureComponent {
             handleModalVisible={flag => this.handleModalVisible({ key: 'sync', flag })}
             modalVisible={modalVisible.sync}
           />
+          {selectedRows && selectedRows.length ? (
+            <BatchFlowForm
+              dispatch={this.props.dispatch}
+              handleSuccess={this.handleGenFlowSuccess}
+              handleModalVisible={(flag, record) =>
+                this.handleModalVisible({ key: 'batchFlow', flag }, record)
+              }
+              modalVisible={modalVisible.batchFlow}
+              records={selectedRows}
+            />
+          ) : null}
         </GridContent>
       </div>
     );

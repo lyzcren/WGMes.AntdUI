@@ -81,6 +81,14 @@ export class FlowForm extends PureComponent {
       // form.resetFields();
       // 设置fItemId
       fieldsValue.fInterID = values.fInterID;
+      if (fieldsValue.fInputQty <= 0) {
+        message.warning('投入数量必须大于0');
+        return;
+      }
+      if (fieldsValue.fBatchQty <= 0) {
+        message.warning('每批数量必须大于0');
+        return;
+      }
       this.handleGenFlow(fieldsValue);
     });
   };
@@ -118,6 +126,7 @@ export class FlowForm extends PureComponent {
     } = this.props;
     const { workshop, batchNoPrefix, batchNoSuffix } = this.state;
     const maxQty = values.fAuxInHighLimitQty - values.fInputQty;
+    const minQty = 1 / Math.pow(10, values.fQtyDecimal ? values.fQtyDecimal : 0);
 
     return (
       <Modal
@@ -156,16 +165,16 @@ export class FlowForm extends PureComponent {
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="投入数量">
           {form.getFieldDecorator('fInputQty', {
             rules: [{ required: true, message: '请输入投入数量' }],
-            initialValue: maxQty,
-            // })(<InputNumber placeholder="请输入" min={1} max={maxQty} />)} 取消最大数量限制
-          })(<InputNumber placeholder="请输入" min={1} />)}
+            initialValue: maxQty ? maxQty : minQty,
+            // })(<InputNumber placeholder="请输入" min={minQty} max={maxQty} />)} 取消最大数量限制
+          })(<InputNumber placeholder="请输入" min={minQty} />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="每批数量">
           {form.getFieldDecorator('fBatchQty', {
             rules: [{ required: true, message: '请输入每批数量' }],
-            initialValue: maxQty,
-            // })(<InputNumber placeholder="请输入" min={1} max={maxQty} />)} 取消最大数量限制
-          })(<InputNumber placeholder="请输入" min={1} />)}
+            initialValue: maxQty ? maxQty : minQty,
+            // })(<InputNumber placeholder="请输入" min={minQty} max={maxQty} />)} 取消最大数量限制
+          })(<InputNumber placeholder="请输入" min={minQty} />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="车间">
           {/* {form.getFieldDecorator('fWorkShop', {

@@ -217,14 +217,14 @@ class ColumnConfig {
           <Fragment>
             <Authorized authority="Mission_Read">
               <a onClick={() => this.profileModalVisibleCallback(record)}>详情</a>
-              {
-                // record.fAuxInHighLimitQty - record.fInputQty > 0 &&
-                <span>
-                  <Divider type="vertical" />
-                  <a onClick={() => this.flowModalVisibleCallback(record)}>开流程单</a>
-                </span>
-              }
             </Authorized>
+            {
+              // record.fAuxInHighLimitQty - record.fInputQty > 0 &&
+              <Authorized authority="Flow_Create">
+                <Divider type="vertical" />
+                <a onClick={() => this.flowModalVisibleCallback(record)}>开流程单</a>
+              </Authorized>
+            }
             <Authorized authority="Mission_Delete">
               <Divider type="vertical" />
               <Popconfirm title="是否要删除此行？" onConfirm={() => this.deleteCallback(record)}>

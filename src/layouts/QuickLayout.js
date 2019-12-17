@@ -4,6 +4,7 @@ import Link from 'umi/link';
 import { Icon } from 'antd';
 import GlobalFooter from '@/components/GlobalFooter';
 import SelectLang from '@/components/SelectLang';
+
 import styles from './QuickLayout.less';
 import logo from '../assets/logoOri.svg';
 

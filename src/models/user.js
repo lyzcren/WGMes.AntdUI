@@ -108,7 +108,6 @@ export default {
     },
     saveCurrentUser(state, action) {
       if (action.payload) {
-        console.log(action.payload);
         setAuthority(action.payload.currentAuthority);
         if (action.payload.fAccessToken) {
           setToken(action.payload.fAccessToken);

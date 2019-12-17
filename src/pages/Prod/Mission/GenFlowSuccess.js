@@ -74,11 +74,27 @@ export class GenFlowSuccess extends PureComponent {
 
   render() {
     const { form, modalVisible, handleModalVisible, records, printTemplate } = this.props;
+    console.log(records);
+    const batchNo = records
+      .map(x => x.fBatchNo)
+      .reduce((acc, cur) => {
+        if (acc.indexOf(cur) < 0) {
+          return acc + ',' + cur;
+        } else {
+          return acc;
+        }
+      });
+    const totalBatchCount = records.length;
+    const totalInputQty = records
+      .map(x => x.fInputQty)
+      .reduce((acc, cur) => {
+        return acc * 1 + cur * 1;
+      });
     const formVals = {
-      fBatchNo: records[0].fBatchNo,
+      fBatchNo: batchNo,
       fMoBillNo: records[0].fMoBillNo,
-      fTotalBatchCount: records[0].fTotalBatchCount,
-      fTotalInputQty: records[0].fTotalInputQty,
+      fTotalBatchCount: totalBatchCount,
+      fTotalInputQty: totalInputQty,
     };
 
     const description = (
@@ -96,7 +112,7 @@ export class GenFlowSuccess extends PureComponent {
         </Button>
         <Button
           onClick={() => {
-            this.handleViewFlow(formVals.fBatchNo);
+            this.handleViewFlow(batchNo);
           }}
         >
           查看流程单

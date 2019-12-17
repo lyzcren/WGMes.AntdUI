@@ -66,7 +66,6 @@ class WgBasicLayout extends React.PureComponent {
       route: { routes, authority },
     } = this.props;
     const token = getToken();
-    console.log(token);
     if (!token) {
       dispatch({
         type: 'user/logout',

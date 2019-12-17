@@ -20,7 +20,16 @@ export default [
   {
     path: '/quickOps',
     component: '../layouts/QuickLayout',
-    routes: [{ path: '/quickOps', component: './Quick/List' }],
+    routes: [
+      { path: '/quickOps', component: './Quick/List' },
+      {
+        path: '/quickOps/transfer',
+        name: 'transfer',
+        component: './Prod/Flow/Transfer',
+        authority: ['Flow_Transfer'],
+        hideInMenu: true,
+      },
+    ],
   },
   // app
   {

@@ -509,7 +509,11 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/flow/transfer', data: record, successCallback: this.search },
+      payload: {
+        path: '/prod/flow/transfer',
+        location: { data: record },
+        successCallback: this.search,
+      },
     });
   };
 
