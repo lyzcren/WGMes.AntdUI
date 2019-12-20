@@ -34,7 +34,7 @@ export default {
         return {
           title: column.title,
           dataIndex: column.dataIndex,
-          entryID: findItem ? findItem.entryID : 99999,
+          entryID: columnsConfig.length <= 0 ? index : findItem ? findItem.entryID : 99999,
           isHidden: findItem ? findItem.isHidden : false,
           width: findItem ? findItem.width : column.width,
         };

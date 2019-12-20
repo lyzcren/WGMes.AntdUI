@@ -46,7 +46,7 @@ export class WgStandardTable extends StandardTable {
     const { dispatch, columns, configKey } = this.props;
     dispatch({
       type: 'columnManage/init',
-      payload: { key: configKey, columns },
+      payload: { key: configKey, columns: [...columns] },
     });
   }
 
@@ -54,7 +54,7 @@ export class WgStandardTable extends StandardTable {
     const { dispatch, configKey } = this.props;
     dispatch({
       type: 'columnManage/changeColumn',
-      payload: { key: configKey, column },
+      payload: { key: configKey, column: [...column] },
     });
   };
 
@@ -76,8 +76,9 @@ export class WgStandardTable extends StandardTable {
 
   calColumns(columnsConfig) {
     const { columns } = this.props;
+    const newColumns = [...columns];
     if (columnsConfig) {
-      columns.forEach((column, index) => {
+      newColumns.forEach((column, index) => {
         const config = columnsConfig.find(x => x.dataIndex === column.dataIndex);
         if (config) {
           column.entryID = config.entryID;
@@ -89,7 +90,7 @@ export class WgStandardTable extends StandardTable {
         }
       });
     }
-    const sortedColumns = columns.sort((x, y) => x.entryID - y.entryID);
+    const sortedColumns = newColumns.sort((x, y) => x.entryID - y.entryID);
     return sortedColumns;
   }
 
@@ -124,6 +125,7 @@ export class WgStandardTable extends StandardTable {
       <div>
         <StandardTable
           bordered
+          rowKey={'entryID'}
           // size='small'
           // tableLayout='fixed'
           scroll={{ x: scrollX }}
