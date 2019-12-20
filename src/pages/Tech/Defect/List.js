@@ -33,6 +33,7 @@ import { CreateForm } from './CreateForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
+import { WgStandardTable } from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -50,24 +51,37 @@ const getValue = obj =>
 }))
 @Form.create()
 class TableList extends PureComponent {
-  state = {
-    // 新增界面
-    modalVisible: false,
-    formValues: {},
-    // 修改界面
-    updateModalVisible: false,
-    updateFormValues: {},
-    // 其他
-    expandForm: false,
-    selectedRows: [],
-    queryFilters: [],
-  };
+  constructor(props) {
+    super(props);
 
-  // 列表查询参数
-  currentPagination = {
-    current: 1,
-    pageSize: 10,
-  };
+    // 列配置相关方法
+    ColumnConfig.UpdateModalVisibleCallback = record =>
+      this.handleModalVisible({ key: 'update', flag: true }, record);
+    ColumnConfig.DeleteCallback = record => this.handleDelete(record);
+    ColumnConfig.ActiveCallback = record => this.handleActive(record, !record.fIsActive);
+
+    this.state = {
+      // 界面是否可见
+      modalVisible: {
+        add: false,
+        update: false,
+        columnConfig: false,
+      },
+      formValues: {},
+      currentFormValues: {},
+      // 其他
+      expandForm: false,
+      selectedRows: [],
+      queryFilters: [],
+    };
+
+    // 列表查询参数
+    this.currentPagination = {
+      current: 1,
+      pageSize: 10,
+    };
+    this.columnConfigKey = 'defect';
+  }
 
   componentDidMount() {
     const { dispatch } = this.props;
@@ -75,10 +89,6 @@ class TableList extends PureComponent {
       type: 'defectManage/fetch',
       payload: this.currentPagination,
     });
-    // 列配置相关方法
-    ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdateModalVisible(true, record);
-    ColumnConfig.DeleteCallback = record => this.handleDelete(record);
-    ColumnConfig.ActiveCallback = record => this.handleActive(record, !record.fIsActive);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -234,16 +244,13 @@ class TableList extends PureComponent {
     });
   };
 
-  handleModalVisible = flag => {
+  handleModalVisible = ({ key, flag }, record) => {
+    const { modalVisible, currentFormValues } = this.state;
+    modalVisible[key] = !!flag;
+    currentFormValues[key] = record;
     this.setState({
-      modalVisible: !!flag,
-    });
-  };
-
-  handleUpdateModalVisible = (flag, record) => {
-    this.setState({
-      updateModalVisible: !!flag,
-      updateFormValues: record || {},
+      modalVisible: { ...modalVisible },
+      currentFormValues: { ...currentFormValues },
     });
   };
 
@@ -258,7 +265,7 @@ class TableList extends PureComponent {
       } = this.props;
       if (queryResult.status === 'ok') {
         message.success('添加成功');
-        this.handleModalVisible();
+        this.handleModalVisible({ key: 'add' });
         // 成功后再次刷新列表
         this.search();
       } else {
@@ -278,7 +285,7 @@ class TableList extends PureComponent {
       } = this.props;
       if (queryResult.status === 'ok') {
         message.success('修改成功');
-        this.handleUpdateModalVisible();
+        this.handleModalVisible({ key: 'update' });
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
@@ -448,19 +455,8 @@ class TableList extends PureComponent {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  render() {
-    const {
-      defectManage: { data, queryResult },
-      loading,
-    } = this.props;
-    const {
-      selectedRows,
-      modalVisible,
-      updateModalVisible,
-      updateFormValues,
-      authorityModalVisible,
-      authorizeUserModalVisible,
-    } = this.state;
+  renderOperator() {
+    const { selectedRows } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove" disabled={!hasAuthority('Defect_Delete')}>
@@ -475,77 +471,106 @@ class TableList extends PureComponent {
       </Menu>
     );
 
-    const parentMethods = {
-      handleSubmit: this.handleAdd,
-      handleModalVisible: this.handleModalVisible,
-    };
-    const updateMethods = {
-      handleModalVisible: this.handleUpdateModalVisible,
-      handleSubmit: this.handleUpdate,
-    };
+    return (
+      <div style={{ overflow: 'hidden' }}>
+        <Authorized authority="Defect_Create">
+          <Button
+            icon="plus"
+            type="primary"
+            onClick={() => this.handleModalVisible({ key: 'add', flag: true })}
+          >
+            新建
+          </Button>
+        </Authorized>
+        <Authorized authority="Defect_Export">
+          <Dropdown
+            overlay={
+              <Menu onClick={this.handleExport} selectedKeys={[]}>
+                <Menu.Item key="currentPage">当前页</Menu.Item>
+                <Menu.Item key="allPage">所有页</Menu.Item>
+              </Menu>
+            }
+          >
+            <Button icon="download">
+              导出 <Icon type="down" />
+            </Button>
+          </Dropdown>
+        </Authorized>
+        {selectedRows.length > 0 && (
+          <span>
+            <Authorized authority="Defect_Delete">
+              <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
+            </Authorized>
+            <Authorized authority={['Defect_Delete', 'Defect_Active']}>
+              <Dropdown overlay={menu}>
+                <Button>
+                  更多操作 <Icon type="down" />
+                </Button>
+              </Dropdown>
+            </Authorized>
+          </span>
+        )}
+        <div style={{ float: 'right', marginRight: 24 }}>
+          <Button
+            icon="menu"
+            onClick={() => {
+              this.handleModalVisible({ key: 'columnConfig', flag: true });
+            }}
+          >
+            列配置
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  render() {
+    const {
+      defectManage: { data, queryResult },
+      loading,
+    } = this.props;
+    const { selectedRows, modalVisible, currentFormValues } = this.state;
+
     return (
       <div style={{ margin: '-24px -24px 0' }}>
         <GridContent>
           <Card bordered={false}>
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
-              <div className={styles.tableListOperator}>
-                <Authorized authority="Defect_Create">
-                  <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
-                    新建
-                  </Button>
-                </Authorized>
-                <Authorized authority="Defect_Export">
-                  <Dropdown
-                    overlay={
-                      <Menu onClick={this.handleExport} selectedKeys={[]}>
-                        <Menu.Item key="currentPage">当前页</Menu.Item>
-                        <Menu.Item key="allPage">所有页</Menu.Item>
-                      </Menu>
-                    }
-                  >
-                    <Button icon="download">
-                      导出 <Icon type="down" />
-                    </Button>
-                  </Dropdown>
-                </Authorized>
-                {selectedRows.length > 0 && (
-                  <span>
-                    <Authorized authority="Defect_Delete">
-                      <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
-                    </Authorized>
-                    <Authorized authority={['Defect_Delete', 'Defect_Active']}>
-                      <Dropdown overlay={menu}>
-                        <Button>
-                          更多操作 <Icon type="down" />
-                        </Button>
-                      </Dropdown>
-                    </Authorized>
-                  </span>
-                )}
-              </div>
-              <StandardTable
+              <div className={styles.tableListOperator}>{this.renderOperator()}</div>
+              <WgStandardTable
                 rowKey="fItemID"
-                bordered
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
                 columns={ColumnConfig.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
+                // 以下属性与列配置相关
+                configKey={this.columnConfigKey}
+                configModalVisible={modalVisible.columnConfig}
+                handleConfigModalVisible={flag =>
+                  this.handleModalVisible({ key: 'columnConfig', flag })
+                }
               />
             </div>
           </Card>
           <CreateForm
-            {...parentMethods}
-            modalVisible={modalVisible}
+            handleModalVisible={(flag, record) =>
+              this.handleModalVisible({ key: 'add', flag }, record)
+            }
+            handleSubmit={this.handleAdd}
+            modalVisible={modalVisible.add}
             dispatch={this.props.dispatch}
           />
-          {updateFormValues && Object.keys(updateFormValues).length ? (
+          {currentFormValues.update && Object.keys(currentFormValues.update).length ? (
             <UpdateForm
-              {...updateMethods}
-              updateModalVisible={updateModalVisible}
-              values={updateFormValues}
+              handleModalVisible={(flag, record) =>
+                this.handleModalVisible({ key: 'update', flag }, record)
+              }
+              handleSubmit={this.handleUpdate}
+              modalVisible={modalVisible.update}
+              values={currentFormValues.update}
             />
           ) : null}
         </GridContent>

@@ -11,17 +11,20 @@ class ColumnConfig {
     {
       title: '名称',
       dataIndex: 'fName',
+      width: 220,
       sorter: true,
       render: (val, record) => <a onClick={() => this.profileModalVisible(record)}>{val}</a>,
     },
     {
       title: '编码',
       dataIndex: 'fNumber',
+      width: 220,
       sorter: true,
     },
     {
       title: '启用',
       dataIndex: 'fIsActive',
+      width: 220,
       filters: [
         {
           text: activeData[0],
@@ -37,25 +40,31 @@ class ColumnConfig {
     {
       title: '状态',
       dataIndex: 'fStatusName',
+      width: 220,
       sorter: true,
     },
     {
       title: '创建人',
       dataIndex: 'fCreatorName',
+      width: 220,
       sorter: true,
     },
     {
       title: '创建日期',
       dataIndex: 'fCreateDate',
+      width: 220,
       sorter: true,
       render: val => moment(val).format('YYYY-MM-DD'),
     },
     {
       title: '备注',
       dataIndex: 'fComments',
+      width: 220,
     },
     {
       title: '操作',
+      width: 260,
+      fixed: 'right',
       render: (text, record) => (
         <Fragment>
           <Authorized authority="Route_Update">

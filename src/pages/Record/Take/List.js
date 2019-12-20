@@ -22,6 +22,7 @@ import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
+import { WgStandardTable } from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -41,26 +42,36 @@ const getValue = obj =>
 }))
 @Form.create()
 class TableList extends PureComponent {
-  state = {
-    // 界面是否可见
-    modalVisible: {
-      add: false,
-      update: false,
-    },
-    formValues: {},
-    // 当前操作选中列的数据
-    currentFormValues: {},
-    // expandForm: 是否展开更多查询条件
-    expandForm: false,
-    selectedRows: [],
-    queryFilters: [],
-  };
+  constructor(props) {
+    super(props);
 
-  // 列表查询参数
-  currentPagination = {
-    current: 1,
-    pageSize: 10,
-  };
+    // 列配置
+    ColumnConfig.handleViewFlow = fFullBatchNo => this.handleViewFlow(fFullBatchNo);
+    ColumnConfig.handleRollback = record => this.handleRollback(record);
+
+    this.state = {
+      // 界面是否可见
+      modalVisible: {
+        add: false,
+        update: false,
+        columnConfig: false,
+      },
+      formValues: {},
+      // 当前操作选中列的数据
+      currentFormValues: {},
+      // expandForm: 是否展开更多查询条件
+      expandForm: false,
+      selectedRows: [],
+      queryFilters: [],
+    };
+
+    // 列表查询参数
+    this.currentPagination = {
+      current: 1,
+      pageSize: 10,
+    };
+    this.columnConfigKey = 'takeRecord';
+  }
 
   componentDidMount() {
     const { dispatch } = this.props;
@@ -71,8 +82,6 @@ class TableList extends PureComponent {
     dispatch({
       type: 'basicData/getAuthorizeProcessTree',
     });
-    ColumnConfig.handleViewFlow = fFullBatchNo => this.handleViewFlow(fFullBatchNo);
-    ColumnConfig.handleRollback = record => this.handleRollback(record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -223,18 +232,55 @@ class TableList extends PureComponent {
     });
   };
 
-  handleModalVisible = flag => {
-    const { modalVisible } = this.state;
+  handleModalVisible = ({ key, flag }, record) => {
+    const { modalVisible, currentFormValues } = this.state;
+    modalVisible[key] = !!flag;
+    currentFormValues[key] = record;
     this.setState({
-      modalVisible: { ...modalVisible, add: !!flag },
+      modalVisible: { ...modalVisible },
+      currentFormValues: { ...currentFormValues },
     });
   };
 
-  handleUpdateModalVisible = (flag, record) => {
-    const { modalVisible } = this.state;
-    this.setState({
-      modalVisible: { ...modalVisible, update: !!flag },
-      currentFormValues: record || {},
+  handleViewFlow(fBatchNo) {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/openMenu',
+      payload: { path: '/prod/flow', fBatchNo },
+    });
+  }
+
+  handleRollback(record) {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'takeManage/rollback',
+      payload: { guid: record.guid },
+    }).then(() => {
+      const {
+        takeManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success(`已成功撤销，批号【${record.fFullBatchNo}】.`);
+      } else if (queryResult.status === 'warning') {
+        message.warning(queryResult.message);
+      } else {
+        message.error(queryResult.message);
+      }
+    });
+  }
+
+  handleBatchRollback = () => {
+    const { selectedRows } = this.state;
+
+    if (selectedRows.length === 0) return;
+    Modal.confirm({
+      title: '撤销',
+      content: '确定撤销吗？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => {
+        selectedRows.map(x => this.handleRollback(x));
+      },
     });
   };
 
@@ -298,47 +344,46 @@ class TableList extends PureComponent {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  handleViewFlow(fBatchNo) {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'menu/openMenu',
-      payload: { path: '/prod/flow', fBatchNo },
-    });
-  }
-
-  handleRollback(record) {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'takeManage/rollback',
-      payload: { guid: record.guid },
-    }).then(() => {
-      const {
-        takeManage: { queryResult },
-      } = this.props;
-      if (queryResult.status === 'ok') {
-        message.success(`已成功撤销，批号【${record.fFullBatchNo}】.`);
-      } else if (queryResult.status === 'warning') {
-        message.warning(queryResult.message);
-      } else {
-        message.error(queryResult.message);
-      }
-    });
-  }
-
-  handleBatchRollback = () => {
+  renderOperator() {
     const { selectedRows } = this.state;
+    const menu = <Menu onClick={this.handleMenuClick} selectedKeys={[]} />;
 
-    if (selectedRows.length === 0) return;
-    Modal.confirm({
-      title: '撤销',
-      content: '确定撤销吗？',
-      okText: '确认',
-      cancelText: '取消',
-      onOk: () => {
-        selectedRows.map(x => this.handleRollback(x));
-      },
-    });
-  };
+    return (
+      <div style={{ overflow: 'hidden' }}>
+        <Authorized authority="RecordTake_Export">
+          <Dropdown
+            overlay={
+              <Menu onClick={this.handleExport} selectedKeys={[]}>
+                <Menu.Item key="currentPage">当前页</Menu.Item>
+                <Menu.Item key="allPage">所有页</Menu.Item>
+              </Menu>
+            }
+          >
+            <Button icon="download">
+              导出 <Icon type="down" />
+            </Button>
+          </Dropdown>
+        </Authorized>
+        {selectedRows.length > 0 && (
+          <span>
+            <Authorized authority="RecordTake_Rollback">
+              <Button onClick={this.handleBatchRollback}>撤销</Button>
+            </Authorized>
+          </span>
+        )}
+        <div style={{ float: 'right', marginRight: 24 }}>
+          <Button
+            icon="menu"
+            onClick={() => {
+              this.handleModalVisible({ key: 'columnConfig', flag: true });
+            }}
+          >
+            列配置
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   render() {
     const {
@@ -346,66 +391,31 @@ class TableList extends PureComponent {
       takeManage: { data, queryResult },
       loading,
     } = this.props;
-    const { selectedRows, currentFormValues } = this.state;
-    const menu = <Menu onClick={this.handleMenuClick} selectedKeys={[]} />;
+    const { selectedRows, currentFormValues, modalVisible } = this.state;
 
-    const parentMethods = {
-      dispatch,
-      handleModalVisible: this.handleModalVisible,
-      handleSuccess: this.search,
-    };
-    const updateMethods = {
-      dispatch,
-      handleModalVisible: this.handleUpdateModalVisible,
-      handleSuccess: this.search,
-    };
     const columns = ColumnConfig.getColumns();
-    const scrollX = columns
-      .map(c => {
-        return c.width;
-      })
-      .reduce(function(sum, width, index) {
-        return sum + width;
-      });
+
     return (
       <div style={{ margin: '-24px -24px 0' }}>
         <GridContent>
           <Card bordered={false}>
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
-              <div className={styles.tableListOperator}>
-                <Authorized authority="RecordTake_Export">
-                  <Dropdown
-                    overlay={
-                      <Menu onClick={this.handleExport} selectedKeys={[]}>
-                        <Menu.Item key="currentPage">当前页</Menu.Item>
-                        <Menu.Item key="allPage">所有页</Menu.Item>
-                      </Menu>
-                    }
-                  >
-                    <Button icon="download">
-                      导出 <Icon type="down" />
-                    </Button>
-                  </Dropdown>
-                </Authorized>
-                {selectedRows.length > 0 && (
-                  <span>
-                    <Authorized authority="RecordTake_Rollback">
-                      <Button onClick={this.handleBatchRollback}>撤销</Button>
-                    </Authorized>
-                  </span>
-                )}
-              </div>
-              <StandardTable
+              <div className={styles.tableListOperator}>{this.renderOperator()}</div>
+              <WgStandardTable
                 rowKey="guid"
-                bordered
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
                 columns={columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
-                scroll={{ x: scrollX }}
+                // 以下属性与列配置相关
+                configKey={this.columnConfigKey}
+                configModalVisible={modalVisible.columnConfig}
+                handleConfigModalVisible={flag =>
+                  this.handleModalVisible({ key: 'columnConfig', flag })
+                }
               />
             </div>
           </Card>

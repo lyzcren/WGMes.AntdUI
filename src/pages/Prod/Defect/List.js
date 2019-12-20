@@ -34,6 +34,7 @@ import { RepairForm } from './RepairForm';
 import { default as ColumnConfig } from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
+import { WgStandardTable } from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 import { filter } from 'minimatch';
@@ -53,25 +54,31 @@ const getValue = obj =>
 }))
 @Form.create()
 class TableList extends PureComponent {
-  state = {
-    // 界面是否可见
-    modalVisible: {
-      repair: false,
-    },
-    formValues: {},
-    // 当前操作选中列的数据
-    currentFormValues: {},
-    // expandForm: 是否展开更多查询条件
-    expandForm: false,
-    selectedRows: [],
-    queryFilters: [],
-  };
+  constructor(props) {
+    super(props);
 
-  // 列表查询参数
-  currentPagination = {
-    current: 1,
-    pageSize: 10,
-  };
+    this.state = {
+      // 界面是否可见
+      modalVisible: {
+        repair: false,
+        columnConfig: false,
+      },
+      formValues: {},
+      // 当前操作选中列的数据
+      currentFormValues: {},
+      // expandForm: 是否展开更多查询条件
+      expandForm: false,
+      selectedRows: [],
+      queryFilters: [],
+    };
+
+    // 列表查询参数
+    this.currentPagination = {
+      current: 1,
+      pageSize: 10,
+    };
+    this.columnConfigKey = 'prodDefect';
+  }
 
   componentDidMount() {
     const { dispatch } = this.props;
@@ -279,6 +286,52 @@ class TableList extends PureComponent {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
+  renderOperator() {
+    const { selectedRows } = this.state;
+
+    return (
+      <div style={{ overflow: 'hidden' }}>
+        <Authorized authority="ProdDefect_Export">
+          <Dropdown
+            overlay={
+              <Menu onClick={this.handleExport} selectedKeys={[]}>
+                <Menu.Item key="currentPage">当前页</Menu.Item>
+                <Menu.Item key="allPage">所有页</Menu.Item>
+              </Menu>
+            }
+          >
+            <Button icon="download">
+              导出 <Icon type="down" />
+            </Button>
+          </Dropdown>
+        </Authorized>
+        {selectedRows.length > 0 && (
+          <span>
+            <Authorized authority="ProdDefect_Repair">
+              <Button onClick={() => this.handleRepair()}>返修</Button>
+            </Authorized>
+            <Authorized authority="ProdDefect_Divert">
+              <Button onClick={() => this.handleDivert()}>转移</Button>
+            </Authorized>
+            <Authorized authority="ProdDefect_Scrap">
+              <Button onClick={() => this.handleScrap()}>报废</Button>
+            </Authorized>
+          </span>
+        )}
+        <div style={{ float: 'right', marginRight: 24 }}>
+          <Button
+            icon="menu"
+            onClick={() => {
+              this.handleModalVisible({ key: 'columnConfig', flag: true });
+            }}
+          >
+            列配置
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   handleRepair() {
     const { selectedRows } = this.state;
     const filterRows = Array.from(new Set(selectedRows.map(row => row.fMoBillNo)));
@@ -355,58 +408,28 @@ class TableList extends PureComponent {
       handleModalVisible: flag => this.handleModalVisible({ key: 'repair', flag }),
       handleSuccess: this.search,
     };
-    const scrollX = ColumnConfig.columns
-      .map(c => {
-        return c.width;
-      })
-      .reduce(function(sum, width, index) {
-        return sum + width;
-      });
+
     return (
       <div style={{ margin: '-24px -24px 0' }}>
         <GridContent>
           <Card bordered={false}>
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
-              <div className={styles.tableListOperator}>
-                <Authorized authority="ProdDefect_Export">
-                  <Dropdown
-                    overlay={
-                      <Menu onClick={this.handleExport} selectedKeys={[]}>
-                        <Menu.Item key="currentPage">当前页</Menu.Item>
-                        <Menu.Item key="allPage">所有页</Menu.Item>
-                      </Menu>
-                    }
-                  >
-                    <Button icon="download">
-                      导出 <Icon type="down" />
-                    </Button>
-                  </Dropdown>
-                </Authorized>
-                {selectedRows.length > 0 && (
-                  <span>
-                    <Authorized authority="ProdDefect_Repair">
-                      <Button onClick={() => this.handleRepair()}>返修</Button>
-                    </Authorized>
-                    <Authorized authority="ProdDefect_Divert">
-                      <Button onClick={() => this.handleDivert()}>转移</Button>
-                    </Authorized>
-                    <Authorized authority="ProdDefect_Scrap">
-                      <Button onClick={() => this.handleScrap()}>报废</Button>
-                    </Authorized>
-                  </span>
-                )}
-              </div>
-              <StandardTable
+              <div className={styles.tableListOperator}>{this.renderOperator()}</div>
+              <WgStandardTable
                 rowKey="fInterID"
-                bordered
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
                 columns={ColumnConfig.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
-                scroll={{ x: scrollX }}
+                // 以下属性与列配置相关
+                configKey={this.columnConfigKey}
+                configModalVisible={modalVisible.columnConfig}
+                handleConfigModalVisible={flag =>
+                  this.handleModalVisible({ key: 'columnConfig', flag })
+                }
               />
             </div>
           </Card>

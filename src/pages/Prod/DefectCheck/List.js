@@ -35,6 +35,7 @@ import { default as ColumnConfig } from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
 import { print } from '@/utils/wgUtils';
+import { WgStandardTable } from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -54,26 +55,37 @@ const getValue = obj =>
 }))
 @Form.create()
 class TableList extends PureComponent {
-  state = {
-    // 界面是否可见
-    modalVisible: {
-      add: false,
-      update: false,
-    },
-    formValues: {},
-    // 当前操作选中列的数据
-    currentFormValues: {},
-    // expandForm: 是否展开更多查询条件
-    expandForm: false,
-    selectedRows: [],
-    queryFilters: [],
-  };
+  constructor(props) {
+    super(props);
 
-  // 列表查询参数
-  currentPagination = {
-    current: 1,
-    pageSize: 10,
-  };
+    // 指定操作列
+    ColumnConfig.renderOperation = this.renderOperation;
+    // 列配置相关方法
+    ColumnConfig.profileCallback = record => this.handleProfile(record);
+
+    this.state = {
+      // 界面是否可见
+      modalVisible: {
+        add: false,
+        update: false,
+        columnConfig: false,
+      },
+      formValues: {},
+      // 当前操作选中列的数据
+      currentFormValues: {},
+      // expandForm: 是否展开更多查询条件
+      expandForm: false,
+      selectedRows: [],
+      queryFilters: [],
+    };
+
+    // 列表查询参数
+    this.currentPagination = {
+      current: 1,
+      pageSize: 10,
+    };
+    this.columnConfigKey = 'defectCheck';
+  }
 
   componentDidMount() {
     const { dispatch } = this.props;
@@ -93,10 +105,6 @@ class TableList extends PureComponent {
         type: 'defectCheckManage/getPrintTemplates',
       });
     }
-    // 指定操作列
-    ColumnConfig.renderOperation = this.renderOperation;
-    // 列配置相关方法
-    ColumnConfig.profileCallback = record => this.handleProfile(record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -274,10 +282,13 @@ class TableList extends PureComponent {
     });
   };
 
-  handleModalVisible = flag => {
-    const { modalVisible } = this.state;
+  handleModalVisible = ({ key, flag }, record) => {
+    const { modalVisible, currentFormValues } = this.state;
+    modalVisible[key] = !!flag;
+    currentFormValues[key] = record;
     this.setState({
-      modalVisible: { ...modalVisible, add: !!flag },
+      modalVisible: { ...modalVisible },
+      currentFormValues: { ...currentFormValues },
     });
   };
 
@@ -495,6 +506,65 @@ class TableList extends PureComponent {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
+  renderOperator() {
+    const { selectedRows } = this.state;
+    const menu = (
+      <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
+        <Menu.Item key="remove" disabled={!hasAuthority('DefectCheck_Delete')}>
+          删除
+        </Menu.Item>
+      </Menu>
+    );
+
+    return (
+      <div style={{ overflow: 'hidden' }}>
+        <Authorized authority="DefectCheck_Create">
+          <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
+            新建
+          </Button>
+        </Authorized>
+        <Authorized authority="DefectCheck_Export">
+          <Dropdown
+            overlay={
+              <Menu onClick={this.handleExport} selectedKeys={[]}>
+                <Menu.Item key="currentPage">当前页</Menu.Item>
+                <Menu.Item key="allPage">所有页</Menu.Item>
+              </Menu>
+            }
+          >
+            <Button icon="download">
+              导出 <Icon type="down" />
+            </Button>
+          </Dropdown>
+        </Authorized>
+        {selectedRows.length > 0 && (
+          <span>
+            <Authorized authority="DefectCheck_Delete">
+              <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
+            </Authorized>
+            <Authorized authority={['DefectCheck_Delete']}>
+              <Dropdown overlay={menu}>
+                <Button>
+                  更多操作 <Icon type="down" />
+                </Button>
+              </Dropdown>
+            </Authorized>
+          </span>
+        )}
+        <div style={{ float: 'right', marginRight: 24 }}>
+          <Button
+            icon="menu"
+            onClick={() => {
+              this.handleModalVisible({ key: 'columnConfig', flag: true });
+            }}
+          >
+            列配置
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   handleAdd() {
     const { dispatch } = this.props;
     dispatch({
@@ -579,63 +649,15 @@ class TableList extends PureComponent {
       loading,
     } = this.props;
     const { selectedRows, modalVisible, updateModalVisible, currentFormValues } = this.state;
-    const menu = (
-      <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-        <Menu.Item key="remove" disabled={!hasAuthority('DefectCheck_Delete')}>
-          删除
-        </Menu.Item>
-      </Menu>
-    );
 
-    const scrollX = ColumnConfig.columns
-      .map(c => {
-        return c.width;
-      })
-      .reduce(function(sum, width, index) {
-        return sum + width;
-      });
     return (
       <div style={{ margin: '-24px -24px 0' }}>
         <GridContent>
           <Card bordered={false}>
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
-              <div className={styles.tableListOperator}>
-                <Authorized authority="DefectCheck_Create">
-                  <Button icon="plus" type="primary" onClick={() => this.handleAdd()}>
-                    新建
-                  </Button>
-                </Authorized>
-                <Authorized authority="DefectCheck_Export">
-                  <Dropdown
-                    overlay={
-                      <Menu onClick={this.handleExport} selectedKeys={[]}>
-                        <Menu.Item key="currentPage">当前页</Menu.Item>
-                        <Menu.Item key="allPage">所有页</Menu.Item>
-                      </Menu>
-                    }
-                  >
-                    <Button icon="download">
-                      导出 <Icon type="down" />
-                    </Button>
-                  </Dropdown>
-                </Authorized>
-                {selectedRows.length > 0 && (
-                  <span>
-                    <Authorized authority="DefectCheck_Delete">
-                      <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
-                    </Authorized>
-                    <Authorized authority={['DefectCheck_Delete']}>
-                      <Dropdown overlay={menu}>
-                        <Button>
-                          更多操作 <Icon type="down" />
-                        </Button>
-                      </Dropdown>
-                    </Authorized>
-                  </span>
-                )}
-              </div>
-              <StandardTable
+              <div className={styles.tableListOperator}>{this.renderOperator()}</div>
+              <WgStandardTable
                 rowKey="fInterID"
                 bordered
                 selectedRows={selectedRows}
@@ -645,7 +667,12 @@ class TableList extends PureComponent {
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
                 expandedRowRender={this.expandedRowRender}
-                // scroll={{ x: scrollX }}
+                // 以下属性与列配置相关
+                configKey={this.columnConfigKey}
+                configModalVisible={modalVisible.columnConfig}
+                handleConfigModalVisible={flag =>
+                  this.handleModalVisible({ key: 'columnConfig', flag })
+                }
               />
             </div>
           </Card>

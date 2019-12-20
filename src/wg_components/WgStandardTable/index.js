@@ -1,14 +1,19 @@
 import StandardTable from '@/components/StandardTable';
+import { connect } from 'dva';
 import { resizeComponents } from '@/utils/resizeComponents';
-import { ColumnConfigForm } from '@/wg_components/ColumnConfigForm';
+import { ColumnConfigForm } from './ColumnConfigForm';
 
 import { styles } from './index.less';
 
+/* eslint react/no-multi-comp:0 */
+@connect(({ columnManage, loading }) => ({
+  columnManage,
+  columnsConfigLoading: loading.models.columnManage,
+}))
 export class WgStandardTable extends StandardTable {
-
   timeclock = 0;
 
-  handleResize = (index) => (e, { size }) => {
+  handleResize = index => (e, { size }) => {
     const { dispatch, columns, configKey } = this.props;
     this.timeclock++;
     const nextColumns = [...columns];
@@ -18,7 +23,7 @@ export class WgStandardTable extends StandardTable {
     };
     dispatch({
       type: 'columnManage/changeColumn',
-      payload: { key: configKey, column: nextColumns[index] }
+      payload: { key: configKey, column: nextColumns[index] },
     });
     // 因拖拽是持续事件，故采用延时判断，延时3秒后无操作则保存列配置
     setTimeout(() => {
@@ -33,45 +38,43 @@ export class WgStandardTable extends StandardTable {
     const { dispatch, configKey } = this.props;
     dispatch({
       type: 'columnManage/saveColumns',
-      payload: { key: configKey }
+      payload: { key: configKey },
     });
-  }
+  };
 
-
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch, columns, configKey } = this.props;
     dispatch({
       type: 'columnManage/init',
-      payload: { key: configKey, columns }
+      payload: { key: configKey, columns },
     });
   }
 
-
-  handleColumnChange = (column) => {
+  handleColumnChange = column => {
     const { dispatch, configKey } = this.props;
     dispatch({
       type: 'columnManage/changeColumn',
-      payload: { key: configKey, column }
+      payload: { key: configKey, column },
     });
-  }
+  };
 
   handleColumnMove = (dragName, hoverName) => {
     const { dispatch, configKey } = this.props;
     dispatch({
       type: 'columnManage/moveColumn',
-      payload: { key: configKey, dragName, hoverName }
+      payload: { key: configKey, dragName, hoverName },
     });
-  }
+  };
 
   handleSaveColumns = () => {
     const { dispatch, configKey } = this.props;
     dispatch({
       type: 'columnManage/saveColumns',
-      payload: { key: configKey }
+      payload: { key: configKey },
     });
-  }
+  };
 
-  calColumns (columnsConfig) {
+  calColumns(columnsConfig) {
     const { columns } = this.props;
     if (columnsConfig) {
       columns.forEach((column, index) => {
@@ -90,18 +93,24 @@ export class WgStandardTable extends StandardTable {
     return sortedColumns;
   }
 
-  render () {
-    const { columns, configModalVisible, columnsConfig, columnsConfigLoading,
+  render() {
+    const {
+      columns,
+      configModalVisible,
+      columnsConfigLoading,
+      configKey,
       handleConfigModalVisible,
-      ...rest } = this.props;
+      columnManage: { configs },
+      ...rest
+    } = this.props;
 
-    const sortedColumns = this.calColumns(columnsConfig);
+    const sortedColumns = this.calColumns(configs[configKey]);
     const scrollX = sortedColumns
       .filter(x => !x.isHidden)
       .map(c => {
         return c.width;
       })
-      .reduce(function (sum, width, index) {
+      .reduce(function(sum, width, index) {
         return sum + width;
       });
     sortedColumns.forEach((column, index) => {
@@ -131,6 +140,7 @@ export class WgStandardTable extends StandardTable {
           handleColumnMove={this.handleColumnMove}
           handleSaveColumns={this.handleSaveColumns}
         />
-      </div>);
+      </div>
+    );
   }
 }

@@ -10,21 +10,25 @@ class ColumnConfig {
     {
       title: '名称',
       dataIndex: 'fName',
+      width: 260,
       sorter: true,
     },
     {
       title: '编码',
       dataIndex: 'fNumber',
+      width: 260,
       sorter: true,
     },
     {
       title: '参数类型',
       dataIndex: 'fTypeName',
+      width: 260,
       sorter: true,
     },
     {
       title: '参数值',
       dataIndex: 'values',
+      width: 260,
       render(val) {
         return val.join(', ');
       },
@@ -32,6 +36,7 @@ class ColumnConfig {
     {
       title: '启用',
       dataIndex: 'fIsActive',
+      width: 160,
       filters: [
         {
           text: activeData[0],
@@ -61,6 +66,9 @@ class ColumnConfig {
     },
     {
       title: '操作',
+      dataIndex: 'operator',
+      width: 260,
+      fixed: 'right',
       render: (text, record) => (
         <Fragment>
           <Authorized authority="Param_Update">

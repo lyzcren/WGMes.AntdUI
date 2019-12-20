@@ -44,6 +44,7 @@ class ColumnConfig {
     },
     {
       title: '操作',
+      dataIndex: 'operators',
       width: 220,
       render: (text, record) => this.renderOperation(text, record),
     },

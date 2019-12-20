@@ -7,9 +7,9 @@ import RadioButton from 'antd/lib/radio/radioButton';
 
 class ColumnConfig {
   // 查看任务单
-  missionModalVisibleCallback = record => { };
+  missionModalVisibleCallback = record => {};
   // 查看工艺路线
-  routeModalVisibleCallback = record => { };
+  routeModalVisibleCallback = record => {};
   statusFilter = [];
 
   getColumns = () => {
@@ -190,10 +190,10 @@ class ColumnConfig {
       .map(c => {
         return c.width;
       })
-      .reduce(function (sum, width, index) {
+      .reduce(function(sum, width, index) {
         return sum + width;
       });
-  }
+  };
 
   renderOperation = (text, record) => {
     return <Fragment />;

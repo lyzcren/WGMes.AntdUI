@@ -23,6 +23,7 @@ import { ParamForm } from './ParamForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
+import { WgStandardTable } from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -41,24 +42,34 @@ const getValue = obj =>
 }))
 @Form.create()
 class TableList extends PureComponent {
-  state = {
-    exporting: false,
-    // 新增界面
-    modalVisible: { add: false, update: false, param: false },
-    formValues: {},
-    currentFormValues: {},
-    // 其他
-    expandForm: false,
-    renderCreateForm: true,
-    selectedRows: [],
-    queryFilters: [],
-  };
+  constructor(props) {
+    super(props);
 
-  // 列表查询参数
-  currentPagination = {
-    current: 1,
-    pageSize: 10,
-  };
+    this.state = {
+      exporting: false,
+      // 新增界面
+      modalVisible: {
+        add: false,
+        update: false,
+        param: false,
+        columnConfig: false,
+      },
+      formValues: {},
+      currentFormValues: {},
+      // 其他
+      expandForm: false,
+      renderCreateForm: true,
+      selectedRows: [],
+      queryFilters: [],
+    };
+
+    // 列表查询参数
+    this.currentPagination = {
+      current: 1,
+      pageSize: 10,
+    };
+    this.columnConfigKey = 'route';
+  }
 
   componentDidMount() {
     const { dispatch } = this.props;
@@ -69,12 +80,14 @@ class TableList extends PureComponent {
     // 列配置相关方法
     ColumnConfig.ProfileModalVisibleCallback = record =>
       this.handleProfileModalVisible(true, record);
-    ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdateModalVisible(true, record);
+    ColumnConfig.UpdateModalVisibleCallback = record =>
+      this.handleModalVisible({ key: 'update', flag: true }, record);
     ColumnConfig.DeleteCallback = record => this.handleDelete(record);
     ColumnConfig.ActiveCallback = record => this.handleActive(record, !record.fIsActive);
     ColumnConfig.CheckCallback = record =>
       this.handleCheck(record, record.fStatusNumber === 'Created');
-    ColumnConfig.ParamCallback = record => this.handleParamModalVisible(true, record);
+    ColumnConfig.ParamCallback = record =>
+      this.handleModalVisible({ key: 'param', flag: true }, record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -233,30 +246,13 @@ class TableList extends PureComponent {
     });
   };
 
-  handleModalVisible = flag => {
-    const { modalVisible, renderCreateForm } = this.state;
+  handleModalVisible = ({ key, flag }, record) => {
+    const { modalVisible, currentFormValues } = this.state;
+    modalVisible[key] = !!flag;
+    currentFormValues[key] = record;
     this.setState({
-      modalVisible: {
-        ...modalVisible,
-        add: !!flag,
-      },
-      renderCreateForm: renderCreateForm || !!flag,
-    });
-  };
-
-  handleUpdateModalVisible = (flag, record) => {
-    const { modalVisible } = this.state;
-    this.setState({
-      modalVisible: { ...modalVisible, update: !!flag },
-      currentFormValues: record || {},
-    });
-  };
-
-  handleParamModalVisible = (flag, record) => {
-    const { modalVisible } = this.state;
-    this.setState({
-      modalVisible: { ...modalVisible, param: !!flag },
-      currentFormValues: record || {},
+      modalVisible: { ...modalVisible },
+      currentFormValues: { ...currentFormValues },
     });
   };
 
@@ -279,7 +275,7 @@ class TableList extends PureComponent {
       } = this.props;
       if (queryResult.status === 'ok') {
         message.success('添加成功');
-        this.handleModalVisible();
+        this.handleModalVisible({ key: 'add' });
         // 成功后再次刷新列表
         this.search();
       } else {
@@ -299,7 +295,7 @@ class TableList extends PureComponent {
       } = this.props;
       if (queryResult.status === 'ok') {
         message.success('修改成功');
-        this.handleUpdateModalVisible();
+        this.handleModalVisible({ key: 'update' });
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
@@ -523,22 +519,8 @@ class TableList extends PureComponent {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  afterCreateFormClose = () => {
-    this.setState({ renderCreateForm: false });
-  };
-
-  render() {
-    const {
-      routeManage: { data },
-      loading,
-    } = this.props;
-    const {
-      selectedRows,
-      modalVisible,
-      renderCreateForm,
-      currentFormValues,
-      exporting,
-    } = this.state;
+  renderOperator() {
+    const { selectedRows, exporting } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove" disabled={!hasAuthority('Route_Delete')}>
@@ -559,16 +541,81 @@ class TableList extends PureComponent {
       </Menu>
     );
 
+    return (
+      <div style={{ overflow: 'hidden' }}>
+        <Authorized authority="Route_Create">
+          <Button
+            icon="plus"
+            type="primary"
+            onClick={() => this.handleModalVisible({ key: 'add', flag: true })}
+          >
+            新建
+          </Button>
+        </Authorized>
+        <Authorized authority="Route_Export">
+          <Dropdown
+            overlay={
+              <Menu onClick={this.handleExport} selectedKeys={[]}>
+                <Menu.Item key="currentPage">当前页</Menu.Item>
+                <Menu.Item key="allPage">所有页</Menu.Item>
+              </Menu>
+            }
+          >
+            <Button icon="download" loading={exporting}>
+              导出 <Icon type="down" />
+            </Button>
+          </Dropdown>
+        </Authorized>
+        {selectedRows.length > 0 && (
+          <span>
+            <Authorized authority="Route_Delete">
+              <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
+            </Authorized>
+            <Authorized authority={['Route_Delete', 'Route_Active']}>
+              <Dropdown overlay={menu}>
+                <Button>
+                  更多操作 <Icon type="down" />
+                </Button>
+              </Dropdown>
+            </Authorized>
+          </span>
+        )}
+        <div style={{ float: 'right', marginRight: 24 }}>
+          <Button
+            icon="menu"
+            onClick={() => {
+              this.handleModalVisible({ key: 'columnConfig', flag: true });
+            }}
+          >
+            列配置
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  afterCreateFormClose = () => {
+    this.setState({ renderCreateForm: false });
+  };
+
+  render() {
+    const {
+      routeManage: { data },
+      loading,
+    } = this.props;
+    const { selectedRows, modalVisible, renderCreateForm, currentFormValues } = this.state;
+
     const parentMethods = {
       handleSubmit: this.handleAdd,
-      handleModalVisible: this.handleModalVisible,
+      handleModalVisible: (flag, record) => this.handleModalVisible({ key: 'add', flag }, record),
     };
     const updateMethods = {
-      handleModalVisible: this.handleUpdateModalVisible,
+      handleModalVisible: (flag, record) =>
+        this.handleModalVisible({ key: 'update', flag }, record),
       handleSubmit: this.handleUpdate,
     };
     const paramMethods = {
-      handleModalVisible: this.handleParamModalVisible,
+      handleModalVisible: (flag, record) => this.handleModalVisible({ key: 'param', flag }, record),
       handleSubmit: this.handleUpdate,
     };
     return (
@@ -577,50 +624,21 @@ class TableList extends PureComponent {
           <Card bordered={false}>
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
-              <div className={styles.tableListOperator}>
-                <Authorized authority="Route_Create">
-                  <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
-                    新建
-                  </Button>
-                </Authorized>
-                <Authorized authority="Route_Export">
-                  <Dropdown
-                    overlay={
-                      <Menu onClick={this.handleExport} selectedKeys={[]}>
-                        <Menu.Item key="currentPage">当前页</Menu.Item>
-                        <Menu.Item key="allPage">所有页</Menu.Item>
-                      </Menu>
-                    }
-                  >
-                    <Button icon="download" loading={exporting}>
-                      导出 <Icon type="down" />
-                    </Button>
-                  </Dropdown>
-                </Authorized>
-                {selectedRows.length > 0 && (
-                  <span>
-                    <Authorized authority="Route_Delete">
-                      <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
-                    </Authorized>
-                    <Authorized authority={['Route_Delete', 'Route_Active']}>
-                      <Dropdown overlay={menu}>
-                        <Button>
-                          更多操作 <Icon type="down" />
-                        </Button>
-                      </Dropdown>
-                    </Authorized>
-                  </span>
-                )}
-              </div>
-              <StandardTable
+              <div className={styles.tableListOperator}>{this.renderOperator()}</div>
+              <WgStandardTable
                 rowKey="fInterID"
-                bordered
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
                 columns={ColumnConfig.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
+                // 以下属性与列配置相关
+                configKey={this.columnConfigKey}
+                configModalVisible={modalVisible.columnConfig}
+                handleConfigModalVisible={flag =>
+                  this.handleModalVisible({ key: 'columnConfig', flag })
+                }
               />
             </div>
           </Card>
@@ -631,18 +649,18 @@ class TableList extends PureComponent {
               afterClose={this.afterCreateFormClose}
             />
           )}
-          {currentFormValues && Object.keys(currentFormValues).length ? (
+          {currentFormValues.update && Object.keys(currentFormValues.update).length ? (
             <UpdateForm
               {...updateMethods}
               updateModalVisible={modalVisible.update}
-              values={currentFormValues}
+              values={currentFormValues.update}
             />
           ) : null}
-          {currentFormValues && Object.keys(currentFormValues).length ? (
+          {currentFormValues.param && Object.keys(currentFormValues.param).length ? (
             <ParamForm
               {...paramMethods}
               modalVisible={modalVisible.param}
-              values={currentFormValues}
+              values={currentFormValues.param}
             />
           ) : null}
         </GridContent>

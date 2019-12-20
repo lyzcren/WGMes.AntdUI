@@ -11,20 +11,24 @@ class ColumnConfig {
     {
       title: '名称',
       dataIndex: 'fName',
+      width: 260,
       sorter: true,
     },
     {
       title: '编码',
       dataIndex: 'fNumber',
+      width: 160,
       sorter: true,
     },
     {
       title: '岗位',
       dataIndex: 'fDeptNames',
+      width: 260,
     },
     {
       title: '启用',
       dataIndex: 'fIsActive',
+      width: 160,
       filters: [
         {
           text: activeData[0],
@@ -42,6 +46,7 @@ class ColumnConfig {
     {
       title: '类型',
       dataIndex: 'fTypeID',
+      width: 360,
       filters: TypeData,
       render(val) {
         const type = TypeData.find((type, index) => type.value == val);
@@ -50,6 +55,9 @@ class ColumnConfig {
     },
     {
       title: '操作',
+      dataIndex: 'operators',
+      width: 260,
+      fixed: 'right',
       render: (text, record) => (
         <Fragment>
           <Authorized authority="Defect_Update">

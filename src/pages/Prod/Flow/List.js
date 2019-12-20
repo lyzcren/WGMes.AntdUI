@@ -40,7 +40,6 @@ import { SplitForm } from './SplitForm';
 import { RefundForm } from './RefundForm';
 import { RejectForm } from './RejectForm';
 import { ChangeRouteForm } from './ChangeRouteForm';
-import { ColumnConfigForm } from '@/wg_components/ColumnConfigForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
@@ -48,7 +47,6 @@ import { print } from '@/utils/wgUtils';
 import { WgStandardTable } from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
-import { tsImportType } from '@babel/types';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -58,11 +56,9 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ flowManage, columnManage, loading, basicData, user }) => ({
+@connect(({ flowManage, loading, basicData, user }) => ({
   flowManage,
-  columnManage,
   loading: loading.models.flowManage,
-  columnsConfigLoading: loading.models.columnManage,
   basicData,
   currentUser: user.currentUser,
 }))
@@ -112,14 +108,11 @@ class TableList extends PureComponent {
       current: 1,
       pageSize: 10,
     };
-    this.columnConfig = ColumnConfig;
     this.columnConfigKey = 'flow';
   }
 
-
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props;
-    // this.searchWhereInit();
 
     dispatch({
       type: 'basicData/getAuthorizeProcessTree',
@@ -137,9 +130,10 @@ class TableList extends PureComponent {
       type: 'basicData/getStatus',
       payload: { number: 'flowStatus' },
     });
+    this.searchWhereInit();
   }
 
-  componentDidUpdate (preProps) {
+  componentDidUpdate(preProps) {
     const { fBatchNo } = this.props;
     if (preProps.fBatchNo !== fBatchNo) {
       this.searchWhereInit();
@@ -411,16 +405,16 @@ class TableList extends PureComponent {
     const badgeStatus = !flowStatus
       ? []
       : flowStatus.map(x => {
-        return {
-          text: <Badge color={x.fColor} text={x.fValue} />,
-          value: x.fKeyName,
-        };
-      });
+          return {
+            text: <Badge color={x.fColor} text={x.fValue} />,
+            value: x.fKeyName,
+          };
+        });
     return badgeStatus;
   };
 
   //应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
-  webapp_start (templateId, interIds, type) {
+  webapp_start(templateId, interIds, type) {
     // var option = {
     //   baseurl: 'http://' + window.location.host,
     //   report: '/api/PrintTemplate/grf?id=' + templateId,
@@ -875,7 +869,7 @@ class TableList extends PureComponent {
     );
   };
 
-  renderSimpleForm () {
+  renderSimpleForm() {
     const {
       form: { getFieldDecorator },
       basicData: {
@@ -967,7 +961,7 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm () {
+  renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
       basicData: {
@@ -1131,12 +1125,12 @@ class TableList extends PureComponent {
     );
   }
 
-  renderForm () {
+  renderForm() {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  reanderOperator () {
+  reanderOperator() {
     const { selectedRows } = this.state;
     const {
       flowManage: { data, queryResult, printTemplates },
@@ -1151,7 +1145,7 @@ class TableList extends PureComponent {
           }}
         >
           扫描
-          </Button>
+        </Button>
         <Authorized authority="Flow_Export">
           <Dropdown
             overlay={
@@ -1162,38 +1156,35 @@ class TableList extends PureComponent {
             }
           >
             <Button icon="download">
-              导出<Icon type="down" />
+              导出
+              <Icon type="down" />
             </Button>
           </Dropdown>
         </Authorized>
-        {
-          selectedRows.length > 0 && printTemplates && printTemplates.length > 0 ? (
-            <Authorized authority="Flow_Print">
-              <Dropdown
-                overlay={
-                  <Menu onClick={this.handlePrint} selectedKeys={[]}>
-                    {printTemplates.map(val => {
-                      return <Menu.Item key={val.fInterID}>{val.fName}</Menu.Item>;
-                    })}
-                  </Menu>
-                }
-              >
-                <Button icon="printer">
-                  打印 <Icon type="down" />
-                </Button>
-              </Dropdown>
-            </Authorized>
-          ) : null
-        }
-        {
-          selectedRows.length > 0 && (
-            <Authorized authority="Flow_Sign">
-              <Button disabled={!queryDeptID} onClick={this.handleBatchSign}>
-                签收
-                  </Button>
-            </Authorized>
-          )
-        }
+        {selectedRows.length > 0 && printTemplates && printTemplates.length > 0 ? (
+          <Authorized authority="Flow_Print">
+            <Dropdown
+              overlay={
+                <Menu onClick={this.handlePrint} selectedKeys={[]}>
+                  {printTemplates.map(val => {
+                    return <Menu.Item key={val.fInterID}>{val.fName}</Menu.Item>;
+                  })}
+                </Menu>
+              }
+            >
+              <Button icon="printer">
+                打印 <Icon type="down" />
+              </Button>
+            </Dropdown>
+          </Authorized>
+        ) : null}
+        {selectedRows.length > 0 && (
+          <Authorized authority="Flow_Sign">
+            <Button disabled={!queryDeptID} onClick={this.handleBatchSign}>
+              签收
+            </Button>
+          </Authorized>
+        )}
 
         <div style={{ float: 'right', marginRight: 24 }}>
           <Button
@@ -1209,13 +1200,11 @@ class TableList extends PureComponent {
     );
   }
 
-  render () {
+  render() {
     const {
       dispatch,
       flowManage: { data, queryResult },
-      columnManage: { configs },
       loading,
-      columnsConfigLoading,
     } = this.props;
     const {
       queryDeptID,
@@ -1232,7 +1221,7 @@ class TableList extends PureComponent {
       handleModalVisible: (flag, record) => this.handleModalVisible({ key: 'sign', flag }, record),
       handleSubmit: this.sign,
     };
-    
+
     return (
       <div style={{ margin: '-24px -24px 0' }}>
         <GridContent>
@@ -1249,12 +1238,11 @@ class TableList extends PureComponent {
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
                 // 以下属性与列配置相关
-                dispatch={dispatch}
                 configKey={this.columnConfigKey}
                 configModalVisible={modalVisible.columnConfig}
-                handleConfigModalVisible={flag => this.handleModalVisible({ key: 'columnConfig', flag })}
-                columnsConfig={configs[this.columnConfigKey]}
-                columnsConfigLoading={columnsConfigLoading}
+                handleConfigModalVisible={flag =>
+                  this.handleModalVisible({ key: 'columnConfig', flag })
+                }
               />
             </div>
           </Card>

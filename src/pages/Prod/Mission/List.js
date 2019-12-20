@@ -38,6 +38,7 @@ import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
 import { GenFlowSuccess } from './GenFlowSuccess';
 import { print } from '@/utils/wgUtils';
+import { WgStandardTable } from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -59,29 +60,42 @@ const getValue = obj =>
 }))
 @Form.create()
 class TableList extends PureComponent {
-  state = {
-    // 界面是否可见
-    modalVisible: {
-      update: false,
-      batchFlow: false,
-      genFlowSuccess: false,
-      sync: false,
-    },
-    formValues: {},
-    // 当前操作选中列的数据
-    currentFormValues: {},
-    // expandForm: 是否展开更多查询条件
-    expandForm: false,
-    selectedRows: [],
-    queryFilters: [],
-    checkSyncSecond: 1,
-  };
+  constructor(props) {
+    super(props);
 
-  // 列表查询参数
-  currentPagination = {
-    current: 1,
-    pageSize: 10,
-  };
+    // 列配置相关方法
+    ColumnConfig.profileModalVisibleCallback = record =>
+      this.handleProfileModalVisible(true, record);
+    ColumnConfig.flowModalVisibleCallback = record =>
+      this.handleModalVisible({ key: 'update', flag: true }, record);
+    ColumnConfig.deleteCallback = record => this.handleDelete(record);
+
+    this.state = {
+      // 界面是否可见
+      modalVisible: {
+        update: false,
+        batchFlow: false,
+        genFlowSuccess: false,
+        sync: false,
+        columnConfig: false,
+      },
+      formValues: {},
+      // 当前操作选中列的数据
+      currentFormValues: {},
+      // expandForm: 是否展开更多查询条件
+      expandForm: false,
+      selectedRows: [],
+      queryFilters: [],
+      checkSyncSecond: 1,
+    };
+
+    // 列表查询参数
+    this.currentPagination = {
+      current: 1,
+      pageSize: 10,
+    };
+    this.columnConfigKey = 'mission';
+  }
 
   componentDidMount() {
     const { dispatch } = this.props;
@@ -94,12 +108,6 @@ class TableList extends PureComponent {
         type: 'missionManage/getPrintTemplates',
       });
     }
-    // 列配置相关方法
-    ColumnConfig.profileModalVisibleCallback = record =>
-      this.handleProfileModalVisible(true, record);
-    ColumnConfig.flowModalVisibleCallback = record =>
-      this.handleModalVisible({ key: 'update', flag: true }, record);
-    ColumnConfig.deleteCallback = record => this.handleDelete(record);
 
     // 检查同步状态
     this.Checkk3Syncing();
@@ -588,6 +596,78 @@ class TableList extends PureComponent {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
+  renderOperator() {
+    const { selectedRows } = this.state;
+    const {
+      missionManage: { queryResult, printTemplates },
+      missionSync: { isSyncing, totalCount, currentCount },
+    } = this.props;
+
+    return (
+      <div style={{ overflow: 'hidden' }}>
+        <Authorized authority="Mission_Sync">
+          <Button
+            icon="plus"
+            type="primary"
+            onClick={() => this.handleModalVisible({ key: 'sync', flag: true })}
+            loading={isSyncing}
+          >
+            从 K3 同步
+          </Button>
+        </Authorized>
+        {isSyncing && <Tag color="blue">{currentCount + ' / ' + totalCount}</Tag>}
+        <Authorized authority="Mission_Export">
+          <Dropdown
+            overlay={
+              <Menu onClick={this.handleExport} selectedKeys={[]}>
+                <Menu.Item key="currentPage">当前页</Menu.Item>
+                <Menu.Item key="allPage">所有页</Menu.Item>
+              </Menu>
+            }
+          >
+            <Button icon="download">
+              导出 <Icon type="down" />
+            </Button>
+          </Dropdown>
+        </Authorized>
+        {selectedRows.length > 0 && printTemplates && printTemplates.length > 0 ? (
+          <span>
+            <Authorized authority="Mission_Print">
+              <Dropdown
+                overlay={
+                  <Menu onClick={this.handlePrint} selectedKeys={[]}>
+                    {printTemplates.map(val => {
+                      return <Menu.Item key={val.fInterID}>{val.fName}</Menu.Item>;
+                    })}
+                  </Menu>
+                }
+              >
+                <Button icon="printer">
+                  打印 <Icon type="down" />
+                </Button>
+              </Dropdown>
+            </Authorized>
+            <Authorized authority="Flow_Create">
+              <Button icon="profile" onClick={this.handleBatchFlow}>
+                开流程单
+              </Button>
+            </Authorized>
+          </span>
+        ) : null}
+        <div style={{ float: 'right', marginRight: 24 }}>
+          <Button
+            icon="menu"
+            onClick={() => {
+              this.handleModalVisible({ key: 'columnConfig', flag: true });
+            }}
+          >
+            列配置
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   render() {
     const {
       missionManage: { data, queryResult, printTemplates },
@@ -603,80 +683,27 @@ class TableList extends PureComponent {
       successFlows,
     } = this.state;
 
-    const scrollX = ColumnConfig.columns
-      .map(c => {
-        return c.width;
-      })
-      .reduce(function(sum, width, index) {
-        return sum + width;
-      });
     return (
       <div style={{ margin: '-24px -24px 0' }}>
         <GridContent>
           <Card bordered={false}>
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
-              <div className={styles.tableListOperator}>
-                <Authorized authority="Mission_Sync">
-                  <Button
-                    icon="plus"
-                    type="primary"
-                    onClick={() => this.handleModalVisible({ key: 'sync', flag: true })}
-                    loading={isSyncing}
-                  >
-                    从 K3 同步
-                  </Button>
-                </Authorized>
-                {isSyncing && <Tag color="blue">{currentCount + ' / ' + totalCount}</Tag>}
-                <Authorized authority="Mission_Export">
-                  <Dropdown
-                    overlay={
-                      <Menu onClick={this.handleExport} selectedKeys={[]}>
-                        <Menu.Item key="currentPage">当前页</Menu.Item>
-                        <Menu.Item key="allPage">所有页</Menu.Item>
-                      </Menu>
-                    }
-                  >
-                    <Button icon="download">
-                      导出 <Icon type="down" />
-                    </Button>
-                  </Dropdown>
-                </Authorized>
-                {selectedRows.length > 0 && printTemplates && printTemplates.length > 0 ? (
-                  <span>
-                    <Authorized authority="Mission_Print">
-                      <Dropdown
-                        overlay={
-                          <Menu onClick={this.handlePrint} selectedKeys={[]}>
-                            {printTemplates.map(val => {
-                              return <Menu.Item key={val.fInterID}>{val.fName}</Menu.Item>;
-                            })}
-                          </Menu>
-                        }
-                      >
-                        <Button icon="printer">
-                          打印 <Icon type="down" />
-                        </Button>
-                      </Dropdown>
-                    </Authorized>
-                    <Authorized authority="Flow_Create">
-                      <Button icon="profile" onClick={this.handleBatchFlow}>
-                        开流程单
-                      </Button>
-                    </Authorized>
-                  </span>
-                ) : null}
-              </div>
-              <StandardTable
+              <div className={styles.tableListOperator}>{this.renderOperator()}</div>
+              <WgStandardTable
                 rowKey="fInterID"
-                bordered
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
                 columns={ColumnConfig.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
-                scroll={{ x: scrollX }}
+                // 以下属性与列配置相关
+                configKey={this.columnConfigKey}
+                configModalVisible={modalVisible.columnConfig}
+                handleConfigModalVisible={flag =>
+                  this.handleModalVisible({ key: 'columnConfig', flag })
+                }
               />
             </div>
           </Card>

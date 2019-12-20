@@ -121,6 +121,7 @@ class ColumnConfig {
         ...this.columns,
         {
           title: '操作',
+          dataIndex: 'operators',
           fixed: 'right',
           width: 120,
           render: (text, record) => {

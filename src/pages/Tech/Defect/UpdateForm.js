@@ -54,7 +54,7 @@ export class UpdateForm extends PureComponent {
   };
 
   render() {
-    const { form, updateModalVisible, handleModalVisible, values, basicData } = this.props;
+    const { form, modalVisible, handleModalVisible, values, basicData } = this.props;
     const { formVals } = this.state;
 
     return (
@@ -65,7 +65,7 @@ export class UpdateForm extends PureComponent {
             修改 <Tag color="blue">{formVals.fName}</Tag>
           </div>
         }
-        visible={updateModalVisible}
+        visible={modalVisible}
         onOk={this.okHandle}
         onCancel={() => handleModalVisible(false, values)}
         afterClose={() => handleModalVisible()}

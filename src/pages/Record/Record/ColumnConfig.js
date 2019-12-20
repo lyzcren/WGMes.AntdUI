@@ -149,6 +149,7 @@ class ColumnConfig {
       },
       {
         title: '操作',
+        dataIndex: 'operators',
         fixed: 'right',
         width: 80,
         render: (text, record) => this.renderOperation(text, record),

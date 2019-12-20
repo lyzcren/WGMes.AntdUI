@@ -36,6 +36,7 @@ import { ValuesForm } from './ValuesForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
+import { WgStandardTable } from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -54,25 +55,37 @@ const getValue = obj =>
 }))
 @Form.create()
 class TableList extends PureComponent {
-  state = {
-    // 新增界面
-    modalVisible: false,
-    formValues: {},
-    // 修改界面
-    updateModalVisible: false,
-    updateFormValues: {},
-    valuesModalVisible: false,
-    // 其他
-    expandForm: false,
-    selectedRows: [],
-    queryFilters: [],
-  };
+  constructor(props) {
+    super(props);
 
-  // 列表查询参数
-  currentPagination = {
-    current: 1,
-    pageSize: 10,
-  };
+    // 列配置相关方法
+    ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdateModalVisible(true, record);
+    ColumnConfig.ValuesModalVisibleCallback = record => this.handleValuesModalVisible(true, record);
+    ColumnConfig.DeleteCallback = record => this.handleDelete(record);
+    ColumnConfig.ActiveCallback = record => this.handleActive(record, !record.fIsActive);
+
+    this.state = {
+      // 新增界面
+      modalVisible: false,
+      formValues: {},
+      // 修改界面
+      updateModalVisible: false,
+      columnConfigVisible: false,
+      updateFormValues: {},
+      valuesModalVisible: false,
+      // 其他
+      expandForm: false,
+      selectedRows: [],
+      queryFilters: [],
+    };
+
+    // 列表查询参数
+    this.currentPagination = {
+      current: 1,
+      pageSize: 10,
+    };
+    this.columnConfigKey = 'param';
+  }
 
   componentDidMount() {
     const { dispatch } = this.props;
@@ -80,11 +93,6 @@ class TableList extends PureComponent {
       type: 'paramManage/fetch',
       payload: this.currentPagination,
     });
-    // 列配置相关方法
-    ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdateModalVisible(true, record);
-    ColumnConfig.ValuesModalVisibleCallback = record => this.handleValuesModalVisible(true, record);
-    ColumnConfig.DeleteCallback = record => this.handleDelete(record);
-    ColumnConfig.ActiveCallback = record => this.handleActive(record, !record.fIsActive);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -278,6 +286,12 @@ class TableList extends PureComponent {
         updateFormValues: record || {},
       });
     }
+  };
+
+  handleColumnConfigModalVisible = (flag, record) => {
+    this.setState({
+      columnConfigVisible: !!flag,
+    });
   };
 
   handleAdd = fields => {
@@ -493,6 +507,7 @@ class TableList extends PureComponent {
       updateModalVisible,
       updateFormValues,
       valuesModalVisible,
+      columnConfigVisible,
     } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
@@ -560,16 +575,29 @@ class TableList extends PureComponent {
                     </Authorized>
                   </span>
                 )}
+                <div style={{ float: 'right', marginRight: 24 }}>
+                  <Button
+                    icon="menu"
+                    onClick={() => {
+                      this.handleColumnConfigModalVisible(true);
+                    }}
+                  >
+                    列配置
+                  </Button>
+                </div>
               </div>
-              <StandardTable
+              <WgStandardTable
                 rowKey="fItemID"
-                bordered
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
                 columns={ColumnConfig.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
+                // 以下属性与列配置相关
+                configKey={this.columnConfigKey}
+                configModalVisible={columnConfigVisible}
+                handleConfigModalVisible={flag => this.handleColumnConfigModalVisible(flag)}
               />
             </div>
           </Card>

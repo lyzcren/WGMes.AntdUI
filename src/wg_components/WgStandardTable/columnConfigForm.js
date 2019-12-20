@@ -7,15 +7,14 @@ import { DndProvider, DragSource, DropTarget } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import update from 'immutability-helper';
 
-import styles from './index.less';
-
+import styles from './columnConfigForm.less';
 
 let dragingIndex = -1;
 const FormItem = Form.Item;
 const { Option } = Select;
 
 class BodyRow extends React.Component {
-  render () {
+  render() {
     const { isOver, connectDragSource, connectDropTarget, moveRow, ...restProps } = this.props;
     const style = { ...restProps.style, cursor: 'move' };
 
@@ -30,13 +29,13 @@ class BodyRow extends React.Component {
     }
 
     return connectDragSource(
-      connectDropTarget(<tr {...restProps} className={className} style={style} />),
+      connectDropTarget(<tr {...restProps} className={className} style={style} />)
     );
   }
 }
 
 const rowSource = {
-  beginDrag (props) {
+  beginDrag(props) {
     dragingIndex = props.index;
     return {
       index: props.index,
@@ -45,7 +44,7 @@ const rowSource = {
 };
 
 const rowTarget = {
-  drop (props, monitor) {
+  drop(props, monitor) {
     const dragIndex = monitor.getItem().index;
     const hoverIndex = props.index;
 
@@ -71,15 +70,14 @@ const DragableBodyRow = DropTarget('row', rowTarget, (connect, monitor) => ({
 }))(
   DragSource('row', rowSource, connect => ({
     connectDragSource: connect.dragSource(),
-  }))(BodyRow),
+  }))(BodyRow)
 );
-
 
 /* eslint react/no-multi-comp:0 */
 @Form.create()
 export class ColumnConfigForm extends PureComponent {
   static defaultProps = {
-    handleModalVisible: () => { },
+    handleModalVisible: () => {},
   };
 
   components = {
@@ -93,7 +91,7 @@ export class ColumnConfigForm extends PureComponent {
     setTimeout(() => {
       handleColumnChange({ ...record, isHidden: val });
     }, 0);
-  }
+  };
 
   moveRow = (dragIndex, hoverIndex) => {
     const { handleColumnMove, dataSource } = this.props;
@@ -105,7 +103,7 @@ export class ColumnConfigForm extends PureComponent {
     }, 0);
   };
 
-  render () {
+  render() {
     const {
       form: { getFieldDecorator },
       loading,
@@ -144,16 +142,13 @@ export class ColumnConfigForm extends PureComponent {
         >
           关闭
         </Button>
-      </div>);
+      </div>
+    );
 
     return (
       <Modal
         destroyOnClose
-        title={
-          < div >
-            列配置
-          </div>
-        }
+        title={<div>列配置</div>}
         visible={modalVisible}
         footer={footer}
         onCancel={() => handleModalVisible(false)}
@@ -178,7 +173,7 @@ export class ColumnConfigForm extends PureComponent {
             bordered
           />
         </DndProvider>
-      </Modal >
+      </Modal>
     );
   }
 }

@@ -34,6 +34,7 @@ import { UpdateForm } from './UpdateForm';
 import { default as ColumnConfig } from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
+import { WgStandardTable } from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -52,26 +53,36 @@ const getValue = obj =>
 }))
 @Form.create()
 class TableList extends PureComponent {
-  state = {
-    // 界面是否可见
-    modalVisible: {
-      add: false,
-      update: false,
-    },
-    formValues: {},
-    // 当前操作选中列的数据
-    currentFormValues: {},
-    // expandForm: 是否展开更多查询条件
-    expandForm: false,
-    selectedRows: [],
-    queryFilters: [],
-  };
+  constructor(props) {
+    super(props);
 
-  // 列表查询参数
-  currentPagination = {
-    current: 1,
-    pageSize: 10,
-  };
+    // 列配置相关方法
+    ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdateModalVisible(true, record);
+    ColumnConfig.DeleteCallback = record => this.handleDelete(record);
+
+    this.state = {
+      // 界面是否可见
+      modalVisible: {
+        add: false,
+        update: false,
+        columnConfig: false,
+      },
+      formValues: {},
+      // 当前操作选中列的数据
+      currentFormValues: {},
+      // expandForm: 是否展开更多查询条件
+      expandForm: false,
+      selectedRows: [],
+      queryFilters: [],
+    };
+
+    // 列表查询参数
+    this.currentPagination = {
+      current: 1,
+      pageSize: 10,
+    };
+    this.columnConfigKey = 'defectScrapRecord';
+  }
 
   componentDidMount() {
     const { dispatch } = this.props;
@@ -82,9 +93,6 @@ class TableList extends PureComponent {
     dispatch({
       type: 'basicData/getAuthorizeProcessTree',
     });
-    // 列配置相关方法
-    ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdateModalVisible(true, record);
-    ColumnConfig.DeleteCallback = record => this.handleDelete(record);
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -234,18 +242,13 @@ class TableList extends PureComponent {
     });
   };
 
-  handleModalVisible = flag => {
-    const { modalVisible } = this.state;
+  handleModalVisible = ({ key, flag }, record) => {
+    const { modalVisible, currentFormValues } = this.state;
+    modalVisible[key] = !!flag;
+    currentFormValues[key] = record;
     this.setState({
-      modalVisible: { ...modalVisible, add: !!flag },
-    });
-  };
-
-  handleUpdateModalVisible = (flag, record) => {
-    const { modalVisible } = this.state;
-    this.setState({
-      modalVisible: { ...modalVisible, update: !!flag },
-      currentFormValues: record || {},
+      modalVisible: { ...modalVisible },
+      currentFormValues: { ...currentFormValues },
     });
   };
 
@@ -354,13 +357,8 @@ class TableList extends PureComponent {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  render() {
-    const {
-      dispatch,
-      defectScrapManage: { data, queryResult },
-      loading,
-    } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, currentFormValues } = this.state;
+  renderOperator() {
+    const { selectedRows } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove" disabled={!hasAuthority('DefectScrap_Delete')}>
@@ -368,62 +366,74 @@ class TableList extends PureComponent {
         </Menu.Item>
       </Menu>
     );
+    return (
+      <div style={{ overflow: 'hidden' }}>
+        <Authorized authority="DefectScrap_Export">
+          <Dropdown
+            overlay={
+              <Menu onClick={this.handleExport} selectedKeys={[]}>
+                <Menu.Item key="currentPage">当前页</Menu.Item>
+                <Menu.Item key="allPage">所有页</Menu.Item>
+              </Menu>
+            }
+          >
+            <Button icon="download">
+              导出 <Icon type="down" />
+            </Button>
+          </Dropdown>
+        </Authorized>
+        <div style={{ float: 'right', marginRight: 24 }}>
+          <Button
+            icon="menu"
+            onClick={() => {
+              this.handleModalVisible({ key: 'columnConfig', flag: true });
+            }}
+          >
+            列配置
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
-    const parentMethods = {
+  render() {
+    const {
       dispatch,
-      handleModalVisible: this.handleModalVisible,
-      handleSuccess: this.search,
-    };
-    const updateMethods = {
-      dispatch,
-      handleModalVisible: this.handleUpdateModalVisible,
-      handleSuccess: this.search,
-    };
-    const scrollX = ColumnConfig.columns
-      .map(c => {
-        return c.width;
-      })
-      .reduce(function(sum, width, index) {
-        return sum + width;
-      });
+      defectScrapManage: { data, queryResult },
+      loading,
+    } = this.props;
+    const { selectedRows, modalVisible, updateModalVisible, currentFormValues } = this.state;
+
     return (
       <div style={{ margin: '-24px -24px 0' }}>
         <GridContent>
           <Card bordered={false}>
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
-              <div className={styles.tableListOperator}>
-                <Authorized authority="DefectScrap_Export">
-                  <Dropdown
-                    overlay={
-                      <Menu onClick={this.handleExport} selectedKeys={[]}>
-                        <Menu.Item key="currentPage">当前页</Menu.Item>
-                        <Menu.Item key="allPage">所有页</Menu.Item>
-                      </Menu>
-                    }
-                  >
-                    <Button icon="download">
-                      导出 <Icon type="down" />
-                    </Button>
-                  </Dropdown>
-                </Authorized>
-              </div>
-              <StandardTable
+              <div className={styles.tableListOperator}>{this.renderOperator()}</div>
+              <WgStandardTable
                 rowKey="fInterID"
-                bordered
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
                 columns={ColumnConfig.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
-                scroll={{ x: scrollX }}
+                // 以下属性与列配置相关
+                configKey={this.columnConfigKey}
+                configModalVisible={modalVisible.columnConfig}
+                handleConfigModalVisible={flag =>
+                  this.handleModalVisible({ key: 'columnConfig', flag })
+                }
               />
             </div>
           </Card>
           {currentFormValues && Object.keys(currentFormValues).length ? (
             <UpdateForm
-              {...updateMethods}
+              dispatch={dispatch}
+              handleModalVisible={(flag, record) =>
+                this.handleModalVisible({ key: 'update', flag }, record)
+              }
               modalVisible={modalVisible.update}
               values={currentFormValues}
             />
