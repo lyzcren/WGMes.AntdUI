@@ -40,10 +40,12 @@ import { SplitForm } from './SplitForm';
 import { RefundForm } from './RefundForm';
 import { RejectForm } from './RejectForm';
 import { ChangeRouteForm } from './ChangeRouteForm';
+import { ColumnConfigForm } from '@/wg_components/ColumnConfigForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
 import { print } from '@/utils/wgUtils';
+import { WgStandardTable } from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 import { tsImportType } from '@babel/types';
@@ -56,51 +58,68 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ flowManage, loading, basicData, user }) => ({
+@connect(({ flowManage, columnManage, loading, basicData, user }) => ({
   flowManage,
+  columnManage,
   loading: loading.models.flowManage,
+  columnsConfigLoading: loading.models.columnManage,
   basicData,
   currentUser: user.currentUser,
 }))
 @Form.create()
 class TableList extends PureComponent {
-  state = {
-    // 界面是否可见
-    modalVisible: {
-      add: false,
-      sign: false,
-      route: false,
-      record: false,
-      take: false,
-      viewTake: false,
-      refund: false,
-      reject: false,
-      changeRoute: false,
-      split: false,
-      scan: false,
-    },
-    formValues: {},
-    // 当前操作选中列的数据
-    currentFormValues: {},
-    // expandForm: 是否展开更多查询条件
-    expandForm: false,
-    selectedRows: [],
-    queryFilters: [],
-    queryDeptID: null,
-    queryStatusNumber: null,
-    queryRecordStatusNumber: null,
-    queryBatchNo: this.props.fBatchNo,
-  };
+  constructor(props) {
+    super(props);
+    // 列配置相关方法
+    ColumnConfig.missionModalVisibleCallback = record =>
+      this.handleMissionModalVisible(true, record);
+    ColumnConfig.routeModalVisibleCallback = record =>
+      this.handleModalVisible({ key: 'route', flag: true }, record);
+    // 指定操作列
+    ColumnConfig.renderOperation = this.renderOperation;
+    ColumnConfig.statusFilter = this.statusFilter();
 
-  // 列表查询参数
-  currentPagination = {
-    current: 1,
-    pageSize: 10,
-  };
+    this.state = {
+      // 界面是否可见
+      modalVisible: {
+        add: false,
+        sign: false,
+        route: false,
+        record: false,
+        take: false,
+        viewTake: false,
+        refund: false,
+        reject: false,
+        changeRoute: false,
+        split: false,
+        scan: false,
+        columnConfig: false,
+      },
+      formValues: {},
+      // 当前操作选中列的数据
+      currentFormValues: {},
+      // expandForm: 是否展开更多查询条件
+      expandForm: false,
+      selectedRows: [],
+      queryFilters: [],
+      queryDeptID: null,
+      queryStatusNumber: null,
+      queryRecordStatusNumber: null,
+      queryBatchNo: props.fBatchNo,
+    };
+    // 列表查询参数
+    this.currentPagination = {
+      current: 1,
+      pageSize: 10,
+    };
+    this.columnConfig = ColumnConfig;
+    this.columnConfigKey = 'flow';
+  }
 
-  componentDidMount() {
+
+  componentDidMount () {
     const { dispatch } = this.props;
-    this.searchWhereInit();
+    // this.searchWhereInit();
 
     dispatch({
       type: 'basicData/getAuthorizeProcessTree',
@@ -118,14 +137,9 @@ class TableList extends PureComponent {
       type: 'basicData/getStatus',
       payload: { number: 'flowStatus' },
     });
-    // 列配置相关方法
-    ColumnConfig.missionModalVisibleCallback = record =>
-      this.handleMissionModalVisible(true, record);
-    ColumnConfig.routeModalVisibleCallback = record =>
-      this.handleModalVisible({ key: 'route', flag: true }, record);
   }
 
-  componentDidUpdate(preProps) {
+  componentDidUpdate (preProps) {
     const { fBatchNo } = this.props;
     if (preProps.fBatchNo !== fBatchNo) {
       this.searchWhereInit();
@@ -397,16 +411,16 @@ class TableList extends PureComponent {
     const badgeStatus = !flowStatus
       ? []
       : flowStatus.map(x => {
-          return {
-            text: <Badge color={x.fColor} text={x.fValue} />,
-            value: x.fKeyName,
-          };
-        });
+        return {
+          text: <Badge color={x.fColor} text={x.fValue} />,
+          value: x.fKeyName,
+        };
+      });
     return badgeStatus;
   };
 
   //应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
-  webapp_start(templateId, interIds, type) {
+  webapp_start (templateId, interIds, type) {
     // var option = {
     //   baseurl: 'http://' + window.location.host,
     //   report: '/api/PrintTemplate/grf?id=' + templateId,
@@ -511,7 +525,7 @@ class TableList extends PureComponent {
       type: 'menu/openMenu',
       payload: {
         path: '/prod/flow/transfer',
-        location: { data: record },
+        location: { data: record, tabMode: true },
         successCallback: this.search,
       },
     });
@@ -861,7 +875,7 @@ class TableList extends PureComponent {
     );
   };
 
-  renderSimpleForm() {
+  renderSimpleForm () {
     const {
       form: { getFieldDecorator },
       basicData: {
@@ -953,7 +967,7 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm() {
+  renderAdvancedForm () {
     const {
       form: { getFieldDecorator },
       basicData: {
@@ -1117,16 +1131,91 @@ class TableList extends PureComponent {
     );
   }
 
-  renderForm() {
+  renderForm () {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  render() {
+  reanderOperator () {
+    const { selectedRows } = this.state;
+    const {
+      flowManage: { data, queryResult, printTemplates },
+    } = this.props;
+    return (
+      <div style={{ overflow: 'hidden' }}>
+        <Button
+          type="primary"
+          icon="scan"
+          onClick={() => {
+            this.handleModalVisible({ key: 'scan', flag: true });
+          }}
+        >
+          扫描
+          </Button>
+        <Authorized authority="Flow_Export">
+          <Dropdown
+            overlay={
+              <Menu onClick={this.handleExport} selectedKeys={[]}>
+                <Menu.Item key="currentPage">当前页</Menu.Item>
+                <Menu.Item key="allPage">所有页</Menu.Item>
+              </Menu>
+            }
+          >
+            <Button icon="download">
+              导出<Icon type="down" />
+            </Button>
+          </Dropdown>
+        </Authorized>
+        {
+          selectedRows.length > 0 && printTemplates && printTemplates.length > 0 ? (
+            <Authorized authority="Flow_Print">
+              <Dropdown
+                overlay={
+                  <Menu onClick={this.handlePrint} selectedKeys={[]}>
+                    {printTemplates.map(val => {
+                      return <Menu.Item key={val.fInterID}>{val.fName}</Menu.Item>;
+                    })}
+                  </Menu>
+                }
+              >
+                <Button icon="printer">
+                  打印 <Icon type="down" />
+                </Button>
+              </Dropdown>
+            </Authorized>
+          ) : null
+        }
+        {
+          selectedRows.length > 0 && (
+            <Authorized authority="Flow_Sign">
+              <Button disabled={!queryDeptID} onClick={this.handleBatchSign}>
+                签收
+                  </Button>
+            </Authorized>
+          )
+        }
+
+        <div style={{ float: 'right', marginRight: 24 }}>
+          <Button
+            icon="menu"
+            onClick={() => {
+              this.handleModalVisible({ key: 'columnConfig', flag: true });
+            }}
+          >
+            列配置
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  render () {
     const {
       dispatch,
-      flowManage: { data, queryResult, printTemplates },
+      flowManage: { data, queryResult },
+      columnManage: { configs },
       loading,
+      columnsConfigLoading,
     } = this.props;
     const {
       queryDeptID,
@@ -1136,105 +1225,36 @@ class TableList extends PureComponent {
       currentFormValues,
     } = this.state;
 
+    const columns = ColumnConfig.getColumns();
+
     const signMethods = {
       dispatch,
       handleModalVisible: (flag, record) => this.handleModalVisible({ key: 'sign', flag }, record),
       handleSubmit: this.sign,
     };
-    // 指定操作列
-    ColumnConfig.renderOperation = this.renderOperation;
-    ColumnConfig.statusFilter = this.statusFilter();
-
-    const columns = ColumnConfig.getColumns();
-    const scrollX = columns
-      .map(c => {
-        return c.width;
-      })
-      .reduce(function(sum, width, index) {
-        return sum + width;
-      });
+    
     return (
       <div style={{ margin: '-24px -24px 0' }}>
         <GridContent>
           <Card bordered={false}>
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
-              <div className={styles.tableListOperator}>
-                <Button
-                  type="primary"
-                  icon="scan"
-                  onClick={() => {
-                    this.handleModalVisible({ key: 'scan', flag: true });
-                  }}
-                >
-                  扫描
-                </Button>
-                <Authorized authority="Flow_Export">
-                  <Dropdown
-                    overlay={
-                      <Menu onClick={this.handleExport} selectedKeys={[]}>
-                        <Menu.Item key="currentPage">当前页</Menu.Item>
-                        <Menu.Item key="allPage">所有页</Menu.Item>
-                      </Menu>
-                    }
-                  >
-                    <Button icon="download">
-                      导出
-                      <Icon type="down" />
-                    </Button>
-                  </Dropdown>
-                </Authorized>
-                {selectedRows.length > 0 && printTemplates && printTemplates.length > 0 ? (
-                  <Authorized authority="Flow_Print">
-                    <Dropdown
-                      overlay={
-                        <Menu onClick={this.handlePrint} selectedKeys={[]}>
-                          {printTemplates.map(val => {
-                            return <Menu.Item key={val.fInterID}>{val.fName}</Menu.Item>;
-                          })}
-                        </Menu>
-                      }
-                    >
-                      <Button icon="printer">
-                        打印 <Icon type="down" />
-                      </Button>
-                    </Dropdown>
-                  </Authorized>
-                ) : null}
-                {selectedRows.length > 0 && (
-                  <span>
-                    <Authorized authority="Flow_Sign">
-                      <Button disabled={!queryDeptID} onClick={this.handleBatchSign}>
-                        签收
-                      </Button>
-                    </Authorized>
-                    {/* <Authorized authority="Flow_Combine">
-                      <Button disabled={!queryDeptID} onClick={this.handleBatchCombine}>
-                        合批
-                      </Button>
-                    </Authorized> */}
-                    {/* <Authorized authority="Flow_Report">
-                      <Button
-                        disabled={queryStatusNumber !== 'EndProduce'}
-                        onClick={this.handleBatchReport}
-                      >
-                        汇报
-                      </Button>
-                    </Authorized> */}
-                  </span>
-                )}
-              </div>
-              <StandardTable
+              <div className={styles.tableListOperator}>{this.reanderOperator()}</div>
+              <WgStandardTable
                 rowKey="fInterID"
-                bordered
-                // size='small'
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
                 columns={columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
-                scroll={{ x: scrollX }}
+                // 以下属性与列配置相关
+                dispatch={dispatch}
+                configKey={this.columnConfigKey}
+                configModalVisible={modalVisible.columnConfig}
+                handleConfigModalVisible={flag => this.handleModalVisible({ key: 'columnConfig', flag })}
+                columnsConfig={configs[this.columnConfigKey]}
+                columnsConfigLoading={columnsConfigLoading}
               />
             </div>
           </Card>

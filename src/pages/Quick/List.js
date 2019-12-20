@@ -6,6 +6,16 @@ import { Checkbox, Alert, message, Col, Row, Icon } from 'antd';
 import Login from '@/components/Login';
 import screenfull from 'screenfull';
 import { getToken } from '@/utils/token';
+import {
+  getDeptId,
+  setDeptId,
+  getMachineId,
+  setMachineId,
+  getWorkTimeId,
+  setWorkTimeId,
+  getOperator,
+  setOperator,
+} from '@/utils/quickOpsBinding';
 
 import { ChooseDeptForm } from './ChooseDeptForm';
 import { ChooseMachineForm } from './ChooseMachineForm';
@@ -58,11 +68,20 @@ class QuickOpsPage extends Component {
         user: { currentUser },
       } = this.props;
       const { deptList, fBindEmpID, fBindEmpName, fBindEmpNumber } = currentUser;
+      const deptId = getDeptId();
       if (deptList.length >= 1) {
         this.setState({ deptList });
-        this.handleDeptChanged(deptList[0]);
+        const dept = deptList.find(x => x.fDeptID == deptId);
+        if (deptId && dept) {
+          this.handleDeptChanged(dept);
+        } else {
+          this.handleDeptChanged(deptList[0]);
+        }
       }
-      if (currentUser.fBindEmpID) {
+      const operator = getOperator();
+      if (operator) {
+        this.setState({ operator });
+      } else if (currentUser.fBindEmpID) {
         this.setState({ operator: { fEmpID: fBindEmpID, fEmpName: fBindEmpName } });
       }
     });
@@ -83,6 +102,7 @@ class QuickOpsPage extends Component {
     const { dispatch } = this.props;
     const { fDeptID } = newDept;
     this.setState({ dept: newDept });
+    setDeptId(newDept.fDeptID);
 
     dispatch({
       type: 'quickOps/getMachine',
@@ -90,6 +110,11 @@ class QuickOpsPage extends Component {
     }).then(() => {
       const { machineList } = this.props.quickOps;
       this.setState({ machineList });
+      const machineId = getMachineId();
+      const machine = machineList.find(x => x.fItemID == machineId);
+      if (machineId && machine) {
+        this.setState({ machine });
+      }
     });
     dispatch({
       type: 'quickOps/getWorkTimes',
@@ -97,6 +122,11 @@ class QuickOpsPage extends Component {
     }).then(() => {
       const { worktimeList } = this.props.quickOps;
       this.setState({ worktimeList });
+      const worktimeId = getWorkTimeId();
+      const worktime = worktimeList.find(x => x.fWorkTimeID == worktimeId);
+      if (worktimeId && worktime) {
+        this.setState({ worktime });
+      }
     });
   };
 
@@ -128,6 +158,7 @@ class QuickOpsPage extends Component {
   changeMachine = machine => {
     this.handleModalVisible({ key: 'chooseMachine', flag: false });
     this.setState({ machine });
+    setMachineId(machine.fItemID);
   };
 
   chooseWorktime = () => {
@@ -144,6 +175,7 @@ class QuickOpsPage extends Component {
   changeWorktime = worktime => {
     this.handleModalVisible({ key: 'chooseWorktime', flag: false });
     this.setState({ worktime });
+    setWorkTimeId(worktime.fWorkTimeID);
   };
 
   chooseOperator = () => {
@@ -153,6 +185,7 @@ class QuickOpsPage extends Component {
   changeOperator = operator => {
     this.handleModalVisible({ key: 'chooseOperator', flag: false });
     this.setState({ operator });
+    setOperator(operator);
   };
 
   scanSign = () => {

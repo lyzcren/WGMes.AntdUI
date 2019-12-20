@@ -61,8 +61,22 @@ export class ScanTransferForm extends PureComponent {
       const {
         scanSign: { data },
       } = this.props;
-      if (data == null) {
+      if (data == null || data == '') {
         message.warning('未找到流程单');
+      } else if (data.fCancellation) {
+        message.warning('流程单已作废');
+      } else if (data.fStatusNumber === 'EndProduce' || data.fStatusNumber === 'Reported') {
+        message.warning('流程单已完成');
+      } else if (data.fStatusNumber === 'NonProduced') {
+        message.warning('流程单无产出');
+      } else if (data.fStatusNumber === 'BeforeProduce') {
+        message.warning('流程单未生产');
+      } else if (data.fEndProduceDeptIDList.indexOf(fDeptID) >= 0) {
+        message.warning('当前工序已完成');
+      } else if (data.fCurrentDeptID == fDeptID && data.fRecordStatusNumber == 'ManufTransfered') {
+        message.warning('当前工序已转出');
+      } else if (data.fAllDeptIDList.indexOf(fDeptID) >= 0 && data.fCurrentDeptID != fDeptID) {
+        message.warning('当前工序未生产');
       } else {
         dispatch(
           routerRedux.push({
@@ -112,6 +126,7 @@ export class ScanTransferForm extends PureComponent {
         footer={footer}
         onCancel={() => handleModalVisible()}
         wrapClassName={styles.modalWrap}
+        loading={loading}
       >
         <FormItem label="">
           {getFieldDecorator('fFullBatchNo', {

@@ -1,4 +1,5 @@
 import React, { PureComponent, Fragment } from 'react';
+import router from 'umi/router';
 import moment from 'moment';
 import numeral from 'numeral';
 import QRCode from 'qrcode.react';
@@ -192,11 +193,18 @@ class Transfer extends PureComponent {
   }
 
   close() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'menu/closeMenu',
-      payload: { path: '/prod/flow/transfer' },
-    });
+    const {
+      dispatch,
+      location: { tabMode },
+    } = this.props;
+    if (tabMode) {
+      dispatch({
+        type: 'menu/closeMenu',
+        payload: { path: '/prod/flow/transfer' },
+      });
+    } else {
+      router.goBack();
+    }
   }
 
   handleOperatorChange = value => {
@@ -305,7 +313,7 @@ class Transfer extends PureComponent {
       form: { getFieldDecorator },
       basicData: { defectData, operators },
       fBindEmpID,
-      location: { fEmpID },
+      location: { fEmpID, tabMode },
     } = this.props;
     const { showMoreDefect, moreDefectValue, qtyFormat, qtyDecimal } = this.state;
     // 默认机台
@@ -386,7 +394,7 @@ class Transfer extends PureComponent {
             </Button>
           </Dropdown> */}
         </ButtonGroup>
-        <Button onClick={() => this.close()}>关闭</Button>
+        <Button onClick={() => this.close()}>{tabMode ? '关闭' : '返回'}</Button>
       </Fragment>
     );
 
@@ -404,131 +412,132 @@ class Transfer extends PureComponent {
     );
 
     return (
-      <WgPageHeaderWrapper
-        title={'流程单：' + data.fFullBatchNo}
-        logo={
-          <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
-        }
-        action={action}
-        content={description}
-        extraContent={extra}
-        wrapperClassName={styles.advancedForm}
-        loading={loading}
-      >
-        <Card title="基本信息" style={{ marginBottom: 24 }} bordered={false}>
-          <Form layout="vertical">
-            <Row gutter={16}>
-              <Col lg={6} md={12} sm={24}>
-                <FormItem key="fOperatorID" label="操作员">
-                  {getFieldDecorator('fOperatorID', {
-                    rules: [{ required: true, message: '请选择操作员' }],
-                    initialValue: fEmpID ? fEmpID : fBindEmpID ? fBindEmpID : null,
-                  })(
-                    <Select
-                      placeholder="请选择操作员"
-                      autoFocus
-                      showSearch
-                      filterOption={(input, option) =>
-                        option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                      }
-                      onChange={this.handleOperatorChange}
-                    >
-                      {operators &&
-                        operators.map(x => (
-                          <Option key={x.fItemID} value={x.fItemID}>
-                            {x.fName + ' - ' + x.fNumber}
-                          </Option>
-                        ))}
-                    </Select>
-                  )}
-                </FormItem>
-              </Col>
-              <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-                <FormItem key="fMachineID" label="机台">
-                  {getFieldDecorator('fMachineID', {
-                    rules: [{ required: data.fRequireMachine, message: '请选择机台' }],
-                    initialValue: defaultMachineID,
-                  })(
-                    <Select
-                      placeholder="请选择机台"
-                      showSearch
-                      filterOption={(input, option) =>
-                        option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                      }
-                    >
-                      {machineData &&
-                        machineData.map(x => (
-                          <Option key={x.fItemID} value={x.fItemID}>
-                            {x.fName + ' - ' + x.fNumber}
-                          </Option>
-                        ))}
-                    </Select>
-                  )}
-                </FormItem>
-              </Col>
-              {/* <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
+      <div style={{ backgroundColor: 'rgb(240, 242, 245)' }}>
+        <WgPageHeaderWrapper
+          title={'流程单：' + data.fFullBatchNo}
+          logo={
+            <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
+          }
+          action={action}
+          content={description}
+          extraContent={extra}
+          wrapperClassName={styles.advancedForm}
+          loading={loading}
+        >
+          <Card title="基本信息" style={{ marginBottom: 24 }} bordered={false}>
+            <Form layout="vertical">
+              <Row gutter={16}>
+                <Col lg={6} md={12} sm={24}>
+                  <FormItem key="fOperatorID" label="操作员">
+                    {getFieldDecorator('fOperatorID', {
+                      rules: [{ required: true, message: '请选择操作员' }],
+                      initialValue: fEmpID ? fEmpID : fBindEmpID ? fBindEmpID : null,
+                    })(
+                      <Select
+                        placeholder="请选择操作员"
+                        autoFocus
+                        showSearch
+                        filterOption={(input, option) =>
+                          option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        onChange={this.handleOperatorChange}
+                      >
+                        {operators &&
+                          operators.map(x => (
+                            <Option key={x.fItemID} value={x.fItemID}>
+                              {x.fName + ' - ' + x.fNumber}
+                            </Option>
+                          ))}
+                      </Select>
+                    )}
+                  </FormItem>
+                </Col>
+                <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
+                  <FormItem key="fMachineID" label="机台">
+                    {getFieldDecorator('fMachineID', {
+                      rules: [{ required: data.fRequireMachine, message: '请选择机台' }],
+                      initialValue: defaultMachineID,
+                    })(
+                      <Select
+                        placeholder="请选择机台"
+                        showSearch
+                        filterOption={(input, option) =>
+                          option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                      >
+                        {machineData &&
+                          machineData.map(x => (
+                            <Option key={x.fItemID} value={x.fItemID}>
+                              {x.fName + ' - ' + x.fNumber}
+                            </Option>
+                          ))}
+                      </Select>
+                    )}
+                  </FormItem>
+                </Col>
+                {/* <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <FormItem key="fMoldID" label="模具">
                   {getFieldDecorator('fMoldID', {
                     rules: [{ required: false, message: '请选择模具' }],
                   })(<Input placeholder="请输入" />)}
                 </FormItem>
               </Col> */}
-            </Row>
-          </Form>
-          <Form layout="vertical">
-            <Row gutter={16}>
-              <Col lg={6} md={12} sm={24}>
-                <FormItem key="fSignDate" label="签收时间">
-                  {getFieldDecorator('fSignDate', {
-                    rules: [{ required: false, message: '请选择开工时间' }],
-                    initialValue: moment(data.fSignDate),
-                  })(
-                    <DatePicker
-                      disabled
-                      format="YYYY-MM-DD HH:mm:ss"
-                      // disabledDate={current => current && current < data.fSignDate}
-                      // disabledTime={disabledDateTime}
-                      showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}
-                    />
-                  )}
-                </FormItem>
-              </Col>
-              <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-                <FormItem key="fBeginDate" label="生产时间">
-                  {getFieldDecorator('fBeginDate', {
-                    rules: [{ required: true, message: '请选择生产时间' }],
-                    initialValue: [moment(data.fSignDate), moment()],
-                  })(
-                    <RangePicker
-                      showTime={{ format: 'HH:mm' }}
-                      format="YYYY-MM-DD HH:mm"
-                      placeholder={['开工时间', '完工时间']}
-                      disabledDate={value => {
-                        return this.disabledDate(value, data.fSignDate);
-                      }}
-                      onOk={this.handleChangeDate}
-                    />
-                  )}
-                </FormItem>
-              </Col>
-              <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-                <FormItem label="班次">
-                  {getFieldDecorator('fWorkTimeID', {
-                    rules: [{ required: false, message: '请选择班次' }],
-                    initialValue: defaultWorkTimeID ? defaultWorkTimeID : currentWorkTimeID,
-                  })(
-                    <Select>
-                      {workTimes &&
-                        workTimes.map(workTime => (
-                          <Option key={workTime.fWorkTimeID} value={workTime.fWorkTimeID}>
-                            {workTime.fWorkTimeName}
-                          </Option>
-                        ))}
-                    </Select>
-                  )}
-                </FormItem>
-              </Col>
-              {/* <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
+              </Row>
+            </Form>
+            <Form layout="vertical">
+              <Row gutter={16}>
+                <Col lg={6} md={12} sm={24}>
+                  <FormItem key="fSignDate" label="签收时间">
+                    {getFieldDecorator('fSignDate', {
+                      rules: [{ required: false, message: '请选择开工时间' }],
+                      initialValue: moment(data.fSignDate),
+                    })(
+                      <DatePicker
+                        disabled
+                        format="YYYY-MM-DD HH:mm:ss"
+                        // disabledDate={current => current && current < data.fSignDate}
+                        // disabledTime={disabledDateTime}
+                        showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}
+                      />
+                    )}
+                  </FormItem>
+                </Col>
+                <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
+                  <FormItem key="fBeginDate" label="生产时间">
+                    {getFieldDecorator('fBeginDate', {
+                      rules: [{ required: true, message: '请选择生产时间' }],
+                      initialValue: [moment(data.fSignDate), moment()],
+                    })(
+                      <RangePicker
+                        showTime={{ format: 'HH:mm' }}
+                        format="YYYY-MM-DD HH:mm"
+                        placeholder={['开工时间', '完工时间']}
+                        disabledDate={value => {
+                          return this.disabledDate(value, data.fSignDate);
+                        }}
+                        onOk={this.handleChangeDate}
+                      />
+                    )}
+                  </FormItem>
+                </Col>
+                <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
+                  <FormItem label="班次">
+                    {getFieldDecorator('fWorkTimeID', {
+                      rules: [{ required: false, message: '请选择班次' }],
+                      initialValue: defaultWorkTimeID ? defaultWorkTimeID : currentWorkTimeID,
+                    })(
+                      <Select>
+                        {workTimes &&
+                          workTimes.map(workTime => (
+                            <Option key={workTime.fWorkTimeID} value={workTime.fWorkTimeID}>
+                              {workTime.fWorkTimeName}
+                            </Option>
+                          ))}
+                      </Select>
+                    )}
+                  </FormItem>
+                </Col>
+                {/* <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <FormItem key="fBeginDate" label="开工时间">
                   {getFieldDecorator('fBeginDate', {
                     rules: [{ required: true, message: '请选择开工时间' }],
@@ -554,133 +563,134 @@ class Transfer extends PureComponent {
                   )}
                 </FormItem>
               </Col> */}
-            </Row>
-          </Form>
-        </Card>
-        <Card title="不良" style={{ marginBottom: 24 }} bordered={false}>
-          <Form layout="vertical" hideRequiredMark>
-            <Row gutter={16}>
-              {defectList.map((d, i) => (
-                <Col
-                  key={'detailDefectCol' + i}
-                  xl={i % 3 === 0 ? {} : { span: 6, offset: 2 }}
-                  lg={i % 3 === 0 ? 6 : { span: 8 }}
-                  md={12}
-                  sm={24}
-                >
-                  <FormItem key={'detailDefectID' + d.fItemID} label={d.fName}>
-                    {getFieldDecorator('detailDefectID' + d.fItemID, {
-                      rules: [{ required: false, message: '' }],
-                      initialValue: d.fValue,
-                    })(
-                      <InputNumber
-                        onChange={val => this.handleFieldChange(val, d.fItemID)}
-                        style={{ width: '100%' }}
-                        placeholder="请输入数量"
-                        min={Math.pow(0.1, qtyDecimal)}
-                        step={Math.pow(0.1, qtyDecimal)}
-                        precision={qtyDecimal}
-                      />
-                    )}
-                  </FormItem>
-                </Col>
-              ))}
-            </Row>
-            {showMoreDefect && (
+              </Row>
+            </Form>
+          </Card>
+          <Card title="不良" style={{ marginBottom: 24 }} bordered={false}>
+            <Form layout="vertical" hideRequiredMark>
               <Row gutter={16}>
-                <Col lg={6} md={12} sm={24}>
-                  <FormItem label="其他不良">
-                    {getFieldDecorator('fOtherDefectID', {
-                      rules: [{ required: false, message: '请选择不良' }],
-                    })(
-                      <Select
-                        showSearch
-                        autoClearSearchValue
-                        filterOption={(input, option) =>
-                          option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                        placeholder="请选择不良"
-                        autoFocus
-                        ref={c => (this.otherDefectRef = c)}
-                      >
-                        {defectData
-                          .filter(x => !defectList.find(y => y.fItemID === x.fItemID))
-                          .map(x => (
-                            <Option key={x.fItemID} value={x.fItemID}>
-                              {x.fName + ' - ' + x.fNumber}
+                {defectList.map((d, i) => (
+                  <Col
+                    key={'detailDefectCol' + i}
+                    xl={i % 3 === 0 ? {} : { span: 6, offset: 2 }}
+                    lg={i % 3 === 0 ? 6 : { span: 8 }}
+                    md={12}
+                    sm={24}
+                  >
+                    <FormItem key={'detailDefectID' + d.fItemID} label={d.fName}>
+                      {getFieldDecorator('detailDefectID' + d.fItemID, {
+                        rules: [{ required: false, message: '' }],
+                        initialValue: d.fValue,
+                      })(
+                        <InputNumber
+                          onChange={val => this.handleFieldChange(val, d.fItemID)}
+                          style={{ width: '100%' }}
+                          placeholder="请输入数量"
+                          min={Math.pow(0.1, qtyDecimal)}
+                          step={Math.pow(0.1, qtyDecimal)}
+                          precision={qtyDecimal}
+                        />
+                      )}
+                    </FormItem>
+                  </Col>
+                ))}
+              </Row>
+              {showMoreDefect && (
+                <Row gutter={16}>
+                  <Col lg={6} md={12} sm={24}>
+                    <FormItem label="其他不良">
+                      {getFieldDecorator('fOtherDefectID', {
+                        rules: [{ required: false, message: '请选择不良' }],
+                      })(
+                        <Select
+                          showSearch
+                          autoClearSearchValue
+                          filterOption={(input, option) =>
+                            option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                          }
+                          placeholder="请选择不良"
+                          autoFocus
+                          ref={c => (this.otherDefectRef = c)}
+                        >
+                          {defectData
+                            .filter(x => !defectList.find(y => y.fItemID === x.fItemID))
+                            .map(x => (
+                              <Option key={x.fItemID} value={x.fItemID}>
+                                {x.fName + ' - ' + x.fNumber}
+                              </Option>
+                            ))}
+                        </Select>
+                      )}
+                    </FormItem>
+                  </Col>
+                  <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
+                    <FormItem key="fOtherDefectValue" label="数量">
+                      {getFieldDecorator('fOtherDefectValue', {
+                        rules: [{ required: false, message: '请输入数量' }],
+                      })(
+                        <NumericInput
+                          style={{ width: '100%' }}
+                          placeholder="请输入数量"
+                          title={'按回车确认添加'}
+                          // value={moreDefectValue}
+                          // onChange={val => this.handleOtherDefectChange(val)}
+                          onPressEnter={e => this.handleOtherDefectKeyPress(e)}
+                        />
+                      )}
+                    </FormItem>
+                  </Col>
+                </Row>
+              )}
+            </Form>
+            <Button
+              style={{ width: '100%', marginTop: 16, marginBottom: 8 }}
+              type="dashed"
+              onClick={this.handleShowMoreDefect}
+              icon={showMoreDefect ? 'minus' : 'plus'}
+            >
+              {showMoreDefect ? '收起' : '更多不良'}
+            </Button>
+          </Card>
+          <Card title="工艺参数" style={{ marginBottom: 24 }} bordered={false}>
+            <Form layout="vertical">
+              <Row gutter={16}>
+                {paramList.map((d, i) => (
+                  <Col
+                    key={'paramsCol' + i}
+                    xl={i % 3 === 0 ? {} : { span: 6, offset: 2 }}
+                    lg={i % 3 === 0 ? 6 : { span: 8 }}
+                    md={12}
+                    sm={24}
+                  >
+                    <FormItem key={'paramsID' + d.fParamID} label={d.fParamName}>
+                      {getFieldDecorator('paramsID' + d.fParamID, {
+                        rules: [{ required: false, message: '' }],
+                        initialValue: d.fDefaultValue,
+                      })(
+                        <Select
+                          mode={d.fTypeNumber === 'TagSelect' ? 'tags' : ''}
+                          showSearch
+                          filterOption={(input, option) =>
+                            option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                          }
+                          placeholder="请选择"
+                          onChange={val => console.log(val)}
+                        >
+                          {d.values.map(x => (
+                            <Option key={x} value={x}>
+                              {x}
                             </Option>
                           ))}
-                      </Select>
-                    )}
-                  </FormItem>
-                </Col>
-                <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-                  <FormItem key="fOtherDefectValue" label="数量">
-                    {getFieldDecorator('fOtherDefectValue', {
-                      rules: [{ required: false, message: '请输入数量' }],
-                    })(
-                      <NumericInput
-                        style={{ width: '100%' }}
-                        placeholder="请输入数量"
-                        title={'按回车确认添加'}
-                        // value={moreDefectValue}
-                        // onChange={val => this.handleOtherDefectChange(val)}
-                        onPressEnter={e => this.handleOtherDefectKeyPress(e)}
-                      />
-                    )}
-                  </FormItem>
-                </Col>
+                        </Select>
+                      )}
+                    </FormItem>
+                  </Col>
+                ))}
               </Row>
-            )}
-          </Form>
-          <Button
-            style={{ width: '100%', marginTop: 16, marginBottom: 8 }}
-            type="dashed"
-            onClick={this.handleShowMoreDefect}
-            icon={showMoreDefect ? 'minus' : 'plus'}
-          >
-            {showMoreDefect ? '收起' : '更多不良'}
-          </Button>
-        </Card>
-        <Card title="工艺参数" style={{ marginBottom: 24 }} bordered={false}>
-          <Form layout="vertical">
-            <Row gutter={16}>
-              {paramList.map((d, i) => (
-                <Col
-                  key={'paramsCol' + i}
-                  xl={i % 3 === 0 ? {} : { span: 6, offset: 2 }}
-                  lg={i % 3 === 0 ? 6 : { span: 8 }}
-                  md={12}
-                  sm={24}
-                >
-                  <FormItem key={'paramsID' + d.fParamID} label={d.fParamName}>
-                    {getFieldDecorator('paramsID' + d.fParamID, {
-                      rules: [{ required: false, message: '' }],
-                      initialValue: d.fDefaultValue,
-                    })(
-                      <Select
-                        mode={d.fTypeNumber === 'TagSelect' ? 'tags' : ''}
-                        showSearch
-                        filterOption={(input, option) =>
-                          option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                        placeholder="请选择"
-                        onChange={val => console.log(val)}
-                      >
-                        {d.values.map(x => (
-                          <Option key={x} value={x}>
-                            {x}
-                          </Option>
-                        ))}
-                      </Select>
-                    )}
-                  </FormItem>
-                </Col>
-              ))}
-            </Row>
-          </Form>
-        </Card>
-      </WgPageHeaderWrapper>
+            </Form>
+          </Card>
+        </WgPageHeaderWrapper>
+      </div>
     );
   }
 }
