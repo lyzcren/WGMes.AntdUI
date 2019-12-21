@@ -18,7 +18,7 @@ function formatNumber(value) {
   return `${prefix}${result}${list[1] ? `.${list[1]}` : ''}`;
 }
 
-export class NumericInput extends React.Component {
+class NumericInput extends React.Component {
   onChange = e => {
     const { value } = e.target;
     const reg = /^-?(0|[1-9][0-9]*)(\.[0-9]*)?$/;
@@ -66,17 +66,4 @@ export class NumericInput extends React.Component {
   }
 }
 
-// class NumericInputDemo extends React.Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = { value: '' };
-//   }
-
-//   onChange = (value) => {
-//     this.setState({ value });
-//   }
-
-//   render() {
-//     return <NumericInput style={{ width: 120 }} value={this.state.value} onChange={this.onChange} />;
-//   }
-// }
+export default NumericInput;

@@ -9,12 +9,17 @@ import NoticeIcon from '../NoticeIcon';
 import HeaderScan from '../HeaderScan';
 import HeaderDropdown from '../HeaderDropdown';
 import SelectLang from '../SelectLang';
+import WgIcon from '@/wg_components/WgIcon';
 import styles from './index.less';
 
 export default class GlobalHeaderRight extends PureComponent {
   componentDidMount = () => {
     // 监听全屏事件
     this.watchFullScreen();
+    // 默认全屏
+    setTimeout(() => {
+      if (!screenfull.isFullscreen) screenfull.request();
+    }, 3000);
   };
 
   getNoticeData() {
@@ -140,6 +145,13 @@ export default class GlobalHeaderRight extends PureComponent {
     // );
   };
 
+  quickOps = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'global/quickOps',
+    });
+  };
+
   render() {
     const {
       currentUser,
@@ -197,6 +209,11 @@ export default class GlobalHeaderRight extends PureComponent {
             console.log('enter', value); // eslint-disable-line
           }}
         /> */}
+        <Tooltip title={'进入快速操作界面'}>
+          <a onClick={this.quickOps} className={styles.action}>
+            <WgIcon type={'thunder'} color={'#001529'} size={15} />
+          </a>
+        </Tooltip>
         <Tooltip title={formatMessage({ id: 'component.globalHeader.help' })}>
           <a
             target="_blank"

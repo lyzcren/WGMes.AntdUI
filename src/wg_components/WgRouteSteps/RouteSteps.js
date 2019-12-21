@@ -6,7 +6,7 @@ const Step = Steps.Step;
 
 /* eslint react/no-multi-comp:0 */
 @Form.create()
-export class RouteSteps extends PureComponent {
+class RouteSteps extends PureComponent {
   state = {};
 
   render() {
@@ -33,3 +33,5 @@ export class RouteSteps extends PureComponent {
     );
   }
 }
+
+export default RouteSteps;

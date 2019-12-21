@@ -3,7 +3,7 @@ import moment from 'moment';
 import numeral from 'numeral';
 import { connect } from 'dva';
 import { Row, Col, Card, Form, Button, Table, Input, message } from 'antd';
-import WgPageHeaderWrapper from '@/components/WgPageHeaderWrapper';
+import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import DescriptionList from '@/components/DescriptionList';
 
 import styles from './List.less';

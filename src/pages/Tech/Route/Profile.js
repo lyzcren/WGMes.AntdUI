@@ -3,10 +3,10 @@ import moment from 'moment';
 import { connect } from 'dva';
 import { Layout, Row, Col, Card, Form, Button, message, Steps } from 'antd';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
-import WgPageHeaderWrapper from '@/components/WgPageHeaderWrapper';
+import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import DescriptionList from '@/components/DescriptionList';
 import DeptForm from './DeptForm';
-import { RouteSteps } from '@/components/WgRouteSteps/RouteSteps';
+import RouteSteps from '@/wg_components/WgRouteSteps/RouteSteps';
 
 import styles from './List.less';
 

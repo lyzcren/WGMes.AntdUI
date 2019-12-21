@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'umi/locale';
 import Link from 'umi/link';
-import WgPageHeader from '@/components/WgPageHeader';
+import WgPageHeader from '@/wg_components/WgPageHeader';
 import { connect } from 'dva';
 import GridContent from './GridContent';
 import styles from './index.less';

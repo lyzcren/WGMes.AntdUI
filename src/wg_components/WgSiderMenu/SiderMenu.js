@@ -3,7 +3,7 @@ import { Layout } from 'antd';
 import classNames from 'classnames';
 import Link from 'umi/link';
 import styles from './index.less';
-import PageLoading from '../PageLoading';
+import PageLoading from '@/components/PageLoading';
 import { getDefaultCollapsedSubMenus } from './SiderMenuUtils';
 
 const BaseMenu = React.lazy(() => import('./BaseMenu'));

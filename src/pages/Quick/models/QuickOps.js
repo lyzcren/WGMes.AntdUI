@@ -1,5 +1,6 @@
 import { fakeMachineData } from '@/services/basicData';
 import { fakeGetWorkTimes } from '@/services/Basic/Dept';
+import { routerRedux } from 'dva/router';
 
 export default {
   namespace: 'quickOps',
@@ -23,6 +24,9 @@ export default {
         type: 'save',
         payload: { worktimeList: response },
       });
+    },
+    *moreOperator({ payload }, { call, put }) {
+      yield put(routerRedux.replace('/'));
     },
   },
 

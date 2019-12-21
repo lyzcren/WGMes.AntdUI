@@ -14,7 +14,7 @@ import Footer from './Footer';
 import Header from './WgHeader';
 import Context from './MenuContext';
 import PageLoading from '@/components/PageLoading';
-import WgSiderMenu from '@/components/WgSiderMenu';
+import WgSiderMenu from '@/wg_components/WgSiderMenu';
 import { getToken } from '@/utils/token';
 
 import logo from '../assets/logo.svg';

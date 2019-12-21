@@ -16,7 +16,7 @@ import {
   InputNumber,
   DatePicker,
 } from 'antd';
-import WgPageHeaderWrapper from '@/components/WgPageHeaderWrapper';
+import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import DescriptionList from '@/components/DescriptionList';
 import { getTimeDiff } from '@/utils/utils';
 

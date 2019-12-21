@@ -1,4 +1,5 @@
 import { queryNotices } from '@/services/api';
+import { routerRedux } from 'dva/router';
 
 export default {
   namespace: 'global',
@@ -94,12 +95,15 @@ export default {
         },
       });
     },
-    *fullScreen({ payload }, { call, put, select }) {
+    *fullScreen({ payload }, { put }) {
       const { isFullScreen } = payload;
       yield put({
         type: 'changeFullScreen',
         payload: { isFullScreen },
       });
+    },
+    *quickOps({}, { put }) {
+      yield put(routerRedux.replace('/quickOps'));
     },
   },
 

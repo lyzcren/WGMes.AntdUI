@@ -20,7 +20,7 @@ import {
   Icon,
 } from 'antd';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
-import WgPageHeaderWrapper from '@/components/WgPageHeaderWrapper';
+import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import DescriptionList from '@/components/DescriptionList';
 import Authorized from '@/utils/Authorized';
 import { hasAuthority } from '@/utils/authority';

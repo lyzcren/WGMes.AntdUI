@@ -16,7 +16,7 @@ import {
   Dropdown,
   Icon,
 } from 'antd';
-import WgPageHeaderWrapper from '@/components/WgPageHeaderWrapper';
+import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import { AddFromMissionForm } from './AddFromMissionForm';
 
 import styles from './List.less';

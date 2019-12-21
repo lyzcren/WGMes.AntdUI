@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Form, Input, Modal, message, Button } from 'antd';
 
-import styles from './ScanSign.less';
+import styles from './ScanSignForm.less';
 
 const FormItem = Form.Item;
 

@@ -25,9 +25,9 @@ import {
   InputNumber,
   DatePicker,
 } from 'antd';
-import { NumericInput } from '@/components/WgInputNumber';
+import NumericInput from '@/wg_components/WgInputNumber';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
-import WgPageHeaderWrapper from '@/components/WgPageHeaderWrapper';
+import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import DescriptionList from '@/components/DescriptionList';
 import Authorized from '@/utils/Authorized';
 import { hasAuthority } from '@/utils/authority';

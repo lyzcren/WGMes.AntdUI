@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Form, Input, Modal, Radio, Switch, Select, message, Button, Tag } from 'antd';
-import { RouteSteps } from '@/components/WgRouteSteps/RouteSteps';
+import RouteSteps from '@/wg_components/WgRouteSteps/RouteSteps';
 
 /* eslint react/no-multi-comp:0 */
 @connect(({ viewStep, loading }) => ({

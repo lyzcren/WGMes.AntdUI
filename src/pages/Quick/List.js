@@ -27,8 +27,9 @@ import { ScanTransferForm } from './ScanTransferForm';
 
 import styles from './List.less';
 
-@connect(({ user, loading, quickOps }) => ({
+@connect(({ user, global, quickOps }) => ({
   user,
+  global,
   quickOps,
 }))
 class QuickOpsPage extends Component {
@@ -53,7 +54,10 @@ class QuickOpsPage extends Component {
   };
 
   componentDidMount() {
-    const { dispatch } = this.props;
+    const {
+      dispatch,
+      global: { isFullScreen },
+    } = this.props;
     const token = getToken();
     if (!token) {
       dispatch({
@@ -85,10 +89,31 @@ class QuickOpsPage extends Component {
         this.setState({ operator: { fEmpID: fBindEmpID, fEmpName: fBindEmpName } });
       }
     });
-    // setTimeout(() => {
-    //   if (!screenfull.isFullscreen) screenfull.request();
-    // }, 100);
+
+    // 与其他布局使用相同的全屏判断
+    setTimeout(() => {
+      if (!isFullScreen) screenfull.request();
+    }, 100);
+    // 监听全屏事件
+    this.watchFullScreen();
   }
+
+  // 监听fullscreenchange事件
+  watchFullScreen = () => {
+    const { dispatch } = this.props;
+    const screenChange = () => {
+      dispatch({
+        type: 'global/fullScreen',
+        payload: {
+          isFullScreen: screenfull.isFullscreen,
+        },
+      });
+    };
+
+    if (screenfull.enabled) {
+      screenfull.on('change', screenChange);
+    }
+  };
 
   handleModalVisible = ({ key, flag }) => {
     const { modalVisible } = this.state;
@@ -196,6 +221,13 @@ class QuickOpsPage extends Component {
     this.handleModalVisible({ key: 'scanTransfer', flag: true });
   };
 
+  moreOperators = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'quickOps/moreOperator',
+    });
+  };
+
   render() {
     const { login } = this.props;
     const { currentUser } = this.props.user;
@@ -228,7 +260,7 @@ class QuickOpsPage extends Component {
               <QuickButton title="转序" onClick={this.scanTransfer} />
             </Col>
             <Col span={6}>
-              <QuickButton title="打印" />
+              <QuickButton title="拒签" />
             </Col>
           </Row>
           <Row gutter={8}>
@@ -236,13 +268,13 @@ class QuickOpsPage extends Component {
               <div style={{ height: '80px' }} />
             </Col>
             <Col span={6}>
-              <QuickButton title="拒签" />
-            </Col>
-            <Col span={6}>
               <QuickButton title="退回" />
             </Col>
             <Col span={6}>
               <QuickButton title="取走" />
+            </Col>
+            <Col span={6}>
+              <QuickButton title="更多操作" onClick={this.moreOperators} />
             </Col>
           </Row>
         </Col>

@@ -3,7 +3,7 @@ import { connect } from 'dva';
 import { Form, Card, Button, Icon, List } from 'antd';
 
 import Ellipsis from '@/components/Ellipsis';
-import WgPageHeaderWrapper from '@/components/WgPageHeaderWrapper';
+import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 
 import { ManageForm } from './ManageForm';
 

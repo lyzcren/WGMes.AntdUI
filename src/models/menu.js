@@ -5,7 +5,7 @@ import { formatMessage } from 'umi/locale';
 import Authorized from '@/utils/Authorized';
 import pathToRegexp from 'path-to-regexp';
 import { urlToList } from '@/components/_utils/pathTools';
-import { getFlatMenuKeys } from '@/components/WgSiderMenu/SiderMenuUtils';
+import { getFlatMenuKeys } from '@/wg_components/WgSiderMenu/SiderMenuUtils';
 import { getComponentMaps } from '@/utils/utils';
 
 const { check } = Authorized;
