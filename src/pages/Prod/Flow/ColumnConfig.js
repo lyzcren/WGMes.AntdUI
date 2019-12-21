@@ -4,6 +4,7 @@ import QRCode from 'qrcode.react';
 import { Switch, Popconfirm, Divider, Badge, Tooltip } from 'antd';
 import Authorized from '@/utils/Authorized';
 import RadioButton from 'antd/lib/radio/radioButton';
+import { WgIcon } from '@/wg_components/WgIcon';
 
 class ColumnConfig {
   // 查看任务单
@@ -27,7 +28,12 @@ class ColumnConfig {
                   placement="topLeft"
                   title={<QRCode value={val} size={200} fgColor="#000000" />}
                 >
-                  <QRCode style={{ marginRight: '6px' }} value={val} size={19} fgColor="#666666" />
+                  <WgIcon
+                    style={{ marginRight: '6px' }}
+                    type={'barcode'}
+                    size={19}
+                    color="#666666"
+                  />
                 </Tooltip>
               )}
               <div>{val}</div>
@@ -183,16 +189,6 @@ class ColumnConfig {
         render: (text, record) => this.renderOperation(text, record),
       },
     ];
-  };
-
-  getScrollX = () => {
-    return this.getColumns()
-      .map(c => {
-        return c.width;
-      })
-      .reduce(function(sum, width, index) {
-        return sum + width;
-      });
   };
 
   renderOperation = (text, record) => {

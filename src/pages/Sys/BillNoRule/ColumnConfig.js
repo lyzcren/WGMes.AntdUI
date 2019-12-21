@@ -71,6 +71,7 @@ class ColumnConfig {
     },
     {
       title: '操作',
+      dataIndex: 'operators',
       fixed: 'right',
       width: 100,
       render: (text, record) => (

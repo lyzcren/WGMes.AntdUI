@@ -36,6 +36,7 @@ import { TechParamForm } from './TechParamForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
+import { WgStandardTable } from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -64,6 +65,7 @@ class TableList extends PureComponent {
     selectedRows: [],
     queryFilters: [],
   };
+  columnConfigKey = 'dept';
 
   // 列表查询参数
   currentPagination = {
@@ -638,13 +640,22 @@ class TableList extends PureComponent {
                     </Authorized>
                   </span>
                 )}
+                <div style={{ float: 'right', marginRight: 24 }}>
+                  <Button
+                    icon="menu"
+                    onClick={() => {
+                      if (this.showConfig) this.showConfig();
+                    }}
+                  >
+                    列配置
+                  </Button>
+                </div>
               </div>
               {/* defaultExpandAllRows在Table首次初始化有数据时才会起作用，若不是会导致无法展开问题
             详见 https://github.com/ant-design/ant-design/issues/4145 */}
               {data && data.list && data.list.length ? (
-                <StandardTable
+                <WgStandardTable
                   rowKey="fItemID"
-                  bordered
                   defaultExpandAllRows={true}
                   selectedRows={selectedRows}
                   loading={loading}
@@ -652,6 +663,11 @@ class TableList extends PureComponent {
                   columns={ColumnConfig.columns}
                   onSelectRow={this.handleSelectRows}
                   onChange={this.handleStandardTableChange}
+                  // 以下属性与列配置相关
+                  configKey={this.columnConfigKey}
+                  refShowConfig={showConfig => {
+                    this.showConfig = showConfig;
+                  }}
                 />
               ) : (
                 <StandardTable

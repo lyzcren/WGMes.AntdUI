@@ -34,6 +34,7 @@ import { CreateForm } from './CreateForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
+import { WgStandardTable } from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -63,6 +64,7 @@ class TableList extends PureComponent {
     selectedRows: [],
     queryFilters: [],
   };
+  columnConfigKey = 'unit';
 
   // 列表查询参数
   currentPagination = {
@@ -474,16 +476,30 @@ class TableList extends PureComponent {
                     </Authorized>
                   </span>
                 )}
+                <div style={{ float: 'right', marginRight: 24 }}>
+                  <Button
+                    icon="menu"
+                    onClick={() => {
+                      if (this.showConfig) this.showConfig();
+                    }}
+                  >
+                    列配置
+                  </Button>
+                </div>
               </div>
-              <StandardTable
+              <WgStandardTable
                 rowKey="fItemID"
-                bordered
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
                 columns={ColumnConfig.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
+                // 以下属性与列配置相关
+                configKey={this.columnConfigKey}
+                refShowConfig={showConfig => {
+                  this.showConfig = showConfig;
+                }}
               />
             </div>
           </Card>

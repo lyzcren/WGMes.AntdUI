@@ -9,26 +9,31 @@ class ColumnConfig {
     {
       title: '名称',
       dataIndex: 'fName',
+      width: 160,
       sorter: true,
     },
     {
       title: '编码',
       dataIndex: 'fNumber',
+      width: 160,
       sorter: true,
     },
     {
       title: '英文名称',
       dataIndex: 'fEnName',
+      width: 160,
       sorter: true,
     },
     {
       title: '类型',
       dataIndex: 'fTypeName',
+      width: 160,
       sorter: true,
     },
     {
       title: '班次',
       dataIndex: 'workTimeList',
+      width: 160,
       render(val) {
         return (
           val &&
@@ -43,6 +48,7 @@ class ColumnConfig {
     {
       title: '启用',
       dataIndex: 'fIsActive',
+      width: 160,
       filters: [
         {
           text: activeData[0],
@@ -59,6 +65,8 @@ class ColumnConfig {
     },
     {
       title: '操作',
+      dataIndex: 'operators',
+      width: 160,
       render: (text, record) => (
         <Fragment>
           <Authorized authority="Dept_Update">

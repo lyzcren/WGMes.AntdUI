@@ -34,6 +34,7 @@ import { CreateForm } from './CreateForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
+import { WgStandardTable } from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -66,6 +67,7 @@ class TableList extends PureComponent {
     queryFilters: [],
     isSyncing: false,
   };
+  columnConfigKey = 'productList';
 
   // 列表查询参数
   currentPagination = {
@@ -614,13 +616,6 @@ class TableList extends PureComponent {
       handleModalVisible: this.handleUpdateModalVisible,
       handleSubmit: this.handleUpdate,
     };
-    const scrollX = ColumnConfig.columns
-      .map(c => {
-        return c.width;
-      })
-      .reduce(function(sum, width, index) {
-        return sum + width;
-      });
 
     return (
       <div style={{ margin: '-24px -24px 0' }}>
@@ -670,17 +665,30 @@ class TableList extends PureComponent {
                     </Authorized>
                   </span>
                 )}
+                <div style={{ float: 'right', marginRight: 24 }}>
+                  <Button
+                    icon="menu"
+                    onClick={() => {
+                      if (this.showConfig) this.showConfig();
+                    }}
+                  >
+                    列配置
+                  </Button>
+                </div>
               </div>
-              <StandardTable
+              <WgStandardTable
                 rowKey="fItemID"
-                bordered
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
                 columns={ColumnConfig.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
-                scroll={{ x: scrollX }}
+                // 以下属性与列配置相关
+                configKey={this.columnConfigKey}
+                refShowConfig={showConfig => {
+                  this.showConfig = showConfig;
+                }}
               />
             </div>
           </Card>

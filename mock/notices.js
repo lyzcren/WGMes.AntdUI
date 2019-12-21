@@ -9,7 +9,7 @@ const fakeNotices = [
   {
     id: '000000002',
     avatar: 'https://gw.alipayobjects.com/zos/rmsportal/OKJXDXrmkNshAMvwtvhu.png',
-    title: '你推荐的 曲妮妮 已通过第三轮面试',
+    title: '望果信息科技要办展会了',
     datetime: '2017-08-08',
     type: 'notification',
   },
@@ -38,7 +38,7 @@ const fakeNotices = [
   {
     id: '000000006',
     avatar: 'https://gw.alipayobjects.com/zos/rmsportal/fcHMVNCjPOsbUGdEduuv.jpeg',
-    title: '曲丽丽 评论了你',
+    title: '某工序机器停止运转，请处理',
     description: '描述信息描述信息描述信息',
     datetime: '2017-08-07',
     type: 'message',
@@ -47,7 +47,7 @@ const fakeNotices = [
   {
     id: '000000007',
     avatar: 'https://gw.alipayobjects.com/zos/rmsportal/fcHMVNCjPOsbUGdEduuv.jpeg',
-    title: '朱偏右 回复了你',
+    title: '订单临近交付日期',
     description: '这种模板用于提醒谁与你发生了互动，左侧放『谁』的头像',
     datetime: '2017-08-07',
     type: 'message',

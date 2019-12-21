@@ -19,11 +19,11 @@ import {
   TreeSelect,
   Switch,
 } from 'antd';
-import ReportTable from '@/components/ReportTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { exportExcel } from '@/utils/getExcel';
 import { default as ColumnConfig } from './ColumnConfig';
+import { WgStandardTable } from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -55,6 +55,8 @@ class TableList extends PureComponent {
     groupByMission: true,
     groupByDept: true,
   };
+
+  columnConfigKey = 'reportWorkTime';
 
   // 列表查询参数
   currentPagination = {
@@ -284,7 +286,7 @@ class TableList extends PureComponent {
               )}
             </FormItem>
           </Col>
-          <Col md={4} sm={24}>
+          <Col md={7} sm={24}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
                 查询
@@ -310,6 +312,14 @@ class TableList extends PureComponent {
               <a style={{ marginLeft: 8 }} onClick={this.toggleForm} hidden>
                 展开 <Icon type="down" />
               </a>
+              <Button
+                icon="menu"
+                onClick={() => {
+                  if (this.showConfig) this.showConfig();
+                }}
+              >
+                列配置
+              </Button>
             </span>
           </Col>
         </Row>
@@ -333,13 +343,7 @@ class TableList extends PureComponent {
     } = this.props;
 
     const columns = ColumnConfig.getColumns(this.state);
-    const scrollX = columns
-      .map(c => {
-        return c.width;
-      })
-      .reduce(function(sum, width, index) {
-        return sum + width;
-      });
+
     return (
       <div style={{ margin: '-24px -24px 0' }}>
         <GridContent>
@@ -395,14 +399,19 @@ class TableList extends PureComponent {
                   </FormItem>
                 </Form>
               </div>
-              <ReportTable
+              <WgStandardTable
                 rowKey="rownumber"
-                bordered
                 loading={loading}
                 data={data}
                 columns={columns}
                 onChange={this.handleStandardTableChange}
-                scroll={{ x: scrollX }}
+                // 以下属性与列配置相关
+                configKey={this.columnConfigKey}
+                refShowConfig={showConfig => {
+                  this.showConfig = showConfig;
+                }}
+                showAlert={false}
+                selectabel={false}
               />
             </div>
           </Card>

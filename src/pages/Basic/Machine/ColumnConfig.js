@@ -9,21 +9,25 @@ class ColumnConfig {
     {
       title: '名称',
       dataIndex: 'fName',
+      width: 160,
       sorter: true,
     },
     {
       title: '编码',
       dataIndex: 'fNumber',
+      width: 160,
       sorter: true,
     },
     {
       title: '岗位',
       dataIndex: 'fDeptName',
+      width: 160,
       sorter: true,
     },
     {
       title: '启用',
       dataIndex: 'fIsActive',
+      width: 160,
       filters: [
         {
           text: activeData[0],
@@ -40,6 +44,8 @@ class ColumnConfig {
     },
     {
       title: '操作',
+      dataIndex: 'operators',
+      width: 160,
       render: (text, record) => (
         <Fragment>
           <Authorized authority="Machine_Update">

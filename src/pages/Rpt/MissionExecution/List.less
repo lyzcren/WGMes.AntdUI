@@ -35,10 +35,17 @@
       flex: 1;
     }
   }
+
   .submitButtons {
     display: block;
     white-space: nowrap;
     margin-bottom: 24px;
+
+    :global {
+      .ant-btn {
+        margin-left: 8px;
+      }
+    }
   }
 }
 

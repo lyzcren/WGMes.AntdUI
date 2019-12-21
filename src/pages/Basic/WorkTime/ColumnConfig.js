@@ -10,28 +10,34 @@ class ColumnConfig {
     {
       title: '名称',
       dataIndex: 'fName',
+      width: 160,
       sorter: true,
     },
     {
       title: '编码',
       dataIndex: 'fNumber',
+      width: 160,
       sorter: true,
     },
     {
       title: '开始时间',
       dataIndex: 'fBeginTime',
+      width: 160,
     },
     {
       title: '结束时间',
       dataIndex: 'fEndTime',
+      width: 160,
     },
     {
       title: '最迟结束时间',
       dataIndex: 'fLastEndTime',
+      width: 160,
     },
     {
       title: '启用',
       dataIndex: 'fIsActive',
+      width: 160,
       filters: [
         {
           text: activeData[0],
@@ -59,6 +65,8 @@ class ColumnConfig {
     },
     {
       title: '操作',
+      dataIndex: 'operators',
+      width: 260,
       render: (text, record) => (
         <Fragment>
           <Authorized authority="WorkTime_Update">

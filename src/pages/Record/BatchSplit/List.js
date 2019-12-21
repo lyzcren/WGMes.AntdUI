@@ -52,9 +52,7 @@ class TableList extends PureComponent {
 
     this.state = {
       // 界面是否可见
-      modalVisible: {
-        columnConfig: false,
-      },
+      modalVisible: {},
       formValues: {},
       // 当前操作选中列的数据
       currentFormValues: {},
@@ -411,7 +409,7 @@ class TableList extends PureComponent {
           <Button
             icon="menu"
             onClick={() => {
-              this.handleModalVisible({ key: 'columnConfig', flag: true });
+              if (this.showConfig) this.showConfig();
             }}
           >
             列配置
@@ -491,10 +489,9 @@ class TableList extends PureComponent {
                 expandedRowRender={this.expandedRowRender}
                 // 以下属性与列配置相关
                 configKey={this.columnConfigKey}
-                configModalVisible={modalVisible.columnConfig}
-                handleConfigModalVisible={flag =>
-                  this.handleModalVisible({ key: 'columnConfig', flag })
-                }
+                refShowConfig={showConfig => {
+                  this.showConfig = showConfig;
+                }}
               />
             </div>
           </Card>

@@ -29,6 +29,8 @@ import { formatMessage, FormattedMessage } from 'umi/locale';
 import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
+import { WgStandardTable } from '@/wg_components/WgStandardTable';
+
 import { UpdateForm } from './UpdateForm';
 import { CreateForm } from './CreateForm';
 import { AuthorityForm } from './AuthorityForm';
@@ -69,6 +71,7 @@ class TableList extends PureComponent {
     selectedRows: [],
     queryFilters: [],
   };
+  columnConfigKey = 'role';
 
   // 列表查询参数
   currentPagination = {
@@ -80,16 +83,19 @@ class TableList extends PureComponent {
     {
       title: '角色',
       dataIndex: 'fName',
+      width: 160,
       sorter: true,
     },
     {
       title: '编码',
       dataIndex: 'fNumber',
+      width: 160,
       sorter: true,
     },
     {
       title: '启用',
       dataIndex: 'fIsActive',
+      width: 160,
       filters: [
         {
           text: activeData[0],
@@ -107,11 +113,14 @@ class TableList extends PureComponent {
     {
       title: '默认界面',
       dataIndex: 'fIndexPage',
+      width: 160,
       sorter: true,
       render: val => pageMapper[val],
     },
     {
       title: '操作',
+      dataIndex: 'operators',
+      width: 160,
       render: (text, record) => (
         <Fragment>
           <a onClick={() => this.handleUpdateModalVisible(true, record)}>修改</a>
@@ -634,16 +643,30 @@ class TableList extends PureComponent {
                     </Dropdown>
                   </span>
                 )}
+                <div style={{ float: 'right', marginRight: 24 }}>
+                  <Button
+                    icon="menu"
+                    onClick={() => {
+                      if (this.showConfig) this.showConfig();
+                    }}
+                  >
+                    列配置
+                  </Button>
+                </div>
               </div>
-              <StandardTable
+              <WgStandardTable
                 rowKey="fItemID"
-                bordered
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
                 columns={this.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
+                // 以下属性与列配置相关
+                configKey={this.columnConfigKey}
+                refShowConfig={showConfig => {
+                  this.showConfig = showConfig;
+                }}
               />
             </div>
           </Card>

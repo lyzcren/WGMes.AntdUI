@@ -70,7 +70,6 @@ class TableList extends PureComponent {
       formValues: {},
       // 修改界面
       updateModalVisible: false,
-      columnConfigVisible: false,
       updateFormValues: {},
       valuesModalVisible: false,
       // 其他
@@ -288,12 +287,6 @@ class TableList extends PureComponent {
     }
   };
 
-  handleColumnConfigModalVisible = (flag, record) => {
-    this.setState({
-      columnConfigVisible: !!flag,
-    });
-  };
-
   handleAdd = fields => {
     const { dispatch, form } = this.props;
     dispatch({
@@ -507,7 +500,6 @@ class TableList extends PureComponent {
       updateModalVisible,
       updateFormValues,
       valuesModalVisible,
-      columnConfigVisible,
     } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
@@ -579,7 +571,7 @@ class TableList extends PureComponent {
                   <Button
                     icon="menu"
                     onClick={() => {
-                      this.handleColumnConfigModalVisible(true);
+                      if (this.showConfig) this.showConfig();
                     }}
                   >
                     列配置
@@ -596,8 +588,9 @@ class TableList extends PureComponent {
                 onChange={this.handleStandardTableChange}
                 // 以下属性与列配置相关
                 configKey={this.columnConfigKey}
-                configModalVisible={columnConfigVisible}
-                handleConfigModalVisible={flag => this.handleColumnConfigModalVisible(flag)}
+                refShowConfig={showConfig => {
+                  this.showConfig = showConfig;
+                }}
               />
             </div>
           </Card>

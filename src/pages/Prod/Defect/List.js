@@ -61,7 +61,6 @@ class TableList extends PureComponent {
       // 界面是否可见
       modalVisible: {
         repair: false,
-        columnConfig: false,
       },
       formValues: {},
       // 当前操作选中列的数据
@@ -322,7 +321,7 @@ class TableList extends PureComponent {
           <Button
             icon="menu"
             onClick={() => {
-              this.handleModalVisible({ key: 'columnConfig', flag: true });
+              if (this.showConfig) this.showConfig();
             }}
           >
             列配置
@@ -426,10 +425,9 @@ class TableList extends PureComponent {
                 onChange={this.handleStandardTableChange}
                 // 以下属性与列配置相关
                 configKey={this.columnConfigKey}
-                configModalVisible={modalVisible.columnConfig}
-                handleConfigModalVisible={flag =>
-                  this.handleModalVisible({ key: 'columnConfig', flag })
-                }
+                refShowConfig={showConfig => {
+                  this.showConfig = showConfig;
+                }}
               />
             </div>
           </Card>

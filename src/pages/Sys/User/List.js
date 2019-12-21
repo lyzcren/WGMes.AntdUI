@@ -36,6 +36,7 @@ import { CreateForm } from './CreateForm';
 import { AuthorizeRoleForm } from './AuthorizeRoleForm';
 import { hasAuthority } from '@/utils/authority';
 import { print } from '@/utils/wgUtils';
+import { WgStandardTable } from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -70,6 +71,7 @@ class TableList extends PureComponent {
     updatePwdFormValues: {},
     updateRoleFormValues: {},
   };
+  columnConfigKey = 'user';
 
   // 列表查询参数
   currentPagination = {
@@ -157,6 +159,7 @@ class TableList extends PureComponent {
     },
     {
       title: '操作',
+      dataIndex: 'operators',
       width: 300,
       fixed: 'right',
       render: (text, record) => (
@@ -669,13 +672,6 @@ class TableList extends PureComponent {
         <Menu.Item key="approval">批量审批</Menu.Item>
       </Menu>
     );
-    const scrollX = this.columns
-      .map(c => {
-        return c.width;
-      })
-      .reduce(function(sum, width, index) {
-        return sum + width;
-      });
 
     const parentMethods = {
       handleAdd: this.handleAdd,
@@ -734,17 +730,30 @@ class TableList extends PureComponent {
                     </Dropdown>
                   </span>
                 )}
+                <div style={{ float: 'right', marginRight: 24 }}>
+                  <Button
+                    icon="menu"
+                    onClick={() => {
+                      if (this.showConfig) this.showConfig();
+                    }}
+                  >
+                    列配置
+                  </Button>
+                </div>
               </div>
-              <StandardTable
+              <WgStandardTable
                 rowKey="fItemID"
-                bordered
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
                 columns={this.columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
-                scroll={{ x: scrollX }}
+                // 以下属性与列配置相关
+                configKey={this.columnConfigKey}
+                refShowConfig={showConfig => {
+                  this.showConfig = showConfig;
+                }}
               />
             </div>
           </Card>

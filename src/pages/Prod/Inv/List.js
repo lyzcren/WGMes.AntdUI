@@ -15,7 +15,7 @@ import {
   TreeSelect,
   Switch,
 } from 'antd';
-import ReportTable from '@/components/ReportTable';
+import { WgStandardTable } from '@/wg_components/WgStandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { default as ColumnConfig } from './ColumnConfig';
@@ -50,6 +50,8 @@ class TableList extends PureComponent {
     groupByWorkShop: true,
     groupByDept: true,
   };
+
+  columnConfigKey = 'inv';
 
   // 列表查询参数
   currentPagination = {
@@ -252,6 +254,14 @@ class TableList extends PureComponent {
               <a style={{ marginLeft: 8 }} onClick={this.toggleForm} hidden>
                 展开 <Icon type="down" />
               </a>
+              <Button
+                icon="menu"
+                onClick={() => {
+                  if (this.showConfig) this.showConfig();
+                }}
+              >
+                列配置
+              </Button>
             </span>
           </Col>
         </Row>
@@ -331,14 +341,19 @@ class TableList extends PureComponent {
                   </FormItem>
                 </Form>
               </div>
-              <ReportTable
+              <WgStandardTable
                 rowKey="rownumber"
-                bordered
                 loading={loading}
                 data={data}
                 columns={columns}
                 onChange={this.handleStandardTableChange}
-                scroll={{ x: scrollX }}
+                // 以下属性与列配置相关
+                configKey={this.columnConfigKey}
+                refShowConfig={showConfig => {
+                  this.showConfig = showConfig;
+                }}
+                showAlert={false}
+                selectabel={false}
               />
             </div>
           </Card>

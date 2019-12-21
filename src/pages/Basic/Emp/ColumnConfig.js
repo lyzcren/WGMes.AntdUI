@@ -9,16 +9,19 @@ class ColumnConfig {
     {
       title: '名称',
       dataIndex: 'fName',
+      width: 160,
       sorter: true,
     },
     {
       title: '编码',
       dataIndex: 'fNumber',
+      width: 160,
       sorter: true,
     },
     {
       title: '操作员',
       dataIndex: 'fIsOperator',
+      width: 160,
       filters: [
         {
           text: '是',
@@ -36,6 +39,7 @@ class ColumnConfig {
     {
       title: '调机员',
       dataIndex: 'fIsDebugger',
+      width: 160,
       filters: [
         {
           text: '是',
@@ -53,6 +57,7 @@ class ColumnConfig {
     {
       title: '启用',
       dataIndex: 'fIsActive',
+      width: 160,
       filters: [
         {
           text: activeData[0],
@@ -69,6 +74,8 @@ class ColumnConfig {
     },
     {
       title: '操作',
+      width: 160,
+      dataIndex: 'operators',
       render: (text, record) => (
         <Fragment>
           <Authorized authority="Emp_Update">

@@ -148,6 +148,7 @@ export class ColumnConfigForm extends PureComponent {
     return (
       <Modal
         destroyOnClose
+        keyboard={true}
         title={<div>列配置</div>}
         visible={modalVisible}
         footer={footer}

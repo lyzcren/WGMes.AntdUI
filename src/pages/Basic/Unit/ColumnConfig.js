@@ -7,24 +7,30 @@ class ColumnConfig {
     {
       title: '名称',
       dataIndex: 'fName',
+      width: 160,
       sorter: true,
     },
     {
       title: '编码',
       dataIndex: 'fNumber',
+      width: 160,
       sorter: true,
     },
     {
       title: '简码',
       dataIndex: 'fShortNumber',
+      width: 160,
       sorter: true,
     },
     {
       title: '小数位',
       dataIndex: 'fPrecision',
+      width: 160,
     },
     {
       title: '操作',
+      dataIndex: 'operators',
+      width: 160,
       render: (text, record) => (
         <Fragment>
           <Authorized authority="Unit_Update">
