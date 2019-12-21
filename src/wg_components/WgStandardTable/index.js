@@ -42,11 +42,11 @@ export class WgStandardTable extends StandardTable {
     });
   };
 
-  componentDidMount() {
+  componentDidMount () {
     const { dispatch, columns, configKey } = this.props;
     dispatch({
       type: 'columnManage/init',
-      payload: { key: configKey, columns: [...columns] },
+      payload: { key: configKey, columns },
     });
   }
 
@@ -54,7 +54,7 @@ export class WgStandardTable extends StandardTable {
     const { dispatch, configKey } = this.props;
     dispatch({
       type: 'columnManage/changeColumn',
-      payload: { key: configKey, column: [...column] },
+      payload: { key: configKey, column },
     });
   };
 
@@ -74,7 +74,7 @@ export class WgStandardTable extends StandardTable {
     });
   };
 
-  calColumns(columnsConfig) {
+  calColumns (columnsConfig) {
     const { columns } = this.props;
     const newColumns = [...columns];
     if (columnsConfig) {
@@ -94,7 +94,7 @@ export class WgStandardTable extends StandardTable {
     return sortedColumns;
   }
 
-  render() {
+  render () {
     const {
       columns,
       configModalVisible,
@@ -111,7 +111,7 @@ export class WgStandardTable extends StandardTable {
       .map(c => {
         return c.width;
       })
-      .reduce(function(sum, width, index) {
+      .reduce(function (sum, width, index) {
         return sum + width;
       });
     sortedColumns.forEach((column, index) => {
