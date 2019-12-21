@@ -1,11 +1,10 @@
-import { stringify } from 'qs';
 import request from '@/utils/request';
 
-export async function fakeDeptTreeData(params) {
+export async function fakeDeptTreeData() {
   return request('/api/Dept/GetTreeData');
 }
 
-export async function fakeProcessDeptTree(params) {
+export async function fakeProcessDeptTree() {
   return request('/api/Dept/GetProcessTree');
 }
 
@@ -13,7 +12,7 @@ export async function fakeGetAuthorizeProcessTree() {
   return request('/api/Dept/AuthorizeProcessTree');
 }
 
-export async function fakeGetWorkShops(params) {
+export async function fakeGetWorkShops() {
   return request('/api/Dept/GetWorkShop');
 }
 
@@ -31,7 +30,7 @@ export async function fakeGetRouteData(params) {
   });
 }
 
-export async function fakeGetTechParamData(params) {
+export async function fakeGetTechParamData() {
   return request('/api/Param');
 }
 
@@ -56,13 +55,12 @@ export async function fakeGetDefect(params) {
 export async function fakeGetOperatorList(params) {
   if (params && params.fDeptID) {
     return request(`/api/emp/getOperatorList?fDeptID=${params.fDeptID}`);
-  } else {
-    return request(`/api/emp/getOperatorList`);
   }
+  return request(`/api/emp/getOperatorList`);
 }
 
 export async function fakeGetBillNo(params) {
-  let url = `/api/billNoRule?fNumber=${params.fNumber}`;
+  const url = `/api/billNoRule?fNumber=${params.fNumber}`;
   return request(url);
 }
 

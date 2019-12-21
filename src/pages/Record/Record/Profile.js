@@ -67,7 +67,7 @@ class Transfer extends PureComponent {
       dispatch,
       data: { fQtyDecimal },
     } = this.props;
-    const qtyDecimal = fQtyDecimal ? fQtyDecimal : 0;
+    const qtyDecimal = fQtyDecimal || 0;
 
     // 根据单位的小数位数配置相关数量的小数位
     const qtyDecimalPart = '00000000'.slice(0, qtyDecimal);
@@ -180,7 +180,7 @@ class Transfer extends PureComponent {
         <Col xs={24} sm={12}>
           <div className={styles.textSecondary}>良率</div>
           <div className={styles.heading}>
-            {numeral((fPassQty * 100) / fInputQty).format('0.00') + '%'}
+            {`${numeral((fPassQty * 100) / fInputQty).format('0.00')}%`}
           </div>
         </Col>
         <Col xs={24} sm={12}>
@@ -192,7 +192,7 @@ class Transfer extends PureComponent {
 
     return (
       <WgPageHeaderWrapper
-        title={'生产记录：' + fFullBatchNo}
+        title={`生产记录：${fFullBatchNo}`}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }
@@ -239,14 +239,14 @@ class Transfer extends PureComponent {
               <Row gutter={16}>
                 {defectList.map((d, i) => (
                   <Col
-                    key={'detailDefectCol' + i}
+                    key={`detailDefectCol${i}`}
                     xl={i % 3 === 0 ? {} : { span: 6, offset: 2 }}
                     lg={i % 3 === 0 ? 6 : { span: 8 }}
                     md={12}
                     sm={24}
                   >
-                    <FormItem key={'detailDefectID' + d.fDefectID} label={d.fDefectName}>
-                      {getFieldDecorator('detailDefectID' + d.fDefectID, {
+                    <FormItem key={`detailDefectID${d.fDefectID}`} label={d.fDefectName}>
+                      {getFieldDecorator(`detailDefectID${d.fDefectID}`, {
                         initialValue: d.fQty,
                       })(
                         <InputNumber
@@ -271,14 +271,14 @@ class Transfer extends PureComponent {
               <Row gutter={16}>
                 {paramList.map((d, i) => (
                   <Col
-                    key={'paramsCol' + i}
+                    key={`paramsCol${i}`}
                     xl={i % 3 === 0 ? {} : { span: 6, offset: 2 }}
                     lg={i % 3 === 0 ? 6 : { span: 8 }}
                     md={12}
                     sm={24}
                   >
-                    <FormItem key={'paramsID' + d.fParamID} label={d.fParamName}>
-                      {getFieldDecorator('paramsID' + d.fParamID, {
+                    <FormItem key={`paramsID${d.fParamID}`} label={d.fParamName}>
+                      {getFieldDecorator(`paramsID${d.fParamID}`, {
                         initialValue: d.fValue,
                       })(<Input readOnly />)}
                     </FormItem>

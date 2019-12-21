@@ -1,29 +1,11 @@
 import React, { PureComponent, Fragment } from 'react';
 import moment from 'moment';
 import { connect } from 'dva';
-import {
-  Layout,
-  Row,
-  Col,
-  Card,
-  Form,
-  Input,
-  Select,
-  Icon,
-  Button,
-  Dropdown,
-  Menu,
-  Modal,
-  message,
-  Steps,
-  Table,
-} from 'antd';
+import { Layout, Row, Col, Card, Form, Button, message, Steps } from 'antd';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import WgPageHeaderWrapper from '@/components/WgPageHeaderWrapper';
 import DescriptionList from '@/components/DescriptionList';
-import Authorized from '@/utils/Authorized';
-import { hasAuthority } from '@/utils/authority';
-import { DeptForm } from './DeptForm';
+import DeptForm from './DeptForm';
 import { RouteSteps } from '@/components/WgRouteSteps/RouteSteps';
 
 import styles from './List.less';
@@ -31,7 +13,7 @@ import styles from './List.less';
 // const FormItem = Form.Item;
 // const { Option } = Select;
 const { Header, Footer, Sider, Content } = Layout;
-const Step = Steps.Step;
+const { Step } = Steps;
 const { Description } = DescriptionList;
 const ButtonGroup = Button.Group;
 
@@ -98,7 +80,7 @@ class TableList extends PureComponent {
       dispatch,
       data: { fInterID },
     } = this.props;
-    const checkType = 'routeManage/' + (isCheck ? 'check' : 'uncheck');
+    const checkType = `routeManage/${isCheck ? 'check' : 'uncheck'}`;
     dispatch({
       type: checkType,
       payload: { fInterID },
@@ -107,7 +89,7 @@ class TableList extends PureComponent {
         routeManage: { queryResult },
       } = this.props;
       if (queryResult.status === 'ok') {
-        message.success((isCheck ? '审批' : '反审批') + '成功');
+        message.success(`${isCheck ? '审批' : '反审批'}成功`);
         // 成功后关闭界面
         this.close();
       } else {
@@ -227,7 +209,7 @@ class TableList extends PureComponent {
           {steps && steps[currentStep] && (
             <Content>
               <GridContent style={{ marginLeft: '10px' }}>
-                <Card title={'操作'} bordered={true}>
+                <Card title="操作" bordered>
                   <div className="steps-action" style={{ margin: '10px' }}>
                     <Button type="primary" onClick={() => this.nextStep()}>
                       下一步
@@ -249,7 +231,7 @@ class TableList extends PureComponent {
                   </div>
                 </Card>
                 <div>
-                  <Card title={'第 ' + (currentStep + 1) + ' 步'} bordered={true}>
+                  <Card title={`第 ${currentStep + 1} 步`} bordered>
                     <DeptForm
                       loading={loading}
                       route={data}

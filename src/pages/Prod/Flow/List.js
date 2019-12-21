@@ -27,7 +27,7 @@ import {
   TreeSelect,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import StandardTable from '@/components/StandardTable';
+
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { SignForm } from './SignForm';
@@ -43,8 +43,8 @@ import { ChangeRouteForm } from './ChangeRouteForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
-import { print } from '@/utils/wgUtils';
-import { WgStandardTable } from '@/wg_components/WgStandardTable';
+import print from '@/utils/wgUtils';
+import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -52,7 +52,7 @@ const FormItem = Form.Item;
 const { Option } = Select;
 const getValue = obj =>
   Object.keys(obj)
-    .map(key => "'" + obj[key] + "'")
+    .map(key => `'${obj[key]}'`)
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
@@ -310,7 +310,7 @@ class TableList extends PureComponent {
 
     this.setState({
       formValues: values,
-      queryFilters: queryFilters,
+      queryFilters,
     });
 
     const { pageSize, filters, sorter } = this.currentPagination;
@@ -378,12 +378,12 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      let pagination = this.getSearchParam(fieldsValue);
+      const pagination = this.getSearchParam(fieldsValue);
       let fileName = '流程单.xls';
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          fileName = '流程单-第' + pagination.current + '页.xls';
+          fileName = `流程单-第${pagination.current}页.xls`;
           break;
         case 'allPage':
           pagination.exportPage = false;
@@ -403,16 +403,14 @@ class TableList extends PureComponent {
     } = this.props;
     const badgeStatus = !flowStatus
       ? []
-      : flowStatus.map(x => {
-          return {
-            text: <Badge color={x.fColor} text={x.fValue} />,
-            value: x.fKeyName,
-          };
-        });
+      : flowStatus.map(x => ({
+          text: <Badge color={x.fColor} text={x.fValue} />,
+          value: x.fKeyName,
+        }));
     return badgeStatus;
   };
 
-  //应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
+  // 应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
   webapp_start(templateId, interIds, type) {
     // var option = {
     //   baseurl: 'http://' + window.location.host,
@@ -431,7 +429,7 @@ class TableList extends PureComponent {
 
     const templateId = e.key;
     // this.webapp_start(templateId, selectedRows.map(row => row.fInterID).join(','), 'preview');
-    var interIds = selectedRows.map(row => row.fInterID).join(',');
+    const interIds = selectedRows.map(row => row.fInterID).join(',');
     const { printUrl } = this.props.basicData;
     print('flow', printUrl, templateId, interIds);
   };
@@ -593,19 +591,15 @@ class TableList extends PureComponent {
       } = this.props;
       if (queryResult.status === 'ok') {
         const msg =
-          '【' +
-          record.fFullBatchNo +
-          '】' +
-          '签收成功' +
-          (fDeptName ? '，签收岗位【' + fDeptName + '】' : '');
+          `【${record.fFullBatchNo}】` + `签收成功${fDeptName ? `，签收岗位【${fDeptName}】` : ''}`;
         message.success(msg);
         this.handleModalVisible({ key: 'sign', flag: false });
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
-        message.warning('【' + record.fFullBatchNo + '】' + queryResult.message);
+        message.warning(`【${record.fFullBatchNo}】${queryResult.message}`);
       } else {
-        message.error('【' + record.fFullBatchNo + '】' + queryResult.message);
+        message.error(`【${record.fFullBatchNo}】${queryResult.message}`);
       }
     });
   };
@@ -627,9 +621,9 @@ class TableList extends PureComponent {
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
-        message.warning('【' + record.fFullBatchNo + '】' + queryResult.message);
+        message.warning(`【${record.fFullBatchNo}】${queryResult.message}`);
       } else {
-        message.error('【' + record.fFullBatchNo + '】' + queryResult.message);
+        message.error(`【${record.fFullBatchNo}】${queryResult.message}`);
       }
     });
   };
@@ -651,9 +645,9 @@ class TableList extends PureComponent {
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
-        message.warning('【' + record.fFullBatchNo + '】' + queryResult.message);
+        message.warning(`【${record.fFullBatchNo}】${queryResult.message}`);
       } else {
-        message.error('【' + record.fFullBatchNo + '】' + queryResult.message);
+        message.error(`【${record.fFullBatchNo}】${queryResult.message}`);
       }
     });
   };
@@ -671,14 +665,14 @@ class TableList extends PureComponent {
         flowManage: { queryResult },
       } = this.props;
       if (queryResult.status === 'ok') {
-        message.success('【' + record.fFullBatchNo + '】' + '签收成功');
+        message.success(`【${record.fFullBatchNo}】` + `签收成功`);
         this.handleModalVisible({ key: 'sign', flag: false });
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
-        message.warning('【' + record.fFullBatchNo + '】' + queryResult.message);
+        message.warning(`【${record.fFullBatchNo}】${queryResult.message}`);
       } else {
-        message.error('【' + record.fFullBatchNo + '】' + queryResult.message);
+        message.error(`【${record.fFullBatchNo}】${queryResult.message}`);
       }
     });
   };
@@ -693,14 +687,14 @@ class TableList extends PureComponent {
         flowManage: { queryResult },
       } = this.props;
       if (queryResult.status === 'ok') {
-        message.success('【' + record.fFullBatchNo + '】' + '取走成功');
+        message.success(`【${record.fFullBatchNo}】` + `取走成功`);
         this.handleModalVisible({ key: 'take', flag: false });
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
-        message.warning('【' + record.fFullBatchNo + '】' + queryResult.message);
+        message.warning(`【${record.fFullBatchNo}】${queryResult.message}`);
       } else {
-        message.error('【' + record.fFullBatchNo + '】' + queryResult.message);
+        message.error(`【${record.fFullBatchNo}】${queryResult.message}`);
       }
     });
   };
@@ -799,7 +793,7 @@ class TableList extends PureComponent {
       record.fRecordStatusNumber === 'ManufRefund'
     ) {
       operators.push(
-        <Authorized key={'sign'} authority="Flow_Sign">
+        <Authorized key="sign" authority="Flow_Sign">
           <Divider type="vertical" />
           <a disabled={!canSign} onClick={() => this.handleSign(record)}>
             签收
@@ -813,7 +807,7 @@ class TableList extends PureComponent {
       record.fRecordStatusNumber === 'ManufReject'
     ) {
       operators.push(
-        <Authorized key={'sign4Reject'} authority="Flow_Sign">
+        <Authorized key="sign4Reject" authority="Flow_Sign">
           <Divider type="vertical" />
           <a disabled={!canSign} onClick={() => this.handleSign4Reject(record)}>
             签收(被拒)
@@ -827,7 +821,7 @@ class TableList extends PureComponent {
       record.fRecordStatusNumber === 'ManufProducing'
     ) {
       operators.push(
-        <Authorized key={'transfer'} authority="Flow_Transfer">
+        <Authorized key="transfer" authority="Flow_Transfer">
           <Divider type="vertical" />
           <a disabled={!canTransfer} onClick={() => this.transferModalVisible(record)}>
             转序
@@ -887,7 +881,7 @@ class TableList extends PureComponent {
                 <Select
                   placeholder="请选择"
                   style={{ width: '100%' }}
-                  allowClear={true}
+                  allowClear
                   onChange={this.selectChange}
                 >
                   {flowStatus &&
@@ -911,7 +905,7 @@ class TableList extends PureComponent {
                   treeDefaultExpandAll
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                   onChange={this.selectChange}
-                  allowClear={true}
+                  allowClear
                 />
               )}
             </FormItem>
@@ -922,7 +916,7 @@ class TableList extends PureComponent {
                 <Select
                   placeholder="请选择"
                   style={{ width: '100%' }}
-                  allowClear={true}
+                  allowClear
                   onChange={this.selectChange}
                 >
                   {recordStatus &&
@@ -1011,7 +1005,7 @@ class TableList extends PureComponent {
                   treeDefaultExpandAll
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                   onChange={this.selectChange}
-                  allowClear={true}
+                  allowClear
                 />
               )}
             </FormItem>
@@ -1022,7 +1016,7 @@ class TableList extends PureComponent {
                 <Select
                   placeholder="请选择"
                   style={{ width: '100%' }}
-                  allowClear={true}
+                  allowClear
                   onChange={this.selectChange}
                 >
                   {recordStatus &&
@@ -1046,7 +1040,7 @@ class TableList extends PureComponent {
                   treeDefaultExpandAll
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                   onChange={this.selectChange}
-                  allowClear={true}
+                  allowClear
                 />
               )}
             </FormItem>
@@ -1165,9 +1159,9 @@ class TableList extends PureComponent {
             <Dropdown
               overlay={
                 <Menu onClick={this.handlePrint} selectedKeys={[]}>
-                  {printTemplates.map(val => {
-                    return <Menu.Item key={val.fInterID}>{val.fName}</Menu.Item>;
-                  })}
+                  {printTemplates.map(val => (
+                    <Menu.Item key={val.fInterID}>{val.fName}</Menu.Item>
+                  ))}
                 </Menu>
               }
             >

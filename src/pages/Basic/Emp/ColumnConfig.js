@@ -98,22 +98,25 @@ class ColumnConfig {
 
   // 修改方法
   UpdateModalVisibleCallback = record => {};
+
   updateModalVisible = record => {
     this.UpdateModalVisibleCallback(record);
   };
 
   // 删除方法
   DeleteCallback = record => {};
+
   delete = record => {
     this.DeleteCallback(record);
   };
 
   // 删除方法
   ActiveCallback = record => {};
+
   handleActive = record => {
     this.ActiveCallback(record);
   };
 }
 
-let columnConfig = new ColumnConfig();
+const columnConfig = new ColumnConfig();
 export default columnConfig;

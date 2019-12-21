@@ -1,4 +1,3 @@
-import { stringify } from 'qs';
 import request from '@/utils/request';
 
 export async function fakeQuery(params) {
@@ -12,7 +11,7 @@ export async function fakeQuery(params) {
 }
 
 export async function fakeRemove(id) {
-  return request('/api/missionInput/' + id, {
+  return request(`/api/missionInput/${id}`, {
     method: 'DELETE',
     body: {
       ...params,
@@ -32,7 +31,7 @@ export async function fakeAdd(params) {
 }
 
 export async function fakeUpdate(params) {
-  return request('/api/missionInput/' + params.id, {
+  return request(`/api/missionInput/${params.id}`, {
     method: 'PUT',
     body: {
       ...params,

@@ -1,4 +1,3 @@
-import { stringify } from 'qs';
 import request from '@/utils/request';
 
 export async function fakeQuery(params) {
@@ -16,7 +15,7 @@ export async function fakeGet(params) {
 }
 
 export async function fakeRemove(id) {
-  return request('/api/invCheck/' + id, {
+  return request(`/api/invCheck/${id}`, {
     method: 'DELETE',
     body: {
       method: 'delete',
@@ -35,7 +34,7 @@ export async function fakeAdd(params) {
 }
 
 export async function fakeUpdate(params) {
-  return request('/api/invCheck/' + params.fInterID, {
+  return request(`/api/invCheck/${params.fInterID}`, {
     method: 'PUT',
     body: {
       ...params,

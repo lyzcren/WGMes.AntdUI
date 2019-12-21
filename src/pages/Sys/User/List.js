@@ -27,7 +27,7 @@ import {
   Tag,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import StandardTable from '@/components/StandardTable';
+
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { UpdateForm } from './UpdateForm';
@@ -35,8 +35,8 @@ import { UpdatePwdForm } from './UpdatePwdForm';
 import { CreateForm } from './CreateForm';
 import { AuthorizeRoleForm } from './AuthorizeRoleForm';
 import { hasAuthority } from '@/utils/authority';
-import { print } from '@/utils/wgUtils';
-import { WgStandardTable } from '@/wg_components/WgStandardTable';
+import print from '@/utils/wgUtils';
+import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -71,6 +71,7 @@ class TableList extends PureComponent {
     updatePwdFormValues: {},
     updateRoleFormValues: {},
   };
+
   columnConfigKey = 'user';
 
   // 列表查询参数
@@ -106,16 +107,13 @@ class TableList extends PureComponent {
       title: '授权岗位',
       dataIndex: 'deptList',
       width: 420,
-      render: val => {
-        return (
-          val &&
-          val.map(x => (
-            <Tag key={x.fDeptID} color={x.fIsActive ? 'green' : undefined}>
-              {x.fDeptName}
-            </Tag>
-          ))
-        );
-      },
+      render: val =>
+        val &&
+        val.map(x => (
+          <Tag key={x.fDeptID} color={x.fIsActive ? 'green' : undefined}>
+            {x.fDeptName}
+          </Tag>
+        )),
     },
     {
       title: '性别',
@@ -257,7 +255,7 @@ class TableList extends PureComponent {
 
     this.setState({
       formValues: values,
-      queryFilters: queryFilters,
+      queryFilters,
     });
 
     const { pageSize, filters, sorter } = this.currentPagination;
@@ -371,7 +369,7 @@ class TableList extends PureComponent {
   handleRoleModalVisible = (flag, record) => {
     const { dispatch } = this.props;
 
-    if (!!flag) {
+    if (flag) {
       // 获取当前角色已关联的角色列表
       dispatch({
         type: 'userManage/getAuthorizeRole',
@@ -509,7 +507,7 @@ class TableList extends PureComponent {
     }).then(() => {
       const { userManage } = this.props;
       if (userManage.result.status === 'ok') {
-        message.success((record.fIsActive ? '禁用' : '启用') + '成功');
+        message.success(`${record.fIsActive ? '禁用' : '启用'}成功`);
         // 成功后再次刷新列表
         this.search();
       } else if (userManage.result.status === 'warning') {
@@ -524,7 +522,7 @@ class TableList extends PureComponent {
 
     const templateId = e.key;
     // this.webapp_start(templateId, selectedRows.map(row => row.fInterID).join(','), 'preview');
-    var ids = selectedRows.map(row => row.fItemID).join(',');
+    const ids = selectedRows.map(row => row.fItemID).join(',');
     const { printUrl } = this.props.basicData;
     print('user', printUrl, templateId, ids);
   };
@@ -706,9 +704,9 @@ class TableList extends PureComponent {
                     <Dropdown
                       overlay={
                         <Menu onClick={this.handlePrint} selectedKeys={[]}>
-                          {printTemplates.map(val => {
-                            return <Menu.Item key={val.fInterID}>{val.fName}</Menu.Item>;
-                          })}
+                          {printTemplates.map(val => (
+                            <Menu.Item key={val.fInterID}>{val.fName}</Menu.Item>
+                          ))}
                         </Menu>
                       }
                     >

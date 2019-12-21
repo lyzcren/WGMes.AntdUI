@@ -6,7 +6,7 @@ import Result from '@/components/Result';
 import DescriptionList from '@/components/DescriptionList';
 import Authorized from '@/utils/Authorized';
 import { hasAuthority } from '@/utils/authority';
-import { print } from '@/utils/wgUtils';
+import print from '@/utils/wgUtils';
 
 import styles from './List.less';
 

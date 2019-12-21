@@ -18,7 +18,7 @@ import {
   Dropdown,
   Icon,
 } from 'antd';
-import StandardTable from '@/components/StandardTable';
+
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import WgPageHeaderWrapper from '@/components/WgPageHeaderWrapper';
 import DescriptionList from '@/components/DescriptionList';
@@ -129,15 +129,15 @@ class Create extends PureComponent {
       if (details) {
         let entryId = 1;
         const currentDetail = details.map(x => {
-          const fQty = form.getFieldValue('fQty_' + x.fInterID);
-          const fRowComments = form.getFieldValue('fRowComments' + x.fInterID);
+          const fQty = form.getFieldValue(`fQty_${x.fInterID}`);
+          const fRowComments = form.getFieldValue(`fRowComments${x.fInterID}`);
           return {
             ...x,
             fRecordID: x.fInterID,
             fQty: fQty !== undefined ? fQty : '',
             fInvQty: x.fInputQty,
             fDeltaQty: fQty !== undefined ? fQty - x.fInputQty : '',
-            fRowComments: fRowComments,
+            fRowComments,
             fEntryID: entryId++,
           };
         });
@@ -200,15 +200,15 @@ class Create extends PureComponent {
         const { model } = queryResult;
 
         this.showResult(queryResult, model => {
-          message.success('新建盘点单成功，单号：' + model.fBillNo);
-          if (!!bCheck) {
+          message.success(`新建盘点单成功，单号：${model.fBillNo}`);
+          if (bCheck) {
             dispatch({
               type: 'invCheckManage/check',
               payload: { fInterID: model.fInterID },
             }).then(() => {
               const checkResult = this.props.invCheckManage.queryResult;
               this.showResult(checkResult, () => {
-                message.success('【' + model.fBillNo + '】' + '审核成功');
+                message.success(`【${model.fBillNo}】` + `审核成功`);
               });
             });
           }
@@ -290,16 +290,12 @@ class Create extends PureComponent {
       {
         title: '批次',
         dataIndex: 'fFullBatchNo',
-        render: (val, record) => {
-          return record.fIsNew ? '-' : val;
-        },
+        render: (val, record) => (record.fIsNew ? '-' : val),
       },
       {
         title: '任务单号',
         dataIndex: 'fMoBillNo',
-        render: (val, record) => {
-          return <span style={{ color: record.fIsNew ? 'red' : '' }}>{val}</span>;
-        },
+        render: (val, record) => <span style={{ color: record.fIsNew ? 'red' : '' }}>{val}</span>,
       },
       {
         title: '产品',
@@ -322,7 +318,7 @@ class Create extends PureComponent {
         dataIndex: 'fQty',
         render: (val, record) => (
           <FormItem style={{ marginBottom: 0 }}>
-            {getFieldDecorator('fQty_' + record.fRecordID, {
+            {getFieldDecorator(`fQty_${record.fRecordID}`, {
               rules: [{ required: true, message: '请输入' }],
               initialValue: record.fQty,
             })(
@@ -347,7 +343,7 @@ class Create extends PureComponent {
         dataIndex: 'fRowComments',
         render: (val, record) => (
           <FormItem style={{ marginBottom: 0 }}>
-            {getFieldDecorator('fRowComments_' + record.fRecordID, {
+            {getFieldDecorator(`fRowComments_${record.fRecordID}`, {
               initialValue: record.fRowComments,
             })(
               <Input
@@ -372,7 +368,7 @@ class Create extends PureComponent {
 
     return (
       <WgPageHeaderWrapper
-        title={'在制品盘点单：' + billNo.InvCheck}
+        title={`在制品盘点单：${billNo.InvCheck}`}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }
@@ -401,7 +397,7 @@ class Create extends PureComponent {
                       placeholder="请选择"
                       style={{ width: 300 }}
                       treeDefaultExpandAll
-                      allowClear={true}
+                      allowClear
                       dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                       treeData={processDeptTree}
                       onChange={val => {

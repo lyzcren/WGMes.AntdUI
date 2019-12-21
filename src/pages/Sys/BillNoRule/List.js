@@ -26,13 +26,13 @@ import {
   Popconfirm,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import StandardTable from '@/components/StandardTable';
+
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { UpdateForm } from './UpdateForm';
 import ColumnConfig from './ColumnConfig';
 import { hasAuthority } from '@/utils/authority';
-import { WgStandardTable } from '@/wg_components/WgStandardTable';
+import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -66,6 +66,7 @@ class TableList extends PureComponent {
     current: 1,
     pageSize: 10,
   };
+
   columnConfigKey = 'billNoRule';
 
   componentDidMount() {
@@ -126,7 +127,7 @@ class TableList extends PureComponent {
 
     this.setState({
       formValues: values,
-      queryFilters: queryFilters,
+      queryFilters,
     });
 
     const { pageSize, filters, sorter } = this.currentPagination;

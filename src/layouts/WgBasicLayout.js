@@ -134,21 +134,19 @@ class WgBasicLayout extends React.PureComponent {
     return breadcrumbNameMap[pathKey];
   };
 
-  getPageTitle = (pathname, breadcrumbNameMap) => {
-    return '望果制造执行系统';
+  getPageTitle = (pathname, breadcrumbNameMap) => '望果制造执行系统';
 
-    // const currRouterData = this.matchParamsPath(pathname, breadcrumbNameMap);
-    // if (!currRouterData) {
-    //   return '望果制造执行系统';
-    // }
-    // alert('todo：获取路由页面信息');
-    // const pageName = formatMessage({
-    //   id: currRouterData.locale || currRouterData.name,
-    //   defaultMessage: currRouterData.name,
-    // });
+  // const currRouterData = this.matchParamsPath(pathname, breadcrumbNameMap);
+  // if (!currRouterData) {
+  //   return '望果制造执行系统';
+  // }
+  // alert('todo：获取路由页面信息');
+  // const pageName = formatMessage({
+  //   id: currRouterData.locale || currRouterData.name,
+  //   defaultMessage: currRouterData.name,
+  // });
 
-    // return `${pageName} - 望果制造执行系统`;
-  };
+  // return `${pageName} - 望果制造执行系统`;
 
   getLayoutStyle = () => {
     const { fixSiderbar, isMobile, collapsed, layout } = this.props;

@@ -9,27 +9,23 @@ class ColumnConfig {
       title: '生产任务单号',
       dataIndex: 'fMoBillNo',
       width: 180,
-      render: (val, record) => {
-        return <a onClick={() => this.profileModalVisibleCallback(record)}>{val}</a>;
-      },
+      render: (val, record) => (
+        <a onClick={() => this.profileModalVisibleCallback(record)}>{val}</a>
+      ),
     },
     {
       title: '日期',
       dataIndex: 'fDate',
       sorter: true,
       width: 120,
-      render: val => {
-        return moment(val).format('YYYY-MM-DD');
-      },
+      render: val => moment(val).format('YYYY-MM-DD'),
     },
     {
       title: '计划完工日期',
       dataIndex: 'fPlanFinishDate',
       sorter: true,
       width: 140,
-      render: val => {
-        return moment(val).format('YYYY-MM-DD');
-      },
+      render: val => moment(val).format('YYYY-MM-DD'),
     },
     {
       title: '订单号',
@@ -180,27 +176,21 @@ class ColumnConfig {
       dataIndex: 'fCreateDate',
       sorter: true,
       width: 120,
-      render: val => {
-        return moment(val).format('YYYY-MM-DD');
-      },
+      render: val => moment(val).format('YYYY-MM-DD'),
     },
     {
       title: '审核日期',
       dataIndex: 'fCheckDate',
       sorter: true,
       width: 120,
-      render: val => {
-        return moment(val).format('YYYY-MM-DD');
-      },
+      render: val => moment(val).format('YYYY-MM-DD'),
     },
     {
       title: '同步日期',
       dataIndex: 'fErpSyncDate',
       sorter: true,
       width: 120,
-      render: val => {
-        return moment(val).format('YYYY-MM-DD');
-      },
+      render: val => moment(val).format('YYYY-MM-DD'),
     },
     {
       title: '备注',
@@ -212,28 +202,26 @@ class ColumnConfig {
       title: '操作',
       fixed: 'right',
       width: 250,
-      render: (text, record) => {
-        return (
-          <Fragment>
-            <Authorized authority="Mission_Read">
-              <a onClick={() => this.profileModalVisibleCallback(record)}>详情</a>
-            </Authorized>
-            {
-              // record.fAuxInHighLimitQty - record.fInputQty > 0 &&
-              <Authorized authority="Flow_Create">
-                <Divider type="vertical" />
-                <a onClick={() => this.flowModalVisibleCallback(record)}>开流程单</a>
-              </Authorized>
-            }
-            <Authorized authority="Mission_Delete">
+      render: (text, record) => (
+        <Fragment>
+          <Authorized authority="Mission_Read">
+            <a onClick={() => this.profileModalVisibleCallback(record)}>详情</a>
+          </Authorized>
+          {
+            // record.fAuxInHighLimitQty - record.fInputQty > 0 &&
+            <Authorized authority="Flow_Create">
               <Divider type="vertical" />
-              <Popconfirm title="是否要删除此行？" onConfirm={() => this.deleteCallback(record)}>
-                <a>删除</a>
-              </Popconfirm>
+              <a onClick={() => this.flowModalVisibleCallback(record)}>开流程单</a>
             </Authorized>
-          </Fragment>
-        );
-      },
+          }
+          <Authorized authority="Mission_Delete">
+            <Divider type="vertical" />
+            <Popconfirm title="是否要删除此行？" onConfirm={() => this.deleteCallback(record)}>
+              <a>删除</a>
+            </Popconfirm>
+          </Authorized>
+        </Fragment>
+      ),
     },
   ];
 
@@ -242,8 +230,9 @@ class ColumnConfig {
 
   // 流程单方法
   flowModalVisibleCallback = record => {};
+
   deleteCallback = record => {};
 }
 
-let columnConfig = new ColumnConfig();
+const columnConfig = new ColumnConfig();
 export default columnConfig;

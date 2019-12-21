@@ -3,13 +3,13 @@ import { FormattedMessage, formatMessage } from 'umi/locale';
 import { Spin, Tag, Menu, Icon, Avatar, Tooltip } from 'antd';
 import moment from 'moment';
 import groupBy from 'lodash/groupBy';
+import screenfull from 'screenfull';
 import NoticeIcon from '../NoticeIcon';
 // import HeaderSearch from '../HeaderSearch';
 import HeaderScan from '../HeaderScan';
 import HeaderDropdown from '../HeaderDropdown';
 import SelectLang from '../SelectLang';
 import styles from './index.less';
-import screenfull from 'screenfull';
 
 export default class GlobalHeaderRight extends PureComponent {
   componentDidMount = () => {
@@ -93,7 +93,7 @@ export default class GlobalHeaderRight extends PureComponent {
     }
   };
 
-  //监听fullscreenchange事件
+  // 监听fullscreenchange事件
   watchFullScreen = () => {
     const { dispatch } = this.props;
     const screenChange = () => {

@@ -22,7 +22,7 @@ import { GlobalConst } from '@/utils/GlobalConst';
 import styles from './List.less';
 
 const FormItem = Form.Item;
-const Option = Select.Option;
+const { Option } = Select;
 const TypeData = GlobalConst.DefectTypeData;
 
 /* eslint react/no-multi-comp:0 */
@@ -32,7 +32,7 @@ const TypeData = GlobalConst.DefectTypeData;
 }))
 @Form.create()
 /* eslint react/no-multi-comp:0 */
-export class DeptForm extends PureComponent {
+class DeptForm extends PureComponent {
   // static defaultProps = {
   //   handleSubmit: () => { },
   //   handleModalVisible: () => { },
@@ -41,6 +41,7 @@ export class DeptForm extends PureComponent {
   // };
 
   MaxEntryID = 0;
+
   cacheOriginData = {};
 
   constructor(props) {
@@ -150,84 +151,74 @@ export class DeptForm extends PureComponent {
         title: '岗位',
         dataIndex: 'fDeptName',
         width: '50%',
-        render: (text, record) => {
-          return (
-            <FormItem style={{ marginBottom: 0 }}>
-              {getFieldDecorator('fDeptID_' + record.fInterID + '_' + record.fEntryID, {
-                // rules: [{ required: true, message: '请输入' }],
-                initialValue: record.fDeptID,
-              })(
-                <TreeSelect
-                  style={{ width: '100%' }}
-                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                  treeData={processDeptTree}
-                  treeDefaultExpandAll
-                  onChange={(depts, label) =>
-                    this.handleDeptChange(depts, label[0], record.fEntryID)
-                  }
-                />
-              )}
-            </FormItem>
-          );
-        },
+        render: (text, record) => (
+          <FormItem style={{ marginBottom: 0 }}>
+            {getFieldDecorator(`fDeptID_${record.fInterID}_${record.fEntryID}`, {
+              // rules: [{ required: true, message: '请输入' }],
+              initialValue: record.fDeptID,
+            })(
+              <TreeSelect
+                style={{ width: '100%' }}
+                dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                treeData={processDeptTree}
+                treeDefaultExpandAll
+                onChange={(depts, label) => this.handleDeptChange(depts, label[0], record.fEntryID)}
+              />
+            )}
+          </FormItem>
+        ),
       },
       {
         title: '机台必选',
         dataIndex: 'fRequireMachine',
         width: 100,
-        render: (text, record) => {
-          return (
-            <FormItem style={{ marginBottom: 0 }}>
-              {getFieldDecorator(
-                `fRequireMachine_${currentStep}${record.fInterID}${record.fEntryID}`,
-                {
-                  initialValue: !!record.fRequireMachine,
-                  valuePropName: 'checked',
-                }
-              )(
-                <Switch
-                  onChange={checked => {
-                    this.handleFieldChange('fRequireMachine', checked, record.fEntryID);
-                  }}
-                />
-              )}
-            </FormItem>
-          );
-        },
+        render: (text, record) => (
+          <FormItem style={{ marginBottom: 0 }}>
+            {getFieldDecorator(
+              `fRequireMachine_${currentStep}${record.fInterID}${record.fEntryID}`,
+              {
+                initialValue: !!record.fRequireMachine,
+                valuePropName: 'checked',
+              }
+            )(
+              <Switch
+                onChange={checked => {
+                  this.handleFieldChange('fRequireMachine', checked, record.fEntryID);
+                }}
+              />
+            )}
+          </FormItem>
+        ),
       },
       {
         title: '自动签收',
         dataIndex: 'fAutoSign',
         width: 100,
-        render: (text, record) => {
-          return (
-            <FormItem style={{ marginBottom: 0 }}>
-              {getFieldDecorator(`fAutoSign_${currentStep}${record.fInterID}${record.fEntryID}`, {
-                initialValue: !!record.fAutoSign,
-                valuePropName: 'checked',
-              })(
-                <Switch
-                  onChange={checked => {
-                    this.handleFieldChange('fAutoSign', checked, record.fEntryID);
-                  }}
-                />
-              )}
-            </FormItem>
-          );
-        },
+        render: (text, record) => (
+          <FormItem style={{ marginBottom: 0 }}>
+            {getFieldDecorator(`fAutoSign_${currentStep}${record.fInterID}${record.fEntryID}`, {
+              initialValue: !!record.fAutoSign,
+              valuePropName: 'checked',
+            })(
+              <Switch
+                onChange={checked => {
+                  this.handleFieldChange('fAutoSign', checked, record.fEntryID);
+                }}
+              />
+            )}
+          </FormItem>
+        ),
       },
       {
         title: '操作',
         key: 'action',
-        render: (text, record) => {
-          return (
-            <span>
-              <Popconfirm title="是否要删除此行？" onConfirm={() => this.remove(record.fEntryID)}>
-                <a>删除</a>
-              </Popconfirm>
-            </span>
-          );
-        },
+        render: (text, record) => (
+          <span>
+            <Popconfirm title="是否要删除此行？" onConfirm={() => this.remove(record.fEntryID)}>
+              <a>删除</a>
+            </Popconfirm>
+          </span>
+        ),
       },
     ];
 

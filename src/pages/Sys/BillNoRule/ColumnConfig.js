@@ -86,10 +86,11 @@ class ColumnConfig {
 
   // 修改方法
   UpdateModalVisibleCallback = record => {};
+
   updateModalVisible = record => {
     this.UpdateModalVisibleCallback(record);
   };
 }
 
-let columnConfig = new ColumnConfig();
+const columnConfig = new ColumnConfig();
 export default columnConfig;

@@ -17,6 +17,7 @@ import {
   setOperator,
 } from '@/utils/quickOpsBinding';
 
+import ButtonGroup from 'antd/lib/button/button-group';
 import { ChooseDeptForm } from './ChooseDeptForm';
 import { ChooseMachineForm } from './ChooseMachineForm';
 import { ChooseWorktimeForm } from './ChooseWorktimeForm';
@@ -25,7 +26,6 @@ import { ScanSignForm } from './ScanSignForm';
 import { ScanTransferForm } from './ScanTransferForm';
 
 import styles from './List.less';
-import ButtonGroup from 'antd/lib/button/button-group';
 
 @connect(({ user, loading, quickOps }) => ({
   user,
@@ -222,13 +222,13 @@ class QuickOpsPage extends Component {
               <div style={{ height: '80px' }} />
             </Col>
             <Col span={6}>
-              <QuickButton title={'签收'} onClick={this.scanSign} />
+              <QuickButton title="签收" onClick={this.scanSign} />
             </Col>
             <Col span={6}>
-              <QuickButton title={'转序'} onClick={this.scanTransfer} />
+              <QuickButton title="转序" onClick={this.scanTransfer} />
             </Col>
             <Col span={6}>
-              <QuickButton title={'打印'} />
+              <QuickButton title="打印" />
             </Col>
           </Row>
           <Row gutter={8}>
@@ -236,13 +236,13 @@ class QuickOpsPage extends Component {
               <div style={{ height: '80px' }} />
             </Col>
             <Col span={6}>
-              <QuickButton title={'拒签'} />
+              <QuickButton title="拒签" />
             </Col>
             <Col span={6}>
-              <QuickButton title={'退回'} />
+              <QuickButton title="退回" />
             </Col>
             <Col span={6}>
-              <QuickButton title={'取走'} />
+              <QuickButton title="取走" />
             </Col>
           </Row>
         </Col>

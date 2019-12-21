@@ -7,14 +7,14 @@ import { GlobalConst } from '@/utils/GlobalConst';
 import styles from './List.less';
 
 const FormItem = Form.Item;
-const Option = Select.Option;
+const { Option } = Select;
 
 /* eslint react/no-multi-comp:0 */
 @connect(({ basicData }) => ({
   basicData,
 }))
 @Form.create()
-export class CreateForm extends PureComponent {
+class CreateForm extends PureComponent {
   static defaultProps = {};
 
   constructor(props) {
@@ -70,3 +70,5 @@ export class CreateForm extends PureComponent {
     );
   }
 }
+
+export default CreateForm;

@@ -1,4 +1,3 @@
-import { stringify } from 'qs';
 import request from '@/utils/request';
 
 export async function fakeQuery(params) {
@@ -12,7 +11,7 @@ export async function fakeQuery(params) {
 }
 
 export async function fakeScan(batchNo) {
-  return request('/api/report/scan?batchNo=' + batchNo);
+  return request(`/api/report/scan?batchNo=${batchNo}`);
 }
 
 export async function fakeQueryGroupBy() {
@@ -20,7 +19,7 @@ export async function fakeQueryGroupBy() {
 }
 
 export async function fakeGet(params) {
-  return request('/api/report/' + params.id);
+  return request(`/api/report/${params.id}`);
 }
 
 export async function fakeAdd(params) {
@@ -34,7 +33,7 @@ export async function fakeAdd(params) {
 }
 
 export async function fakeUpdate(params) {
-  return request('/api/report/' + params.id, {
+  return request(`/api/report/${params.id}`, {
     method: 'PUT',
     body: {
       ...params,
@@ -44,7 +43,7 @@ export async function fakeUpdate(params) {
 }
 
 export async function fakeRemove(params) {
-  return request('/api/report/' + params.id, {
+  return request(`/api/report/${params.id}`, {
     method: 'DELETE',
     body: {
       ...params,
@@ -54,7 +53,7 @@ export async function fakeRemove(params) {
 }
 
 export async function fakeCheck(params) {
-  return request('/api/report/check/' + params.fInterID, {
+  return request(`/api/report/check/${params.fInterID}`, {
     method: 'PUT',
     body: {
       ...params,

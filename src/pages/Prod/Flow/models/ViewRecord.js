@@ -55,23 +55,19 @@ export default {
           ) {
             step.description = (
               <span>
-                {'【' +
-                  record.fOperatorName +
-                  '】于 ' +
-                  moment(record.fTransferDateTime).format('YYYY-MM-DD HH:mm') +
-                  ' 完成，耗时【' +
-                  getTimeDiff(new Date(record.fBeginDate), new Date(record.fTransferDateTime)) +
-                  '】' +
-                  '，良率：' +
-                  numeral((record.fPassQty * 100) / record.fInputQty).format('0.00') +
-                  '%'}
+                {`【${record.fOperatorName}】于 ${moment(record.fTransferDateTime).format(
+                  'YYYY-MM-DD HH:mm'
+                )} 完成，耗时【${getTimeDiff(
+                  new Date(record.fBeginDate),
+                  new Date(record.fTransferDateTime)
+                )}】` +
+                  `，良率：${numeral((record.fPassQty * 100) / record.fInputQty).format('0.00')}%`}
               </span>
             );
           } else if (record.fStatusNumber === 'ManufProducing') {
-            step.description =
-              (record.fSignUserName ? `【${record.fSignUserName}】` : '自动') +
-              '签收于  ' +
-              moment(record.fSignDate).format('YYYY-MM-DD HH:mm');
+            step.description = `${
+              record.fSignUserName ? `【${record.fSignUserName}】` : '自动'
+            }签收于  ${moment(record.fSignDate).format('YYYY-MM-DD HH:mm')}`;
           } else if (
             record.fStatusNumber === 'ManufCancel' ||
             record.fStatusNumber === 'ManufRefund' ||

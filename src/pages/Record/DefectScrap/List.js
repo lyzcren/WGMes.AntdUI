@@ -27,14 +27,14 @@ import {
   Popconfirm,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import StandardTable from '@/components/StandardTable';
+
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { UpdateForm } from './UpdateForm';
 import { default as ColumnConfig } from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
-import { WgStandardTable } from '@/wg_components/WgStandardTable';
+import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -42,7 +42,7 @@ const FormItem = Form.Item;
 const { Option } = Select;
 const getValue = obj =>
   Object.keys(obj)
-    .map(key => "'" + obj[key] + "'")
+    .map(key => `'${obj[key]}'`)
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
@@ -141,7 +141,7 @@ class TableList extends PureComponent {
 
     this.setState({
       formValues: values,
-      queryFilters: queryFilters,
+      queryFilters,
     });
 
     const { pageSize, filters, sorter } = this.currentPagination;
@@ -201,7 +201,7 @@ class TableList extends PureComponent {
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          const fileName = '报废记录-第' + pagination.current + '页.xls';
+          const fileName = `报废记录-第${pagination.current}页.xls`;
           exportExcel('/api/defectScrap/export', pagination, fileName);
           break;
         case 'allPage':
@@ -266,7 +266,7 @@ class TableList extends PureComponent {
           defectScrapManage: { queryResult },
         } = this.props;
         if (queryResult.status === 'ok') {
-          message.success('【' + record.fName + '】' + '删除成功');
+          message.success(`【${record.fName}】` + `删除成功`);
           // 成功后再次刷新列表
           this.search();
         } else if (queryResult.status === 'warning') {
@@ -318,7 +318,7 @@ class TableList extends PureComponent {
                   style={{ width: '100%' }}
                   treeData={authorizeProcessTree}
                   treeDefaultExpandAll
-                  allowClear={true}
+                  allowClear
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                 />
               )}

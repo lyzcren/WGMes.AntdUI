@@ -26,7 +26,6 @@ import {
   Popconfirm,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { UpdateForm } from './UpdateForm';
@@ -131,7 +130,7 @@ class TableList extends PureComponent {
 
     this.setState({
       formValues: values,
-      queryFilters: queryFilters,
+      queryFilters,
     });
 
     this.currentPagination = {
@@ -261,12 +260,8 @@ class TableList extends PureComponent {
     } = this.props;
     const { selectedRows } = this.state;
     const scrollX = ColumnConfig.columns
-      .map(c => {
-        return c.width;
-      })
-      .reduce(function(sum, width, index) {
-        return sum + width;
-      });
+      .map(c => c.width)
+      .reduce((sum, width, index) => sum + width);
 
     return (
       <div style={{ margin: '-24px -24px 0' }}>

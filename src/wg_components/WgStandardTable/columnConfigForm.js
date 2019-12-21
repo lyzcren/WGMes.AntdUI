@@ -75,7 +75,7 @@ const DragableBodyRow = DropTarget('row', rowTarget, (connect, monitor) => ({
 
 /* eslint react/no-multi-comp:0 */
 @Form.create()
-export class ColumnConfigForm extends PureComponent {
+class ColumnConfigForm extends PureComponent {
   static defaultProps = {
     handleModalVisible: () => {},
   };
@@ -122,12 +122,11 @@ export class ColumnConfigForm extends PureComponent {
         title: '显示',
         dataIndex: 'isHidden',
         width: '80px',
-        render: (val, record) => {
-          return getFieldDecorator('isHidden_' + record.dataIndex, {
+        render: (val, record) =>
+          getFieldDecorator(`isHidden_${record.dataIndex}`, {
             initialValue: !val,
             valuePropName: 'checked',
-          })(<Switch onChange={(val, e) => this.handleColumnChange(!val, record)} />);
-        },
+          })(<Switch onChange={(val, e) => this.handleColumnChange(!val, record)} />),
       },
     ];
 
@@ -148,7 +147,7 @@ export class ColumnConfigForm extends PureComponent {
     return (
       <Modal
         destroyOnClose
-        keyboard={true}
+        keyboard
         title={<div>列配置</div>}
         visible={modalVisible}
         footer={footer}
@@ -160,7 +159,7 @@ export class ColumnConfigForm extends PureComponent {
       >
         <DndProvider backend={HTML5Backend}>
           <Table
-            rowKey={'entryID'}
+            rowKey="entryID"
             columns={columns}
             dataSource={dataSource}
             pagination={false}
@@ -178,3 +177,5 @@ export class ColumnConfigForm extends PureComponent {
     );
   }
 }
+
+export default ColumnConfigForm;

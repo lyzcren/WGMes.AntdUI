@@ -27,14 +27,14 @@ import {
   TreeSelect,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import StandardTable from '@/components/StandardTable';
+
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { UpdateForm } from './UpdateForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
-import { WgStandardTable } from '@/wg_components/WgStandardTable';
+import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -43,7 +43,7 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 const getValue = obj =>
   Object.keys(obj)
-    .map(key => "'" + obj[key] + "'")
+    .map(key => `'${obj[key]}'`)
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
@@ -108,12 +108,10 @@ class TableList extends PureComponent {
     } = this.props;
     const badgeStatus = !recordStatus
       ? []
-      : recordStatus.map(x => {
-          return {
-            text: <Badge color={x.fColor} text={x.fValue} />,
-            value: x.fKeyName,
-          };
-        });
+      : recordStatus.map(x => ({
+          text: <Badge color={x.fColor} text={x.fValue} />,
+          value: x.fKeyName,
+        }));
     return badgeStatus;
   };
 
@@ -212,7 +210,7 @@ class TableList extends PureComponent {
 
     this.setState({
       formValues: values,
-      queryFilters: queryFilters,
+      queryFilters,
     });
 
     const { pageSize, filters, sorter } = this.currentPagination;
@@ -273,7 +271,7 @@ class TableList extends PureComponent {
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          fileName = '生产记录-第' + pagination.current + '页.xls';
+          fileName = `生产记录-第${pagination.current}页.xls`;
           break;
         case 'allPage':
           pagination.exportPage = false;
@@ -351,7 +349,7 @@ class TableList extends PureComponent {
                   style={{ width: '100%' }}
                   treeData={authorizeProcessTree}
                   treeDefaultExpandAll
-                  allowClear={true}
+                  allowClear
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                 />
               )}
@@ -363,7 +361,7 @@ class TableList extends PureComponent {
                 <Select
                   placeholder="请选择"
                   style={{ width: '100%' }}
-                  allowClear={true}
+                  allowClear
                   onChange={this.selectChange}
                 >
                   {recordStatus &&
@@ -426,7 +424,7 @@ class TableList extends PureComponent {
                   style={{ width: '100%' }}
                   treeData={authorizeProcessTree}
                   treeDefaultExpandAll
-                  allowClear={true}
+                  allowClear
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                 />
               )}

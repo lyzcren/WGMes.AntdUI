@@ -17,12 +17,12 @@ import {
   Modal,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import StandardTable from '@/components/StandardTable';
+
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
-import { WgStandardTable } from '@/wg_components/WgStandardTable';
+import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -30,7 +30,7 @@ const FormItem = Form.Item;
 const { Option } = Select;
 const getValue = obj =>
   Object.keys(obj)
-    .map(key => "'" + obj[key] + "'")
+    .map(key => `'${obj[key]}'`)
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
@@ -134,7 +134,7 @@ class TableList extends PureComponent {
 
     this.setState({
       formValues: values,
-      queryFilters: queryFilters,
+      queryFilters,
     });
 
     this.currentPagination = {
@@ -192,7 +192,7 @@ class TableList extends PureComponent {
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          const fileName = '工艺路线变更记录-第' + pagination.current + '页.xls';
+          const fileName = `工艺路线变更记录-第${pagination.current}页.xls`;
           exportExcel('/api/changeRoute/export', pagination, fileName);
           break;
         case 'allPage':
@@ -298,7 +298,7 @@ class TableList extends PureComponent {
                   style={{ width: '100%' }}
                   treeData={authorizeProcessTree}
                   treeDefaultExpandAll
-                  allowClear={true}
+                  allowClear
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                 />
               )}

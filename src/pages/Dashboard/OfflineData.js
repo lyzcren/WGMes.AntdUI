@@ -10,7 +10,7 @@ const CustomTab = ({ data, currentTabKey: currentKey }) => (
     <Col span={12}>
       <NumberInfo
         title={data.name}
-        subTitle={'良品率'}
+        subTitle="良品率"
         gap={2}
         total={`${data.cvr * 100}%`}
         theme={currentKey !== data.name && 'light'}

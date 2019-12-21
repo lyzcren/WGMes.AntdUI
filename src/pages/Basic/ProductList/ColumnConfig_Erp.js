@@ -60,6 +60,7 @@ class ColumnConfig {
 
   // 导入方法
   ImportModalVisibleCallback = record => {};
+
   _importModalVisible = record => {
     this.ImportModalVisibleCallback(record);
   };

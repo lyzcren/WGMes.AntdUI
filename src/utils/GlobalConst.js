@@ -94,11 +94,8 @@ export const GlobalConst = {
   ],
 };
 
-export const badgeStatusList = statusArray => {
-  return statusArray.map(x => {
-    return {
-      text: <Badge status={x.badgeStatus} text={x.text} />,
-      value: x.number,
-    };
-  });
-};
+export const badgeStatusList = statusArray =>
+  statusArray.map(x => ({
+    text: <Badge status={x.badgeStatus} text={x.text} />,
+    value: x.number,
+  }));

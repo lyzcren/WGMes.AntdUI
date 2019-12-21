@@ -26,10 +26,10 @@ import {
   Popconfirm,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import StandardTable from '@/components/StandardTable';
+
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
-import { WgStandardTable } from '@/wg_components/WgStandardTable';
+import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import { UpdateForm } from './UpdateForm';
 import { CreateForm } from './CreateForm';
@@ -71,6 +71,7 @@ class TableList extends PureComponent {
     selectedRows: [],
     queryFilters: [],
   };
+
   columnConfigKey = 'role';
 
   // 列表查询参数
@@ -206,7 +207,7 @@ class TableList extends PureComponent {
 
       this.setState({
         formValues: values,
-        queryFilters: queryFilters,
+        queryFilters,
       });
 
       const { pageSize, filters, sorter } = this.currentPagination;
@@ -297,7 +298,7 @@ class TableList extends PureComponent {
   handleAuthorityModalVisible = (flag, record) => {
     const { dispatch } = this.props;
 
-    if (!!flag) {
+    if (flag) {
       // 获取当前角色已分配的权限
       dispatch({
         type: 'roleManage/getCurrentAuthority',
@@ -319,7 +320,7 @@ class TableList extends PureComponent {
   handleAuthorizeUserModalVisible = (flag, record) => {
     const { dispatch } = this.props;
 
-    if (!!flag) {
+    if (flag) {
       // 获取当前角色已关联的用户列表
       dispatch({
         type: 'roleManage/getAuthorizeUser',
@@ -396,7 +397,7 @@ class TableList extends PureComponent {
         roleManage: { queryResult },
       } = this.props;
       if (queryResult.status === 'ok') {
-        message.success((record.fIsActive ? '禁用' : '启用') + '成功');
+        message.success(`${record.fIsActive ? '禁用' : '启用'}成功`);
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {

@@ -19,13 +19,13 @@ import {
   TreeSelect,
   Modal,
 } from 'antd';
-import StandardTable from '@/components/StandardTable';
+
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
-import { WgStandardTable } from '@/wg_components/WgStandardTable';
+import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -33,7 +33,7 @@ const FormItem = Form.Item;
 const { Option } = Select;
 const getValue = obj =>
   Object.keys(obj)
-    .map(key => "'" + obj[key] + "'")
+    .map(key => `'${obj[key]}'`)
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
@@ -128,7 +128,7 @@ class TableList extends PureComponent {
 
     this.setState({
       formValues: values,
-      queryFilters: queryFilters,
+      queryFilters,
     });
 
     const { pageSize, filters, sorter } = this.currentPagination;
@@ -188,7 +188,7 @@ class TableList extends PureComponent {
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          const fileName = '导出-第' + pagination.current + '页.xls';
+          const fileName = `导出-第${pagination.current}页.xls`;
           exportExcel('/api/batchSplit/export', pagination, fileName);
           break;
         case 'allPage':
@@ -243,7 +243,7 @@ class TableList extends PureComponent {
         batchSplitManage: { queryResult },
       } = this.props;
       this.showResult(queryResult, () => {
-        message.success('【' + record.fName + '】' + '删除成功');
+        message.success(`【${record.fName}】` + `删除成功`);
         // 成功后再次刷新列表
         this.search();
       });
@@ -334,7 +334,7 @@ class TableList extends PureComponent {
                   style={{ width: '100%' }}
                   treeData={authorizeProcessTree}
                   treeDefaultExpandAll
-                  allowClear={true}
+                  allowClear
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                 />
               )}
@@ -425,21 +425,19 @@ class TableList extends PureComponent {
         title: '批号',
         dataIndex: 'fFullBatchNo',
         width: '20%',
-        render: (val, record) => {
-          return (
-            <div style={{ display: 'flex' }}>
-              {val && (
-                <Tooltip
-                  placement="topLeft"
-                  title={<QRCode value={val} size={200} fgColor="#000000" />}
-                >
-                  <QRCode style={{ marginRight: '6px' }} value={val} size={19} fgColor="#666666" />
-                </Tooltip>
-              )}
-              <a onClick={() => this.handleViewFlow(record.fFullBatchNo)}>{val}</a>
-            </div>
-          );
-        },
+        render: (val, record) => (
+          <div style={{ display: 'flex' }}>
+            {val && (
+              <Tooltip
+                placement="topLeft"
+                title={<QRCode value={val} size={200} fgColor="#000000" />}
+              >
+                <QRCode style={{ marginRight: '6px' }} value={val} size={19} fgColor="#666666" />
+              </Tooltip>
+            )}
+            <a onClick={() => this.handleViewFlow(record.fFullBatchNo)}>{val}</a>
+          </div>
+        ),
       },
       {
         title: '数量',

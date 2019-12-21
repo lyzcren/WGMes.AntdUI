@@ -58,7 +58,7 @@ class Profile extends PureComponent {
     dispatch({
       type: 'reportProfile/get',
       payload: {
-        fInterID: fInterID,
+        fInterID,
       },
     }).then(() => {
       const {
@@ -84,14 +84,14 @@ class Profile extends PureComponent {
     dispatch({
       type: 'reportManage/check',
       payload: {
-        fInterID: fInterID,
+        fInterID,
       },
     }).then(() => {
       const {
         reportManage: { queryResult },
       } = this.props;
       this.showResult(queryResult, () => {
-        message.success('【' + fBillNo + '】' + '反审核成功');
+        message.success(`【${fBillNo}】` + `反审核成功`);
         this.reload();
         // 成功后再次刷新列表
         if (handleSuccess) handleSuccess();
@@ -105,14 +105,14 @@ class Profile extends PureComponent {
     dispatch({
       type: 'reportManage/uncheck',
       payload: {
-        fInterID: fInterID,
+        fInterID,
       },
     }).then(() => {
       const {
         reportManage: { queryResult },
       } = this.props;
       this.showResult(queryResult, () => {
-        message.success('【' + fBillNo + '】' + '审核成功');
+        message.success(`【${fBillNo}】` + `审核成功`);
         this.reload();
         // 成功后再次刷新列表
         if (handleSuccess) handleSuccess();
@@ -241,7 +241,7 @@ class Profile extends PureComponent {
 
     return (
       <WgPageHeaderWrapper
-        title={'不良盘点单：' + fBillNo}
+        title={`不良盘点单：${fBillNo}`}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }

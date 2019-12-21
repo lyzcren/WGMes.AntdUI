@@ -30,9 +30,9 @@ class ColumnConfig {
       width: 150,
       render: (val, record) => {
         if (record.fCancellation) {
-          return <Badge color={'#696969'} text={'已撤销'} />;
+          return <Badge color="#696969" text="已撤销" />;
         }
-        return <Badge color={'green'} text={'正常'} />;
+        return <Badge color="green" text="正常" />;
       },
       // filters: this.statusFilter,
     },
@@ -81,6 +81,7 @@ class ColumnConfig {
       render: val => (val ? moment(val).format('YYYY-MM-DD HH:mm') : ''),
     },
   ];
+
   getColumns = () => {
     if (hasAuthority('DefectRepair_Rollback')) {
       const allColumns = [
@@ -94,7 +95,7 @@ class ColumnConfig {
             const operators = [];
             if (hasAuthority('DefectRepair_Rollback') && !record.fCancellation) {
               operators.push((text, record) => (
-                <Authorized key={'rollback'} authority="DefectRepair_Rollback">
+                <Authorized key="rollback" authority="DefectRepair_Rollback">
                   <Popconfirm
                     title="是否要撤销此记录？"
                     onConfirm={() => this.handleRollback(record)}
@@ -109,12 +110,12 @@ class ColumnConfig {
         },
       ];
       return allColumns;
-    } else {
-      return this.columns;
     }
+    return this.columns;
   };
+
   handleRollback = record => {};
 }
 
-let columnConfig = new ColumnConfig();
+const columnConfig = new ColumnConfig();
 export default columnConfig;

@@ -35,9 +35,7 @@ class ColumnConfig {
           title: '日期',
           dataIndex: 'fTransferDate',
           width: 120,
-          render: val => {
-            return moment(val).format('YYYY-MM-DD');
-          },
+          render: val => moment(val).format('YYYY-MM-DD'),
         },
       ];
     }
@@ -152,9 +150,7 @@ class ColumnConfig {
         title: '良率',
         dataIndex: 'fPassRate',
         width: 100,
-        render: value => {
-          return numeral(value * 100).format('0.00') + '%';
-        },
+        render: value => `${numeral(value * 100).format('0.00')}%`,
       },
     ];
 
@@ -162,5 +158,5 @@ class ColumnConfig {
   };
 }
 
-let columnConfig = new ColumnConfig();
+const columnConfig = new ColumnConfig();
 export default columnConfig;

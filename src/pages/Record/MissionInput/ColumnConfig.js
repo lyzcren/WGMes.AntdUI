@@ -11,9 +11,7 @@ class ColumnConfig {
       dataIndex: 'fBatchNo',
       width: 220,
       sorter: true,
-      render: (val, record) => {
-        return <a onClick={() => this.handleViewFlow(record)}>{val}</a>;
-      },
+      render: (val, record) => <a onClick={() => this.handleViewFlow(record)}>{val}</a>,
     },
     {
       title: '投入数量',
@@ -32,9 +30,7 @@ class ColumnConfig {
       dataIndex: 'fMoBillNo',
       width: 200,
       sorter: true,
-      render: (val, record) => {
-        return <a onClick={() => this.handleViewMission(record)}>{val}</a>;
-      },
+      render: (val, record) => <a onClick={() => this.handleViewMission(record)}>{val}</a>,
     },
     {
       title: '订单号',
@@ -47,9 +43,9 @@ class ColumnConfig {
       width: 150,
       render: (val, record) => {
         if (record.fCancellation) {
-          return <Badge color={'#696969'} text={'已撤销'} />;
+          return <Badge color="#696969" text="已撤销" />;
         }
-        return <Badge color={'green'} text={'正常'} />;
+        return <Badge color="green" text="正常" />;
       },
       // filters: this.statusFilter,
     },
@@ -124,6 +120,7 @@ class ColumnConfig {
       render: val => (val ? moment(val).format('YYYY-MM-DD HH:mm') : ''),
     },
   ];
+
   getColumns = () => {
     if (hasAuthority('MissionInput_Rollback')) {
       const allColumns = [
@@ -137,7 +134,7 @@ class ColumnConfig {
             const operators = [];
             if (hasAuthority('MissionInput_Rollback') && !record.fCancellation) {
               operators.push((text, record) => (
-                <Authorized key={'rollback'} authority="MissionInput_Rollback">
+                <Authorized key="rollback" authority="MissionInput_Rollback">
                   <Popconfirm
                     title="是否要撤销此记录？"
                     onConfirm={() => this.handleRollback(record)}
@@ -152,17 +149,18 @@ class ColumnConfig {
         },
       ];
       return allColumns;
-    } else {
-      return this.columns;
     }
+    return this.columns;
   };
+
   handleRollback = record => {};
 
   // 查看任务单
   missionModalVisibleCallback = record => {};
+
   // 查看工艺路线
   routeModalVisibleCallback = record => {};
 }
 
-let columnConfig = new ColumnConfig();
+const columnConfig = new ColumnConfig();
 export default columnConfig;

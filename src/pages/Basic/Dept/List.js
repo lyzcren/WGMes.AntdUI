@@ -26,7 +26,6 @@ import {
   Popconfirm,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import StandardTable from '@/components/StandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { UpdateForm } from './UpdateForm';
@@ -36,7 +35,7 @@ import { TechParamForm } from './TechParamForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
-import { WgStandardTable } from '@/wg_components/WgStandardTable';
+import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -65,6 +64,7 @@ class TableList extends PureComponent {
     selectedRows: [],
     queryFilters: [],
   };
+
   columnConfigKey = 'dept';
 
   // 列表查询参数
@@ -142,7 +142,7 @@ class TableList extends PureComponent {
 
     this.setState({
       formValues: values,
-      queryFilters: queryFilters,
+      queryFilters,
     });
 
     const { pageSize, filters, sorter } = this.currentPagination;
@@ -198,12 +198,12 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      let pagination = this.getSearchParam(fieldsValue);
+      const pagination = this.getSearchParam(fieldsValue);
       let fileName = '岗位.xls';
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          fileName = '岗位-第' + pagination.current + '页.xls';
+          fileName = `岗位-第${pagination.current}页.xls`;
           break;
         case 'allPage':
           break;
@@ -388,14 +388,14 @@ class TableList extends PureComponent {
       type: 'deptManage/active',
       payload: {
         fItemID: record.fItemID,
-        fIsActive: fIsActive,
+        fIsActive,
       },
     }).then(() => {
       const {
         deptManage: { queryResult },
       } = this.props;
       if (queryResult.status === 'ok') {
-        message.success('【' + record.fName + '】' + (fIsActive ? '启用' : '禁用') + '成功');
+        message.success(`【${record.fName}】${fIsActive ? '启用' : '禁用'}成功`);
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
@@ -421,7 +421,7 @@ class TableList extends PureComponent {
         deptManage: { queryResult },
       } = this.props;
       if (queryResult.status === 'ok') {
-        message.success('【' + record.fName + '】' + '删除成功');
+        message.success(`【${record.fName}】` + `删除成功`);
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
@@ -502,7 +502,7 @@ class TableList extends PureComponent {
           <Col md={6} sm={24}>
             <FormItem label="车间">
               {getFieldDecorator('queryWorkShop')(
-                <Select placeholder="请选择" style={{ width: '100%' }} allowClear={true}>
+                <Select placeholder="请选择" style={{ width: '100%' }} allowClear>
                   {workshops &&
                     workshops.map(x => (
                       <Option key={x.fNumber} value={x.fItemID}>
@@ -656,7 +656,7 @@ class TableList extends PureComponent {
               {data && data.list && data.list.length ? (
                 <WgStandardTable
                   rowKey="fItemID"
-                  defaultExpandAllRows={true}
+                  defaultExpandAllRows
                   selectedRows={selectedRows}
                   loading={loading}
                   data={data}

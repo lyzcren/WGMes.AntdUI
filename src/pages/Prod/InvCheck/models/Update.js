@@ -16,7 +16,7 @@ export default {
 
       yield put({
         type: 'save',
-        payload: { queryResult: response ? response : {} },
+        payload: { queryResult: response || {} },
       });
     },
     *getInvByDept({ payload }, { call, put }) {

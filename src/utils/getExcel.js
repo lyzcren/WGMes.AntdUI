@@ -3,7 +3,7 @@ import { getToken } from './token';
 
 function checkStatus(request) {
   const token = getToken();
-  const status = request.status;
+  const { status } = request;
   if (status === 401) {
     // @HACK
     /* eslint-disable no-underscore-dangle */
@@ -13,7 +13,7 @@ function checkStatus(request) {
     return false;
   }
   if (status === 403) {
-    //当出现403代码时，检查token
+    // 当出现403代码时，检查token
     fetch('/api/account/checkToken', {
       method: 'POST',
       headers: {
@@ -58,7 +58,7 @@ function exportExcel(url, params, fileName) {
     }
     const { response: content } = oReq;
     const blob = new Blob([content]);
-    //const blob = new Blob([content], { type: 'application/vnd.ms-excel'});//text/csv,charset=GBK
+    // const blob = new Blob([content], { type: 'application/vnd.ms-excel'});//text/csv,charset=GBK
     if (navigator.appVersion.toString().indexOf('.NET') > 0) {
       window.navigator.msSaveBlob(blob, fileName);
     } else {

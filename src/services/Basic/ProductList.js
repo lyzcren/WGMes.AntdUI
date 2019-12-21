@@ -1,4 +1,3 @@
-import { stringify } from 'qs';
 import request from '@/utils/request';
 
 export async function fakeQuery(params) {
@@ -49,7 +48,6 @@ export async function fakeIsSyncing(params) {
       method: 'isSyncing',
     },
   });
-  // return request(`/api/ProductList/isSyncing?${stringify(params)}`);
 }
 
 export async function fakeAdd(params) {

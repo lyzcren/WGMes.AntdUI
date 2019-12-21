@@ -58,7 +58,7 @@ class Profile extends PureComponent {
     dispatch({
       type: 'invCheckProfile/get',
       payload: {
-        fInterID: fInterID,
+        fInterID,
       },
     }).then(() => {
       const {
@@ -84,14 +84,14 @@ class Profile extends PureComponent {
     dispatch({
       type: 'invCheckManage/check',
       payload: {
-        fInterID: fInterID,
+        fInterID,
       },
     }).then(() => {
       const {
         invCheckManage: { queryResult },
       } = this.props;
       this.showResult(queryResult, () => {
-        message.success('【' + fBillNo + '】' + '审核成功');
+        message.success(`【${fBillNo}】` + `审核成功`);
         this.reload();
         // 成功后再次刷新列表
         if (handleSuccess) handleSuccess();
@@ -105,14 +105,14 @@ class Profile extends PureComponent {
     dispatch({
       type: 'invCheckManage/uncheck',
       payload: {
-        fInterID: fInterID,
+        fInterID,
       },
     }).then(() => {
       const {
         invCheckManage: { queryResult },
       } = this.props;
       this.showResult(queryResult, () => {
-        message.success('【' + fBillNo + '】' + '反审核成功');
+        message.success(`【${fBillNo}】` + `反审核成功`);
         this.reload();
         // 成功后再次刷新列表
         if (handleSuccess) handleSuccess();
@@ -178,16 +178,14 @@ class Profile extends PureComponent {
       {
         title: '批次',
         dataIndex: 'fFullBatchNo',
-        render: (val, record) => {
-          return <span style={{ color: record.fIsNew ? 'red' : '' }}>{val ? val : '-'}</span>;
-        },
+        render: (val, record) => (
+          <span style={{ color: record.fIsNew ? 'red' : '' }}>{val || '-'}</span>
+        ),
       },
       {
         title: '任务单号',
         dataIndex: 'fMoBillNo',
-        render: (val, record) => {
-          return <span style={{ color: record.fIsNew ? 'red' : '' }}>{val}</span>;
-        },
+        render: (val, record) => <span style={{ color: record.fIsNew ? 'red' : '' }}>{val}</span>,
       },
       {
         title: '产品',
@@ -247,7 +245,7 @@ class Profile extends PureComponent {
 
     return (
       <WgPageHeaderWrapper
-        title={'在制品盘点单：' + fBillNo}
+        title={`在制品盘点单：${fBillNo}`}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }

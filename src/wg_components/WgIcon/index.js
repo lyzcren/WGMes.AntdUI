@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Icon } from 'antd';
 
-export class WgIcon extends PureComponent {
+class WgIcon extends PureComponent {
   svgs = {
     barcode: ({ size, color }) => (
       <svg
@@ -54,3 +54,5 @@ export class WgIcon extends PureComponent {
     return <Icon component={() => svg({ size, color })} {...rest} />;
   }
 }
+
+export default WgIcon;

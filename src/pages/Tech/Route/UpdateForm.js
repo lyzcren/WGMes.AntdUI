@@ -14,7 +14,7 @@ const { TextArea } = Input;
 
 /* eslint react/no-multi-comp:0 */
 @Form.create()
-export class UpdateForm extends PureComponent {
+class UpdateForm extends PureComponent {
   static defaultProps = {
     handleSubmit: () => {},
     handleModalVisible: () => {},
@@ -86,3 +86,5 @@ export class UpdateForm extends PureComponent {
     );
   }
 }
+
+export default UpdateForm;

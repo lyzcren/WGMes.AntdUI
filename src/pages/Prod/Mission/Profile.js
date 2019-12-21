@@ -119,7 +119,7 @@ class Profile extends PureComponent {
 
     return (
       <WgPageHeaderWrapper
-        title={'生产任务单：' + data.fMoBillNo}
+        title={`生产任务单：${data.fMoBillNo}`}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }

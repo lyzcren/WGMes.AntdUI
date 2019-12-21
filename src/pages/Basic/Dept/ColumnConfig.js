@@ -107,11 +107,15 @@ class ColumnConfig {
 
   // 修改方法
   updateModalVisible = record => {};
+
   updateFixModalVisible = record => {};
+
   delete = record => {};
+
   handleActive = record => {};
+
   handleTechParam = record => {};
 }
 
-let columnConfig = new ColumnConfig();
+const columnConfig = new ColumnConfig();
 export default columnConfig;

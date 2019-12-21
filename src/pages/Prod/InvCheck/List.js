@@ -28,14 +28,14 @@ import {
   TreeSelect,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import StandardTable from '@/components/StandardTable';
+
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { default as ColumnConfig } from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
-import { print } from '@/utils/wgUtils';
-import { WgStandardTable } from '@/wg_components/WgStandardTable';
+import print from '@/utils/wgUtils';
+import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -43,7 +43,7 @@ const FormItem = Form.Item;
 const { Option } = Select;
 const getValue = obj =>
   Object.keys(obj)
-    .map(key => "'" + obj[key] + "'")
+    .map(key => `'${obj[key]}'`)
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
@@ -159,7 +159,7 @@ class TableList extends PureComponent {
 
     this.setState({
       formValues: values,
-      queryFilters: queryFilters,
+      queryFilters,
     });
 
     this.currentPagination = {
@@ -217,7 +217,7 @@ class TableList extends PureComponent {
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          const fileName = '在制品盘点-第' + pagination.current + '页.xls';
+          const fileName = `在制品盘点-第${pagination.current}页.xls`;
           exportExcel('/api/invCheck/export', pagination, fileName);
           break;
         case 'allPage':
@@ -230,18 +230,18 @@ class TableList extends PureComponent {
     });
   };
 
-  //应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
+  // 应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
   webapp_start(templateId, interId, type) {
-    var option = {
-      baseurl: 'http://' + window.location.host,
-      report: '/api/PrintTemplate/grf?id=' + templateId,
-      data: '/api/invCheck/getPrintData?id=' + interId,
+    const option = {
+      baseurl: `http://${window.location.host}`,
+      report: `/api/PrintTemplate/grf?id=${templateId}`,
+      data: `/api/invCheck/getPrintData?id=${interId}`,
       selfsql: false,
-      type: type,
+      type,
     };
 
-    //创建启动WEB报表客户端的URL协议参数
-    window.location.href = 'grwebapp://' + JSON.stringify(option);
+    // 创建启动WEB报表客户端的URL协议参数
+    window.location.href = `grwebapp://${JSON.stringify(option)}`;
   }
 
   handlePrint = (key, record) => {
@@ -306,7 +306,7 @@ class TableList extends PureComponent {
         selectedRows: [],
       });
       if (queryResult.status === 'ok') {
-        message.success('【' + record.fBillNo + '】' + '删除成功');
+        message.success(`【${record.fBillNo}】` + `删除成功`);
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
@@ -329,7 +329,7 @@ class TableList extends PureComponent {
         invCheckManage: { queryResult },
       } = this.props;
       if (queryResult.status === 'ok') {
-        message.success('【' + record.fBillNo + '】' + '审核成功');
+        message.success(`【${record.fBillNo}】` + `审核成功`);
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
@@ -352,7 +352,7 @@ class TableList extends PureComponent {
         invCheckManage: { queryResult },
       } = this.props;
       if (queryResult.status === 'ok') {
-        message.success('【' + record.fBillNo + '】' + '反审核成功');
+        message.success(`【${record.fBillNo}】` + `反审核成功`);
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
@@ -416,9 +416,9 @@ class TableList extends PureComponent {
             <Dropdown
               overlay={
                 <Menu onClick={({ key }) => this.handlePrint(key, record)}>
-                  {printTemplates.map(val => {
-                    return <Menu.Item key={val.fInterID}>{val.fName}</Menu.Item>;
-                  })}
+                  {printTemplates.map(val => (
+                    <Menu.Item key={val.fInterID}>{val.fName}</Menu.Item>
+                  ))}
                 </Menu>
               }
             >

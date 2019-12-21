@@ -21,7 +21,7 @@ import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { default as ColumnConfig } from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
-import { WgStandardTable } from '@/wg_components/WgStandardTable';
+import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -30,7 +30,7 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 const getValue = obj =>
   Object.keys(obj)
-    .map(key => "'" + obj[key] + "'")
+    .map(key => `'${obj[key]}'`)
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
@@ -155,7 +155,7 @@ class TableList extends PureComponent {
 
     this.setState({
       formValues: values,
-      queryFilters: queryFilters,
+      queryFilters,
     });
 
     this.currentPagination = {
@@ -236,7 +236,7 @@ class TableList extends PureComponent {
   }
 
   changeGroupBy(group, checked) {
-    const state = this.state;
+    const { state } = this;
     state[group] = checked;
     this.setState({ ...state });
   }
@@ -251,12 +251,12 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      let pagination = this.getSearchParam(fieldsValue);
+      const pagination = this.getSearchParam(fieldsValue);
       let fileName = '执行情况.xls';
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          fileName = '执行情况-第' + pagination.current + '页.xls';
+          fileName = `执行情况-第${pagination.current}页.xls`;
           break;
         case 'allPage':
           pagination.exportPage = false;

@@ -27,23 +27,23 @@ import {
   TreeSelect,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import StandardTable from '@/components/StandardTable';
+
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
+import { filter } from 'minimatch';
 import { RepairForm } from './RepairForm';
 import { default as ColumnConfig } from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
-import { WgStandardTable } from '@/wg_components/WgStandardTable';
+import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
-import { filter } from 'minimatch';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 const getValue = obj =>
   Object.keys(obj)
-    .map(key => "'" + obj[key] + "'")
+    .map(key => `'${obj[key]}'`)
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
@@ -137,7 +137,7 @@ class TableList extends PureComponent {
 
     this.setState({
       formValues: values,
-      queryFilters: queryFilters,
+      queryFilters,
     });
 
     this.currentPagination = {
@@ -195,7 +195,7 @@ class TableList extends PureComponent {
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          const fileName = '不良-第' + pagination.current + '页.xls';
+          const fileName = `不良-第${pagination.current}页.xls`;
           exportExcel('/api/prodDefect/export', pagination, fileName);
           break;
         case 'allPage':
@@ -247,7 +247,7 @@ class TableList extends PureComponent {
                   style={{ width: '100%' }}
                   treeData={basicData.authorizeProcessTree}
                   treeDefaultExpandAll
-                  allowClear={true}
+                  allowClear
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                 />
               )}
@@ -346,7 +346,6 @@ class TableList extends PureComponent {
     const filterRows = Array.from(new Set(selectedRows.map(row => row.fMoBillNo)));
     if (filterRows.length > 1) {
       message.warning('不同任务单无法同时转移.');
-      return;
     }
   }
 
@@ -363,9 +362,10 @@ class TableList extends PureComponent {
       okText: '确认',
       cancelText: '取消',
       onOk: () => {
-        const list = selectedRows.map(item => {
-          return { fInterID: item.fInterID, fQty: item.fCurrentQty };
-        });
+        const list = selectedRows.map(item => ({
+          fInterID: item.fInterID,
+          fQty: item.fCurrentQty,
+        }));
         const submitData = { list };
         this.scrap(submitData);
       },

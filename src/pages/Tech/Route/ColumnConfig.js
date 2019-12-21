@@ -102,34 +102,40 @@ class ColumnConfig {
 
   // 路线方法
   ProfileModalVisibleCallback = record => {};
+
   profileModalVisible = record => {
     this.ProfileModalVisibleCallback(record);
   };
 
   // 修改方法
   UpdateModalVisibleCallback = record => {};
+
   updateModalVisible = record => {
     this.UpdateModalVisibleCallback(record);
   };
 
   // 删除方法
   DeleteCallback = record => {};
+
   delete = record => {
     this.DeleteCallback(record);
   };
 
   // 启用方法
   ActiveCallback = record => {};
+
   handleActive = record => {
     this.ActiveCallback(record);
   };
 
   CheckCallback = record => {};
+
   handleCheck = record => {
     this.CheckCallback(record);
   };
 
   ParamCallback = record => {};
+
   paramModalVisible = record => {
     this.ParamCallback(record);
   };
@@ -149,5 +155,5 @@ class ColumnConfig {
   };
 }
 
-let columnConfig = new ColumnConfig();
+const columnConfig = new ColumnConfig();
 export default columnConfig;

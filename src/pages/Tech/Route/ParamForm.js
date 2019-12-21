@@ -14,7 +14,7 @@ const { TextArea } = Input;
   basicData,
 }))
 @Form.create()
-export class ParamForm extends PureComponent {
+class ParamForm extends PureComponent {
   static defaultProps = {
     handleSubmit: () => {},
     handleModalVisible: () => {},
@@ -103,16 +103,14 @@ export class ParamForm extends PureComponent {
         dataIndex: 'fDefaultValue',
         key: 'fDefaultValue',
         width: '30%',
-        render: (text, record) => {
-          return (
-            <Input
-              value={text}
-              onChange={e => this.handleFieldChange(e, 'fDefaultValue', record.fEntryID)}
-              onKeyPress={e => this.handleKeyPress(e, record.fEntryID)}
-              placeholder="参数值"
-            />
-          );
-        },
+        render: (text, record) => (
+          <Input
+            value={text}
+            onChange={e => this.handleFieldChange(e, 'fDefaultValue', record.fEntryID)}
+            onKeyPress={e => this.handleKeyPress(e, record.fEntryID)}
+            placeholder="参数值"
+          />
+        ),
       },
     ];
 
@@ -141,3 +139,5 @@ export class ParamForm extends PureComponent {
     );
   }
 }
+
+export default ParamForm;

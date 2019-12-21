@@ -75,12 +75,12 @@ const SalesCard = memo(
               <Row>
                 <Col xl={16} lg={12} md={12} sm={24} xs={24}>
                   <div className={styles.salesBar}>
-                    <Bar height={250} title={'产量'} data={salesData} />
+                    <Bar height={250} title="产量" data={salesData} />
                     <Bar
-                      color={'rgba(24, 205, 104, 0.85)'}
+                      color="rgba(24, 205, 104, 0.85)"
                       scale={{ x: { type: 'cat' }, y: { min: 60 } }}
                       height={250}
-                      title={'良率（%）'}
+                      title="良率（%）"
                       data={passRateListData}
                     />
                   </div>

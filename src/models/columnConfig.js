@@ -1,8 +1,6 @@
 import { fakeGetColumns, fakeUpdateColumns } from '@/services/Sys/tableConfig';
 
-const sortByEntryID = (x, y) => {
-  return x.entryID - y.entryID;
-};
+const sortByEntryID = (x, y) => x.entryID - y.entryID;
 
 export default {
   namespace: 'columnManage',

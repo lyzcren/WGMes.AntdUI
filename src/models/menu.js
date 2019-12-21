@@ -135,18 +135,16 @@ const matchParamsPath = (pathname, breadcrumbNameMap) => {
 };
 
 // 传参处理
-const appendRouteParam = (routeItems, path, params) => {
-  return routeItems.map(routeItem => {
+const appendRouteParam = (routeItems, path, params) =>
+  routeItems.map(routeItem => {
     if (routeItem && routeItem.children) {
       routeItem.children = appendRouteParam(routeItem.children, path, params);
     }
     if (routeItem.path == path) {
       return { ...routeItem, ...params };
-    } else {
-      return routeItem;
     }
+    return routeItem;
   });
-};
 
 const memoizeOneGetBreadcrumbNameMap = memoizeOne(getBreadcrumbNameMap, isEqual);
 
@@ -210,9 +208,8 @@ export default {
       const newPanes = panes.map(p => {
         if (p.key === activeKey) {
           return { ...p, ...payload, key: activeKey };
-        } else {
-          return p;
         }
+        return p;
       });
 
       const newRouteHistory = [...routeHistory].filter(x => x !== path);
@@ -285,7 +282,7 @@ export default {
       const { menuData, routeData, routeHistory, panes, activeKey } = yield select(
         state => state.menu
       );
-      let newActiveKey = activeKey;
+      const newActiveKey = activeKey;
       const newPanes = panes.filter(pane => pane.key === activeKey || pane.closable === false);
       const selectedKeys = getSelectedMenuKeys(newActiveKey, routeData);
 

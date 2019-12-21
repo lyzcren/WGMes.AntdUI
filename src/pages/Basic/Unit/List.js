@@ -26,7 +26,7 @@ import {
   Popconfirm,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import StandardTable from '@/components/StandardTable';
+
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { UpdateForm } from './UpdateForm';
@@ -34,7 +34,7 @@ import { CreateForm } from './CreateForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
-import { WgStandardTable } from '@/wg_components/WgStandardTable';
+import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -64,6 +64,7 @@ class TableList extends PureComponent {
     selectedRows: [],
     queryFilters: [],
   };
+
   columnConfigKey = 'unit';
 
   // 列表查询参数
@@ -131,7 +132,7 @@ class TableList extends PureComponent {
 
     this.setState({
       formValues: values,
-      queryFilters: queryFilters,
+      queryFilters,
     });
 
     const { pageSize, filters, sorter } = this.currentPagination;
@@ -187,12 +188,12 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      let pagination = this.getSearchParam(fieldsValue);
+      const pagination = this.getSearchParam(fieldsValue);
       let fileName = '单位.xls';
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          fileName = '单位-第' + pagination.current + '页.xls';
+          fileName = `单位-第${pagination.current}页.xls`;
           break;
         case 'allPage':
           break;
@@ -300,7 +301,7 @@ class TableList extends PureComponent {
           unitManage: { queryResult },
         } = this.props;
         if (queryResult.status === 'ok') {
-          message.success('【' + record.fName + '】' + '删除成功');
+          message.success(`【${record.fName}】` + `删除成功`);
           // 成功后再次刷新列表
           this.search();
         } else if (queryResult.status === 'warning') {

@@ -27,7 +27,7 @@ import {
   Tag,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import StandardTable from '@/components/StandardTable';
+
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { FlowForm } from './FlowForm';
@@ -37,8 +37,8 @@ import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
 import { GenFlowSuccess } from './GenFlowSuccess';
-import { print } from '@/utils/wgUtils';
-import { WgStandardTable } from '@/wg_components/WgStandardTable';
+import print from '@/utils/wgUtils';
+import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -237,7 +237,7 @@ class TableList extends PureComponent {
 
     this.setState({
       formValues: values,
-      queryFilters: queryFilters,
+      queryFilters,
     });
 
     const { pageSize, filters, sorter } = this.currentPagination;
@@ -349,7 +349,7 @@ class TableList extends PureComponent {
         missionManage: { queryResult },
       } = this.props;
       if (queryResult.status === 'ok') {
-        message.success('【' + record.fMoBillNo + '】' + '删除成功');
+        message.success(`【${record.fMoBillNo}】` + `删除成功`);
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
@@ -366,12 +366,12 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      let pagination = this.getSearchParam(fieldsValue);
+      const pagination = this.getSearchParam(fieldsValue);
       let fileName = '任务单.xls';
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          fileName = '任务单-第' + pagination.current + '页.xls';
+          fileName = `任务单-第${pagination.current}页.xls`;
           break;
         case 'allPage':
           pagination.exportPage = false;
@@ -398,7 +398,7 @@ class TableList extends PureComponent {
     });
   };
 
-  //应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
+  // 应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
   webapp_start(templateId, interIds, type) {
     // var option = {
     //   baseurl: 'http://' + window.location.host,
@@ -417,7 +417,7 @@ class TableList extends PureComponent {
 
     const templateId = e.key;
     // this.webapp_start(templateId, selectedRows.map(row => row.fInterID).join(','), 'preview');
-    var interIds = selectedRows.map(row => row.fInterID).join(',');
+    const interIds = selectedRows.map(row => row.fInterID).join(',');
     const { printUrl } = this.props.basicData;
     print('mission', printUrl, templateId, interIds);
   };
@@ -614,7 +614,7 @@ class TableList extends PureComponent {
             从 K3 同步
           </Button>
         </Authorized>
-        {isSyncing && <Tag color="blue">{currentCount + ' / ' + totalCount}</Tag>}
+        {isSyncing && <Tag color="blue">{`${currentCount} / ${totalCount}`}</Tag>}
         <Authorized authority="Mission_Export">
           <Dropdown
             overlay={
@@ -635,9 +635,9 @@ class TableList extends PureComponent {
               <Dropdown
                 overlay={
                   <Menu onClick={this.handlePrint} selectedKeys={[]}>
-                    {printTemplates.map(val => {
-                      return <Menu.Item key={val.fInterID}>{val.fName}</Menu.Item>;
-                    })}
+                    {printTemplates.map(val => (
+                      <Menu.Item key={val.fInterID}>{val.fName}</Menu.Item>
+                    ))}
                   </Menu>
                 }
               >

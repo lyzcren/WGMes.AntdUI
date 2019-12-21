@@ -15,7 +15,7 @@ import {
   TreeSelect,
   Switch,
 } from 'antd';
-import { WgStandardTable } from '@/wg_components/WgStandardTable';
+import WgStandardTable from '@/wg_components/WgStandardTable';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
 import { default as ColumnConfig } from './ColumnConfig';
@@ -27,7 +27,7 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 const getValue = obj =>
   Object.keys(obj)
-    .map(key => "'" + obj[key] + "'")
+    .map(key => `'${obj[key]}'`)
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
@@ -130,7 +130,7 @@ class TableList extends PureComponent {
 
     this.setState({
       formValues: values,
-      queryFilters: queryFilters,
+      queryFilters,
     });
 
     this.currentPagination = {
@@ -211,7 +211,7 @@ class TableList extends PureComponent {
   }
 
   changeGroupBy(group, checked) {
-    const state = this.state;
+    const { state } = this;
     state[group] = checked;
     this.setState({ ...state });
   }
@@ -237,7 +237,7 @@ class TableList extends PureComponent {
                   style={{ width: '100%' }}
                   treeData={authorizeProcessTree}
                   treeDefaultExpandAll
-                  allowClear={true}
+                  allowClear
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                 />
               )}
@@ -285,13 +285,7 @@ class TableList extends PureComponent {
     } = this.props;
 
     const columns = ColumnConfig.getColumns(this.state);
-    const scrollX = columns
-      .map(c => {
-        return c.width;
-      })
-      .reduce(function(sum, width, index) {
-        return sum + width;
-      });
+    const scrollX = columns.map(c => c.width).reduce((sum, width, index) => sum + width);
     return (
       <div style={{ margin: '-24px -24px 0' }}>
         <GridContent>

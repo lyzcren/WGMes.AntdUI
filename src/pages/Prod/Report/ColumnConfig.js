@@ -50,10 +50,8 @@ class ColumnConfig {
     },
   ];
 
-  renderOperation = (text, record) => {
-    return <Fragment />;
-  };
+  renderOperation = (text, record) => <Fragment />;
 }
 
-let columnConfig = new ColumnConfig();
+const columnConfig = new ColumnConfig();
 export default columnConfig;

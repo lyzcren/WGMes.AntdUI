@@ -37,9 +37,7 @@ class ColumnConfig {
           title: '日期',
           dataIndex: 'fTransferDate',
           width: 120,
-          render: val => {
-            return moment(val).format('YYYY-MM-DD');
-          },
+          render: val => moment(val).format('YYYY-MM-DD'),
         },
       ];
     }
@@ -166,5 +164,5 @@ class ColumnConfig {
   };
 }
 
-let columnConfig = new ColumnConfig();
+const columnConfig = new ColumnConfig();
 export default columnConfig;

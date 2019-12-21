@@ -59,7 +59,7 @@ export default {
       });
       if (callback) callback();
     },
-    *nextStep({}, { call, put, select }) {
+    *nextStep({}, { put, select }) {
       const { steps, currentStep, maxGroupID } = yield select(state => state.routeProfile);
       const step = steps[currentStep];
       // 当前步骤未选择添加任何岗位，不允许再加下一个步骤
@@ -81,8 +81,8 @@ export default {
         payload,
       });
     },
-    *prevStep({}, { call, put, select }) {
-      const { steps, currentStep, maxGroupID } = yield select(state => state.routeProfile);
+    *prevStep({}, { put, select }) {
+      const { currentStep, maxGroupID } = yield select(state => state.routeProfile);
       const newStep = currentStep - 1;
 
       const payload = { currentStep: newStep };
@@ -91,7 +91,7 @@ export default {
         payload,
       });
     },
-    *deleteStep({}, { call, put, select }) {
+    *deleteStep({}, { put, select }) {
       const { steps, currentStep, maxGroupID } = yield select(state => state.routeProfile);
       const newStep = currentStep - 1;
       const newSteps = steps.filter((s, i) => i !== currentStep);
@@ -102,7 +102,7 @@ export default {
         payload,
       });
     },
-    *changeStep({ payload }, { call, put, select }) {
+    *changeStep({ payload }, { put, select }) {
       const { steps, currentStep } = yield select(state => state.routeProfile);
       const { depts } = payload;
       const target = steps[currentStep];
@@ -113,12 +113,11 @@ export default {
         payload: { steps, currentStep },
       });
     },
-    *saveStep({ payload, callback }, { call, put, select }) {
-      const { steps, currentStep, maxGroupID } = yield select(state => state.routeProfile);
+    *saveStep({ payload, callback }, { put, select }) {
+      const { steps } = yield select(state => state.routeProfile);
       const submitSteps = [];
-      let fEntryID = 1;
-      steps.map((group, groupId) => {
-        group.depts.map(dept => {
+      steps.forEach((group, groupId) => {
+        group.depts.forEach(dept => {
           submitSteps.push({
             fGroupID: groupId,
             fEntryID: dept.fEntryID,

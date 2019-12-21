@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 // import Link from 'umi/link';
-import { Checkbox, Alert, message } from 'antd';
+import { Checkbox, Alert } from 'antd';
 import Login from '@/components/Login';
 import styles from './Login.less';
 
-const { Tab, UserName, Password, IdCard, Mobile, Captcha, Submit } = Login;
+const { Tab, UserName, Password, IdCard, Submit } = Login;
 
 @connect(({ user, loading, menu }) => ({
   user,
@@ -23,22 +23,22 @@ class LoginPage extends Component {
     this.setState({ type });
   };
 
-  onGetCaptcha = () =>
-    new Promise((resolve, reject) => {
-      this.loginForm.validateFields(['mobile'], {}, (err, values) => {
-        if (err) {
-          reject(err);
-        } else {
-          const { dispatch } = this.props;
-          dispatch({
-            type: 'user/getCaptcha',
-            payload: values.mobile,
-          })
-            .then(resolve)
-            .catch(reject);
-        }
-      });
-    });
+  // onGetCaptcha = () =>
+  //   new Promise((resolve, reject) => {
+  //     this.loginForm.validateFields(['mobile'], {}, (err, values) => {
+  //       if (err) {
+  //         reject(err);
+  //       } else {
+  //         const { dispatch } = this.props;
+  //         dispatch({
+  //           type: 'user/getCaptcha',
+  //           payload: values.mobile,
+  //         })
+  //           .then(resolve)
+  //           .catch(reject);
+  //       }
+  //     });
+  //   });
 
   handleSubmit = (err, values) => {
     const { type } = this.state;

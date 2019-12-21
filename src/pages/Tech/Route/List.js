@@ -14,16 +14,16 @@ import {
   Modal,
   message,
 } from 'antd';
-import StandardTable from '@/components/StandardTable';
+
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
-import { UpdateForm } from './UpdateForm';
-import { CreateForm } from './CreateForm';
-import { ParamForm } from './ParamForm';
+import UpdateForm from './UpdateForm';
+import CreateForm from './CreateForm';
+import ParamForm from './ParamForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
-import { WgStandardTable } from '@/wg_components/WgStandardTable';
+import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
 
@@ -35,7 +35,7 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ routeManage, routeProfile, loading, menu }) => ({
+@connect(({ routeManage, loading, menu }) => ({
   routeManage,
   loading: loading.models.routeManage,
   menu,
@@ -136,7 +136,7 @@ class TableList extends PureComponent {
 
     this.setState({
       formValues: values,
-      queryFilters: queryFilters,
+      queryFilters,
     });
 
     this.currentPagination = {
@@ -190,12 +190,12 @@ class TableList extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      let pagination = this.getSearchParam(fieldsValue);
+      const pagination = this.getSearchParam(fieldsValue);
       let fileName = '工艺路线.xls';
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          fileName = '工艺路线-第' + pagination.current + '页.xls';
+          fileName = `工艺路线-第${pagination.current}页.xls`;
           break;
         case 'allPage':
           pagination.exportPage = false;
@@ -318,7 +318,7 @@ class TableList extends PureComponent {
         routeManage: { queryResult },
       } = this.props;
       if (queryResult.status === 'ok') {
-        message.success('【' + record.fName + '】' + (fIsActive ? '启用' : '禁用') + '成功');
+        message.success(`【${record.fName}】${fIsActive ? '启用' : '禁用'}成功`);
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
@@ -344,7 +344,7 @@ class TableList extends PureComponent {
           routeManage: { queryResult },
         } = this.props;
         if (queryResult.status === 'ok') {
-          message.success('【' + record.fName + '】' + '删除成功');
+          message.success(`【${record.fName}】` + `删除成功`);
           // 成功后再次刷新列表
           this.search();
         } else if (queryResult.status === 'warning') {
@@ -359,7 +359,7 @@ class TableList extends PureComponent {
   handleCheck(record, isCheck = true) {
     const { dispatch } = this.props;
     const { fInterID } = record;
-    const checkType = 'routeManage/' + (isCheck ? 'check' : 'uncheck');
+    const checkType = `routeManage/${isCheck ? 'check' : 'uncheck'}`;
     dispatch({
       type: checkType,
       payload: { fInterID },
@@ -368,7 +368,7 @@ class TableList extends PureComponent {
         routeManage: { queryResult },
       } = this.props;
       if (queryResult.status === 'ok') {
-        message.success((isCheck ? '审批' : '反审批') + '成功');
+        message.success(`${isCheck ? '审批' : '反审批'}成功`);
         // 成功后再次刷新列表
         this.search();
       } else {
@@ -510,7 +510,7 @@ class TableList extends PureComponent {
   }
 
   renderAdvancedForm() {
-    return renderSimpleForm;
+    return this.renderSimpleForm;
   }
 
   renderForm() {

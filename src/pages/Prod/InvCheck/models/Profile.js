@@ -16,7 +16,7 @@ export default {
 
       yield put({
         type: 'save',
-        payload: { profile: response ? response : {} },
+        payload: { profile: response || {} },
       });
     },
   },

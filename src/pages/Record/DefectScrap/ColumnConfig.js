@@ -81,5 +81,5 @@ class ColumnConfig {
   ];
 }
 
-let columnConfig = new ColumnConfig();
+const columnConfig = new ColumnConfig();
 export default columnConfig;

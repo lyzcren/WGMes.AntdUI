@@ -32,8 +32,8 @@ import DescriptionList from '@/components/DescriptionList';
 import Authorized from '@/utils/Authorized';
 import { hasAuthority } from '@/utils/authority';
 
-import styles from './List.less';
 import { isArray } from 'util';
+import styles from './List.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -97,7 +97,7 @@ class Transfer extends PureComponent {
         data: { fQtyDecimal },
       },
     } = this.props;
-    const qtyDecimal = fQtyDecimal ? fQtyDecimal : 0;
+    const qtyDecimal = fQtyDecimal || 0;
 
     // 根据单位的小数位数配置相关数量的小数位
     const qtyDecimalPart = '00000000'.slice(0, qtyDecimal);
@@ -158,7 +158,7 @@ class Transfer extends PureComponent {
       data.fWorkTimeID = fieldsValue.fWorkTimeID;
       data.defects = [];
       data.params = [];
-      for (let key in fieldsValue) {
+      for (const key in fieldsValue) {
         if (key.indexOf('detailDefectID') === 0 && fieldsValue[key]) {
           data.defects.push({
             fDefectID: key.replace('detailDefectID', ''),
@@ -221,7 +221,7 @@ class Transfer extends PureComponent {
   };
 
   handleFieldChange(fValue, fDefectID) {
-    fValue = fValue ? fValue : 0;
+    fValue = fValue || 0;
     const { dispatch } = this.props;
     dispatch({
       type: 'flowTransfer/changeDefect',
@@ -292,9 +292,7 @@ class Transfer extends PureComponent {
     this.setState({ showMoreDefect: !showMoreDefect });
   };
 
-  disabledDate = (date, fSignDate) => {
-    return date < moment(fSignDate) || date >= moment();
-  };
+  disabledDate = (date, fSignDate) => date < moment(fSignDate) || date >= moment();
 
   handleChangeDate = value => {
     console.log(
@@ -414,7 +412,7 @@ class Transfer extends PureComponent {
     return (
       <div style={{ backgroundColor: 'rgb(240, 242, 245)' }}>
         <WgPageHeaderWrapper
-          title={'流程单：' + data.fFullBatchNo}
+          title={`流程单：${data.fFullBatchNo}`}
           logo={
             <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
           }
@@ -431,7 +429,7 @@ class Transfer extends PureComponent {
                   <FormItem key="fOperatorID" label="操作员">
                     {getFieldDecorator('fOperatorID', {
                       rules: [{ required: true, message: '请选择操作员' }],
-                      initialValue: fEmpID ? fEmpID : fBindEmpID ? fBindEmpID : null,
+                      initialValue: fEmpID || (fBindEmpID || null),
                     })(
                       <Select
                         placeholder="请选择操作员"
@@ -445,7 +443,7 @@ class Transfer extends PureComponent {
                         {operators &&
                           operators.map(x => (
                             <Option key={x.fItemID} value={x.fItemID}>
-                              {x.fName + ' - ' + x.fNumber}
+                              {`${x.fName} - ${x.fNumber}`}
                             </Option>
                           ))}
                       </Select>
@@ -468,7 +466,7 @@ class Transfer extends PureComponent {
                         {machineData &&
                           machineData.map(x => (
                             <Option key={x.fItemID} value={x.fItemID}>
-                              {x.fName + ' - ' + x.fNumber}
+                              {`${x.fName} - ${x.fNumber}`}
                             </Option>
                           ))}
                       </Select>
@@ -512,9 +510,7 @@ class Transfer extends PureComponent {
                         showTime={{ format: 'HH:mm' }}
                         format="YYYY-MM-DD HH:mm"
                         placeholder={['开工时间', '完工时间']}
-                        disabledDate={value => {
-                          return this.disabledDate(value, data.fSignDate);
-                        }}
+                        disabledDate={value => this.disabledDate(value, data.fSignDate)}
                         onOk={this.handleChangeDate}
                       />
                     )}
@@ -524,7 +520,7 @@ class Transfer extends PureComponent {
                   <FormItem label="班次">
                     {getFieldDecorator('fWorkTimeID', {
                       rules: [{ required: false, message: '请选择班次' }],
-                      initialValue: defaultWorkTimeID ? defaultWorkTimeID : currentWorkTimeID,
+                      initialValue: defaultWorkTimeID || currentWorkTimeID,
                     })(
                       <Select>
                         {workTimes &&
@@ -571,14 +567,14 @@ class Transfer extends PureComponent {
               <Row gutter={16}>
                 {defectList.map((d, i) => (
                   <Col
-                    key={'detailDefectCol' + i}
+                    key={`detailDefectCol${i}`}
                     xl={i % 3 === 0 ? {} : { span: 6, offset: 2 }}
                     lg={i % 3 === 0 ? 6 : { span: 8 }}
                     md={12}
                     sm={24}
                   >
-                    <FormItem key={'detailDefectID' + d.fItemID} label={d.fName}>
-                      {getFieldDecorator('detailDefectID' + d.fItemID, {
+                    <FormItem key={`detailDefectID${d.fItemID}`} label={d.fName}>
+                      {getFieldDecorator(`detailDefectID${d.fItemID}`, {
                         rules: [{ required: false, message: '' }],
                         initialValue: d.fValue,
                       })(
@@ -616,7 +612,7 @@ class Transfer extends PureComponent {
                             .filter(x => !defectList.find(y => y.fItemID === x.fItemID))
                             .map(x => (
                               <Option key={x.fItemID} value={x.fItemID}>
-                                {x.fName + ' - ' + x.fNumber}
+                                {`${x.fName} - ${x.fNumber}`}
                               </Option>
                             ))}
                         </Select>
@@ -631,7 +627,7 @@ class Transfer extends PureComponent {
                         <NumericInput
                           style={{ width: '100%' }}
                           placeholder="请输入数量"
-                          title={'按回车确认添加'}
+                          title="按回车确认添加"
                           // value={moreDefectValue}
                           // onChange={val => this.handleOtherDefectChange(val)}
                           onPressEnter={e => this.handleOtherDefectKeyPress(e)}
@@ -656,14 +652,14 @@ class Transfer extends PureComponent {
               <Row gutter={16}>
                 {paramList.map((d, i) => (
                   <Col
-                    key={'paramsCol' + i}
+                    key={`paramsCol${i}`}
                     xl={i % 3 === 0 ? {} : { span: 6, offset: 2 }}
                     lg={i % 3 === 0 ? 6 : { span: 8 }}
                     md={12}
                     sm={24}
                   >
-                    <FormItem key={'paramsID' + d.fParamID} label={d.fParamName}>
-                      {getFieldDecorator('paramsID' + d.fParamID, {
+                    <FormItem key={`paramsID${d.fParamID}`} label={d.fParamName}>
+                      {getFieldDecorator(`paramsID${d.fParamID}`, {
                         rules: [{ required: false, message: '' }],
                         initialValue: d.fDefaultValue,
                       })(

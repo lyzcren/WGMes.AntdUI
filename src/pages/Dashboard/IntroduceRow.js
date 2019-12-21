@@ -18,8 +18,8 @@ const topColResponsiveProps = {
   style: { marginBottom: 24 },
 };
 
-const IntroduceRow = memo(({ loading, visitData, workshops, onTabChange }) => {
-  return (
+const IntroduceRow = memo(
+  ({ loading, visitData, workshops, onTabChange }) =>
     workshops && (
       <Tabs style={{ marginTop: -23 }} onChange={onTabChange}>
         {workshops.map(workshop => {
@@ -33,9 +33,9 @@ const IntroduceRow = memo(({ loading, visitData, workshops, onTabChange }) => {
                 <Col {...topColResponsiveProps}>
                   <ChartCard
                     bordered={false}
-                    title={'投入数量'}
+                    title="投入数量"
                     action={
-                      <Tooltip title={'已开出流程单的数量'}>
+                      <Tooltip title="已开出流程单的数量">
                         <Icon type="info-circle-o" />
                       </Tooltip>
                     }
@@ -43,7 +43,7 @@ const IntroduceRow = memo(({ loading, visitData, workshops, onTabChange }) => {
                     total={() => `${numeral(workshop.totalInputQty).format('0,0')}`}
                     footer={
                       <Field
-                        label={'今日投入数量'}
+                        label="今日投入数量"
                         value={`${numeral(workshop.todayInputQty).format('0,0')}`}
                       />
                     }
@@ -64,16 +64,16 @@ const IntroduceRow = memo(({ loading, visitData, workshops, onTabChange }) => {
                   <ChartCard
                     bordered={false}
                     loading={loading}
-                    title={'完工数量'}
+                    title="完工数量"
                     action={
-                      <Tooltip title={'已完工流程单数量'}>
+                      <Tooltip title="已完工流程单数量">
                         <Icon type="info-circle-o" />
                       </Tooltip>
                     }
                     total={`${numeral(workshop.totalPassQty).format('0,0')}`}
                     footer={
                       <Field
-                        label={'今日完工数量'}
+                        label="今日完工数量"
                         value={`${numeral(workshop.todayPassQty).format('0,0')}`}
                       />
                     }
@@ -86,16 +86,16 @@ const IntroduceRow = memo(({ loading, visitData, workshops, onTabChange }) => {
                   <ChartCard
                     bordered={false}
                     loading={loading}
-                    title={'汇报数量'}
+                    title="汇报数量"
                     action={
-                      <Tooltip title={'生产流程单汇报数量'}>
+                      <Tooltip title="生产流程单汇报数量">
                         <Icon type="info-circle-o" />
                       </Tooltip>
                     }
                     total={`${numeral(workshop.totalReportQty).format('0,0')}`}
                     footer={
                       <Field
-                        label={'今日汇报'}
+                        label="今日汇报"
                         value={`${numeral(workshop.todayReportQty).format('0,0')}`}
                       />
                     }
@@ -108,9 +108,9 @@ const IntroduceRow = memo(({ loading, visitData, workshops, onTabChange }) => {
                   <ChartCard
                     loading={loading}
                     bordered={false}
-                    title={'良品率'}
+                    title="良品率"
                     action={
-                      <Tooltip title={'生产流程单良品率'}>
+                      <Tooltip title="生产流程单良品率">
                         <Icon type="info-circle-o" />
                       </Tooltip>
                     }
@@ -138,7 +138,6 @@ const IntroduceRow = memo(({ loading, visitData, workshops, onTabChange }) => {
         })}
       </Tabs>
     )
-  );
-});
+);
 
 export default IntroduceRow;

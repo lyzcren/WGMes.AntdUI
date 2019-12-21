@@ -2,7 +2,7 @@ import React, { PureComponent, Fragment } from 'react';
 import { Table, Alert } from 'antd';
 import { connect } from 'dva';
 import { resizeComponents } from '@/utils/resizeComponents';
-import { ColumnConfigForm } from './ColumnConfigForm';
+import ColumnConfigForm from './columnConfigForm';
 
 import styles from './index.less';
 
@@ -21,7 +21,7 @@ function initTotalList(columns) {
   columnManage,
   columnsConfigLoading: loading.models.columnManage,
 }))
-export class WgStandardTable extends PureComponent {
+class WgStandardTable extends PureComponent {
   timeclock = 0;
 
   constructor(props) {
@@ -41,6 +41,14 @@ export class WgStandardTable extends PureComponent {
     if (this.props.refShowConfig) {
       this.props.refShowConfig(this.showConfig);
     }
+  }
+
+  componentDidMount() {
+    const { dispatch, columns, configKey } = this.props;
+    dispatch({
+      type: 'columnManage/init',
+      payload: { key: configKey, columns },
+    });
   }
 
   static getDerivedStateFromProps(nextProps) {
@@ -101,7 +109,7 @@ export class WgStandardTable extends PureComponent {
     };
     dispatch({
       type: 'columnManage/changeColumn',
-      payload: { key: configKey, column: column },
+      payload: { key: configKey, column },
     });
     // 因拖拽是持续事件，故采用延时判断，延时3秒后无操作则保存列配置
     setTimeout(() => {
@@ -119,14 +127,6 @@ export class WgStandardTable extends PureComponent {
       payload: { key: configKey },
     });
   };
-
-  componentDidMount() {
-    const { dispatch, columns, configKey } = this.props;
-    dispatch({
-      type: 'columnManage/init',
-      payload: { key: configKey, columns },
-    });
-  }
 
   handleColumnChange = column => {
     const { dispatch, configKey } = this.props;
@@ -198,19 +198,13 @@ export class WgStandardTable extends PureComponent {
     const scrollX =
       sortedColumns
         .filter(x => !x.isHidden)
-        .map(c => {
-          return c.width;
-        })
-        .reduce(function(sum, width, index) {
-          return sum + width;
-        }) + scrollxFixWidth;
+        .map(c => c.width)
+        .reduce((sum, width, index) => sum + width) + scrollxFixWidth;
 
     const paginationProps = {
       showSizeChanger: true,
       showQuickJumper: true,
-      showTotal: (total, range) => {
-        return `共 ${total} 条`;
-      },
+      showTotal: (total, range) => `共 ${total} 条`,
       ...pagination,
     };
 
@@ -295,3 +289,5 @@ export class WgStandardTable extends PureComponent {
     // );
   }
 }
+
+export default WgStandardTable;

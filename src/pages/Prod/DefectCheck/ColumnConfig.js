@@ -9,9 +9,7 @@ class ColumnConfig {
       title: '单号',
       dataIndex: 'fBillNo',
       width: 160,
-      render: (val, record) => {
-        return <a onClick={() => this.profileCallback(record)}>{val}</a>;
-      },
+      render: (val, record) => <a onClick={() => this.profileCallback(record)}>{val}</a>,
     },
     {
       title: '岗位',
@@ -61,5 +59,5 @@ class ColumnConfig {
   profileCallback = record => {};
 }
 
-let columnConfig = new ColumnConfig();
+const columnConfig = new ColumnConfig();
 export default columnConfig;

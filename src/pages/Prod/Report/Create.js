@@ -144,15 +144,15 @@ class Create extends PureComponent {
         const { model } = queryResult;
 
         this.showResult(queryResult, () => {
-          message.success('新建汇报单成功.单号：' + model.fBillNo);
-          if (!!bCheck) {
+          message.success(`新建汇报单成功.单号：${model.fBillNo}`);
+          if (bCheck) {
             dispatch({
               type: 'reportManage/check',
               payload: { fInterID: model.fInterID },
             }).then(() => {
               const checkResult = this.props.reportManage.queryResult;
               this.showResult(checkResult, () => {
-                message.success('【' + model.fBillNo + '】' + '审核成功');
+                message.success(`【${model.fBillNo}】` + `审核成功`);
               });
             });
           }
@@ -252,7 +252,7 @@ class Create extends PureComponent {
         dataIndex: 'fRowComments',
         render: (val, record) => (
           <FormItem style={{ marginBottom: 0 }}>
-            {getFieldDecorator('fRowComments_' + record.fInterID, {
+            {getFieldDecorator(`fRowComments_${record.fInterID}`, {
               initialValue: record.fRowComments,
             })(
               <Input
@@ -277,7 +277,7 @@ class Create extends PureComponent {
 
     return (
       <WgPageHeaderWrapper
-        title={'流程单汇报：' + billNo.Report}
+        title={`流程单汇报：${billNo.Report}`}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }

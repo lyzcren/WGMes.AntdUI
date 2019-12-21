@@ -152,7 +152,7 @@ export function isUrl(path) {
 
 export function formatWan(val) {
   const v = val * 1;
-  if (!v || typeof v != 'number') return '';
+  if (!v || typeof v !== 'number') return '';
 
   let result = val;
   if (val > 10000) {
@@ -180,7 +180,7 @@ export function formatWan(val) {
 export function getComponentMaps(menuData) {
   const menuComponentMap = [];
   const getMenuDataMap = memuData => {
-    memuData.map(m => {
+    memuData.forEach(m => {
       if (m.component) {
         menuComponentMap.push(m);
       }
@@ -219,20 +219,20 @@ export function getBillNoByRule(rule) {
 }
 
 export function getTimeDiff(beginTime, endTime) {
-  //时间相差毫秒数
-  var span = endTime.getTime() - beginTime.getTime();
-  //计算相差天数
-  var result = '';
-  var days = Math.floor(span / (24 * 3600 * 1000));
-  result += days ? days + '天' : '';
-  //相差小时数
-  var leave1 = span % (24 * 3600 * 1000);
-  var hours = Math.floor(leave1 / (3600 * 1000));
-  result += hours + '小时';
-  //相差分钟
-  var leave2 = leave1 % (3600 * 1000);
-  var minutes = Math.floor(leave2 / (60 * 1000));
-  result += minutes + '分钟';
+  // 时间相差毫秒数
+  const span = endTime.getTime() - beginTime.getTime();
+  // 计算相差天数
+  let result = '';
+  const days = Math.floor(span / (24 * 3600 * 1000));
+  result += days ? `${days}天` : '';
+  // 相差小时数
+  const leave1 = span % (24 * 3600 * 1000);
+  const hours = Math.floor(leave1 / (3600 * 1000));
+  result += `${hours}小时`;
+  // 相差分钟
+  const leave2 = leave1 % (3600 * 1000);
+  const minutes = Math.floor(leave2 / (60 * 1000));
+  result += `${minutes}分钟`;
 
   return result;
 }

@@ -1,4 +1,3 @@
-import { stringify } from 'qs';
 import request from '@/utils/request';
 
 export async function fakeQuery(params) {
@@ -12,7 +11,7 @@ export async function fakeQuery(params) {
 }
 
 export async function fakeRemove(id) {
-  return request('/api/workTime/' + id, {
+  return request(`/api/workTime/${id}`, {
     method: 'DELETE',
     body: {
       method: 'delete',
@@ -31,7 +30,7 @@ export async function fakeAdd(params) {
 }
 
 export async function fakeUpdate(params) {
-  return request('/api/workTime/' + params.id, {
+  return request(`/api/workTime/${params.id}`, {
     method: 'PUT',
     body: {
       ...params,
@@ -41,7 +40,7 @@ export async function fakeUpdate(params) {
 }
 
 export async function fakeActive(params) {
-  return request('/api/workTime/active/' + params.id, {
+  return request(`/api/workTime/active/${params.id}`, {
     method: 'PUT',
     body: {
       method: 'active',
@@ -50,7 +49,7 @@ export async function fakeActive(params) {
 }
 
 export async function fakeDeactive(params) {
-  return request('/api/workTime/deactive/' + params.id, {
+  return request(`/api/workTime/deactive/${params.id}`, {
     method: 'PUT',
     body: {
       method: 'deactive',

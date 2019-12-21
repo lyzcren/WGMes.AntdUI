@@ -40,13 +40,13 @@ export class NumericInput extends React.Component {
 
   render() {
     const { value, title } = this.props;
-    const inputTitle = title ? (
-      title
-    ) : value ? (
-      <span className="numeric-input-title">{value !== '-' ? formatNumber(value) : '-'}</span>
-    ) : (
-      '请输入数量'
-    );
+    const inputTitle =
+      title ||
+      (value ? (
+        <span className="numeric-input-title">{value !== '-' ? formatNumber(value) : '-'}</span>
+      ) : (
+        '请输入数量'
+      ));
     return (
       <Tooltip
         trigger={['focus']}

@@ -120,15 +120,15 @@ class Update extends PureComponent {
       if (details) {
         let entryId = 1;
         const currentDetail = details.map(x => {
-          const fQty = form.getFieldValue('fQty_' + x.fInterID);
-          const fRowComments = form.getFieldValue('fRowComments_' + x.fInterID);
+          const fQty = form.getFieldValue(`fQty_${x.fInterID}`);
+          const fRowComments = form.getFieldValue(`fRowComments_${x.fInterID}`);
           return {
             ...x,
             fRecordID: x.fInterID,
             fQty: fQty !== undefined ? fQty : '',
             fInvQty: x.fInputQty,
             fDeltaQty: fQty !== undefined ? fQty - x.fInputQty : '',
-            fRowComments: fRowComments,
+            fRowComments,
             fEntryID: entryId++,
           };
         });
@@ -188,15 +188,15 @@ class Update extends PureComponent {
         } = this.props;
 
         this.showResult(queryResult, model => {
-          message.success('修改盘点单成功，单号：' + fBillNo);
-          if (!!bCheck) {
+          message.success(`修改盘点单成功，单号：${fBillNo}`);
+          if (bCheck) {
             dispatch({
               type: 'invCheckManage/check',
-              payload: { fInterID: fInterID },
+              payload: { fInterID },
             }).then(() => {
               const checkResult = this.props.invCheckManage.queryResult;
               this.showResult(checkResult, () => {
-                message.success('【' + fBillNo + '】' + '审核成功');
+                message.success(`【${fBillNo}】` + `审核成功`);
               });
             });
           }
@@ -276,16 +276,14 @@ class Update extends PureComponent {
       {
         title: '批次',
         dataIndex: 'fFullBatchNo',
-        render: (val, record) => {
-          return <span style={{ color: record.fIsNew ? 'red' : '' }}>{val ? val : '-'}</span>;
-        },
+        render: (val, record) => (
+          <span style={{ color: record.fIsNew ? 'red' : '' }}>{val || '-'}</span>
+        ),
       },
       {
         title: '任务单号',
         dataIndex: 'fMoBillNo',
-        render: (val, record) => {
-          return <span style={{ color: record.fIsNew ? 'red' : '' }}>{val}</span>;
-        },
+        render: (val, record) => <span style={{ color: record.fIsNew ? 'red' : '' }}>{val}</span>,
       },
       {
         title: '产品',
@@ -308,7 +306,7 @@ class Update extends PureComponent {
         dataIndex: 'fQty',
         render: (val, record) => (
           <FormItem style={{ marginBottom: 0 }}>
-            {getFieldDecorator('fQty_' + record.fRecordID, {
+            {getFieldDecorator(`fQty_${record.fRecordID}`, {
               rules: [{ required: true, message: '请输入' }],
               initialValue: record.fQty,
             })(
@@ -333,7 +331,7 @@ class Update extends PureComponent {
         dataIndex: 'fRowComments',
         render: (val, record) => (
           <FormItem style={{ marginBottom: 0 }}>
-            {getFieldDecorator('fRowComments_' + record.fRecordID, {
+            {getFieldDecorator(`fRowComments_${record.fRecordID}`, {
               initialValue: record.fRowComments,
             })(
               <Input
@@ -358,7 +356,7 @@ class Update extends PureComponent {
 
     return (
       <WgPageHeaderWrapper
-        title={'在制品盘点单：' + fBillNo}
+        title={`在制品盘点单：${fBillNo}`}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }

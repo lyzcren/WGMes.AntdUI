@@ -11,14 +11,14 @@ import {
 } from '@/utils/validators';
 
 const FormItem = Form.Item;
-const Option = Select.Option;
+const { Option } = Select;
 
 /* eslint react/no-multi-comp:0 */
 @connect(({ basicData }) => ({
   basicData,
 }))
 @Form.create()
-export class UpdateForm extends PureComponent {
+class UpdateForm extends PureComponent {
   static defaultProps = {
     handleSubmit: () => {},
     handleModalVisible: () => {},
@@ -91,3 +91,5 @@ export class UpdateForm extends PureComponent {
     );
   }
 }
+
+export default UpdateForm;

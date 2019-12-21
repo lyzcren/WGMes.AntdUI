@@ -82,7 +82,7 @@ export async function fakeSaveSteps(params) {
 export async function fakeQueryParams(params) {
   let url = `/api/Route/Params/${params.fInterID}`;
   if (params.fEntryID) {
-    url += '?fEntryID=' + params.fEntryID;
+    url += `?fEntryID=${params.fEntryID}`;
   }
   return request(url);
 }
