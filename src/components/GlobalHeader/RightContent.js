@@ -10,16 +10,17 @@ import HeaderScan from '../HeaderScan';
 import HeaderDropdown from '../HeaderDropdown';
 import SelectLang from '../SelectLang';
 import WgIcon from '@/wg_components/WgIcon';
+import { autoSreenfull, watchFullScreen, changeFullScreen } from '@/utils/wgUtils';
+
 import styles from './index.less';
 
 export default class GlobalHeaderRight extends PureComponent {
   componentDidMount = () => {
+    const { dispatch } = this.props;
     // 监听全屏事件
-    this.watchFullScreen();
+    watchFullScreen(dispatch);
     // 默认全屏
-    setTimeout(() => {
-      if (!screenfull.isFullscreen) screenfull.request();
-    }, 3000);
+    autoSreenfull();
   };
 
   getNoticeData() {
@@ -89,62 +90,6 @@ export default class GlobalHeaderRight extends PureComponent {
     });
   };
 
-  changeFullScreen = () => {
-    const { dispatch } = this.props;
-    if (screenfull.isFullscreen) {
-      screenfull.exit();
-    } else {
-      screenfull.request();
-    }
-  };
-
-  // 监听fullscreenchange事件
-  watchFullScreen = () => {
-    const { dispatch } = this.props;
-    const screenChange = () => {
-      dispatch({
-        type: 'global/fullScreen',
-        payload: {
-          isFullScreen: screenfull.isFullscreen,
-        },
-      });
-    };
-
-    if (screenfull.enabled) {
-      screenfull.on('change', screenChange);
-    }
-
-    // // IE 11, chrome
-    // window.addEventListener("resize", screenChange);
-    // // firefox
-    // document.addEventListener(
-    //   "fullscreenchange",
-    //   screenChange,
-    //   false
-    // );
-    // document.addEventListener(
-    //   "mozfullscreenchange",
-    //   function () {
-    //     alert('mozfullscreenchange');
-    //   },
-    //   false
-    // );
-    // document.addEventListener(
-    //   "msfullscreenchange",
-    //   function () {
-    //     alert('msfullscreenchange');
-    //   },
-    //   false
-    // );
-    // document.addEventListener(
-    //   "webkitfullscreenChange",
-    //   function () {
-    //     alert('webkitfullscreenChange');
-    //   },
-    //   false
-    // );
-  };
-
   quickOps = () => {
     const { dispatch } = this.props;
     dispatch({
@@ -211,7 +156,7 @@ export default class GlobalHeaderRight extends PureComponent {
         /> */}
         <Tooltip title={'进入快速操作界面'}>
           <a onClick={this.quickOps} className={styles.action}>
-            <WgIcon type={'thunder'} color={'#001529'} size={15} />
+            <WgIcon type={'thunder'} color={'#001529'} size={18} />
           </a>
         </Tooltip>
         <Tooltip title={formatMessage({ id: 'component.globalHeader.help' })}>
@@ -292,7 +237,7 @@ export default class GlobalHeaderRight extends PureComponent {
             <a
               target="_blank"
               rel="noopener noreferrer"
-              onClick={this.changeFullScreen}
+              onClick={() => changeFullScreen()}
               className={styles.action}
             >
               {/* <Icon type="border" style={isFullScreen ? { fontSize: 20, color: '#52c41a' } : {}} /> */}

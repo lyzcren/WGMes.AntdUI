@@ -99,7 +99,7 @@ export class ScanSignForm extends PureComponent {
     return (
       <Modal
         destroyOnClose
-        title="扫描"
+        title="签收"
         visible={modalVisible}
         footer={footer}
         onCancel={() => handleModalVisible()}

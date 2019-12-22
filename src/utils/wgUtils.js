@@ -1,6 +1,44 @@
-function print(module, printUrl, grfId, id) {
+import screenfull from 'screenfull';
+
+export function print(module, printUrl, grfId, id) {
   const w = window.open('about:blank');
   w.location.href = `${printUrl}/print/${module}/${grfId}/${id}`;
 }
 
-export default print;
+export function autoSreenfull() {
+  try {
+    setTimeout(() => {
+      if (!screenfull.isFullscreen) {
+        if (screenfull.enabled) {
+          screenfull.request();
+        }
+      }
+    }, 2000);
+  } catch (error) {
+    autoSreenfull();
+  }
+}
+
+export function watchFullScreen(dispatch) {
+  const screenChange = () => {
+    dispatch({
+      type: 'global/fullScreen',
+      payload: {
+        isFullScreen: screenfull.isFullscreen,
+      },
+    });
+  };
+  if (screenfull.enabled) {
+    screenfull.on('change', screenChange);
+  }
+}
+
+export function changeFullScreen() {
+  try {
+    if (screenfull.isFullscreen) {
+      screenfull.exit();
+    } else {
+      screenfull.request();
+    }
+  } catch (error) {}
+}

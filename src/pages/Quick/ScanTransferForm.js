@@ -3,7 +3,7 @@ import { connect } from 'dva';
 import { Form, Input, Modal, message, Button } from 'antd';
 import { routerRedux } from 'dva/router';
 
-import styles from './ScanSignForm.less';
+import styles from './ScanTransferForm.less';
 
 const FormItem = Form.Item;
 

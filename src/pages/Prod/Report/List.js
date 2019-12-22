@@ -34,7 +34,7 @@ import Authorized from '@/utils/Authorized';
 import { default as ColumnConfig } from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
-import print from '@/utils/wgUtils';
+import { print } from '@/utils/wgUtils';
 import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';

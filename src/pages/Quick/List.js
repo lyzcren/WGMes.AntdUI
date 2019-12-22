@@ -24,6 +24,9 @@ import { ChooseWorktimeForm } from './ChooseWorktimeForm';
 import { ChooseOperatorForm } from './ChooseOperatorForm';
 import { ScanSignForm } from './ScanSignForm';
 import { ScanTransferForm } from './ScanTransferForm';
+import { ScanRejectForm } from './ScanRejectForm';
+import { ScanTakeForm } from './ScanTakeForm';
+import { ScanRefundForm } from './ScanRefundForm';
 
 import styles from './List.less';
 
@@ -42,6 +45,9 @@ class QuickOpsPage extends Component {
       chooseOperator: false,
       scanSign: false,
       scanTransfer: false,
+      scanReject: false,
+      scanRefund: false,
+      scanTake: false,
     },
     deptList: [],
     machineList: [],
@@ -89,31 +95,7 @@ class QuickOpsPage extends Component {
         this.setState({ operator: { fEmpID: fBindEmpID, fEmpName: fBindEmpName } });
       }
     });
-
-    // 与其他布局使用相同的全屏判断
-    setTimeout(() => {
-      if (!isFullScreen) screenfull.request();
-    }, 100);
-    // 监听全屏事件
-    this.watchFullScreen();
   }
-
-  // 监听fullscreenchange事件
-  watchFullScreen = () => {
-    const { dispatch } = this.props;
-    const screenChange = () => {
-      dispatch({
-        type: 'global/fullScreen',
-        payload: {
-          isFullScreen: screenfull.isFullscreen,
-        },
-      });
-    };
-
-    if (screenfull.enabled) {
-      screenfull.on('change', screenChange);
-    }
-  };
 
   handleModalVisible = ({ key, flag }) => {
     const { modalVisible } = this.state;
@@ -221,6 +203,37 @@ class QuickOpsPage extends Component {
     this.handleModalVisible({ key: 'scanTransfer', flag: true });
   };
 
+  scanReject = () => {
+    const { dept, operator } = this.state;
+    if (!dept || !dept.fDeptID) {
+      message.warning('请先选择岗位');
+    } else if (!operator || !operator.fEmpID) {
+      message.warning('请先选择操作员');
+    } else {
+      this.handleModalVisible({ key: 'scanReject', flag: true });
+    }
+  };
+
+  scanTake = () => {
+    const { dept, operator } = this.state;
+    if (!operator || !operator.fEmpID) {
+      message.warning('请先选择操作员');
+    } else {
+      this.handleModalVisible({ key: 'scanTake', flag: true });
+    }
+  };
+
+  scanRefund = () => {
+    const { dept, operator } = this.state;
+    if (!dept || !dept.fDeptID) {
+      message.warning('请先选择岗位');
+    } else if (!operator || !operator.fEmpID) {
+      message.warning('请先选择操作员');
+    } else {
+      this.handleModalVisible({ key: 'scanRefund', flag: true });
+    }
+  };
+
   moreOperators = () => {
     const { dispatch } = this.props;
     dispatch({
@@ -260,7 +273,7 @@ class QuickOpsPage extends Component {
               <QuickButton title="转序" onClick={this.scanTransfer} />
             </Col>
             <Col span={6}>
-              <QuickButton title="拒签" />
+              <QuickButton title="拒签" onClick={this.scanReject} />
             </Col>
           </Row>
           <Row gutter={8}>
@@ -268,10 +281,10 @@ class QuickOpsPage extends Component {
               <div style={{ height: '80px' }} />
             </Col>
             <Col span={6}>
-              <QuickButton title="退回" />
+              <QuickButton title="退回" onClick={this.scanRefund} />
             </Col>
             <Col span={6}>
-              <QuickButton title="取走" />
+              <QuickButton title="取走" onClick={this.scanTake} />
             </Col>
             <Col span={6}>
               <QuickButton title="更多操作" onClick={this.moreOperators} />
@@ -313,33 +326,27 @@ class QuickOpsPage extends Component {
           </Row>
         </Col>
 
-        {deptList && deptList.length && (
-          <ChooseDeptForm
-            dispatch
-            handleModalVisible={flag => this.handleModalVisible({ key: 'chooseDept', flag })}
-            handleSubmit={this.changeDept}
-            modalVisible={modalVisible.chooseDept}
-            deptList={deptList}
-          />
-        )}
-        {machineList && machineList.length && (
-          <ChooseMachineForm
-            dispatch
-            handleModalVisible={flag => this.handleModalVisible({ key: 'chooseMachine', flag })}
-            handleSubmit={this.changeMachine}
-            modalVisible={modalVisible.chooseMachine}
-            machineList={machineList}
-          />
-        )}
-        {worktimeList && worktimeList.length && (
-          <ChooseWorktimeForm
-            dispatch
-            handleModalVisible={flag => this.handleModalVisible({ key: 'chooseWorktime', flag })}
-            handleSubmit={this.changeWorktime}
-            modalVisible={modalVisible.chooseWorktime}
-            worktimeList={worktimeList}
-          />
-        )}
+        <ChooseDeptForm
+          dispatch
+          handleModalVisible={flag => this.handleModalVisible({ key: 'chooseDept', flag })}
+          handleSubmit={this.changeDept}
+          modalVisible={modalVisible.chooseDept}
+          deptList={deptList}
+        />
+        <ChooseMachineForm
+          dispatch
+          handleModalVisible={flag => this.handleModalVisible({ key: 'chooseMachine', flag })}
+          handleSubmit={this.changeMachine}
+          modalVisible={modalVisible.chooseMachine}
+          machineList={machineList}
+        />
+        <ChooseWorktimeForm
+          dispatch
+          handleModalVisible={flag => this.handleModalVisible({ key: 'chooseWorktime', flag })}
+          handleSubmit={this.changeWorktime}
+          modalVisible={modalVisible.chooseWorktime}
+          worktimeList={worktimeList}
+        />
         <ChooseOperatorForm
           dispatch
           handleModalVisible={flag => this.handleModalVisible({ key: 'chooseOperator', flag })}
@@ -357,6 +364,33 @@ class QuickOpsPage extends Component {
           dispatch
           handleModalVisible={flag => this.handleModalVisible({ key: 'scanTransfer', flag })}
           modalVisible={modalVisible.scanTransfer}
+          dept={dept}
+          operator={operator}
+          worktime={worktime}
+          machine={machine}
+        />
+        <ScanRejectForm
+          dispatch
+          handleModalVisible={flag => this.handleModalVisible({ key: 'scanReject', flag })}
+          modalVisible={modalVisible.scanReject}
+          dept={dept}
+          operator={operator}
+          worktime={worktime}
+          machine={machine}
+        />
+        <ScanRefundForm
+          dispatch
+          handleModalVisible={flag => this.handleModalVisible({ key: 'scanRefund', flag })}
+          modalVisible={modalVisible.scanRefund}
+          dept={dept}
+          operator={operator}
+          worktime={worktime}
+          machine={machine}
+        />
+        <ScanTakeForm
+          dispatch
+          handleModalVisible={flag => this.handleModalVisible({ key: 'scanTake', flag })}
+          modalVisible={modalVisible.scanTake}
           dept={dept}
           operator={operator}
           worktime={worktime}

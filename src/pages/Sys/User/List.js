@@ -35,7 +35,7 @@ import { UpdatePwdForm } from './UpdatePwdForm';
 import { CreateForm } from './CreateForm';
 import { AuthorizeRoleForm } from './AuthorizeRoleForm';
 import { hasAuthority } from '@/utils/authority';
-import print from '@/utils/wgUtils';
+import { print } from '@/utils/wgUtils';
 import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
