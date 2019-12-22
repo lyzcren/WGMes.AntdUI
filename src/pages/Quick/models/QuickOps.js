@@ -31,9 +31,6 @@ export default {
         payload: { worktimeList: response },
       });
     },
-    *moreOperator({ payload }, { call, put }) {
-      yield put(routerRedux.replace('/'));
-    },
     *getFlowByBatchNo({ payload }, { call, put }) {
       const response = yield call(fakeGet, payload);
       yield put({

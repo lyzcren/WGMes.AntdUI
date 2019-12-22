@@ -105,6 +105,9 @@ export default {
     *quickOps({}, { put }) {
       yield put(routerRedux.replace('/quickOps'));
     },
+    *moreOps({}, { put }) {
+      yield put(routerRedux.replace('/'));
+    },
   },
 
   reducers: {

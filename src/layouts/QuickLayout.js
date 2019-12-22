@@ -48,6 +48,13 @@ class QuickLayout extends React.PureComponent {
     autoSreenfull();
   }
 
+  moreOps = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'global/moreOps',
+    });
+  };
+
   render() {
     const {
       children,
@@ -58,7 +65,7 @@ class QuickLayout extends React.PureComponent {
       <div className={styles.container}>
         <div className={styles.quickOps}>
           <Tooltip title={'进入更多操作界面'}>
-            <a onClick={this.quickOps} className={styles.action}>
+            <a onClick={this.moreOps} className={styles.action}>
               <WgIcon type={'thunder'} color={'#ffffff'} size={18} />
             </a>
           </Tooltip>

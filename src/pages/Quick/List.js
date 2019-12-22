@@ -237,7 +237,7 @@ class QuickOpsPage extends Component {
   moreOperators = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'quickOps/moreOperator',
+      type: 'global/moreOps',
     });
   };
 
