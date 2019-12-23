@@ -35,6 +35,7 @@ import { TechParamForm } from './TechParamForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
+import StandardTable from '@/components/StandardTable';
 import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';

@@ -32,6 +32,7 @@ import { UpdateForm } from './UpdateForm';
 import { CreateForm } from './CreateForm';
 import { default as ColumnConfig } from './ColumnConfig_Erp';
 import { hasAuthority } from '@/utils/authority';
+import StandardTable from '@/components/StandardTable';
 
 import styles from './List.less';
 

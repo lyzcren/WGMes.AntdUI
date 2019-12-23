@@ -20,7 +20,7 @@ export default class GlobalHeaderRight extends PureComponent {
     // 监听全屏事件
     watchFullScreen(dispatch);
     // 默认全屏
-    autoSreenfull();
+    // autoSreenfull();
   };
 
   getNoticeData() {

@@ -142,13 +142,13 @@ class QuickOpsPage extends Component {
   };
 
   changeDept = dept => {
-    this.handleModalVisible({ key: 'chooseDept', flag: false });
     const { fDeptID } = dept;
     this.handleDeptChanged(dept);
     if (dept.fDeptID != this.state.fDeptID) {
       this.setState({ machine: { fItemID: 0, fName: '<请选择>' } });
       this.setState({ worktime: { fWorkTimeID: 0, fWorkTimeName: '<请选择>' } });
     }
+    this.handleModalVisible({ key: 'chooseDept', flag: false });
   };
 
   chooseMachine = () => {
@@ -297,31 +297,35 @@ class QuickOpsPage extends Component {
             <div className={styles.right_header} />
           </Row>
           <Row gutter={8}>
-            <h2 className={styles.text_gradient} onClick={this.chooseDept}>
-              <span>
-                <Icon type="double-right" /> 岗位： <b>{dept.fDeptName}</b>
+            <h2 onClick={this.chooseDept}>
+              <span className={styles.text_gradient}>
+                <Icon type="double-right" /> 岗 位：
               </span>
+              <span className={styles.text_gradient_info}>{dept.fDeptName}</span>
             </h2>
           </Row>
           <Row gutter={8}>
-            <h2 className={styles.text_gradient} onClick={this.chooseMachine}>
-              <span>
-                <Icon type="double-right" /> 机台： <b>{machine.fName}</b>
+            <h2 onClick={this.chooseMachine}>
+              <span className={styles.text_gradient}>
+                <Icon type="double-right" /> 机 台：
               </span>
+              <span className={styles.text_gradient_info}>{machine.fName}</span>
             </h2>
           </Row>
           <Row gutter={8}>
-            <h2 className={styles.text_gradient} onClick={this.chooseWorktime}>
-              <span>
-                <Icon type="double-right" /> 班次： <b>{worktime.fWorkTimeName}</b>
+            <h2 onClick={this.chooseWorktime}>
+              <span className={styles.text_gradient}>
+                <Icon type="double-right" /> 班 次：
               </span>
+              <span className={styles.text_gradient_info}>{worktime.fWorkTimeName}</span>
             </h2>
           </Row>
           <Row gutter={8}>
-            <h2 className={styles.text_gradient} onClick={this.chooseOperator}>
-              <span>
-                <Icon type="double-right" /> 操作员： <b>{operator.fEmpName}</b>
+            <h2 onClick={this.chooseOperator}>
+              <span className={styles.text_gradient}>
+                <Icon type="double-right" /> 操作员：
               </span>
+              <span className={styles.text_gradient_info}>{operator.fEmpName}</span>
             </h2>
           </Row>
         </Col>

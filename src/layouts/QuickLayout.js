@@ -45,7 +45,7 @@ class QuickLayout extends React.PureComponent {
     // 监听全屏事件
     watchFullScreen(dispatch);
     // 默认全屏
-    autoSreenfull();
+    // autoSreenfull();
   }
 
   moreOps = () => {

@@ -102,7 +102,7 @@ export class AuthorityForm extends PureComponent {
         destroyOnClose
         title={
           <div>
-            ??? <Tag color="blue">{formVals.fName}</Tag>???
+            修改 <Tag color="blue">{formVals.fName}</Tag>权限
           </div>
         }
         visible={authorityModalVisible}

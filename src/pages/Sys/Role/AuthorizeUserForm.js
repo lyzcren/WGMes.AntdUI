@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import moment from 'moment';
 import { Row, Col, Form, Input, Select, Button, Modal, Switch, Tag, Table, message } from 'antd';
+import StandardTable from '@/components/StandardTable';
 
 import { formatMessage, FormattedMessage } from 'umi/locale';
 
