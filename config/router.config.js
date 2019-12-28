@@ -382,6 +382,21 @@ export default [
             authority: ['Unit_Read'],
           },
           {
+            path: '/basic/unitConverter',
+            name: 'unitConverter',
+            component: './Basic/UnitConverter/List',
+            authority: ['UnitConverter_Read'],
+            routes: [
+              {
+                path: '/basic/unitConverter/create',
+                name: 'create',
+                component: './Basic/UnitConverter/Create',
+                authority: ['UnitConverter_Create'],
+                hideInMenu: true,
+              },
+            ],
+          },
+          {
             path: '/basic/machine',
             name: 'machine',
             component: './Basic/Machine/List',

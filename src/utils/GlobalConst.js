@@ -1,4 +1,8 @@
 import { Badge } from 'antd';
+import moment from 'moment';
+
+
+export const defaultDateTimeFormat = datetime => moment(datetime).format('YYYY-MM-DD HH:mm:ss');
 
 export const GlobalConst = {
   passwordProgressMap: {
@@ -99,3 +103,16 @@ export const badgeStatusList = statusArray =>
     text: <Badge status={x.badgeStatus} text={x.text} />,
     value: x.number,
   }));
+
+
+export const DecimalModes = [
+  { fKey: 'round', fName: '四舍五入' },
+  { fKey: 'floor', fName: '向下舍入' },
+  { fKey: 'ceiling', fName: '向上舍入' },
+  { fKey: 'round2', fName: '四舍六入五成双' },
+];
+
+export const ConvertModes = [
+  { fKey: 'multi', fName: '乘' },
+  { fKey: 'div', fName: '除' },
+];
