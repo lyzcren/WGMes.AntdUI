@@ -1,7 +1,6 @@
 import { Badge } from 'antd';
 import moment from 'moment';
 
-
 export const defaultDateTimeFormat = datetime => moment(datetime).format('YYYY-MM-DD HH:mm:ss');
 
 export const GlobalConst = {
@@ -104,7 +103,6 @@ export const badgeStatusList = statusArray =>
     value: x.number,
   }));
 
-
 export const DecimalModes = [
   { fKey: 'round', fName: '四舍五入' },
   { fKey: 'floor', fName: '向下舍入' },
@@ -112,7 +110,4 @@ export const DecimalModes = [
   { fKey: 'round2', fName: '四舍六入五成双' },
 ];
 
-export const ConvertModes = [
-  { fKey: 'multi', fName: '乘' },
-  { fKey: 'div', fName: '除' },
-];
+export const ConvertModes = [{ fKey: 'multi', fName: '乘' }, { fKey: 'div', fName: '除' }];

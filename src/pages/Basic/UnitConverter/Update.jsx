@@ -32,7 +32,7 @@ import { columns as flowFields } from '@/columns/Prod/Flow';
 import { DecimalModes, ConvertModes } from '@/utils/GlobalConst';
 
 import { isArray } from 'util';
-import styles from './Create.less';
+import styles from './Update.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -41,21 +41,29 @@ const ButtonGroup = Button.Group;
 const { TextArea } = Input;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ unitConverterCreate, basicData, loading, menu, user }) => ({
-  unitConverterCreate,
+@connect(({ unitConverterUpdate, basicData, loading, menu }) => ({
+  unitConverterUpdate,
   basicData,
-  loading: loading.models.unitConverterCreate,
+  loading: loading.models.unitConverterUpdate,
   menu,
-  fBindEmpID: user.currentUser.fBindEmpID,
 }))
 @Form.create()
-class Create extends PureComponent {
-  state = {
-    regFields: [],
-  };
-
+class Update extends PureComponent {
   constructor(props) {
     super();
+    console.log('constructor');
+    const {
+      location: { id, data, regexes },
+    } = props;
+    if (!id) {
+      message.error('记录不存在或已删除');
+      this.close();
+    }
+    this.state = {
+      id,
+      data,
+      regexes,
+    };
 
     const { dispatch } = props;
     dispatch({
@@ -63,26 +71,78 @@ class Create extends PureComponent {
     });
   }
 
+  // static getDerivedStateFromProps (nextProps, prevState) {
+  //   if (prevState.id !== nextProps.location.id) {
+  //     return {
+  //       id: nextProps.location.id,
+  //       data: nextProps.location.data,
+  //     };
+  //   }
+  //   return null;
+  // }
+
+  componentDidMount() {
+    const {
+      location: { id, data, regexes },
+    } = this.props;
+    this.setState({
+      id,
+      data,
+      regexes,
+    });
+    this._loadAsyncData(id);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.location.id !== nextProps.location.id) {
+      const {
+        location: { id, data, regexes },
+      } = nextProps;
+      this.setState({
+        id,
+        data,
+        regexes,
+      });
+      this._loadAsyncData(id);
+    }
+  }
+
+  _loadAsyncData(id) {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'unitConverterUpdate/initModel',
+      payload: { id },
+    }).then(() => {
+      const { data } = this.props.unitConverterUpdate;
+      this.setState({ data, regexes: data.regexes });
+    });
+  }
+
   save() {
-    const { form, dispatch } = this.props;
+    const {
+      form,
+      dispatch,
+      location: { id },
+    } = this.props;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-      const { regFields } = this.state;
+      const { regexes } = this.state;
       // 过滤不完整的字段匹配规则
-      const filterRegFields = regFields.filter(reg => reg.fField && reg.fRegex);
+      const filterRegFields = regexes.filter(reg => reg.fField && reg.fRegex);
       if (filterRegFields.length <= 0) {
         message.warn('字段匹配列表不能为空.');
         return;
       }
       dispatch({
-        type: 'unitConverterCreate/add',
+        type: 'unitConverterUpdate/submit',
         payload: {
+          fItemID: id,
           ...fieldsValue,
           regexes: filterRegFields,
         },
       }).then(() => {
         const {
-          unitConverterCreate: { queryResult },
+          unitConverterUpdate: { queryResult },
           location: { successCallback },
         } = this.props;
         if (queryResult.status === 'ok') {
@@ -93,6 +153,9 @@ class Create extends PureComponent {
           message.warning(queryResult.message);
         }
       });
+
+      console.log(filterRegFields);
+      console.log(fieldsValue);
     });
   }
 
@@ -104,7 +167,7 @@ class Create extends PureComponent {
     if (tabMode) {
       dispatch({
         type: 'menu/closeMenu',
-        payload: { path: '/basic/unitConverter/create' },
+        payload: { path: '/basic/unitConverter/update' },
       });
     } else {
       router.goBack();
@@ -125,16 +188,30 @@ class Create extends PureComponent {
     records.forEach(record => {
       const regex = new RegExp(record.fRegex);
     });
-    this.setState({ regFields: records });
+    this.setState({ regexes: records });
   };
 
   render() {
     const {
       loading,
-      form: { getFieldDecorator },
+      form: { getFieldDecorator, getFieldValue },
       basicData: { Units },
     } = this.props;
-    const { regFields } = this.state;
+    const {
+      id,
+      regexes,
+      data: {
+        fName,
+        fInUnitID,
+        fOutUnitID,
+        fConvertMode,
+        fDecimal,
+        fDecimalMode,
+        fFormula,
+        fComments,
+      },
+    } = this.state;
+    console.log(regexes);
 
     const action = (
       <Fragment>
@@ -150,7 +227,7 @@ class Create extends PureComponent {
     return (
       <div style={{ backgroundColor: 'rgb(240, 242, 245)' }}>
         <WgPageHeaderWrapper
-          title={`新增单位转换器`}
+          title={`修改单位转换器`}
           logo={
             <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
           }
@@ -163,6 +240,7 @@ class Create extends PureComponent {
               <FormItem label={'名称'}>
                 {getFieldDecorator(`fName`, {
                   rules: [{ required: true, message: '请输入名称' }],
+                  initialValue: fName,
                 })(<Input />)}
               </FormItem>
             </Col>
@@ -170,6 +248,7 @@ class Create extends PureComponent {
               <FormItem label="转入单位">
                 {getFieldDecorator('fInUnitID', {
                   rules: [{ required: true, message: '请选择转入单位' }],
+                  initialValue: fInUnitID,
                 })(
                   <Select
                     style={{ width: '100%' }}
@@ -192,6 +271,7 @@ class Create extends PureComponent {
               <FormItem label={'转出单位'}>
                 {getFieldDecorator(`fOutUnitID`, {
                   rules: [{ required: true, message: '请输入转出单位' }],
+                  initialValue: fOutUnitID,
                 })(
                   <Select
                     style={{ width: '100%' }}
@@ -211,14 +291,14 @@ class Create extends PureComponent {
               </FormItem>
             </Col>
           </Card>
-          <FieldRegCard fields={flowFields} data={regFields} onChange={this.regFieldChange} />
+          <FieldRegCard id={id} fields={flowFields} data={regexes} onChange={this.regFieldChange} />
           <Card title="转换方式" style={{ marginBottom: 24 }} bordered={false}>
             <Row>
               <Col xl={{ span: 3 }} lg={{ span: 3 }} md={6} sm={24}>
                 <FormItem label="换算方式">
                   {getFieldDecorator('fConvertMode', {
                     rules: [{ required: true, message: '请选择换算方式' }],
-                    initialValue: 'multi',
+                    initialValue: fConvertMode,
                   })(
                     <Radio.Group onChange={e => console.log(e.target.value)}>
                       {ConvertModes.map(x => (
@@ -234,6 +314,7 @@ class Create extends PureComponent {
                 <FormItem label="保留小数位">
                   {getFieldDecorator('fDecimal', {
                     rules: [{ required: true, message: '请填写保留小数位' }],
+                    initialValue: fDecimal,
                   })(<InputNumber />)}
                 </FormItem>
               </Col>
@@ -241,7 +322,7 @@ class Create extends PureComponent {
                 <FormItem label="计数保留法">
                   {getFieldDecorator('fDecimalMode', {
                     rules: [{ required: true, message: '请选择计数保留法' }],
-                    initialValue: 'round',
+                    initialValue: fDecimalMode,
                   })(
                     <Select
                       style={{ width: '100%' }}
@@ -264,6 +345,7 @@ class Create extends PureComponent {
                 <FormItem label="转换率计算公式">
                   {getFieldDecorator('fFormula', {
                     rules: [{ required: true, message: '请填写转换率计算公式' }],
+                    initialValue: fFormula,
                   })(<Input />)}
                 </FormItem>
               </Col>
@@ -274,7 +356,7 @@ class Create extends PureComponent {
               <Row gutter={16}>
                 <Col lg={12} md={12} sm={24}>
                   {getFieldDecorator('fComments', {
-                    initialValue: '',
+                    initialValue: fComments,
                   })(<TextArea style={{ minHeight: 32 }} placeholder="请输入备注" rows={4} />)}
                 </Col>
               </Row>
@@ -294,4 +376,4 @@ class Create extends PureComponent {
   }
 }
 
-export default Create;
+export default Update;

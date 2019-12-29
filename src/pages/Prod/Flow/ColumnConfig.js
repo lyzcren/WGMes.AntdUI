@@ -9,10 +9,10 @@ import { columns } from '@/columns/Prod/Flow';
 
 class ColumnConfig {
   // 查看任务单
-  missionModalVisibleCallback = record => { };
+  missionModalVisibleCallback = record => {};
 
   // 查看工艺路线
-  routeModalVisibleCallback = record => { };
+  routeModalVisibleCallback = record => {};
 
   statusFilter = [];
 
@@ -59,7 +59,9 @@ class ColumnConfig {
       },
       {
         dataIndex: 'fRouteName',
-        render: (val, record) => <a onClick={() => this.routeModalVisibleCallback(record)}>{val}</a>,
+        render: (val, record) => (
+          <a onClick={() => this.routeModalVisibleCallback(record)}>{val}</a>
+        ),
       },
       {
         dataIndex: 'operators',
@@ -83,7 +85,7 @@ class ColumnConfig {
     });
 
     return newColumns;
-  }
+  };
 
   renderOperation = (text, record) => <Fragment />;
 }

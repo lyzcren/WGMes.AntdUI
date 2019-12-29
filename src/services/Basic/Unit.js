@@ -1,6 +1,6 @@
 import request from '@/utils/request';
 
-export async function fakeQuery (params) {
+export async function fakeQuery(params) {
   return request('/api/Unit/getList', {
     method: 'POST',
     body: {
@@ -10,11 +10,11 @@ export async function fakeQuery (params) {
   });
 }
 
-export async function fakeGetAll (params) {
+export async function fakeGetAll(params) {
   return request('/api/Unit');
 }
 
-export async function fakeRemove (params) {
+export async function fakeRemove(params) {
   return request(`/api/Unit/${params.fItemID}`, {
     method: 'DELETE',
     body: {
@@ -24,7 +24,7 @@ export async function fakeRemove (params) {
   });
 }
 
-export async function fakeAdd (params) {
+export async function fakeAdd(params) {
   return request('/api/Unit', {
     method: 'POST',
     body: {
@@ -34,7 +34,7 @@ export async function fakeAdd (params) {
   });
 }
 
-export async function fakeUpdate (params) {
+export async function fakeUpdate(params) {
   return request(`/api/Unit/${params.fItemID}`, {
     method: 'PUT',
     body: {
@@ -44,7 +44,7 @@ export async function fakeUpdate (params) {
   });
 }
 
-export async function fakeActive (params) {
+export async function fakeActive(params) {
   return request(`/api/Unit/${params.fItemID}/active?fIsActive=${params.fIsActive}`, {
     method: 'PUT',
     body: {
@@ -54,6 +54,6 @@ export async function fakeActive (params) {
   });
 }
 
-export async function fakeSync (params) {
+export async function fakeSync(params) {
   return request('/api/Unit/sync');
 }

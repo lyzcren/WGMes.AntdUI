@@ -1,4 +1,10 @@
-import { fakeQuery, fakeRemove, fakeAdd, fakeUpdate, fakeActive } from '@/services/Basic/UnitConverter';
+import {
+  fakeQuery,
+  fakeRemove,
+  fakeAdd,
+  fakeUpdate,
+  fakeActive,
+} from '@/services/Basic/UnitConverter';
 
 export default {
   namespace: 'unitConverter',

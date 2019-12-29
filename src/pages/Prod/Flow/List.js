@@ -109,7 +109,7 @@ class TableList extends PureComponent {
     this.columnConfigKey = 'flow';
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props;
 
     dispatch({
@@ -131,7 +131,7 @@ class TableList extends PureComponent {
     this.searchWhereInit();
   }
 
-  componentDidUpdate (preProps) {
+  componentDidUpdate(preProps) {
     const { fBatchNo } = this.props;
     if (preProps.fBatchNo !== fBatchNo) {
       this.searchWhereInit();
@@ -403,14 +403,14 @@ class TableList extends PureComponent {
     const badgeStatus = !flowStatus
       ? []
       : flowStatus.map(x => ({
-        text: <Badge color={x.fColor} text={x.fValue} />,
-        value: x.fKeyName,
-      }));
+          text: <Badge color={x.fColor} text={x.fValue} />,
+          value: x.fKeyName,
+        }));
     return badgeStatus;
   };
 
   // 应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
-  webapp_start (templateId, interIds, type) {
+  webapp_start(templateId, interIds, type) {
     // var option = {
     //   baseurl: 'http://' + window.location.host,
     //   report: '/api/PrintTemplate/grf?id=' + templateId,
@@ -861,7 +861,7 @@ class TableList extends PureComponent {
     );
   };
 
-  renderSimpleForm () {
+  renderSimpleForm() {
     const {
       form: { getFieldDecorator },
       basicData: {
@@ -953,7 +953,7 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm () {
+  renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
       basicData: {
@@ -1117,12 +1117,12 @@ class TableList extends PureComponent {
     );
   }
 
-  renderForm () {
+  renderForm() {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  reanderOperator () {
+  reanderOperator() {
     const { selectedRows, queryDeptID } = this.state;
     const {
       flowManage: { data, queryResult, printTemplates },
@@ -1192,7 +1192,7 @@ class TableList extends PureComponent {
     );
   }
 
-  render () {
+  render() {
     const {
       dispatch,
       flowManage: { data, queryResult },
@@ -1207,10 +1207,12 @@ class TableList extends PureComponent {
     } = this.state;
 
     const columns = ColumnConfig.getColumns({
-      columnOps: [{
-        dataIndex: 'fStatusNumber',
-        filters: this.statusFilter(),
-      }]
+      columnOps: [
+        {
+          dataIndex: 'fStatusNumber',
+          filters: this.statusFilter(),
+        },
+      ],
     });
 
     const signMethods = {

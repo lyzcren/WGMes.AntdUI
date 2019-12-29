@@ -1,14 +1,12 @@
 import { columns } from '@/columns/Basic/UnitConverter';
 // tslint:disable-next-line: ordered-imports
 import Authorized from '@/utils/Authorized';
-import { Divider, Popconfirm, } from 'antd';
+import { Divider, Popconfirm } from 'antd';
 import React, { Fragment } from 'react';
 
-
-
 class ColumnConfig {
-  public getColumns = (options) => {
-    const { columnOps } = options
+  public getColumns = options => {
+    const { columnOps } = options;
     const defaultColumnOps = this.defaultColumnOps({ ...options });
     const newColumns = (columns || []).map(column => {
       let retColumn = { ...column };
@@ -27,9 +25,9 @@ class ColumnConfig {
     });
 
     return newColumns;
-  }
+  };
 
-  private defaultColumnOps = (options) => {
+  private defaultColumnOps = options => {
     const { updateHandler, deleteHandler } = options || {};
     return [
       {
@@ -39,24 +37,24 @@ class ColumnConfig {
         width: 160,
         render: (text, record) => (
           <Fragment>
-            {updateHandler &&
-              <Authorized authority="UnitConverter_Update" >
+            {updateHandler && (
+              <Authorized authority="UnitConverter_Update">
                 <a onClick={() => updateHandler(record)}> 修改 </a>
                 <Divider type="vertical" />
               </Authorized>
-            }
-            {deleteHandler &&
-              < Authorized authority="UnitConverter_Delete" >
+            )}
+            {deleteHandler && (
+              <Authorized authority="UnitConverter_Delete">
                 <Popconfirm title="是否要删除此行？" onConfirm={() => deleteHandler(record)}>
                   <a>删除 </a>
                 </Popconfirm>
               </Authorized>
-            }
+            )}
           </Fragment>
         ),
       },
     ];
-  }
+  };
 }
 
 const columnConfig = new ColumnConfig();

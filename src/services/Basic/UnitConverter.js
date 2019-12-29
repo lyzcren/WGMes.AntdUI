@@ -10,6 +10,10 @@ export async function fakeQuery(params) {
   });
 }
 
+export async function fakeGet(id) {
+  return request(`/api/UnitConverter/${id}`);
+}
+
 export async function fakeRemove(params) {
   return request(`/api/UnitConverter/${params.fItemID}`, {
     method: 'DELETE',

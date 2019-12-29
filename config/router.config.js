@@ -394,6 +394,13 @@ export default [
                 authority: ['UnitConverter_Create'],
                 hideInMenu: true,
               },
+              {
+                path: '/basic/unitConverter/update',
+                name: 'update',
+                component: './Basic/UnitConverter/Update',
+                authority: ['UnitConverter_Update'],
+                hideInMenu: true,
+              },
             ],
           },
           {

@@ -88,6 +88,7 @@ export default {
   'menu.basic.unit': '单位',
   'menu.basic.unitConverter': '单位转换器',
   'menu.basic.unitConverter.create': '新增单位转换器',
+  'menu.basic.unitConverter.update': '修改单位转换器',
   'menu.basic.machine': '机台',
   'menu.basic.emp': '职员',
   'menu.basic.workTime': '班次',

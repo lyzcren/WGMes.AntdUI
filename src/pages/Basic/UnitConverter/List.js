@@ -28,7 +28,6 @@ import {
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
-import { UpdateForm } from './UpdateForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
@@ -51,12 +50,7 @@ const getValue = obj =>
 @Form.create()
 class TableList extends PureComponent {
   state = {
-    // 新增界面
-    modalVisible: false,
     formValues: {},
-    // 修改界面
-    updateModalVisible: false,
-    updateFormValues: {},
     // 其他
     expandForm: false,
     selectedRows: [],
@@ -71,7 +65,7 @@ class TableList extends PureComponent {
     pageSize: 10,
   };
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
       type: 'unitConverter/fetch',
@@ -347,19 +341,29 @@ class TableList extends PureComponent {
     });
   };
 
-  createModalVisible = record => {
+  openCreatePage = record => {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
       payload: {
         path: '/basic/unitConverter/create',
-        location: { data: record, tabMode: true },
-        successCallback: this.search,
+        location: { data: record, tabMode: true, successCallback: this.search },
       },
     });
   };
 
-  renderSimpleForm () {
+  openUpdatePage = record => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/openMenu',
+      payload: {
+        path: '/basic/unitConverter/update',
+        location: { id: record.fItemID, data: record, tabMode: true, successCallback: this.search },
+      },
+    });
+  };
+
+  renderSimpleForm() {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -399,28 +403,21 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm () {
+  renderAdvancedForm() {
     return renderSimpleForm;
   }
 
-  renderForm () {
+  renderForm() {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  render () {
+  render() {
     const {
       unitConverter: { data, queryResult },
       loading,
     } = this.props;
-    const {
-      selectedRows,
-      modalVisible,
-      updateModalVisible,
-      updateFormValues,
-      authorityModalVisible,
-      authorizeUserModalVisible,
-    } = this.state;
+    const { selectedRows, authorityModalVisible, authorizeUserModalVisible } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove" disabled={!hasAuthority('UnitConverter_Delete')}>
@@ -436,14 +433,10 @@ class TableList extends PureComponent {
     );
 
     const columns = ColumnConfig.getColumns({
-      updateHandler: (record) => this.handleUpdateModalVisible(true, record),
-      deleteHandler: record => this.deleteRecord(record)
+      updateHandler: record => this.openUpdatePage(record),
+      deleteHandler: record => this.deleteRecord(record),
     });
 
-    const updateMethods = {
-      handleModalVisible: this.handleUpdateModalVisible,
-      handleSubmit: this.handleUpdate,
-    };
     return (
       <div style={{ margin: '-24px -24px 0' }}>
         <GridContent>
@@ -452,7 +445,7 @@ class TableList extends PureComponent {
               <div className={styles.tableListForm}>{this.renderForm()}</div>
               <div className={styles.tableListOperator}>
                 <Authorized authority="UnitConverter_Create">
-                  <Button icon="plus" type="primary" onClick={() => this.createModalVisible(true)}>
+                  <Button icon="plus" type="primary" onClick={() => this.openCreatePage(true)}>
                     新建
                   </Button>
                 </Authorized>
@@ -511,13 +504,6 @@ class TableList extends PureComponent {
               />
             </div>
           </Card>
-          {updateFormValues && Object.keys(updateFormValues).length ? (
-            <UpdateForm
-              {...updateMethods}
-              updateModalVisible={updateModalVisible}
-              values={updateFormValues}
-            />
-          ) : null}
         </GridContent>
       </div>
     );

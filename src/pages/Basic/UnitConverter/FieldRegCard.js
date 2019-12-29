@@ -1,45 +1,40 @@
 import React, { PureComponent } from 'react';
-import {
-  Card, Table, Button, Input, Select,
-  message,
-  Popconfirm,
-  Divider,
-} from 'antd';
+import { Card, Table, Button, Input, Select, message, Popconfirm, Divider } from 'antd';
 import isEqual from 'lodash/isEqual';
 import WgStandardTable from '@/wg_components/WgStandardTable';
-
 
 const { Option } = Select;
 
 class FieldRegCard extends PureComponent {
   constructor(props) {
     super(props);
-    const { data } = props;
+
     this.state = {
-      data,
       loading: false,
     };
     this.index = 0;
     this.cacheOriginData = {};
   }
 
-  raiseChangeEvent (data) {
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (!isEqual(nextProps.data, prevState.data) || !isEqual(nextProps.fields, prevState.fields)) {
+      return {
+        data: nextProps.data || [],
+        fields: nextProps.fields,
+      };
+    }
+    return null;
+  }
+
+  raiseChangeEvent(data) {
     const { onChange } = this.props;
     if (onChange) onChange(data);
   }
 
   handleAdd = () => {
-    const { data } = this.state;
+    const { data } = this.props;
     const newData = data.map(item => ({ ...item }));
-    // const newItem = {
-    //   guid: `NEW_TEMP_ID_${this.index}`,
-    //   fField: '',
-    //   fFieldName: '',
-    //   fRegex: '',
-    // };
-    // newData.push(newItem);
     this.index += 1;
-    this.setState({ data: newData });
     this.raiseChangeEvent(newData);
   };
 
@@ -47,93 +42,91 @@ class FieldRegCard extends PureComponent {
     this.setState({
       loading: true,
     });
-    const { data } = this.state;
-    let findItem = data.find(x => x.guid === record.guid);
+    const { data } = this.props;
+    let findItem = data.find(x => x.fEntryID === record.fEntryID);
     findItem = { ...findItem, ...record };
-    this.setState({ data, loading: false });
+    this.setState({ loading: false });
     this.raiseChangeEvent(data);
   };
 
-  getRowByKey (guid, newData) {
-    const { data } = this.state;
-    return (newData || data).filter(item => item.guid === guid)[0];
+  getRowByKey(fEntryID, newData) {
+    const { data } = this.props;
+    return (newData || data).filter(item => item.fEntryID === fEntryID)[0];
   }
 
-  toggleEditable = (e, guid) => {
+  toggleEditable = (e, fEntryID) => {
     e.preventDefault();
-    const { data } = this.state;
+    const { data } = this.props;
     const newData = data.map(item => ({ ...item }));
-    const target = this.getRowByKey(guid, newData);
+    const target = this.getRowByKey(fEntryID, newData);
     if (target) {
       // 进入编辑状态时保存原始数据
       if (!target.editable) {
-        this.cacheOriginData[guid] = { ...target };
+        this.cacheOriginData[fEntryID] = { ...target };
       }
       target.editable = !target.editable;
-      this.setState({ data: newData });
+      this.raiseChangeEvent(newData);
     }
   };
 
   newItem = () => {
-    const { data } = this.state;
+    const { data } = this.props;
     const newData = data.map(item => ({ ...item }));
     newData.push({
-      guid: `NEW_TEMP_ID_${this.index}`,
-      fFieldName: '',
+      fEntryID: this.index,
       fField: '',
       fRegex: '',
       editable: true,
       isNew: true,
     });
     this.index += 1;
-    this.setState({ data: newData });
+    this.raiseChangeEvent(newData);
   };
 
-  remove (guid) {
+  remove(fEntryID) {
     this.setState({
       loading: true,
     });
-    const { data } = this.state;
-    const newData = data.filter(x => x.guid != guid);
-    this.setState({ data: newData, loading: false });
+    const { data } = this.props;
+    const newData = data.filter(x => x.fEntryID != fEntryID);
+    this.setState({ loading: false });
     this.raiseChangeEvent(newData);
   }
 
-  handleKeyPress (e, key) {
+  handleKeyPress(e, key) {
     if (e.key === 'Enter') {
       this.saveRow(e, key);
     }
   }
 
-  handleFieldChange (guid, record) {
-    const { data } = this.state;
+  handleFieldChange(fEntryID, record) {
+    const { data } = this.props;
     const newData = data.map(item => ({ ...item }));
-    const target = this.getRowByKey(guid, newData);
+    const target = this.getRowByKey(fEntryID, newData);
     if (target) {
-      target.fFieldName = record.title;
       target.fField = record.dataIndex;
-      this.setState({ data: newData });
+      this.raiseChangeEvent(newData);
     }
   }
 
-  handleOtherFieldChange (guid, fieldName, value) {
-    const { data } = this.state;
+  handleOtherFieldChange(fEntryID, fieldName, value) {
+    const { data } = this.props;
     const newData = data.map(item => ({ ...item }));
-    const target = this.getRowByKey(guid, newData);
+    const target = this.getRowByKey(fEntryID, newData);
     if (target) {
       target[fieldName] = value;
-      this.setState({ data: newData });
+      this.raiseChangeEvent(newData);
     }
   }
 
-  saveRow (e, guid) {
+  saveRow(e, fEntryID) {
     e.persist();
     if (this.clickedCancel) {
       this.clickedCancel = false;
       return;
     }
-    const target = this.getRowByKey(guid) || {};
-    if (!target.fFieldName) {
+    const target = this.getRowByKey(fEntryID) || {};
+    if (!target.fField) {
       message.error('请选择字段');
       e.target.focus();
       return;
@@ -149,28 +142,27 @@ class FieldRegCard extends PureComponent {
       this.handleUpdate(target);
     }
     delete target.isNew;
-    this.toggleEditable(e, guid);
+    this.toggleEditable(e, fEntryID);
   }
 
-  cancel (e, guid) {
+  cancel(e, fEntryID) {
     this.clickedCancel = true;
     e.preventDefault();
-    const { data } = this.state;
+    const { data } = this.props;
     const newData = data.map(item => ({ ...item }));
-    const target = this.getRowByKey(guid, newData);
-    if (this.cacheOriginData[guid]) {
-      Object.assign(target, this.cacheOriginData[guid]);
-      delete this.cacheOriginData[guid];
+    const target = this.getRowByKey(fEntryID, newData);
+    if (this.cacheOriginData[fEntryID]) {
+      Object.assign(target, this.cacheOriginData[fEntryID]);
+      delete this.cacheOriginData[fEntryID];
     }
     target.editable = false;
-    this.setState({ data: newData });
+    this.raiseChangeEvent(newData);
     this.clickedCancel = false;
   }
 
-
-  render () {
-    const { data, loading } = this.state;
-    const { fields } = this.props;
+  render() {
+    const { loading } = this.state;
+    const { data, fields } = this.props;
     const columns = [
       {
         title: '列名',
@@ -184,23 +176,23 @@ class FieldRegCard extends PureComponent {
                 autoFocus
                 value={record.fField}
                 placeholder="请选择列名"
-                onChange={(value) => {
+                onChange={value => {
                   const item = fields.find(x => x.dataIndex === value);
-                  this.handleFieldChange(record.guid, item);
+                  this.handleFieldChange(record.fEntryID, item);
                 }}
-                onKeyPress={e => this.handleKeyPress(e, record.guid)}
+                onKeyPress={e => this.handleKeyPress(e, record.fEntryID)}
                 style={{ width: '100%' }}
               >
-                {fields
-                  .map(x => (
-                    <Option key={x.dataIndex} value={x.dataIndex}>
-                      {x.title}
-                    </Option>
-                  ))}
+                {fields.map(x => (
+                  <Option key={x.dataIndex} value={x.dataIndex}>
+                    {x.title}
+                  </Option>
+                ))}
               </Select>
             );
           } else {
-            return text;
+            const findItem = fields.find(x => x.dataIndex === record.fField);
+            return findItem ? findItem.title : '';
           }
         },
       },
@@ -214,8 +206,10 @@ class FieldRegCard extends PureComponent {
             return (
               <Input
                 value={text}
-                onChange={e => { this.handleOtherFieldChange(record.guid, 'fRegex', e.target.value) }}
-                onKeyPress={e => this.handleKeyPress(e, record.guid)}
+                onChange={e => {
+                  this.handleOtherFieldChange(record.fEntryID, 'fRegex', e.target.value);
+                }}
+                onKeyPress={e => this.handleKeyPress(e, record.fEntryID)}
                 placeholder="请填写正则表达式"
               />
             );
@@ -234,8 +228,10 @@ class FieldRegCard extends PureComponent {
             return (
               <Input
                 value={text}
-                onChange={e => { this.handleOtherFieldChange(record.guid, 'fRegComments', e.target.value) }}
-                onKeyPress={e => this.handleKeyPress(e, record.guid)}
+                onChange={e => {
+                  this.handleOtherFieldChange(record.fEntryID, 'fRegComments', e.target.value);
+                }}
+                onKeyPress={e => this.handleKeyPress(e, record.fEntryID)}
                 placeholder="请填写备注"
               />
             );
@@ -254,23 +250,23 @@ class FieldRegCard extends PureComponent {
             if (record.isNew) {
               return (
                 <span>
-                  <a onClick={e => this.saveRow(e, record.guid)}>添加</a>
+                  <a onClick={e => this.saveRow(e, record.fEntryID)}>添加</a>
                 </span>
               );
             }
             return (
               <span>
-                <a onClick={e => this.saveRow(e, record.guid)}>保存</a>
+                <a onClick={e => this.saveRow(e, record.fEntryID)}>保存</a>
                 <Divider type="vertical" />
-                <a onClick={e => this.cancel(e, record.guid)}>取消</a>
+                <a onClick={e => this.cancel(e, record.fEntryID)}>取消</a>
               </span>
             );
           }
           return (
             <span>
-              <a onClick={e => this.toggleEditable(e, record.guid)}>编辑</a>
+              <a onClick={e => this.toggleEditable(e, record.fEntryID)}>编辑</a>
               <Divider type="vertical" />
-              <Popconfirm title="是否要删除此行？" onConfirm={() => this.remove(record.guid)}>
+              <Popconfirm title="是否要删除此行？" onConfirm={() => this.remove(record.fEntryID)}>
                 <a>删除</a>
               </Popconfirm>
             </span>
@@ -282,7 +278,7 @@ class FieldRegCard extends PureComponent {
     return (
       <Card title="字段匹配" style={{ marginBottom: 24 }} bordered={false}>
         <WgStandardTable
-          rowKey="guid"
+          rowKey="fEntryID"
           loading={loading}
           columns={columns}
           dataSource={data}
@@ -290,7 +286,7 @@ class FieldRegCard extends PureComponent {
           // 以下属性与列配置相关
           configKey={'UnitConverter_FieldRegex'}
           showAlert={false}
-          selectabel={false}          
+          selectabel={false}
         />
         <Button
           style={{ width: '100%', marginTop: 16, marginBottom: 8 }}
