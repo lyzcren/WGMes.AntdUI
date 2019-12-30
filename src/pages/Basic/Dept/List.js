@@ -24,6 +24,7 @@ import {
   Progress,
   notification,
   Popconfirm,
+  Tag,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
@@ -32,11 +33,13 @@ import { UpdateForm } from './UpdateForm';
 import { CreateForm } from './CreateForm';
 import { UpdateFixForm } from './UpdateFixForm';
 import { TechParamForm } from './TechParamForm';
-import ColumnConfig from './ColumnConfig';
+import UnitConverterForm from './UnitConverterForm';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
 import StandardTable from '@/components/StandardTable';
 import WgStandardTable from '@/wg_components/WgStandardTable';
+
+import { getColumns } from '@/columns/columnsConfig';
 
 import styles from './List.less';
 
@@ -48,16 +51,24 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ deptManage, loading, basicData }) => ({
+@connect(({ deptManage, deptUnitConverterManage, loading, basicData }) => ({
   deptManage,
+  deptUnitConverterManage,
   loading: loading.models.deptManage,
+  deptUnitConverterLoading: loading.models.deptUnitConverterManage,
   basicData,
 }))
 @Form.create()
 class TableList extends PureComponent {
   state = {
     // 新增界面
-    modalVisible: { add: false, update: false, techParam: false, updateFix: false },
+    modalVisible: {
+      add: false,
+      update: false,
+      techParam: false,
+      updateFix: false,
+      unitConverter: false,
+    },
     formValues: {},
     currentFormValues: {},
     // 其他
@@ -86,12 +97,11 @@ class TableList extends PureComponent {
     dispatch({
       type: 'basicData/getWorkShops',
     });
-    // 列配置相关方法
-    ColumnConfig.updateModalVisible = record => this.handleUpdateModalVisible(true, record);
-    ColumnConfig.updateFixModalVisible = record => this.handleUpdateFixModalVisible(true, record);
-    ColumnConfig.delete = record => this.handleDelete(record);
-    ColumnConfig.handleActive = record => this.handleActive(record, !record.fIsActive);
-    ColumnConfig.handleTechParam = record => this.handleTechParamModalVisible(true, record);
+    if (hasAuthority('UnitConverter_Read')) {
+      dispatch({
+        type: 'basicData/getUnitConverter',
+      });
+    }
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -297,6 +307,21 @@ class TableList extends PureComponent {
     });
   };
 
+  handleUnitConverterModalVisible = (flag, record) => {
+    const { modalVisible } = this.state;
+    const { dispatch } = this.props;
+    this.setState({
+      modalVisible: { ...modalVisible, unitConverter: !!flag },
+      currentFormValues: record || {},
+    });
+    if (record && record.fItemID) {
+      dispatch({
+        type: 'deptUnitConverterManage/get',
+        payload: { id: record.fItemID },
+      });
+    }
+  };
+
   handleAdd = fields => {
     const { dispatch, form } = this.props;
     dispatch({
@@ -492,6 +517,45 @@ class TableList extends PureComponent {
     });
   };
 
+  unitConverterSubmit = () => {
+    const {
+      dispatch,
+      deptUnitConverterManage: { deptUnitConverters },
+    } = this.props;
+    const {
+      currentFormValues: { fItemID },
+    } = this.state;
+    dispatch({
+      type: 'deptUnitConverterManage/update',
+      payload: {
+        fItemID,
+        fUnitConverterIDs: deptUnitConverters.map(x => x.fItemID),
+      },
+    }).then(() => {
+      const {
+        deptManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success('修改成功');
+        this.handleUnitConverterModalVisible();
+        // 成功后再次刷新列表
+        this.search();
+      } else if (queryResult.status === 'warning') {
+        message.warning(queryResult.message);
+      } else {
+        message.error(queryResult.message);
+      }
+    });
+  };
+
+  handleUnitConverterChange = converters => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'deptUnitConverterManage/change',
+      payload: converters,
+    });
+  };
+
   renderSimpleForm() {
     const {
       form: { getFieldDecorator },
@@ -556,19 +620,8 @@ class TableList extends PureComponent {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  render() {
-    const {
-      deptManage: { data, queryResult, treeData, typeData },
-      loading,
-      dispatch,
-    } = this.props;
-    const {
-      selectedRows,
-      modalVisible,
-      currentFormValues,
-      authorityModalVisible,
-      authorizeUserModalVisible,
-    } = this.state;
+  renderOperator() {
+    const { selectedRows } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove" disabled={!hasAuthority('Dept_Delete')}>
@@ -582,6 +635,169 @@ class TableList extends PureComponent {
         </Menu.Item>
       </Menu>
     );
+    return (
+      <div>
+        <Authorized authority="Dept_Create">
+          <Button icon="plus" type="primary" onClick={() => this.handleSync()}>
+            从 ERP 同步
+          </Button>
+        </Authorized>
+        <Authorized authority="Dept_Create">
+          <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+            新建
+          </Button>
+        </Authorized>
+        <Authorized authority="Dept_Export">
+          <Dropdown
+            overlay={
+              <Menu onClick={this.handleExport} selectedKeys={[]}>
+                <Menu.Item key="currentPage">当前页</Menu.Item>
+                <Menu.Item key="allPage">所有页</Menu.Item>
+              </Menu>
+            }
+          >
+            <Button icon="download">
+              导出 <Icon type="down" />
+            </Button>
+          </Dropdown>
+        </Authorized>
+        {selectedRows.length > 0 && (
+          <span>
+            <Authorized authority="Dept_Delete">
+              <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
+            </Authorized>
+            <Authorized authority={['Dept_Delete', 'Dept_Active']}>
+              <Dropdown overlay={menu}>
+                <Button>
+                  更多操作 <Icon type="down" />
+                </Button>
+              </Dropdown>
+            </Authorized>
+          </span>
+        )}
+        <div style={{ float: 'right', marginRight: 24 }}>
+          <Button
+            icon="menu"
+            onClick={() => {
+              if (this.showConfig) this.showConfig();
+            }}
+          >
+            列配置
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  getColumnOps = () => {
+    return [
+      {
+        dataIndex: 'workTimeList',
+        render(val) {
+          return (
+            val &&
+            val.map(x => (
+              <Tag key={x.fWorkTimeID} color={x.fIsActive ? 'green' : undefined}>
+                {x.fWorkTimeName}
+              </Tag>
+            ))
+          );
+        },
+      },
+      {
+        dataIndex: 'fIsActive',
+        filters: [
+          {
+            text: '启用',
+            value: 1,
+          },
+          {
+            text: '禁用',
+            value: 0,
+          },
+        ],
+        render(val) {
+          return <Switch disabled checked={val} />;
+        },
+      },
+      {
+        dataIndex: 'operators',
+        render: (text, record) => (
+          <Fragment>
+            <Authorized authority="Dept_Update">
+              <a onClick={() => this.handleUpdateModalVisible(true, record)}>修改</a>
+              <Divider type="vertical" />
+            </Authorized>
+            <Authorized authority="Dept_Delete">
+              <Popconfirm title="是否要删除此行？" onConfirm={() => this.handleDelete(record)}>
+                <a>删除</a>
+              </Popconfirm>
+            </Authorized>
+            <Dropdown
+              overlay={
+                <Menu>
+                  <Menu.Item
+                    key="updateBillNoRule"
+                    disabled={
+                      !hasAuthority('BillNoRule_Update') || record.fTypeNumber !== 'WorkShop'
+                    }
+                    onClick={() => this.handleUpdateFixModalVisible(true, record)}
+                  >
+                    编码规则
+                  </Menu.Item>
+                  <Menu.Item
+                    key="updateParams"
+                    disabled={!hasAuthority('Dept_Update') || record.fTypeNumber !== 'Process'}
+                    onClick={() => this.handleTechParamModalVisible(true, record)}
+                  >
+                    工艺参数
+                  </Menu.Item>
+                  {hasAuthority('UnitConverter_Read') && (
+                    <Menu.Item
+                      key="unitConverter"
+                      disabled={!hasAuthority('Dept_Update') || record.fTypeNumber !== 'Process'}
+                      onClick={() => this.handleUnitConverterModalVisible(true, record)}
+                    >
+                      单位转换
+                    </Menu.Item>
+                  )}
+                  <Menu.Item
+                    key="active"
+                    disabled={!hasAuthority('Dept_Active')}
+                    onClick={() => this.handleActive(record, !record.fIsActive)}
+                  >
+                    {record.fIsActive ? '禁用' : '启用'}
+                  </Menu.Item>
+                </Menu>
+              }
+            >
+              <a>
+                <Divider type="vertical" />
+                更多 <Icon type="down" />
+              </a>
+            </Dropdown>
+          </Fragment>
+        ),
+      },
+    ];
+  };
+
+  render() {
+    const {
+      deptManage: { data, queryResult, treeData, typeData },
+      deptUnitConverterManage: { deptUnitConverters },
+      loading,
+      deptUnitConverterLoading,
+      dispatch,
+      basicData: { unitConverters },
+    } = this.props;
+    const {
+      selectedRows,
+      modalVisible,
+      currentFormValues,
+      authorityModalVisible,
+      authorizeUserModalVisible,
+    } = this.state;
 
     const parentMethods = {
       handleSubmit: this.handleAdd,
@@ -596,62 +812,15 @@ class TableList extends PureComponent {
       handleSubmit: this.handleTechParam,
       dispatch,
     };
+    const columns = getColumns({ key: 'dept', columnOps: this.getColumnOps() });
+
     return (
       <div style={{ margin: '-24px -24px 0' }}>
         <GridContent>
           <Card bordered={false}>
             <div className={styles.tableList}>
               <div className={styles.tableListForm}>{this.renderForm()}</div>
-              <div className={styles.tableListOperator}>
-                <Authorized authority="Dept_Create">
-                  <Button icon="plus" type="primary" onClick={() => this.handleSync()}>
-                    从 ERP 同步
-                  </Button>
-                </Authorized>
-                <Authorized authority="Dept_Create">
-                  <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
-                    新建
-                  </Button>
-                </Authorized>
-                <Authorized authority="Dept_Export">
-                  <Dropdown
-                    overlay={
-                      <Menu onClick={this.handleExport} selectedKeys={[]}>
-                        <Menu.Item key="currentPage">当前页</Menu.Item>
-                        <Menu.Item key="allPage">所有页</Menu.Item>
-                      </Menu>
-                    }
-                  >
-                    <Button icon="download">
-                      导出 <Icon type="down" />
-                    </Button>
-                  </Dropdown>
-                </Authorized>
-                {selectedRows.length > 0 && (
-                  <span>
-                    <Authorized authority="Dept_Delete">
-                      <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
-                    </Authorized>
-                    <Authorized authority={['Dept_Delete', 'Dept_Active']}>
-                      <Dropdown overlay={menu}>
-                        <Button>
-                          更多操作 <Icon type="down" />
-                        </Button>
-                      </Dropdown>
-                    </Authorized>
-                  </span>
-                )}
-                <div style={{ float: 'right', marginRight: 24 }}>
-                  <Button
-                    icon="menu"
-                    onClick={() => {
-                      if (this.showConfig) this.showConfig();
-                    }}
-                  >
-                    列配置
-                  </Button>
-                </div>
-              </div>
+              <div className={styles.tableListOperator}>{this.renderOperator()}</div>
               {/* defaultExpandAllRows在Table首次初始化有数据时才会起作用，若不是会导致无法展开问题
             详见 https://github.com/ant-design/ant-design/issues/4145 */}
               {data && data.list && data.list.length ? (
@@ -659,9 +828,9 @@ class TableList extends PureComponent {
                   rowKey="fItemID"
                   defaultExpandAllRows
                   selectedRows={selectedRows}
-                  loading={loading}
+                  loading={loading || deptUnitConverterLoading}
                   data={data}
-                  columns={ColumnConfig.columns}
+                  columns={columns}
                   onSelectRow={this.handleSelectRows}
                   onChange={this.handleStandardTableChange}
                   // 以下属性与列配置相关
@@ -675,7 +844,8 @@ class TableList extends PureComponent {
                   rowKey="fItemID"
                   bordered
                   selectedRows={[]}
-                  columns={ColumnConfig.columns}
+                  columns={columns}
+                  loading={loading || deptUnitConverterLoading}
                 />
               )}
             </div>
@@ -707,6 +877,18 @@ class TableList extends PureComponent {
             <TechParamForm
               {...techParamMethods}
               modalVisible={modalVisible.techParam}
+              values={currentFormValues}
+            />
+          ) : null}
+          {currentFormValues && Object.keys(currentFormValues).length ? (
+            <UnitConverterForm
+              loading={deptUnitConverterLoading}
+              handleModalVisible={this.handleUnitConverterModalVisible}
+              onChange={this.handleUnitConverterChange}
+              onSubmit={this.unitConverterSubmit}
+              modalVisible={modalVisible.unitConverter}
+              unitConverters={unitConverters}
+              data={deptUnitConverters}
               values={currentFormValues}
             />
           ) : null}

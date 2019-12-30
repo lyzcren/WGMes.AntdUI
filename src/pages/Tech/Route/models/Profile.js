@@ -113,7 +113,7 @@ export default {
         payload: { steps, currentStep },
       });
     },
-    *saveStep({ payload, callback }, { put, select }) {
+    *saveStep({ payload, callback }, { call, put, select }) {
       const { steps } = yield select(state => state.routeProfile);
       const submitSteps = [];
       steps.forEach((group, groupId) => {

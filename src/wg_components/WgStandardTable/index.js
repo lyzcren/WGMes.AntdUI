@@ -272,21 +272,6 @@ class WgStandardTable extends PureComponent {
         />
       </div>
     );
-
-    // return (
-    //   <div>
-    //     <StandardTable
-    //       bordered
-    //       rowKey={'entryID'}
-    //       // size='small'
-    //       // tableLayout='fixed'
-    //       scroll={{ x: scrollX }}
-    //       columns={sortedColumns.filter(x => !x.isHidden)}
-    //       components={resizeComponents}
-    //       {...rest}
-    //     />
-    //   </div>
-    // );
   }
 }
 

@@ -33,7 +33,7 @@ export default {
           title: column.title,
           dataIndex: column.dataIndex,
           entryID: columnsConfig.length <= 0 ? index : findItem ? findItem.entryID : 99999,
-          isHidden: findItem ? findItem.isHidden : false,
+          isHidden: findItem ? findItem.isHidden : column.isHidden,
           width: findItem ? findItem.width : column.width,
         };
       });

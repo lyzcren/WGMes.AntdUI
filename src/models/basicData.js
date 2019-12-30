@@ -15,6 +15,7 @@ import {
 } from '@/services/basicData';
 import { fakeGetAll as fakeGetUnit } from '@/services/Basic/Unit';
 import { fakeQueryRootUrl } from '@/services/Sys/PrintTemplate';
+import { fakeGetAll as fakeGetUnitConverter } from '@/services/Basic/UnitConverter';
 
 export default {
   namespace: 'basicData',
@@ -34,6 +35,7 @@ export default {
     workTimes: [],
     paramType: [],
     Units: [],
+    unitConverters: [],
   },
 
   effects: {
@@ -143,6 +145,13 @@ export default {
       yield put({
         type: 'save',
         payload: { Units: response },
+      });
+    },
+    *getUnitConverter({}, { call, put }) {
+      const response = yield call(fakeGetUnitConverter);
+      yield put({
+        type: 'save',
+        payload: { unitConverters: response },
       });
     },
   },

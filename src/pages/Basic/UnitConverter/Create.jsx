@@ -20,6 +20,7 @@ import {
   Modal,
   Radio,
   message,
+  TreeSelect,
 } from 'antd';
 import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import DescriptionList from '@/components/DescriptionList';
@@ -60,6 +61,9 @@ class Create extends PureComponent {
     const { dispatch } = props;
     dispatch({
       type: 'basicData/getUnits',
+    });
+    dispatch({
+      type: 'basicData/getProcessDeptTree',
     });
   }
 
@@ -132,9 +136,18 @@ class Create extends PureComponent {
     const {
       loading,
       form: { getFieldDecorator },
-      basicData: { Units },
+      basicData: { Units, processDeptTree },
     } = this.props;
     const { regFields } = this.state;
+
+    const fields = flowFields.filter(
+      x =>
+        x.dataIndex.indexOf('Qty') < 0 &&
+        x.dataIndex.indexOf('Dept') < 0 &&
+        x.dataIndex.indexOf('Rate') < 0 &&
+        x.dataIndex.indexOf('Status') < 0 &&
+        x.dataIndex !== 'operators'
+    );
 
     const action = (
       <Fragment>
@@ -159,59 +172,78 @@ class Create extends PureComponent {
           loading={loading}
         >
           <Card title="基本信息" style={{ marginBottom: 24 }} bordered={false}>
-            <Col xl={{ span: 6 }} lg={{ span: 8 }} md={6} sm={24}>
-              <FormItem label={'名称'}>
-                {getFieldDecorator(`fName`, {
-                  rules: [{ required: true, message: '请输入名称' }],
-                })(<Input />)}
-              </FormItem>
-            </Col>
-            <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={6} sm={24}>
-              <FormItem label="转入单位">
-                {getFieldDecorator('fInUnitID', {
-                  rules: [{ required: true, message: '请选择转入单位' }],
-                })(
-                  <Select
-                    style={{ width: '100%' }}
-                    showSearch
-                    autoClearSearchValue
-                    filterOption={(input, option) =>
-                      option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                    }
-                  >
-                    {Units.map(x => (
-                      <Option key={x.fItemID} value={x.fItemID}>
-                        {`${x.fName} - ${x.fNumber}`}
-                      </Option>
-                    ))}
-                  </Select>
-                )}
-              </FormItem>
-            </Col>
-            <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={6} sm={24}>
-              <FormItem label={'转出单位'}>
-                {getFieldDecorator(`fOutUnitID`, {
-                  rules: [{ required: true, message: '请输入转出单位' }],
-                })(
-                  <Select
-                    style={{ width: '100%' }}
-                    showSearch
-                    autoClearSearchValue
-                    filterOption={(input, option) =>
-                      option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                    }
-                  >
-                    {Units.map(x => (
-                      <Option key={x.fItemID} value={x.fItemID}>
-                        {`${x.fName} - ${x.fNumber}`}
-                      </Option>
-                    ))}
-                  </Select>
-                )}
-              </FormItem>
-            </Col>
+            <Row>
+              <Col xl={{ span: 6 }} lg={{ span: 8 }} md={6} sm={24}>
+                <FormItem label={'名称'}>
+                  {getFieldDecorator(`fName`, {
+                    rules: [{ required: true, message: '请输入名称' }],
+                  })(<Input />)}
+                </FormItem>
+              </Col>
+              <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={6} sm={24}>
+                <FormItem label="转入单位">
+                  {getFieldDecorator('fInUnitID', {
+                    rules: [{ required: true, message: '请选择转入单位' }],
+                  })(
+                    <Select
+                      style={{ width: '100%' }}
+                      showSearch
+                      autoClearSearchValue
+                      filterOption={(input, option) =>
+                        option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                      }
+                    >
+                      {Units.map(x => (
+                        <Option key={x.fItemID} value={x.fItemID}>
+                          {`${x.fName} - ${x.fNumber}`}
+                        </Option>
+                      ))}
+                    </Select>
+                  )}
+                </FormItem>
+              </Col>
+              <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={6} sm={24}>
+                <FormItem label={'转出单位'}>
+                  {getFieldDecorator(`fOutUnitID`, {
+                    rules: [{ required: true, message: '请输入转出单位' }],
+                  })(
+                    <Select
+                      style={{ width: '100%' }}
+                      showSearch
+                      autoClearSearchValue
+                      filterOption={(input, option) =>
+                        option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                      }
+                    >
+                      {Units.map(x => (
+                        <Option key={x.fItemID} value={x.fItemID}>
+                          {`${x.fName} - ${x.fNumber}`}
+                        </Option>
+                      ))}
+                    </Select>
+                  )}
+                </FormItem>
+              </Col>
+            </Row>
+            <Row>
+              <Col xl={{ span: 6 }} lg={{ span: 8 }} md={6} sm={24}>
+                <FormItem label={'适用岗位'}>
+                  {getFieldDecorator('fDeptIDs', {
+                    rules: [{ required: false, message: '请选择岗位' }],
+                  })(
+                    <TreeSelect
+                      style={{ width: '100%' }}
+                      multiple={true}
+                      dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                      treeData={processDeptTree}
+                      treeDefaultExpandAll={true}
+                    />
+                  )}
+                </FormItem>
+              </Col>
+            </Row>
           </Card>
-          <FieldRegCard fields={flowFields} data={regFields} onChange={this.regFieldChange} />
+          <FieldRegCard fields={fields} data={regFields} onChange={this.regFieldChange} />
           <Card title="转换方式" style={{ marginBottom: 24 }} bordered={false}>
             <Row>
               <Col xl={{ span: 3 }} lg={{ span: 3 }} md={6} sm={24}>

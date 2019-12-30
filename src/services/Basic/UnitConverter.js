@@ -10,6 +10,10 @@ export async function fakeQuery(params) {
   });
 }
 
+export async function fakeGetAll() {
+  return request(`/api/UnitConverter`);
+}
+
 export async function fakeGet(id) {
   return request(`/api/UnitConverter/${id}`);
 }

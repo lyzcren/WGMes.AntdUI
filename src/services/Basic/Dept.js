@@ -91,3 +91,17 @@ export async function fakeAddParams(params) {
 export async function fakeGetWorkTimes(id) {
   return request(`/api/dept/workTimes/${id}`);
 }
+
+export async function fakeGetUnitConverters(id) {
+  return request(`/api/dept/${id}/unitConverters`);
+}
+
+export async function fakeUpdateUnitConverter(params) {
+  return request(`/api/Dept/${params.fItemID}/unitConverter`, {
+    method: 'PUT',
+    body: {
+      ...params,
+      method: 'update',
+    },
+  });
+}

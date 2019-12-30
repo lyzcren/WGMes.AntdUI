@@ -168,7 +168,7 @@ class FieldRegCard extends PureComponent {
         title: '列名',
         dataIndex: 'fFieldName',
         key: 'fFieldName',
-        width: 120,
+        width: 250,
         render: (text, record) => {
           if (record.editable) {
             return (
@@ -244,6 +244,7 @@ class FieldRegCard extends PureComponent {
         title: '操作',
         dataIndex: 'action',
         key: 'action',
+        fixed: 'right',
         width: 120,
         render: (text, record) => {
           if (record.editable) {
@@ -279,7 +280,7 @@ class FieldRegCard extends PureComponent {
       <Card title="字段匹配" style={{ marginBottom: 24 }} bordered={false}>
         <WgStandardTable
           rowKey="fEntryID"
-          loading={loading}
+          loading={loading || this.props.loading}
           columns={columns}
           dataSource={data}
           pagination={false}

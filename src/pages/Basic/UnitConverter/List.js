@@ -115,8 +115,12 @@ class TableList extends PureComponent {
     const queryFilters = [];
     if (fieldsValue.queryName)
       queryFilters.push({ name: 'fName', compare: '%*%', value: fieldsValue.queryName });
-    if (fieldsValue.queryIsActive)
-      queryFilters.push({ name: 'fIsActive', compare: '=', value: fieldsValue.queryIsActive });
+    if (fieldsValue.queryInUnitName)
+      queryFilters.push({
+        name: 'fInUnitName',
+        compare: '%*%',
+        value: fieldsValue.queryInUnitName,
+      });
 
     this.setState({
       formValues: values,
@@ -376,13 +380,8 @@ class TableList extends PureComponent {
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem label="状态">
-              {getFieldDecorator('queryIsActive')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="1">启用</Option>
-                  <Option value="0">禁用</Option>
-                </Select>
-              )}
+            <FormItem label="转入单位">
+              {getFieldDecorator('queryInUnitName')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
