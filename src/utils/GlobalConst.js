@@ -106,7 +106,7 @@ export const badgeStatusList = statusArray =>
 export const DecimalModes = [
   { fKey: 'round', fName: '四舍五入' },
   { fKey: 'floor', fName: '向下舍入' },
-  { fKey: 'ceiling', fName: '向上舍入' },
+  { fKey: 'ceil', fName: '向上舍入' },
   { fKey: 'round2', fName: '四舍六入五成双' },
 ];
 

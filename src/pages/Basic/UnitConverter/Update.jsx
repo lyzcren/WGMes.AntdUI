@@ -54,12 +54,12 @@ class Update extends PureComponent {
   constructor(props) {
     super();
     const {
-      location: { id, data, regexes },
+      location: { id, data, expressions },
     } = props;
     this.state = {
       id,
       data,
-      regexes,
+      expressions,
     };
   }
 
@@ -76,15 +76,18 @@ class Update extends PureComponent {
   componentDidMount() {
     const {
       dispatch,
-      location: { id, data, regexes },
+      location: { id, data, expressions },
     } = this.props;
     this.setState({
       id,
       data,
-      regexes,
+      expressions,
     });
     dispatch({
       type: 'basicData/getUnits',
+    });
+    dispatch({
+      type: 'basicData/getMatchType',
     });
     dispatch({
       type: 'basicData/getProcessDeptTree',
@@ -95,12 +98,12 @@ class Update extends PureComponent {
   componentWillReceiveProps(nextProps) {
     if (this.props.location.id !== nextProps.location.id) {
       const {
-        location: { id, data, regexes },
+        location: { id, data, expressions },
       } = nextProps;
       this.setState({
         id,
         data,
-        regexes,
+        expressions,
       });
       this._loadAsyncData(id);
     }
@@ -117,7 +120,7 @@ class Update extends PureComponent {
         message.error('记录不存在或已删除');
         this.close();
       }
-      this.setState({ data, regexes: data.regexes });
+      this.setState({ data, expressions: data.expressions });
     });
   }
 
@@ -129,9 +132,9 @@ class Update extends PureComponent {
     } = this.props;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-      const { regexes } = this.state;
+      const { expressions } = this.state;
       // 过滤不完整的字段匹配规则
-      const filterRegFields = regexes.filter(reg => reg.fField && reg.fRegex);
+      const filterRegFields = expressions.filter(reg => reg.fField && reg.fExpression);
       if (filterRegFields.length <= 0) {
         message.warn('字段匹配列表不能为空.');
         return;
@@ -141,7 +144,7 @@ class Update extends PureComponent {
         payload: {
           fItemID: id,
           ...fieldsValue,
-          regexes: filterRegFields,
+          expressions: filterRegFields,
         },
       }).then(() => {
         const {
@@ -185,10 +188,10 @@ class Update extends PureComponent {
   }
 
   regFieldChange = records => {
-    records.forEach(record => {
-      const regex = new RegExp(record.fRegex);
-    });
-    this.setState({ regexes: records });
+    // records.forEach(record => {
+    //   const regex = new RegExp(record.fExpression);
+    // });
+    this.setState({ expressions: records });
   };
 
   render() {
@@ -196,11 +199,11 @@ class Update extends PureComponent {
       loading,
       loadingInitModel,
       form: { getFieldDecorator, getFieldValue },
-      basicData: { Units, processDeptTree },
+      basicData: { Units, processDeptTree, matchTypes },
     } = this.props;
     const {
       id,
-      regexes,
+      expressions,
       data: {
         fName,
         fInUnitID,
@@ -322,10 +325,10 @@ class Update extends PureComponent {
             </Row>
           </Card>
           <FieldRegCard
-            id={id}
             loading={loadingInitModel}
             fields={fields}
-            data={regexes}
+            matchTypes={matchTypes}
+            data={expressions}
             onChange={this.regFieldChange}
           />
           <Card title="转换方式" style={{ marginBottom: 24 }} bordered={false}>

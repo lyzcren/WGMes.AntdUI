@@ -75,7 +75,7 @@ class FieldRegCard extends PureComponent {
     newData.push({
       fEntryID: this.index,
       fField: '',
-      fRegex: '',
+      fExpression: '',
       editable: true,
       isNew: true,
     });
@@ -131,7 +131,7 @@ class FieldRegCard extends PureComponent {
       e.target.focus();
       return;
     }
-    if (!target.fRegex) {
+    if (!target.fExpression) {
       message.error('请填写正则表达式');
       e.target.focus();
       return;
@@ -162,7 +162,7 @@ class FieldRegCard extends PureComponent {
 
   render() {
     const { loading } = this.state;
-    const { data, fields } = this.props;
+    const { data, fields, matchTypes } = this.props;
     const columns = [
       {
         title: '列名',
@@ -197,9 +197,40 @@ class FieldRegCard extends PureComponent {
         },
       },
       {
+        title: '匹配方式',
+        dataIndex: 'fMatchType',
+        key: 'fMatchType',
+        width: 120,
+        render: (text, record) => {
+          if (record.editable) {
+            return (
+              <Select
+                autoFocus
+                value={record.fMatchType}
+                placeholder="请选择匹配方式"
+                onChange={value => {
+                  this.handleOtherFieldChange(record.fEntryID, 'fMatchType', value);
+                }}
+                onKeyPress={e => this.handleKeyPress(e, record.fEntryID)}
+                style={{ width: '100%' }}
+              >
+                {matchTypes.map(x => (
+                  <Option key={x.fKey} value={x.fKey}>
+                    {x.fValue}
+                  </Option>
+                ))}
+              </Select>
+            );
+          } else {
+            const findItem = matchTypes.find(x => x.fKey === record.fMatchType);
+            return findItem ? findItem.fValue : '';
+          }
+        },
+      },
+      {
         title: '匹配正则表达式',
-        dataIndex: 'fRegex',
-        key: 'fRegex',
+        dataIndex: 'fExpression',
+        key: 'fExpression',
         width: 250,
         render: (text, record) => {
           if (record.editable) {
@@ -207,7 +238,7 @@ class FieldRegCard extends PureComponent {
               <Input
                 value={text}
                 onChange={e => {
-                  this.handleOtherFieldChange(record.fEntryID, 'fRegex', e.target.value);
+                  this.handleOtherFieldChange(record.fEntryID, 'fExpression', e.target.value);
                 }}
                 onKeyPress={e => this.handleKeyPress(e, record.fEntryID)}
                 placeholder="请填写正则表达式"

@@ -529,7 +529,7 @@ class TableList extends PureComponent {
       type: 'deptUnitConverterManage/update',
       payload: {
         fItemID,
-        fUnitConverterIDs: deptUnitConverters.map(x => x.fItemID),
+        fUnitConverterIDs: deptUnitConverters.filter(x => x.fItemID).map(x => x.fItemID),
       },
     }).then(() => {
       const {

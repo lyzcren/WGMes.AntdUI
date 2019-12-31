@@ -96,6 +96,10 @@ export async function fakeGetUnitConverters(id) {
   return request(`/api/dept/${id}/unitConverters`);
 }
 
+export async function fakeGetUnitConvertersWithMatch(id) {
+  return request(`/api/dept/${id}/unitConverters/withMatch`);
+}
+
 export async function fakeUpdateUnitConverter(params) {
   return request(`/api/Dept/${params.fItemID}/unitConverter`, {
     method: 'PUT',

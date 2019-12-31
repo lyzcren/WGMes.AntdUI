@@ -63,6 +63,9 @@ class Create extends PureComponent {
       type: 'basicData/getUnits',
     });
     dispatch({
+      type: 'basicData/getMatchType',
+    });
+    dispatch({
       type: 'basicData/getProcessDeptTree',
     });
   }
@@ -73,7 +76,7 @@ class Create extends PureComponent {
       if (err) return;
       const { regFields } = this.state;
       // 过滤不完整的字段匹配规则
-      const filterRegFields = regFields.filter(reg => reg.fField && reg.fRegex);
+      const filterRegFields = regFields.filter(reg => reg.fField && reg.fExpression);
       if (filterRegFields.length <= 0) {
         message.warn('字段匹配列表不能为空.');
         return;
@@ -82,7 +85,7 @@ class Create extends PureComponent {
         type: 'unitConverterCreate/add',
         payload: {
           ...fieldsValue,
-          regexes: filterRegFields,
+          expressions: filterRegFields,
         },
       }).then(() => {
         const {
@@ -126,9 +129,9 @@ class Create extends PureComponent {
   }
 
   regFieldChange = records => {
-    records.forEach(record => {
-      const regex = new RegExp(record.fRegex);
-    });
+    // records.forEach(record => {
+    //   const regex = new RegExp(record.fExpression);
+    // });
     this.setState({ regFields: records });
   };
 
@@ -136,7 +139,7 @@ class Create extends PureComponent {
     const {
       loading,
       form: { getFieldDecorator },
-      basicData: { Units, processDeptTree },
+      basicData: { Units, processDeptTree, matchTypes },
     } = this.props;
     const { regFields } = this.state;
 
@@ -243,7 +246,12 @@ class Create extends PureComponent {
               </Col>
             </Row>
           </Card>
-          <FieldRegCard fields={fields} data={regFields} onChange={this.regFieldChange} />
+          <FieldRegCard
+            fields={fields}
+            matchTypes={matchTypes}
+            data={regFields}
+            onChange={this.regFieldChange}
+          />
           <Card title="转换方式" style={{ marginBottom: 24 }} bordered={false}>
             <Row>
               <Col xl={{ span: 3 }} lg={{ span: 3 }} md={6} sm={24}>

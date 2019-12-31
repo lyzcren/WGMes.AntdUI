@@ -106,28 +106,6 @@ class Transfer extends PureComponent {
     dispatch({
       type: 'flowTransfer/initModel',
       payload: { fInterID },
-    }).then(() => {
-      const {
-        flowTransfer: {
-          data: { fRouteID, fRouteEntryID, fDeptID },
-        },
-      } = this.props;
-      dispatch({
-        type: 'flowTransfer/getParams',
-        payload: { fInterID: fRouteID, fEntryID: fRouteEntryID },
-      });
-      dispatch({
-        type: 'flowTransfer/getMachineData',
-        payload: { fDeptID },
-      });
-      dispatch({
-        type: 'flowTransfer/getDefect',
-        payload: { fDeptID },
-      });
-      dispatch({
-        type: 'flowTransfer/getWorkTimes',
-        payload: { fDeptID },
-      });
     });
     dispatch({
       type: 'basicData/getDefectData',
@@ -304,38 +282,12 @@ class Transfer extends PureComponent {
     this.setState({ fBeginDate: value[0], fTransferDateTime: value[1] });
   };
 
-  render() {
+  renderDescription = () => {
     const {
-      flowTransfer: { data, machineData, defectList, paramList, workTimes },
-      loading,
-      form: { getFieldDecorator },
-      basicData: { defectData, operators },
-      fBindEmpID,
-      location: { fEmpID, tabMode },
+      flowTransfer: { data },
     } = this.props;
-    const { showMoreDefect, moreDefectValue, qtyFormat, qtyDecimal } = this.state;
-    // 默认机台
-    const defaultMachineID =
-      machineData && machineData.find(x => x.fItemID === this.state.fMachineID)
-        ? this.state.fMachineID
-        : null;
-    // 默认班次
-    const defaultWorkTimeID =
-      workTimes && workTimes.find(x => x.fWorkTimeID === this.state.fWorkTimeID)
-        ? this.state.fWorkTimeID
-        : null;
-    const currentTime = new Date();
-    // 根据当前时间推算班次信息
-    const currentWorkTime =
-      workTimes &&
-      workTimes.find(
-        x =>
-          moment(x.currentBeginTime) <= moment(currentTime) &&
-          moment(x.currentEndTime) >= moment(currentTime)
-      );
-    const currentWorkTimeID = currentWorkTime ? currentWorkTime.fWorkTimeID : null;
-
-    const description = (
+    const { qtyFormat, qtyDecimal } = this.state;
+    return (
       <div style={{ display: 'flex' }}>
         {data.fFullBatchNo && (
           <QRCode
@@ -372,13 +324,59 @@ class Transfer extends PureComponent {
         </DescriptionList>
       </div>
     );
-    // const menu = (
-    //   <Menu>
-    //     <Menu.Item key="1">选项一</Menu.Item>
-    //     <Menu.Item key="2">选项二</Menu.Item>
-    //     <Menu.Item key="3">选项三</Menu.Item>
-    //   </Menu>
-    // );
+  };
+
+  renderExtraContent = () => {
+    const {
+      flowTransfer: { data },
+    } = this.props;
+    return (
+      <Row>
+        <Col xs={24} sm={12}>
+          <div className={styles.textSecondary}>状态</div>
+          <div className={styles.heading}>{data.fStatusName}</div>
+        </Col>
+        <Col xs={24} sm={12}>
+          <div className={styles.textSecondary}>岗位</div>
+          <div className={styles.heading}>{data.fDeptName}</div>
+        </Col>
+      </Row>
+    );
+  };
+
+  render() {
+    const {
+      flowTransfer: { data, machineData, defectList, paramList, workTimes, unitConverters },
+      loading,
+      form: { getFieldDecorator },
+      basicData: { defectData, operators },
+      fBindEmpID,
+      location: { fEmpID, tabMode },
+    } = this.props;
+
+    console.log(unitConverters);
+
+    const { showMoreDefect, moreDefectValue, qtyDecimal } = this.state;
+    // 默认机台
+    const defaultMachineID =
+      machineData && machineData.find(x => x.fItemID === this.state.fMachineID)
+        ? this.state.fMachineID
+        : null;
+    // 默认班次
+    const defaultWorkTimeID =
+      workTimes && workTimes.find(x => x.fWorkTimeID === this.state.fWorkTimeID)
+        ? this.state.fWorkTimeID
+        : null;
+    const currentTime = new Date();
+    // 根据当前时间推算班次信息
+    const currentWorkTime =
+      workTimes &&
+      workTimes.find(
+        x =>
+          moment(x.currentBeginTime) <= moment(currentTime) &&
+          moment(x.currentEndTime) >= moment(currentTime)
+      );
+    const currentWorkTimeID = currentWorkTime ? currentWorkTime.fWorkTimeID : null;
 
     const action = (
       <Fragment>
@@ -396,19 +394,6 @@ class Transfer extends PureComponent {
       </Fragment>
     );
 
-    const extra = (
-      <Row>
-        <Col xs={24} sm={12}>
-          <div className={styles.textSecondary}>状态</div>
-          <div className={styles.heading}>{data.fStatusName}</div>
-        </Col>
-        <Col xs={24} sm={12}>
-          <div className={styles.textSecondary}>岗位</div>
-          <div className={styles.heading}>{data.fDeptName}</div>
-        </Col>
-      </Row>
-    );
-
     return (
       <div style={{ backgroundColor: 'rgb(240, 242, 245)' }}>
         <WgPageHeaderWrapper
@@ -417,8 +402,8 @@ class Transfer extends PureComponent {
             <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
           }
           action={action}
-          content={description}
-          extraContent={extra}
+          content={this.renderDescription()}
+          extraContent={this.renderExtraContent()}
           wrapperClassName={styles.advancedForm}
           loading={loading}
         >
@@ -533,32 +518,6 @@ class Transfer extends PureComponent {
                     )}
                   </FormItem>
                 </Col>
-                {/* <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-                <FormItem key="fBeginDate" label="开工时间">
-                  {getFieldDecorator('fBeginDate', {
-                    rules: [{ required: true, message: '请选择开工时间' }],
-                    initialValue: moment(data.fSignDate)
-                  })(
-                    <DatePicker
-                      format="YYYY-MM-DD HH:mm:ss"
-                      showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}
-                    />
-                  )}
-                </FormItem>
-              </Col>
-              <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-                <FormItem key="fTransferDate" label="转序时间">
-                  {getFieldDecorator('fTransferDate', {
-                    rules: [{ required: true, message: '请选择转序时间' }],
-                    initialValue: moment()
-                  })(
-                    <DatePicker
-                      format="YYYY-MM-DD HH:mm:ss"
-                      showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}
-                    />
-                  )}
-                </FormItem>
-              </Col> */}
               </Row>
             </Form>
           </Card>

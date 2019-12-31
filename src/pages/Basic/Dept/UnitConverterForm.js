@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react';
-import { Form, Modal, Switch, Table, Button, Select } from 'antd';
+import { Form, Modal, Switch, Table, Button, Select, Typography } from 'antd';
 import WgDragableView from '@/wg_components/WgDragableView';
 import { connect } from 'dva';
 
 const { Option } = Select;
+const { Text } = Typography;
 
 /* eslint react/no-multi-comp:0 */
 @Form.create()
@@ -83,7 +84,7 @@ class UnitConverterForm extends PureComponent {
         render: (val, record) => {
           return (
             <Select
-              style={{ width: 300 }}
+              style={{ width: '100%' }}
               dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
               defaultValue={val}
               onChange={value => this.handleItemChange(value, record)}
@@ -101,6 +102,7 @@ class UnitConverterForm extends PureComponent {
       {
         title: '操作',
         dataIndex: 'operators',
+        width: 80,
         render: (text, record) => {
           return (
             <span>
@@ -146,6 +148,9 @@ class UnitConverterForm extends PureComponent {
         >
           {'新增'}
         </Button>
+        <Text style={{ marginTop: '10px' }} type="warning">
+          注：匹配时系统按自上而下顺序选择转换器
+        </Text>
       </Modal>
     );
   }

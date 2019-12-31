@@ -1,8 +1,9 @@
 import { fakeGetProducingRecord, fakeTransfer } from '@/services/Prod/Record';
 import { fakeGetDeptDefect, fakeMachineData } from '@/services/basicData';
 import { fakeQueryParams } from '@/services/Tech/Route';
-import { fakeGetWorkTimes } from '@/services/Basic/Dept';
+import { fakeGetWorkTimes, fakeGetUnitConvertersWithMatch } from '@/services/Basic/Dept';
 import { defaultCipherList } from 'constants';
+import { getMatchConverter, getConvertQtyWithDecimal } from '@/utils/unitConvertUtil';
 import { exists } from 'fs';
 import numeral from 'numeral';
 
@@ -16,6 +17,7 @@ export default {
     defectList: [],
     paramList: [],
     workTimes: [],
+    unitConverters: [],
 
     queryResult: {
       status: 'ok',
@@ -24,35 +26,45 @@ export default {
   },
 
   effects: {
-    *initModel({ payload, callback }, { call, put }) {
+    *initModel({ payload }, { call, put }) {
       const data = yield call(fakeGetProducingRecord, payload);
       data.fPassQty = data.fInputQty + data.fInvCheckDeltaQty - data.fTakeQty;
-      yield put({
-        type: 'save',
-        payload: {
-          data,
-          defectList: [],
-        },
+
+      const { fRouteID, fRouteEntryID, fDeptID } = data;
+      // getParams
+      const paramList = yield call(fakeQueryParams, {
+        fInterID: fRouteID,
+        fEntryID: fRouteEntryID,
       });
-      if (callback) callback();
-    },
-    *getMachineData({ payload }, { call, put }) {
-      const response = yield call(fakeMachineData, payload);
-      yield put({
-        type: 'saveMachineData',
-        payload: response,
-      });
-    },
-    *getParams({ payload }, { call, put }) {
-      const response = yield call(fakeQueryParams, payload);
-      response.forEach(p => {
+      paramList.forEach(p => {
         if (!p.values.includes(p.fDefaultValue)) {
           p.values.unshift(p.fDefaultValue);
         }
       });
+      // getMachineData
+      const machineData = yield call(fakeMachineData, { fDeptID });
+      // getDefect
+      const defectList = yield call(fakeGetDeptDefect, { fDeptID });
+      // getWorkTimes
+      const workTimes = yield call(fakeGetWorkTimes, fDeptID);
+      // getUnitConverters
+      const unitConverters = yield call(fakeGetUnitConvertersWithMatch, fDeptID);
+      const matchConverter = getMatchConverter(data, unitConverters);
+      if (matchConverter) {
+        const convertQty = getConvertQtyWithDecimal(data, matchConverter, data.fInputQty);
+        console.log(convertQty);
+      }
+
       yield put({
-        type: 'saveParam',
-        payload: response,
+        type: 'save',
+        payload: {
+          data,
+          defectList: defectList || [],
+          paramList,
+          machineData,
+          workTimes,
+          unitConverters,
+        },
       });
     },
     *changeParam({ payload }, { call, put, select }) {
@@ -63,16 +75,8 @@ export default {
         existsOne.fValue = fValue;
       }
       yield put({
-        type: 'saveParam',
-        payload: paramList,
-      });
-    },
-    *getDefect({ payload }, { call, put }) {
-      const response = yield call(fakeGetDeptDefect, payload);
-
-      yield put({
-        type: 'saveDefect',
-        payload: response,
+        type: 'save',
+        payload: { paramList },
       });
     },
     *changeDefect({ payload }, { call, put }) {
@@ -96,16 +100,8 @@ export default {
         defectList.push(newItem);
       }
       put({
-        type: 'saveDefect',
-        payload: defectList,
-      });
-    },
-    *getWorkTimes({ payload }, { call, put }) {
-      const response = yield call(fakeGetWorkTimes, payload.fDeptID);
-
-      yield put({
         type: 'save',
-        payload: { workTimes: response },
+        payload: { defectList: defectList || [] },
       });
     },
     *transfer({ payload }, { call, put }) {
@@ -129,24 +125,6 @@ export default {
         ...state,
         queryResult: action.payload ? action.payload : {},
         // data: (action.payload && action.payload.model) ? action.payload.model : state.data
-      };
-    },
-    saveMachineData(state, action) {
-      return {
-        ...state,
-        machineData: action.payload,
-      };
-    },
-    saveParam(state, action) {
-      return {
-        ...state,
-        paramList: action.payload,
-      };
-    },
-    saveDefect(state, action) {
-      return {
-        ...state,
-        defectList: action.payload ? action.payload : [],
       };
     },
     changeDefectReducer(state, action) {

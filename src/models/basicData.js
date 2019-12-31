@@ -34,6 +34,7 @@ export default {
     status: {},
     workTimes: [],
     paramType: [],
+    matchTypes: [],
     Units: [],
     unitConverters: [],
   },
@@ -152,6 +153,13 @@ export default {
       yield put({
         type: 'save',
         payload: { unitConverters: response },
+      });
+    },
+    *getMatchType({}, { call, put }) {
+      const response = yield call(fakeKeyValues, 'MatchType');
+      yield put({
+        type: 'save',
+        payload: { matchTypes: response },
       });
     },
   },
