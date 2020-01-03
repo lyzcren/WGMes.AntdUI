@@ -31,6 +31,8 @@ import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import DescriptionList from '@/components/DescriptionList';
 import Authorized from '@/utils/Authorized';
 import { hasAuthority } from '@/utils/authority';
+import { getUnconvertQty } from '@/utils/unitConvertUtil';
+import { ViewUnitConverterForm } from './ViewUnitConverter';
 
 import { isArray } from 'util';
 import styles from './List.less';
@@ -57,12 +59,9 @@ class Transfer extends PureComponent {
     moreDefectValue: '',
     fBeginDate: '',
     fTransferDateTime: '',
-    // qtyDecimal: 4,
-    // qtyFormat: '0.0000'
-    qtyDecimal: 0,
-    qtyFormat: '0',
     fMachineID: undefined,
     fWorkTimeID: undefined,
+    unitConverterVisible: false,
   };
 
   componentDidMount() {
@@ -91,17 +90,7 @@ class Transfer extends PureComponent {
   }
 
   loadData(fInterID) {
-    const {
-      dispatch,
-      location: {
-        data: { fQtyDecimal },
-      },
-    } = this.props;
-    const qtyDecimal = fQtyDecimal || 0;
-
-    // 根据单位的小数位数配置相关数量的小数位
-    const qtyDecimalPart = '00000000'.slice(0, qtyDecimal);
-    this.setState({ qtyDecimal, qtyFormat: `0.${qtyDecimalPart}` });
+    const { dispatch } = this.props;
 
     dispatch({
       type: 'flowTransfer/initModel',
@@ -119,38 +108,42 @@ class Transfer extends PureComponent {
     const {
       form,
       dispatch,
-      flowTransfer: { data },
+      flowTransfer: { data, matchConverter },
       successCallback,
     } = this.props;
     const { fBeginDate, fTransferDateTime } = this.state;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      data.fOperatorID = fieldsValue.fOperatorID;
-      data.fMachineID = fieldsValue.fMachineID;
-      data.fMoldID = fieldsValue.fMoldID;
-      data.fBeginDate = fBeginDate ? fBeginDate.format('YYYY-MM-DD HH:mm:ss') : undefined;
-      data.fTransferDateTime = fTransferDateTime
+      const newData = { ...data };
+      newData.fOperatorID = fieldsValue.fOperatorID;
+      newData.fMachineID = fieldsValue.fMachineID;
+      newData.fMoldID = fieldsValue.fMoldID;
+      newData.fBeginDate = fBeginDate ? fBeginDate.format('YYYY-MM-DD HH:mm:ss') : undefined;
+      newData.fTransferDateTime = fTransferDateTime
         ? fTransferDateTime.format('YYYY-MM-DD HH:mm:ss')
         : undefined;
-      data.fWorkTimeID = fieldsValue.fWorkTimeID;
-      data.defects = [];
-      data.params = [];
+      newData.fWorkTimeID = fieldsValue.fWorkTimeID;
+      newData.defects = [];
+      newData.params = [];
       for (const key in fieldsValue) {
         if (key.indexOf('detailDefectID') === 0 && fieldsValue[key]) {
-          data.defects.push({
+          newData.defects.push({
             fDefectID: key.replace('detailDefectID', ''),
-            fValue: fieldsValue[key],
+            fValue: matchConverter
+              ? getUnconvertQty(data, matchConverter, fieldsValue[key])
+              : fieldsValue[key],
+            fConvertValue: fieldsValue[key],
           });
         } else if (key.indexOf('paramsID') === 0) {
           const paramValue = isArray(fieldsValue[key]) ? fieldsValue[key] : [fieldsValue[key]];
-          data.params.push({ fParamID: key.replace('paramsID', ''), fValue: paramValue });
+          newData.params.push({ fParamID: key.replace('paramsID', ''), fValue: paramValue });
         }
       }
 
       dispatch({
         type: 'flowTransfer/transfer',
-        payload: { ...data },
+        payload: { ...newData },
       }).then(() => {
         const {
           flowTransfer: {
@@ -204,25 +197,8 @@ class Transfer extends PureComponent {
     dispatch({
       type: 'flowTransfer/changeDefect',
       payload: { fDefectID, fValue },
-    }).then(() => {
-      const { flowTransfer } = this.props;
-      // console.log(flowTransfer);
     });
   }
-
-  // handleOtherDefectChange (value) {
-  //   value = value.replace(/\.$/g, '');
-  //   this.setState({ moreDefectValue: value });
-  //   const { form, dispatch } = this.props;
-  //   const fieldsValue = form.getFieldsValue();
-  //   dispatch({
-  //     type: 'flowTransfer/changeDefect',
-  //     payload: { fDefectID: fieldsValue.fOtherDefectID, fValue: value },
-  //   }).then(() => {
-  //     const { flowTransfer } = this.props;
-  //     // console.log(flowTransfer);
-  //   });
-  // }
 
   handleOtherDefectKeyPress(e) {
     if (e.key === 'Enter') {
@@ -259,9 +235,6 @@ class Transfer extends PureComponent {
     dispatch({
       type: 'flowTransfer/changeParam',
       payload: { fParamID, fValue },
-    }).then(() => {
-      const { flowTransfer } = this.props;
-      // console.log(flowTransfer);
     });
   }
 
@@ -286,7 +259,8 @@ class Transfer extends PureComponent {
     const {
       flowTransfer: { data },
     } = this.props;
-    const { qtyFormat, qtyDecimal } = this.state;
+    const { fQtyFormat, fQtyDecimal } = data;
+
     return (
       <div style={{ display: 'flex' }}>
         {data.fFullBatchNo && (
@@ -303,24 +277,53 @@ class Transfer extends PureComponent {
           col="3"
           style={{ flex: 'auto' }}
         >
+          <Description term="流程单号">{data.fFullBatchNo}</Description>
           <Description term="任务单号">{data.fMoBillNo}</Description>
           <Description term="订单号">{data.fSoBillNo}</Description>
+
+          <Description term="流程单数量">{`${numeral(data.fFlowInputQty).format(fQtyFormat)} ${
+            data.fUnitName
+          }`}</Description>
+          <Description term="投入数量">{`${numeral(data.fInputQty).format(fQtyFormat)} ${
+            data.fUnitName
+          }`}</Description>
+          <Description term="合格数量">{`${numeral(data.fPassQty).format(fQtyFormat)} ${
+            data.fUnitName
+          }`}</Description>
+          {data.fConvertUnitID && (
+            <Description term="单位转换器">
+              <a onClick={() => this.handleUnitConverterVisible(true)}>{data.fUnitConverterName}</a>
+            </Description>
+          )}
+          {data.fConvertUnitID && (
+            <Description term="当前投入数量">
+              <a onClick={() => this.handleUnitConverterVisible(true)}>{`${numeral(
+                data.fConvertInputQty
+              ).format(data.fConvertQtyFormat)} ${data.fConvertUnitName}`}</a>
+            </Description>
+          )}
+          {data.fConvertUnitID && (
+            <Description term="当前合格数量">
+              <a onClick={() => this.handleUnitConverterVisible(true)}>{`${numeral(
+                data.fConvertPassQty
+              ).format(data.fConvertQtyFormat)} ${data.fConvertUnitName}`}</a>
+            </Description>
+          )}
+
           <Description term="产品编码">{data.fProductNumber}</Description>
           <Description term="产品名称">{data.fProductName}</Description>
           <Description term="规格型号">{data.fModel}</Description>
+
           <Description term="父件型号">{data.fMesSelf002}</Description>
           <Description term="底色编号">{data.fMesSelf001}</Description>
           <Description term="内部订单号">{data.fMesSelf003}</Description>
-          <Description term="单位">{data.fUnitName}</Description>
-          <Description term="流程单数量">
-            {numeral(data.fFlowInputQty).format(qtyFormat)}
-          </Description>
-          <Description term="投入数量">{numeral(data.fInputQty).format(qtyFormat)}</Description>
-          <Description term="合格数量">{numeral(data.fPassQty).format(qtyFormat)}</Description>
+
           <Description term="盘点盈亏数量">
-            {numeral(data.fInvCheckDeltaQty).format(qtyFormat)}
+            {`${numeral(data.fInvCheckDeltaQty).format(fQtyFormat)} ${data.fUnitName}`}
           </Description>
-          <Description term="取走数量">{numeral(data.fTakeQty).format(qtyFormat)}</Description>
+          <Description term="取走数量">{`${numeral(data.fTakeQty).format(fQtyFormat)} ${
+            data.fUnitName
+          }`}</Description>
         </DescriptionList>
       </div>
     );
@@ -344,9 +347,13 @@ class Transfer extends PureComponent {
     );
   };
 
+  handleUnitConverterVisible = flag => {
+    this.setState({ unitConverterVisible: !!flag });
+  };
+
   render() {
     const {
-      flowTransfer: { data, machineData, defectList, paramList, workTimes, unitConverters },
+      flowTransfer: { data, machineData, defectList, paramList, workTimes, matchConverter },
       loading,
       form: { getFieldDecorator },
       basicData: { defectData, operators },
@@ -354,9 +361,9 @@ class Transfer extends PureComponent {
       location: { fEmpID, tabMode },
     } = this.props;
 
-    console.log(unitConverters);
-
-    const { showMoreDefect, moreDefectValue, qtyDecimal } = this.state;
+    const { showMoreDefect, moreDefectValue, unitConverterVisible } = this.state;
+    const { fQtyDecimal, fConvertDecimal } = data;
+    const currentQtyDecimal = fConvertDecimal ? fConvertDecimal : fQtyDecimal;
     // 默认机台
     const defaultMachineID =
       machineData && machineData.find(x => x.fItemID === this.state.fMachineID)
@@ -541,9 +548,9 @@ class Transfer extends PureComponent {
                           onChange={val => this.handleFieldChange(val, d.fItemID)}
                           style={{ width: '100%' }}
                           placeholder="请输入数量"
-                          min={Math.pow(0.1, qtyDecimal)}
-                          step={Math.pow(0.1, qtyDecimal)}
-                          precision={qtyDecimal}
+                          min={Math.pow(0.1, currentQtyDecimal)}
+                          step={Math.pow(0.1, currentQtyDecimal)}
+                          precision={currentQtyDecimal}
                         />
                       )}
                     </FormItem>
@@ -645,6 +652,13 @@ class Transfer extends PureComponent {
             </Form>
           </Card>
         </WgPageHeaderWrapper>
+        {matchConverter && Object.keys(matchConverter).length > 0 && (
+          <ViewUnitConverterForm
+            modalVisible={unitConverterVisible}
+            handleModalVisible={this.handleUnitConverterVisible}
+            dataSource={{ ...matchConverter, fConvertRate: data.fConvertRate }}
+          />
+        )}
       </div>
     );
   }

@@ -228,7 +228,7 @@ class FieldRegCard extends PureComponent {
         },
       },
       {
-        title: '匹配正则表达式',
+        title: '匹配内容/正则表达式',
         dataIndex: 'fExpression',
         key: 'fExpression',
         width: 250,
@@ -241,7 +241,7 @@ class FieldRegCard extends PureComponent {
                   this.handleOtherFieldChange(record.fEntryID, 'fExpression', e.target.value);
                 }}
                 onKeyPress={e => this.handleKeyPress(e, record.fEntryID)}
-                placeholder="请填写正则表达式"
+                placeholder="请填写匹配内容/正则表达式"
               />
             );
           } else {

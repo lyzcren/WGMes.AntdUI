@@ -56,7 +56,7 @@ const isMatch = (data, unitConverter) => {
   return true;
 };
 
-const getConverterRate = (data, unitConverter) => {
+export const getConverterRate = (data, unitConverter) => {
   const reg = /^[0-9]+.?[0-9]*$/;
   if (reg.test(unitConverter.fFormula)) {
     return unitConverter.fFormula * 1;
@@ -87,7 +87,9 @@ const getConverterRate = (data, unitConverter) => {
   }
 };
 
-const getConvertQty = (data, unitConverter, qty) => {
+/// 计算转换后的数量
+export const getConvertQty = (data, unitConverter, qty) => {
+  if (!unitConverter || Object.keys(unitConverter) <= 0) return qty;
   const unitRate = getConverterRate(data, unitConverter);
   let convertQty = 0;
   switch (unitConverter.fConvertMode) {
@@ -96,6 +98,26 @@ const getConvertQty = (data, unitConverter, qty) => {
       break;
     case 'div':
       convertQty = qty / unitRate;
+      break;
+    default:
+      convertQty = qty;
+      break;
+  }
+
+  return convertQty;
+};
+
+/// 计算单位转换前的数量
+export const getUnconvertQty = (data, unitConverter, qty) => {
+  if (!unitConverter || Object.keys(unitConverter) <= 0) return qty;
+  const unitRate = getConverterRate(data, unitConverter);
+  let convertQty = 0;
+  switch (unitConverter.fConvertMode) {
+    case 'multi':
+      convertQty = qty / unitRate;
+      break;
+    case 'div':
+      convertQty = qty * unitRate;
       break;
     default:
       convertQty = qty;

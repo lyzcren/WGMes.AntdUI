@@ -39,10 +39,6 @@ class Transfer extends PureComponent {
   state = {
     fBeginDate: '',
     fTransferDateTime: '',
-    // qtyDecimal: 4,
-    // qtyFormat: '0.0000'
-    qtyDecimal: 0,
-    qtyFormat: '0',
   };
 
   componentDidMount() {
@@ -63,15 +59,7 @@ class Transfer extends PureComponent {
   }
 
   loadData(fInterID) {
-    const {
-      dispatch,
-      data: { fQtyDecimal },
-    } = this.props;
-    const qtyDecimal = fQtyDecimal || 0;
-
-    // 根据单位的小数位数配置相关数量的小数位
-    const qtyDecimalPart = '00000000'.slice(0, qtyDecimal);
-    this.setState({ qtyDecimal, qtyFormat: `0.${qtyDecimalPart}` });
+    const { dispatch } = this.props;
 
     dispatch({
       type: 'recordProfile/initModel',
@@ -87,6 +75,103 @@ class Transfer extends PureComponent {
     });
   }
 
+  renderDescription = () => {
+    const {
+      recordProfile: {
+        data: {
+          defectList,
+          paramList,
+          fMoBillNo,
+          fSoBillNo,
+          fProductNumber,
+          fProductName,
+          fModel,
+          fUnitName,
+          fFlowInputQty,
+          fInputQty,
+          fPassQty,
+          fInvCheckDeltaQty,
+          fTakeQty,
+          fStatusName,
+          fDeptName,
+          fFullBatchNo,
+          fOperatorName,
+          fOperatorNumber,
+          fMachineName,
+          fMachineNumber,
+          fSignDate,
+          fBeginDate,
+          fTransferDateTime,
+          fWorkTimeName,
+          fWorkTimeNumber,
+          fQtyDecimal,
+          fQtyFormat,
+          fConvertDecimal,
+          fConvertUnitID,
+          fConvertUnitName,
+          fConvertInputQty,
+          fConvertPassQty,
+          fConvertQtyFormat,
+          fMesSelf001,
+          fMesSelf002,
+          fMesSelf003,
+        },
+      },
+    } = this.props;
+    const currentQtyDecimal = fConvertDecimal ? fConvertDecimal : fQtyDecimal;
+
+    return (
+      <div style={{ display: 'flex' }}>
+        {fFullBatchNo && (
+          <QRCode
+            style={{ flex: 'auto', marginRight: '20px' }}
+            value={fFullBatchNo}
+            // size={200}
+            fgColor="#000000"
+          />
+        )}
+        <DescriptionList className={styles.headerList} size="small" col="3">
+          <Description term="流程单号">{fFullBatchNo}</Description>
+          <Description term="任务单号">{fMoBillNo}</Description>
+          <Description term="订单号">{fSoBillNo}</Description>
+
+          <Description term="单位">{fUnitName}</Description>
+          <Description term="投入数量">{numeral(fInputQty).format(fQtyFormat)}</Description>
+          <Description term="合格数量">{numeral(fPassQty).format(fQtyFormat)}</Description>
+          {fConvertUnitID && (
+            <Description term="当前单位">
+              <a>{fConvertUnitName}</a>
+            </Description>
+          )}
+          {fConvertUnitID && (
+            <Description term="当前投入数量">
+              <a>{numeral(fConvertInputQty).format(fConvertQtyFormat)}</a>
+            </Description>
+          )}
+          {fConvertUnitID && (
+            <Description term="当前合格数量">
+              <a>{numeral(fConvertPassQty).format(fConvertQtyFormat)}</a>
+            </Description>
+          )}
+
+          <Description term="产品编码">{fProductNumber}</Description>
+          <Description term="产品名称">{fProductName}</Description>
+          <Description term="规格型号">{fModel}</Description>
+
+          <Description term="父件型号">{fMesSelf002}</Description>
+          <Description term="底色编号">{fMesSelf001}</Description>
+          <Description term="内部订单号">{fMesSelf003}</Description>
+
+          <Description term="流程单数量">{numeral(fFlowInputQty).format(fQtyFormat)}</Description>
+          <Description term="盘点盈亏数量">
+            {numeral(fInvCheckDeltaQty).format(fQtyFormat)}
+          </Description>
+          <Description term="取走数量">{numeral(fTakeQty).format(fQtyFormat)}</Description>
+        </DescriptionList>
+      </div>
+    );
+  };
+
   render() {
     const {
       recordProfile: { data },
@@ -94,22 +179,12 @@ class Transfer extends PureComponent {
       form: { getFieldDecorator },
     } = this.props;
     const {
+      fFullBatchNo,
+      fPassQty,
+      fInputQty,
+      fDeptName,
       defectList,
       paramList,
-      fMoBillNo,
-      fSoBillNo,
-      fProductNumber,
-      fProductName,
-      fModel,
-      fUnitName,
-      fFlowInputQty,
-      fInputQty,
-      fPassQty,
-      fInvCheckDeltaQty,
-      fTakeQty,
-      fStatusName,
-      fDeptName,
-      fFullBatchNo,
       fOperatorName,
       fOperatorNumber,
       fMachineName,
@@ -119,56 +194,15 @@ class Transfer extends PureComponent {
       fTransferDateTime,
       fWorkTimeName,
       fWorkTimeNumber,
+      fQtyDecimal,
+      fConvertDecimal,
+      fQtyFormat,
+      fConvertQtyFormat,
     } = data;
-    const { qtyFormat, qtyDecimal } = this.state;
-
-    const description = (
-      <div style={{ display: 'flex' }}>
-        {data.fFullBatchNo && (
-          <QRCode
-            style={{ flex: 'auto', marginRight: '20px' }}
-            value={data.fFullBatchNo}
-            // size={200}
-            fgColor="#000000"
-          />
-        )}
-        <DescriptionList className={styles.headerList} size="small" col="3">
-          <Description term="任务单号">{fMoBillNo}</Description>
-          <Description term="订单号">{fSoBillNo}</Description>
-          <Description term="产品编码">{fProductNumber}</Description>
-          <Description term="产品名称">{fProductName}</Description>
-          <Description term="规格型号">{fModel}</Description>
-          <Description term="单位">{fUnitName}</Description>
-          <Description term="流程单数量">{numeral(fFlowInputQty).format(qtyFormat)}</Description>
-          <Description term="投入数量">{numeral(fInputQty).format(qtyFormat)}</Description>
-          <Description term="合格数量">{numeral(fPassQty).format(qtyFormat)}</Description>
-          <Description term="盘点盈亏数量">
-            {numeral(fInvCheckDeltaQty).format(qtyFormat)}
-          </Description>
-          <Description term="取走数量">{numeral(fTakeQty).format(qtyFormat)}</Description>
-        </DescriptionList>
-      </div>
-    );
-    const menu = (
-      <Menu>
-        <Menu.Item key="1">选项一</Menu.Item>
-        <Menu.Item key="2">选项二</Menu.Item>
-        <Menu.Item key="3">选项三</Menu.Item>
-      </Menu>
-    );
+    const currentQtyDecimal = fConvertDecimal ? fConvertDecimal : fQtyDecimal;
 
     const action = (
       <Fragment>
-        <ButtonGroup>
-          {/* <Button type="primary" onClickCapture={() => this.transfer()}>
-            转序
-          </Button>
-          <Dropdown overlay={menu} placement="bottomRight">
-            <Button>
-              <Icon type="ellipsis" />
-            </Button>
-          </Dropdown> */}
-        </ButtonGroup>
         <Button onClick={() => this.close()}>关闭</Button>
       </Fragment>
     );
@@ -195,7 +229,7 @@ class Transfer extends PureComponent {
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }
         action={action}
-        content={description}
+        content={this.renderDescription()}
         extraContent={extra}
         wrapperClassName={styles.advancedForm}
         loading={loading}
@@ -222,68 +256,30 @@ class Transfer extends PureComponent {
             </Description>
             <Description term="班次">{fWorkTimeName}</Description>
             <Description term="班次编码">{fWorkTimeNumber}</Description>
-            <Description term="流程单数量">{numeral(fFlowInputQty).format(qtyFormat)}</Description>
-            <Description term="投入数量">{numeral(fInputQty).format(qtyFormat)}</Description>
-            <Description term="合格数量">{numeral(fPassQty).format(qtyFormat)}</Description>
-            <Description term="盘点盈亏数量">
-              {numeral(fInvCheckDeltaQty).format(qtyFormat)}
-            </Description>
-            <Description term="取走数量">{numeral(fTakeQty).format(qtyFormat)}</Description>
           </DescriptionList>
         </Card>
-        {defectList && (
+        {defectList && defectList.length > 0 && (
           <Card title="不良" style={{ marginBottom: 24 }} bordered={false}>
-            <Form layout="vertical" hideRequiredMark>
-              <Row gutter={16}>
-                {defectList.map((d, i) => (
-                  <Col
-                    key={`detailDefectCol${i}`}
-                    xl={i % 3 === 0 ? {} : { span: 6, offset: 2 }}
-                    lg={i % 3 === 0 ? 6 : { span: 8 }}
-                    md={12}
-                    sm={24}
-                  >
-                    <FormItem key={`detailDefectID${d.fDefectID}`} label={d.fDefectName}>
-                      {getFieldDecorator(`detailDefectID${d.fDefectID}`, {
-                        initialValue: d.fQty,
-                      })(
-                        <InputNumber
-                          readOnly
-                          style={{ width: '100%' }}
-                          placeholder="请输入数量"
-                          min={Math.pow(0.1, qtyDecimal)}
-                          step={Math.pow(0.1, qtyDecimal)}
-                          qtyDecimal={qtyDecimal}
-                        />
-                      )}
-                    </FormItem>
-                  </Col>
-                ))}
-              </Row>
-            </Form>
+            <DescriptionList className={styles.headerList} size="small" col="3">
+              {defectList.map((d, i) => (
+                <Description key={d.fDefectName} term={d.fDefectName}>
+                  {d.fConvertUnitID
+                    ? numeral(d.fConvertQty).format(fConvertQtyFormat)
+                    : numeral(d.fQty).format(fQtyFormat)}
+                </Description>
+              ))}
+            </DescriptionList>
           </Card>
         )}
-        {paramList && (
+        {paramList && paramList.length > 0 && (
           <Card title="工艺参数" style={{ marginBottom: 24 }} bordered={false}>
-            <Form layout="vertical">
-              <Row gutter={16}>
-                {paramList.map((d, i) => (
-                  <Col
-                    key={`paramsCol${i}`}
-                    xl={i % 3 === 0 ? {} : { span: 6, offset: 2 }}
-                    lg={i % 3 === 0 ? 6 : { span: 8 }}
-                    md={12}
-                    sm={24}
-                  >
-                    <FormItem key={`paramsID${d.fParamID}`} label={d.fParamName}>
-                      {getFieldDecorator(`paramsID${d.fParamID}`, {
-                        initialValue: d.fValue,
-                      })(<Input readOnly />)}
-                    </FormItem>
-                  </Col>
-                ))}
-              </Row>
-            </Form>
+            <DescriptionList className={styles.headerList} size="small" col="3">
+              {paramList.map((d, i) => (
+                <Description key={d.fParamName} term={d.fParamName}>
+                  {d.fValue}
+                </Description>
+              ))}
+            </DescriptionList>
           </Card>
         )}
       </WgPageHeaderWrapper>

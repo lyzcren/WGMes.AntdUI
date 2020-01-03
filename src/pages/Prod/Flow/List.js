@@ -1349,7 +1349,7 @@ class TableList extends PureComponent {
             dispatch
             disabled={!queryDeptID}
             queryDeptID={queryDeptID}
-            handleSign={this.handleSign}
+            handleSign={this.sign}
             handleScanTransfer={this.handleScanTransfer}
             handleModalVisible={flag => this.handleModalVisible({ key: 'scan', flag })}
             modalVisible={modalVisible.scan}

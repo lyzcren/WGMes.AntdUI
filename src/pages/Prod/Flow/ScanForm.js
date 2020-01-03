@@ -1,16 +1,21 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Form, Input, Modal, message, Button } from 'antd';
+import numeral from 'numeral';
+import { Form, Input, Modal, message, Button, Alert, Card, Select } from 'antd';
+import DescriptionList from '@/components/DescriptionList';
 
 import styles from './ScanForm.less';
 
 const FormItem = Form.Item;
+const { Option } = Select;
+const { Description } = DescriptionList;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ flowScan, loading, menu }) => ({
+@connect(({ flowScan, loading, menu, user }) => ({
   flowScan,
   loading: loading.models.flowScan,
   menu,
+  currentUser: user.currentUser,
 }))
 /* eslint react/no-multi-comp:0 */
 @Form.create()
@@ -23,26 +28,12 @@ export class ScanForm extends PureComponent {
     const { queryDeptID } = props;
     this.state = {
       queryDeptID,
-      showSignField: false,
     };
   }
 
-  componentDidMount() {
-    const { queryDeptID } = this.props;
-    this.state = {
-      queryDeptID,
-    };
-  }
+  componentDidMount() {}
 
-  componentDidUpdate() {
-    // const currentQueryDeptID = this.state.queryDeptID;
-    // const { queryDeptID } = this.props;
-    // if (currentQueryDeptID !== queryDeptID) {
-    //   this.state = {
-    //     queryDeptID
-    //   };
-    // }
-  }
+  componentDidUpdate() {}
 
   handleKeyPress(e) {
     if (e.key === 'Enter') {
@@ -75,49 +66,48 @@ export class ScanForm extends PureComponent {
     const {
       form,
       handleScanTransfer,
-      transferModalVisible,
-      flowScan: { data },
+      flowScan: { data, showTransfer },
     } = this.props;
-    const { queryDeptID } = this.state;
-    const fFullBatchNo = form.getFieldValue('fFullBatchNo');
-    if (!data) {
-      message.error(`未找到流程单【${fFullBatchNo}】.`);
+    const { fFullBatchNo } = data;
+    if (showTransfer) {
+      handleScanTransfer(data);
       form.resetFields();
-    } else {
-      const { fStatusNumber, fRecordStatusNumber } = data;
-      // 判断是否可签收
-      if (
-        fStatusNumber === 'Reported' ||
-        fStatusNumber === 'EndProduce' ||
-        fStatusNumber === 'NonProduced'
-      ) {
-        message.info('当前流程单已结束生产.');
-      } else if (fRecordStatusNumber !== 'ManufProducing') {
-        // handleSign(data);
-        this.setState({ showSignField: true });
-      } else if (fRecordStatusNumber === 'ManufProducing') {
-        handleScanTransfer(data);
-        form.resetFields();
-        this.close();
-      }
+      this.close();
     }
   };
 
   sign = () => {
     const {
       form,
-      handleSign,
-      flowScan: { data },
+      flowScan: { data, nextDepts },
     } = this.props;
     const signBatchNo = form.getFieldValue('signBatchNo');
     if (signBatchNo !== data.fFullBatchNo) {
       message.error('两次扫描条码不一致.');
     } else {
-      handleSign(data);
-      form.resetFields();
-      this.setState({ showSignField: false });
-      this.inputFullBatchNo.focus();
+      this.comfirmSign();
     }
+  };
+
+  comfirmSign = () => {
+    const {
+      form,
+      dispatch,
+      handleSign,
+      flowScan: { data, nextDepts },
+    } = this.props;
+    const fDeptID = form.getFieldValue('fDeptID');
+    const dept = nextDepts.find(x => x.fDeptID == fDeptID);
+    if (!dept) {
+      message.error('岗位不存在.');
+      return;
+    }
+    handleSign(data, fDeptID, dept.fName);
+    form.resetFields();
+    this.setState({ showSignField: false });
+    dispatch({
+      type: 'flowScan/initModel',
+    });
   };
 
   close = () => {
@@ -125,17 +115,52 @@ export class ScanForm extends PureComponent {
     handleModalVisible(false);
   };
 
+  afterClose = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'flowScan/initModel',
+    });
+  };
+
   render() {
     const {
       loading,
+      currentUser,
+      queryDeptID,
       form: { getFieldDecorator },
       modalVisible,
       handleModalVisible,
+      flowScan: { data, message: messageInfo, showSign, showTransfer, messageType, nextDepts },
     } = this.props;
-    const { showSignField } = this.state;
+    const {
+      fFullBatchNo,
+      fConvertUnitID,
+      fCurrentPassQty,
+      fConvertPassQty,
+      fUnitName,
+      fConvertUnitName,
+      fQtyFormat,
+      fConvertQtyFormat,
+      fQtyDecimal,
+    } = data;
+    const filterDepts = currentUser.fIsAdmin
+      ? nextDepts
+      : nextDepts.filter(x => currentUser.deptList.find(y => x.fDeptID === y.fDeptID));
 
     const footer = (
       <div>
+        {showSign && (
+          <Button
+            type="primary"
+            loading={loading}
+            onClick={() => this.comfirmSign()}
+            prefixCls="ant-btn"
+            ghost={false}
+            block={false}
+          >
+            确认签收
+          </Button>
+        )}
         <Button
           loading={false}
           onClick={() => handleModalVisible(false)}
@@ -150,28 +175,35 @@ export class ScanForm extends PureComponent {
 
     return (
       <Modal
+        loading={loading}
         destroyOnClose
         title="扫描"
         visible={modalVisible}
         footer={footer}
         onCancel={() => handleModalVisible()}
         wrapClassName={styles.modalWrap}
+        afterClose={() => {
+          this.afterClose();
+        }}
       >
-        <FormItem label="">
-          {getFieldDecorator('fFullBatchNo', {
-            rules: [{ required: true, message: '请扫描条码/二维码', min: 1 }],
-          })(
-            <Input
-              ref={node => {
-                this.inputFullBatchNo = node;
-              }}
-              placeholder="请扫描条码/二维码"
-              autoFocus
-              onKeyPress={e => this.handleKeyPress(e)}
-            />
-          )}
-        </FormItem>
-        {showSignField && (
+        {!showSign && (
+          <FormItem label="">
+            {getFieldDecorator('fFullBatchNo', {
+              rules: [{ required: true, message: '请扫描条码/二维码', min: 1 }],
+            })(
+              <Input
+                ref={node => {
+                  this.inputFullBatchNo = node;
+                }}
+                placeholder="请扫描条码/二维码"
+                autoFocus
+                onKeyPress={e => this.handleKeyPress(e)}
+              />
+            )}
+            {messageInfo && <Alert message={messageInfo} type={messageType} />}
+          </FormItem>
+        )}
+        {showSign && (
           <FormItem label="">
             {getFieldDecorator('signBatchNo', {
               rules: [{ required: true, message: '再次扫描确认签收', min: 1 }],
@@ -180,13 +212,69 @@ export class ScanForm extends PureComponent {
                 ref={node => {
                   this.inputSignBatchNo = node;
                 }}
-                placeholder="再次扫描确认签收"
+                placeholder="再次扫描或点击下方按钮确认签收"
                 autoFocus
                 onKeyPress={e => this.handleSignKeyPress(e)}
               />
             )}
           </FormItem>
         )}
+        {showSign && (
+          <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="签收岗位">
+            {getFieldDecorator('fDeptID', {
+              rules: [{ required: true, message: '请输入岗位' }],
+              initialValue:
+                queryDeptID && filterDepts.find(x => x.fDeptID == queryDeptID)
+                  ? queryDeptID
+                  : filterDepts[0].fDeptID,
+            })(
+              <Select
+                style={{ width: '100%' }}
+                placeholder="请选择岗位"
+                dropdownMatchSelectWidth
+                defaultActiveFirstOption
+                showSearch
+                filterOption={(input, option) =>
+                  option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                }
+              >
+                {filterDepts.map(x => (
+                  <Option key={x.fDeptID} value={x.fDeptID}>
+                    {x.fDeptName + ' - ' + x.fDeptNumber}
+                  </Option>
+                ))}
+              </Select>
+            )}
+          </FormItem>
+        )}
+        {showSign && (
+          <Card>
+            <DescriptionList size="small" col="2" style={{ flex: 'auto' }}>
+              <Description term="批号">{fFullBatchNo}</Description>
+              <Description term="单位">
+                {fConvertUnitID > 0 ? fConvertUnitName : fUnitName}
+              </Description>
+              <Description term="数量">
+                {fConvertUnitID > 0
+                  ? numeral(fConvertPassQty).format(fConvertQtyFormat)
+                  : numeral(fCurrentPassQty).format(fQtyFormat)}
+              </Description>
+              {/* <Description term="单位">{fUnitName}</Description>
+              <Description term="数量">{numeral(fCurrentPassQty).format(fQtyFormat)}</Description> */}
+            </DescriptionList>
+          </Card>
+        )}
+        {/* {
+          matchConverter &&
+          <Card>
+            <DescriptionList
+              size="small"
+              col="2"
+              style={{ flex: 'auto' }}>
+              <Description term="签收后单位">{fConvertUnitName}</Description>
+            </DescriptionList>
+          </Card>
+        } */}
       </Modal>
     );
   }

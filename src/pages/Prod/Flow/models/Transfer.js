@@ -3,7 +3,13 @@ import { fakeGetDeptDefect, fakeMachineData } from '@/services/basicData';
 import { fakeQueryParams } from '@/services/Tech/Route';
 import { fakeGetWorkTimes, fakeGetUnitConvertersWithMatch } from '@/services/Basic/Dept';
 import { defaultCipherList } from 'constants';
-import { getMatchConverter, getConvertQtyWithDecimal } from '@/utils/unitConvertUtil';
+import {
+  getConverterRate,
+  getConvertQty,
+  getUnconvertQty,
+  getMatchConverter,
+  getConvertQtyWithDecimal,
+} from '@/utils/unitConvertUtil';
 import { exists } from 'fs';
 import numeral from 'numeral';
 
@@ -18,6 +24,7 @@ export default {
     paramList: [],
     workTimes: [],
     unitConverters: [],
+    matchConverter: {},
 
     queryResult: {
       status: 'ok',
@@ -29,8 +36,11 @@ export default {
     *initModel({ payload }, { call, put }) {
       const data = yield call(fakeGetProducingRecord, payload);
       data.fPassQty = data.fInputQty + data.fInvCheckDeltaQty - data.fTakeQty;
+      // 根据单位的小数位数配置相关数量的小数位
+      data.fQtyDecimal = data.fQtyDecimal || 0;
+      data.fQtyFormat = '0.' + '00000000'.slice(0, data.fQtyDecimal);
 
-      const { fRouteID, fRouteEntryID, fDeptID } = data;
+      const { fRouteID, fRouteEntryID, fDeptID, fUnitConverterID } = data;
       // getParams
       const paramList = yield call(fakeQueryParams, {
         fInterID: fRouteID,
@@ -50,9 +60,37 @@ export default {
       // getUnitConverters
       const unitConverters = yield call(fakeGetUnitConvertersWithMatch, fDeptID);
       const matchConverter = getMatchConverter(data, unitConverters);
+      console.log(matchConverter);
       if (matchConverter) {
-        const convertQty = getConvertQtyWithDecimal(data, matchConverter, data.fInputQty);
-        console.log(convertQty);
+        const {
+          fItemID,
+          fName,
+          fOutUnitID,
+          fOutUnitName,
+          fOutUnitNumber,
+          fConvertMode,
+          fDecimal,
+        } = matchConverter;
+        // 转换后的单位
+        data.fUnitConverterID = fItemID;
+        data.fUnitConverterName = fName;
+        data.fConvertUnitID = fOutUnitID;
+        data.fConvertUnitName = fOutUnitName;
+        data.fConvertUnitNumber = fOutUnitNumber;
+        data.fConvertMode = fConvertMode;
+        data.fConvertRate = getConverterRate(data, matchConverter);
+        data.fConvertDecimal = fDecimal;
+        data.fConvertQtyFormat = '0.' + '000000000'.slice(0, fDecimal);
+        // 转换的投入数量
+        const convertInputQty = getConvertQtyWithDecimal(data, matchConverter, data.fInputQty);
+        data.fConvertInputQty = convertInputQty;
+        // 转化后的合格数量
+        const convertPassQty = getConvertQtyWithDecimal(
+          data,
+          matchConverter,
+          data.fCurrentPassQty ? data.fCurrentPassQty : data.fInputQty
+        );
+        data.fConvertPassQty = convertPassQty;
       }
 
       yield put({
@@ -64,6 +102,7 @@ export default {
           machineData,
           workTimes,
           unitConverters,
+          matchConverter,
         },
       });
     },
@@ -131,7 +170,7 @@ export default {
       const {
         payload: { fDefectID, fValue },
       } = action;
-      const { data, defect } = state;
+      const { data, matchConverter, defect } = state;
       const existsDefect = defect.find(d => d.fDefectID === fDefectID);
       if (existsDefect) {
         existsDefect.fValue = fValue;
@@ -141,8 +180,17 @@ export default {
       const defectQty = defect
         .map(x => (x.fValue ? x.fValue : 0))
         .reduce((sum, x) => (sum += x * 1.0));
-      data.fDefectQty = defectQty;
-      data.fPassQty = data.fInputQty + data.fInvCheckDeltaQty - data.fTakeQty - data.fDefectQty;
+      data.fConvertDefectQty = defectQty;
+      data.fDefectQty = getUnconvertQty(data, matchConverter, defectQty);
+      // 所有变化的数量（取走、盘点、不良）
+      const allChangeQty = data.fInvCheckDeltaQty - data.fTakeQty - data.fDefectQty;
+      // 计算相关数量
+      data.fPassQty = data.fInputQty + allChangeQty;
+      // 所有变化的数量（取走、盘点、不良）（已转换单位）
+      const allConvertChangeQty = matchConverter
+        ? getConvertQtyWithDecimal(data, matchConverter, allChangeQty)
+        : allChangeQty;
+      data.fConvertPassQty = data.fConvertInputQty + allConvertChangeQty;
       return {
         ...state,
         data,
