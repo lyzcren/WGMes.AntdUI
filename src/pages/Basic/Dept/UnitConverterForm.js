@@ -79,7 +79,7 @@ class UnitConverterForm extends PureComponent {
 
     const columns = [
       {
-        title: '单位转换器',
+        title: '单位转换',
         dataIndex: 'fItemID',
         render: (val, record) => {
           return (

@@ -31,7 +31,6 @@ import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import DescriptionList from '@/components/DescriptionList';
 import Authorized from '@/utils/Authorized';
 import { hasAuthority } from '@/utils/authority';
-import { getUnconvertQty } from '@/utils/unitConvertUtil';
 import { ViewUnitConverterForm } from './ViewUnitConverter';
 
 import { isArray } from 'util';
@@ -130,10 +129,7 @@ class Transfer extends PureComponent {
         if (key.indexOf('detailDefectID') === 0 && fieldsValue[key]) {
           newData.defects.push({
             fDefectID: key.replace('detailDefectID', ''),
-            fValue: matchConverter
-              ? getUnconvertQty(data, matchConverter, fieldsValue[key])
-              : fieldsValue[key],
-            fConvertValue: fieldsValue[key],
+            fValue: fieldsValue[key],
           });
         } else if (key.indexOf('paramsID') === 0) {
           const paramValue = isArray(fieldsValue[key]) ? fieldsValue[key] : [fieldsValue[key]];
@@ -281,34 +277,33 @@ class Transfer extends PureComponent {
           <Description term="任务单号">{data.fMoBillNo}</Description>
           <Description term="订单号">{data.fSoBillNo}</Description>
 
-          <Description term="流程单数量">{`${numeral(data.fFlowInputQty).format(fQtyFormat)} ${
-            data.fUnitName
-          }`}</Description>
-          <Description term="投入数量">{`${numeral(data.fInputQty).format(fQtyFormat)} ${
-            data.fUnitName
-          }`}</Description>
-          <Description term="合格数量">{`${numeral(data.fPassQty).format(fQtyFormat)} ${
-            data.fUnitName
-          }`}</Description>
-          {data.fConvertUnitID && (
-            <Description term="单位转换器">
-              <a onClick={() => this.handleUnitConverterVisible(true)}>{data.fUnitConverterName}</a>
-            </Description>
-          )}
-          {data.fConvertUnitID && (
-            <Description term="当前投入数量">
-              <a onClick={() => this.handleUnitConverterVisible(true)}>{`${numeral(
-                data.fConvertInputQty
-              ).format(data.fConvertQtyFormat)} ${data.fConvertUnitName}`}</a>
-            </Description>
-          )}
-          {data.fConvertUnitID && (
-            <Description term="当前合格数量">
-              <a onClick={() => this.handleUnitConverterVisible(true)}>{`${numeral(
-                data.fConvertPassQty
-              ).format(data.fConvertQtyFormat)} ${data.fConvertUnitName}`}</a>
-            </Description>
-          )}
+          <Description term="流程单数量">
+            {`${numeral(data.fFlowInputQty).format(fQtyFormat)} ${data.fUnitName}`}
+          </Description>
+          <Description term="投入数量">
+            {`${numeral(data.fInputQty).format(fQtyFormat)} ${data.fUnitName}`}
+            {data.fConvertUnitName ? (
+              <a onClick={() => this.handleUnitConverterVisible(true)}>
+                （
+                {`${numeral(data.fConvertInputQty).format(data.fConvertQtyFormat)} ${
+                  data.fConvertUnitName
+                }`}
+                ）
+              </a>
+            ) : null}
+          </Description>
+          <Description term="合格数量">
+            {`${numeral(data.fPassQty).format(fQtyFormat)} ${data.fUnitName}`}
+            {data.fConvertUnitName ? (
+              <a onClick={() => this.handleUnitConverterVisible(true)}>
+                （
+                {`${numeral(data.fConvertPassQty).format(data.fConvertQtyFormat)} ${
+                  data.fConvertUnitName
+                }`}
+                ）
+              </a>
+            ) : null}
+          </Description>
 
           <Description term="产品编码">{data.fProductNumber}</Description>
           <Description term="产品名称">{data.fProductName}</Description>
@@ -363,7 +358,7 @@ class Transfer extends PureComponent {
 
     const { showMoreDefect, moreDefectValue, unitConverterVisible } = this.state;
     const { fQtyDecimal, fConvertDecimal } = data;
-    const currentQtyDecimal = fConvertDecimal ? fConvertDecimal : fQtyDecimal;
+    const defectQtyDecimal = fQtyDecimal;
     // 默认机台
     const defaultMachineID =
       machineData && machineData.find(x => x.fItemID === this.state.fMachineID)
@@ -548,9 +543,9 @@ class Transfer extends PureComponent {
                           onChange={val => this.handleFieldChange(val, d.fItemID)}
                           style={{ width: '100%' }}
                           placeholder="请输入数量"
-                          min={Math.pow(0.1, currentQtyDecimal)}
-                          step={Math.pow(0.1, currentQtyDecimal)}
-                          precision={currentQtyDecimal}
+                          min={Math.pow(0.1, defectQtyDecimal)}
+                          step={Math.pow(0.1, defectQtyDecimal)}
+                          precision={defectQtyDecimal}
                         />
                       )}
                     </FormItem>

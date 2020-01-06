@@ -284,6 +284,9 @@ class TableList extends PureComponent {
   };
 
   handleUpdateModalVisible = (flag, record) => {
+    if (record && record.fIsFromErp) {
+      message.warning('从ERP同步的车间岗位无法修改');
+    }
     const { modalVisible } = this.state;
     this.setState({
       modalVisible: { ...modalVisible, update: !!flag },
@@ -725,12 +728,17 @@ class TableList extends PureComponent {
         render: (text, record) => (
           <Fragment>
             <Authorized authority="Dept_Update">
-              <a onClick={() => this.handleUpdateModalVisible(true, record)}>修改</a>
+              <a
+                disabled={!hasAuthority('BillNoRule_Update') || record.fIsFromErp}
+                onClick={() => this.handleUpdateModalVisible(true, record)}
+              >
+                修改
+              </a>
               <Divider type="vertical" />
             </Authorized>
             <Authorized authority="Dept_Delete">
               <Popconfirm title="是否要删除此行？" onConfirm={() => this.handleDelete(record)}>
-                <a>删除</a>
+                <a disabled={!hasAuthority('Dept_Delete') || record.fIsFromErp}>删除</a>
               </Popconfirm>
             </Authorized>
             <Dropdown

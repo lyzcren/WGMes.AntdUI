@@ -8,10 +8,16 @@ export const getMatchConverter = (data, unitConverters) => {
 };
 
 const isMatch = (data, unitConverter) => {
-  const { expressions, fInUnitID } = unitConverter;
+  const { expressions, fInUnitName, fInUnitCaseSensitive } = unitConverter;
   for (let expression of expressions) {
     const { fField, fMatchTypeNumber, fExpression } = expression;
-    if (data.fUnitID !== fInUnitID) {
+    if (!fInUnitName) {
+      return false;
+    }
+    if (
+      (fInUnitCaseSensitive && data.fUnitName !== fInUnitName) ||
+      data.fUnitName.toUpperCase() !== fInUnitName.toUpperCase()
+    ) {
       return false;
     }
     if (!data.hasOwnProperty(fField)) {

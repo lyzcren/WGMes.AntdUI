@@ -352,7 +352,7 @@ export default [
         path: '/basic',
         name: 'basic',
         icon: 'deployment-unit',
-        authority: ['Product_Read', 'Dept_Read', 'Unit_Read', 'Machine_Read', 'Emp_Read'],
+        authority: ['Product_Read', 'Dept_Read', 'Machine_Read', 'Emp_Read'],
         routes: [
           {
             path: '/basic/product',
@@ -374,12 +374,6 @@ export default [
             name: 'dept',
             component: './Basic/Dept/List',
             authority: ['Dept_Read'],
-          },
-          {
-            path: '/basic/unit',
-            name: 'unit',
-            component: './Basic/Unit/List',
-            authority: ['Unit_Read'],
           },
           {
             path: '/basic/unitConverter',

@@ -5,7 +5,6 @@ import { fakeGetWorkTimes, fakeGetUnitConvertersWithMatch } from '@/services/Bas
 import { defaultCipherList } from 'constants';
 import {
   getConverterRate,
-  getConvertQty,
   getUnconvertQty,
   getMatchConverter,
   getConvertQtyWithDecimal,
@@ -60,12 +59,11 @@ export default {
       // getUnitConverters
       const unitConverters = yield call(fakeGetUnitConvertersWithMatch, fDeptID);
       const matchConverter = getMatchConverter(data, unitConverters);
-      console.log(matchConverter);
+      // console.log(matchConverter);
       if (matchConverter) {
         const {
           fItemID,
           fName,
-          fOutUnitID,
           fOutUnitName,
           fOutUnitNumber,
           fConvertMode,
@@ -74,9 +72,7 @@ export default {
         // 转换后的单位
         data.fUnitConverterID = fItemID;
         data.fUnitConverterName = fName;
-        data.fConvertUnitID = fOutUnitID;
         data.fConvertUnitName = fOutUnitName;
-        data.fConvertUnitNumber = fOutUnitNumber;
         data.fConvertMode = fConvertMode;
         data.fConvertRate = getConverterRate(data, matchConverter);
         data.fConvertDecimal = fDecimal;
@@ -180,17 +176,12 @@ export default {
       const defectQty = defect
         .map(x => (x.fValue ? x.fValue : 0))
         .reduce((sum, x) => (sum += x * 1.0));
-      data.fConvertDefectQty = defectQty;
-      data.fDefectQty = getUnconvertQty(data, matchConverter, defectQty);
+      data.fDefectQty = defectQty;
       // 所有变化的数量（取走、盘点、不良）
       const allChangeQty = data.fInvCheckDeltaQty - data.fTakeQty - data.fDefectQty;
       // 计算相关数量
       data.fPassQty = data.fInputQty + allChangeQty;
-      // 所有变化的数量（取走、盘点、不良）（已转换单位）
-      const allConvertChangeQty = matchConverter
-        ? getConvertQtyWithDecimal(data, matchConverter, allChangeQty)
-        : allChangeQty;
-      data.fConvertPassQty = data.fConvertInputQty + allConvertChangeQty;
+      data.fConvertPassQty = getConvertQtyWithDecimal(data, matchConverter, data.fPassQty);
       return {
         ...state,
         data,

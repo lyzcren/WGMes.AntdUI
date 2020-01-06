@@ -246,12 +246,13 @@ class TableList extends PureComponent {
   };
 
   handleModalVisible = ({ key, flag }, record) => {
-    const { modalVisible, currentFormValues } = this.state;
+    const { modalVisible, currentFormValues, renderCreateForm } = this.state;
     modalVisible[key] = !!flag;
     currentFormValues[key] = record;
     this.setState({
       modalVisible: { ...modalVisible },
       currentFormValues: { ...currentFormValues },
+      renderCreateForm: key == 'add' ? !!flag : renderCreateForm,
     });
   };
 

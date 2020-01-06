@@ -1,4 +1,5 @@
 import { defaultDateTimeFormat, DecimalModes, ConvertModes } from '@/utils/GlobalConst';
+import { Switch } from 'antd';
 
 export const columns = [
   {
@@ -8,26 +9,23 @@ export const columns = [
     sorter: true,
   },
   {
-    title: '转入单位',
+    title: '单位',
     dataIndex: 'fInUnitName',
     width: 160,
     sorter: true,
   },
   {
-    title: '转入单位编码',
-    dataIndex: 'fInUnitNumber',
+    title: '区分大小写',
+    dataIndex: 'fInUnitCaseSensitive',
     width: 160,
     sorter: true,
+    render(val, record) {
+      return <Switch disabled checked={record.fInUnitCaseSensitive} />;
+    },
   },
   {
-    title: '转出单位',
+    title: '副单位',
     dataIndex: 'fOutUnitName',
-    width: 160,
-    sorter: true,
-  },
-  {
-    title: '转出单位编码',
-    dataIndex: 'fOutUnitNumber',
     width: 160,
     sorter: true,
   },

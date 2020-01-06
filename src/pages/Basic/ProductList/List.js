@@ -273,7 +273,7 @@ class TableList extends PureComponent {
   handleSync = () => {
     Modal.confirm({
       title: '同步物料',
-      content: '从 K3 一键同步物料会等待较长时间，确定同步物料吗？',
+      content: '从ERP一键同步物料会等待较长时间，确定同步物料吗？',
       okText: '确认',
       cancelText: '取消',
       onOk: () => {
@@ -312,7 +312,7 @@ class TableList extends PureComponent {
         setTimeout(() => {
           this.Checkk3Syncing();
         }, 3000);
-      } else if (this.state.isSyncing) message.success('从 K3 同步物料已完成');
+      } else if (this.state.isSyncing) message.success('从 ERP 同步物料已完成');
       this.setState({
         isSyncing,
       });
@@ -625,16 +625,16 @@ class TableList extends PureComponent {
               <div className={styles.tableListForm}>{this.renderForm()}</div>
               <div className={styles.tableListOperator}>
                 <Authorized authority="Product_Create">
-                  <Button icon="plus" type="primary" onClick={() => this.handleImport(true)}>
-                    从 K3 手动导入
-                  </Button>
+                  {/* <Button icon="plus" type="primary" onClick={() => this.handleImport(true)}>
+                    从 ERP 手动导入
+                  </Button> */}
                   <Button
                     icon="plus"
                     type="primary"
                     loading={isSyncing}
                     onClick={() => this.handleSync()}
                   >
-                    从 K3 一键同步
+                    从 ERP 一键同步
                   </Button>
                 </Authorized>
                 <Authorized authority="Product_Export">

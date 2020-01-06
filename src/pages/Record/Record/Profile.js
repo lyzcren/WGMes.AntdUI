@@ -118,7 +118,6 @@ class Transfer extends PureComponent {
         },
       },
     } = this.props;
-    const currentQtyDecimal = fConvertDecimal ? fConvertDecimal : fQtyDecimal;
 
     return (
       <div style={{ display: 'flex' }}>
@@ -135,25 +134,6 @@ class Transfer extends PureComponent {
           <Description term="任务单号">{fMoBillNo}</Description>
           <Description term="订单号">{fSoBillNo}</Description>
 
-          <Description term="单位">{fUnitName}</Description>
-          <Description term="投入数量">{numeral(fInputQty).format(fQtyFormat)}</Description>
-          <Description term="合格数量">{numeral(fPassQty).format(fQtyFormat)}</Description>
-          {fConvertUnitID && (
-            <Description term="当前单位">
-              <a>{fConvertUnitName}</a>
-            </Description>
-          )}
-          {fConvertUnitID && (
-            <Description term="当前投入数量">
-              <a>{numeral(fConvertInputQty).format(fConvertQtyFormat)}</a>
-            </Description>
-          )}
-          {fConvertUnitID && (
-            <Description term="当前合格数量">
-              <a>{numeral(fConvertPassQty).format(fConvertQtyFormat)}</a>
-            </Description>
-          )}
-
           <Description term="产品编码">{fProductNumber}</Description>
           <Description term="产品名称">{fProductName}</Description>
           <Description term="规格型号">{fModel}</Description>
@@ -163,6 +143,22 @@ class Transfer extends PureComponent {
           <Description term="内部订单号">{fMesSelf003}</Description>
 
           <Description term="流程单数量">{numeral(fFlowInputQty).format(fQtyFormat)}</Description>
+          <Description term="投入数量">
+            {numeral(fInputQty).format(fQtyFormat)}
+            {fConvertUnitName ? (
+              <a>
+                （{`${numeral(fConvertInputQty).format(fConvertQtyFormat)} ${fConvertUnitName}`}）
+              </a>
+            ) : null}
+          </Description>
+          <Description term="合格数量">
+            {numeral(fPassQty).format(fQtyFormat)}
+            {fConvertUnitName ? (
+              <a>
+                （{`${numeral(fConvertPassQty).format(fConvertQtyFormat)} ${fConvertUnitName}`}）
+              </a>
+            ) : null}
+          </Description>
           <Description term="盘点盈亏数量">
             {numeral(fInvCheckDeltaQty).format(fQtyFormat)}
           </Description>
@@ -197,9 +193,7 @@ class Transfer extends PureComponent {
       fQtyDecimal,
       fConvertDecimal,
       fQtyFormat,
-      fConvertQtyFormat,
     } = data;
-    const currentQtyDecimal = fConvertDecimal ? fConvertDecimal : fQtyDecimal;
 
     const action = (
       <Fragment>
@@ -263,9 +257,7 @@ class Transfer extends PureComponent {
             <DescriptionList className={styles.headerList} size="small" col="3">
               {defectList.map((d, i) => (
                 <Description key={d.fDefectName} term={d.fDefectName}>
-                  {d.fConvertUnitID
-                    ? numeral(d.fConvertQty).format(fConvertQtyFormat)
-                    : numeral(d.fQty).format(fQtyFormat)}
+                  {numeral(d.fQty).format(fQtyFormat)}
                 </Description>
               ))}
             </DescriptionList>

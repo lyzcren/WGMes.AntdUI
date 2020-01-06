@@ -611,7 +611,7 @@ class TableList extends PureComponent {
             onClick={() => this.handleModalVisible({ key: 'sync', flag: true })}
             loading={isSyncing}
           >
-            从 K3 同步
+            从 ERP 同步
           </Button>
         </Authorized>
         {isSyncing && <Tag color="blue">{`${currentCount} / ${totalCount}`}</Tag>}

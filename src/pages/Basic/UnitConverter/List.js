@@ -181,11 +181,11 @@ class TableList extends PureComponent {
       if (err) return;
 
       const pagination = this.getSearchParam(fieldsValue);
-      let fileName = '单位转换器.xls';
+      let fileName = '单位转换.xls';
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          fileName = `单位转换器-第${pagination.current}页.xls`;
+          fileName = `单位转换-第${pagination.current}页.xls`;
           break;
         case 'allPage':
           break;
@@ -435,6 +435,7 @@ class TableList extends PureComponent {
       updateHandler: record => this.openUpdatePage(record),
       deleteHandler: record => this.deleteRecord(record),
     });
+    console.log(data);
 
     return (
       <div style={{ margin: '-24px -24px 0' }}>

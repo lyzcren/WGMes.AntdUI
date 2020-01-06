@@ -446,7 +446,7 @@ class TableList extends PureComponent {
                     新建
                   </Button> */}
                   <Button icon="plus" type="primary" onClick={() => this.handleSync()}>
-                    从 K3 同步
+                    从 ERP 同步
                   </Button>
                 </Authorized>
                 <Authorized authority="Unit_Export">

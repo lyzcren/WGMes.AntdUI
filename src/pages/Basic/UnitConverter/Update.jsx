@@ -21,6 +21,7 @@ import {
   Radio,
   message,
   TreeSelect,
+  Switch,
 } from 'antd';
 import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import DescriptionList from '@/components/DescriptionList';
@@ -206,8 +207,9 @@ class Update extends PureComponent {
       expressions,
       data: {
         fName,
-        fInUnitID,
-        fOutUnitID,
+        fInUnitName,
+        fInUnitCaseSensitive,
+        fOutUnitName,
         fConvertMode,
         fDecimal,
         fDecimalMode,
@@ -240,7 +242,7 @@ class Update extends PureComponent {
     return (
       <div style={{ backgroundColor: 'rgb(240, 242, 245)' }}>
         <WgPageHeaderWrapper
-          title={`修改单位转换器`}
+          title={`修改单位转换`}
           logo={
             <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
           }
@@ -253,60 +255,67 @@ class Update extends PureComponent {
               <Col xl={{ span: 6 }} lg={{ span: 8 }} md={6} sm={24}>
                 <FormItem label={'名称'}>
                   {getFieldDecorator(`fName`, {
-                    rules: [{ required: true, message: '请输入名称' }],
+                    rules: [
+                      { required: true, message: '请输入名称' },
+                      // 正则匹配（提示错误，阻止表单提交）
+                      {
+                        pattern: /^[^\s]*$/,
+                        message: '禁止输入空格',
+                      },
+                    ],
                     initialValue: fName,
                   })(<Input />)}
                 </FormItem>
               </Col>
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={6} sm={24}>
-                <FormItem label="转入单位">
-                  {getFieldDecorator('fInUnitID', {
-                    rules: [{ required: true, message: '请选择转入单位' }],
-                    initialValue: fInUnitID,
-                  })(
-                    <Select
-                      style={{ width: '100%' }}
-                      showSearch
-                      autoClearSearchValue
-                      filterOption={(input, option) =>
-                        option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                      }
-                    >
-                      {Units.map(x => (
-                        <Option key={x.fItemID} value={x.fItemID}>
-                          {`${x.fName} - ${x.fNumber}`}
-                        </Option>
-                      ))}
-                    </Select>
-                  )}
+                <FormItem label="单位">
+                  {getFieldDecorator(`fInUnitName`, {
+                    rules: [
+                      { required: true, message: '请输入单位' },
+                      // 正则匹配（提示错误，阻止表单提交）
+                      {
+                        pattern: /^[^\s]*$/,
+                        message: '禁止输入空格',
+                      },
+                    ],
+                    initialValue: fInUnitName,
+                  })(<Input />)}
                 </FormItem>
               </Col>
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={6} sm={24}>
-                <FormItem label={'转出单位'}>
-                  {getFieldDecorator(`fOutUnitID`, {
-                    rules: [{ required: true, message: '请输入转出单位' }],
-                    initialValue: fOutUnitID,
-                  })(
-                    <Select
-                      style={{ width: '100%' }}
-                      showSearch
-                      autoClearSearchValue
-                      filterOption={(input, option) =>
-                        option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                      }
-                    >
-                      {Units.map(x => (
-                        <Option key={x.fItemID} value={x.fItemID}>
-                          {`${x.fName} - ${x.fNumber}`}
-                        </Option>
-                      ))}
-                    </Select>
-                  )}
+                <FormItem label="单位是否区分大小写">
+                  {getFieldDecorator(`fInUnitCaseSensitive`, {
+                    rules: [
+                      { required: true, message: '请输入单位' },
+                      // 正则匹配（提示错误，阻止表单提交）
+                      {
+                        pattern: /^[^\s]*$/,
+                        message: '禁止输入空格',
+                      },
+                    ],
+                    valuePropName: 'checked',
+                    initialValue: fInUnitCaseSensitive,
+                  })(<Switch />)}
                 </FormItem>
               </Col>
             </Row>
             <Row>
               <Col xl={{ span: 6 }} lg={{ span: 8 }} md={6} sm={24}>
+                <FormItem label={'副单位'}>
+                  {getFieldDecorator(`fOutUnitName`, {
+                    rules: [
+                      { required: true, message: '请输入副单位' },
+                      // 正则匹配（提示错误，阻止表单提交）
+                      {
+                        pattern: /^[^\s]*$/,
+                        message: '禁止输入空格',
+                      },
+                    ],
+                    initialValue: fOutUnitName,
+                  })(<Input />)}
+                </FormItem>
+              </Col>
+              <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={6} sm={24}>
                 <FormItem label={'适用岗位'}>
                   {getFieldDecorator('fDeptIDs', {
                     rules: [{ required: false, message: '请选择岗位' }],
