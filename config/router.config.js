@@ -6,6 +6,11 @@ export default [
     routes: [
       { path: '/user', redirect: '/user/login' },
       { path: '/user/login', name: 'login', component: './User/Login' },
+      {
+        path: '/user/privacyAndTerms',
+        name: 'privacyAndTerms',
+        component: './User/PrivacyAndTerms',
+      },
       { path: '/user/register', name: 'register', component: './User/Register' },
       {
         path: '/user/register-result',
@@ -48,6 +53,7 @@ export default [
             path: '/dashboard/analysis',
             name: 'analysis',
             component: './Dashboard/Analysis',
+            authority: ['Anylasis_Read'],
           },
           // {
           //   path: '/dashboard/monitor',
@@ -68,12 +74,11 @@ export default [
         authority: [
           'Mission_Read',
           'Flow_Read',
-          'Record_Read',
           'Inv_Read',
           'ProdDefect_Read',
-          'DefectRepair_Read',
-          'DefectScrap_Read',
           'InvCheck_Read',
+          'DefectCheck_Read',
+          'Report_Read',
         ],
         routes: [
           {
@@ -221,11 +226,13 @@ export default [
         name: 'record',
         icon: 'book',
         authority: [
+          'Mission_Read',
           'Record_Read',
-          'ProdDefect_Read',
+          'RecordTake_Read',
+          'Flow_ChangeRoute',
+          'Flow_Split',
           'DefectRepair_Read',
           'DefectScrap_Read',
-          'RecordTake_Read',
         ],
         routes: [
           {
@@ -285,7 +292,7 @@ export default [
         path: '/report',
         name: 'report',
         icon: 'area-chart',
-        authority: ['Output_Read', 'PassRate_Read', 'MissionExecution_Read'],
+        authority: ['Output_Read', 'PassRate_Read', 'MissionExecution_Read', 'ReportWorkTime_Read'],
         routes: [
           {
             path: '/report/output',
@@ -352,7 +359,14 @@ export default [
         path: '/basic',
         name: 'basic',
         icon: 'deployment-unit',
-        authority: ['Product_Read', 'Dept_Read', 'Machine_Read', 'Emp_Read'],
+        authority: [
+          'Product_Read',
+          'Dept_Read',
+          'UnitConverter_Read',
+          'Machine_Read',
+          'Emp_Read',
+          'WorkTime_Read',
+        ],
         routes: [
           {
             path: '/basic/product',

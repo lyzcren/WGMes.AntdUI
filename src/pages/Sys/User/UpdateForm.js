@@ -9,11 +9,13 @@ import {
   getPasswordStatus,
   passwordProgressMap,
 } from '@/utils/validators';
+import { pageMapper } from '@/utils/GlobalConst';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 const RadioGroup = Radio.Group;
 const RadioButton = Radio.Button;
+const { SHOW_PARENT } = TreeSelect;
 
 /* eslint react/no-multi-comp:0 */
 @connect(({ basicData }) => ({
@@ -48,7 +50,7 @@ export class UpdateForm extends PureComponent {
       type: 'basicData/getOperator',
     });
     dispatch({
-      type: 'basicData/getProcessDeptTree',
+      type: 'basicData/getDeptTreeData',
     });
   }
 
@@ -69,9 +71,12 @@ export class UpdateForm extends PureComponent {
       updateModalVisible,
       handleUpdateModalVisible,
       values,
-      basicData: { operators, processDeptTree },
+      basicData: { operators, deptTreeData },
     } = this.props;
     const { formVals } = this.state;
+    const expandItems = deptTreeData.find(d => d.fParentID === 0);
+    const treeExpandedKeys =
+      deptTreeData && deptTreeData.length ? deptTreeData.map(d => d.key) : [];
 
     return (
       <Modal
@@ -157,12 +162,26 @@ export class UpdateForm extends PureComponent {
             initialValue: values.deptList && values.deptList.map(x => x.fDeptID),
           })(
             <TreeSelect
-              style={{ width: 300 }}
+              style={{ width: '100%' }}
               dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-              treeData={processDeptTree}
-              multiple
-              treeDefaultExpandAll
+              treeCheckable={true}
+              showCheckedStrategy={SHOW_PARENT}
+              treeData={deptTreeData}
+              treeExpandedKeys={treeExpandedKeys}
             />
+          )}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="默认首页">
+          {getFieldDecorator('fIndexPage', {
+            initialValue: values.fIndexPage,
+          })(
+            <Select style={{ width: '100%' }} placeholder="请选择默认首页" allowClear={true}>
+              {Object.keys(pageMapper).map(x => (
+                <Option key={x} value={x}>
+                  {pageMapper[x]}
+                </Option>
+              ))}
+            </Select>
           )}
         </FormItem>
       </Modal>

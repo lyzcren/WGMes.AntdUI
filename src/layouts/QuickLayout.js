@@ -16,7 +16,8 @@ const links = [
   {
     key: 'help',
     title: formatMessage({ id: 'layout.user.link.help' }),
-    href: '',
+    href: 'http://n2027797j5.iok.la',
+    blankTarget: true,
   },
   {
     key: 'privacy',

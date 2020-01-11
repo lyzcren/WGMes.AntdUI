@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import monment from 'moment';
 import { formatMessage } from 'umi/locale';
 import Link from 'umi/link';
 import { Icon } from 'antd';
@@ -11,23 +12,19 @@ const links = [
   {
     key: 'help',
     title: formatMessage({ id: 'layout.user.link.help' }),
-    href: '',
+    href: 'http://n2027797j5.iok.la',
+    blankTarget: true,
   },
   {
-    key: 'privacy',
-    title: formatMessage({ id: 'layout.user.link.privacy' }),
-    href: '',
-  },
-  {
-    key: 'terms',
-    title: formatMessage({ id: 'layout.user.link.terms' }),
-    href: '',
+    key: 'privacyAndTerms',
+    title: formatMessage({ id: 'layout.user.link.privacyAndTerms' }),
+    href: '/user/privacyAndTerms',
   },
 ];
 
 const copyright = (
   <Fragment>
-    Copyright <Icon type="copyright" /> 2019 望果信息科技有限公司
+    Copyright <Icon type="copyright" /> {`2019~${monment().format('YYYY')} 望果信息科技有限公司`}
   </Fragment>
 );
 

@@ -35,6 +35,7 @@ import { UpdateForm } from './UpdateForm';
 import { CreateForm } from './CreateForm';
 import { AuthorityForm } from './AuthorityForm';
 import { AuthorizeUserForm } from './AuthorizeUserForm';
+import { pageMapper } from '@/utils/GlobalConst';
 
 import styles from './List.less';
 
@@ -45,7 +46,6 @@ const getValue = obj =>
     .map(key => obj[key])
     .join(',');
 const activeData = ['启用', '禁用'];
-const pageMapper = { mission: '生产任务单', flow: '流程单', quickOps: '快速操作' };
 
 /* eslint react/no-multi-comp:0 */
 @connect(({ roleManage, loading }) => ({

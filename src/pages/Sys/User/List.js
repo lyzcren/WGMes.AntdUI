@@ -27,6 +27,7 @@ import {
   Tag,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
+import { pageMapper } from '@/utils/GlobalConst';
 
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
@@ -104,7 +105,7 @@ class TableList extends PureComponent {
       width: 160,
     },
     {
-      title: '授权岗位',
+      title: '授权岗位/车间',
       dataIndex: 'deptList',
       width: 420,
       render: val =>
@@ -136,6 +137,13 @@ class TableList extends PureComponent {
       render(val) {
         return sex[val];
       },
+    },
+    {
+      title: '默认界面',
+      dataIndex: 'fIndexPage',
+      width: 160,
+      sorter: true,
+      render: val => pageMapper[val],
     },
     {
       title: '启用',
@@ -558,9 +566,9 @@ class TableList extends PureComponent {
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
               </Button>
-              <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
+              {/* <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
                 展开 <Icon type="down" />
-              </a>
+              </a> */}
             </span>
           </Col>
         </Row>

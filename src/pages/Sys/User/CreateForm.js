@@ -8,7 +8,7 @@ import {
   getPasswordStatus,
   passwordProgressMap,
 } from '@/utils/validators';
-import { GlobalConst } from '@/utils/GlobalConst';
+import { GlobalConst, pageMapper } from '@/utils/GlobalConst';
 
 import styles from './List.less';
 
@@ -16,6 +16,7 @@ const FormItem = Form.Item;
 const { Option } = Select;
 const RadioGroup = Radio.Group;
 const RadioButton = Radio.Button;
+const { SHOW_PARENT } = TreeSelect;
 
 /* eslint react/no-multi-comp:0 */
 @connect(({ basicData, loading }) => ({
@@ -33,7 +34,7 @@ export class CreateForm extends PureComponent {
       type: 'basicData/getOperator',
     });
     dispatch({
-      type: 'basicData/getProcessDeptTree',
+      type: 'basicData/getDeptTreeData',
     });
   }
 
@@ -101,10 +102,14 @@ export class CreateForm extends PureComponent {
     const {
       form: { getFieldDecorator, getFieldValue },
       modalVisible,
-      basicData: { operators, processDeptTree },
+      basicData: { operators, deptTreeData },
       handleAdd,
       handleModalVisible,
     } = this.props;
+    const expandItems = deptTreeData.find(d => d.fParentID === 0);
+    const treeExpandedKeys =
+      deptTreeData && deptTreeData.length ? deptTreeData.map(d => d.key) : [];
+
     return (
       <Modal
         destroyOnClose
@@ -236,12 +241,24 @@ export class CreateForm extends PureComponent {
             rules: [{ required: true, message: '请选择岗位' }],
           })(
             <TreeSelect
-              style={{ width: 300 }}
+              style={{ width: '100%' }}
               dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-              treeData={processDeptTree}
-              multiple
-              treeDefaultExpandAll
+              treeCheckable={true}
+              showCheckedStrategy={SHOW_PARENT}
+              treeData={deptTreeData}
+              treeExpandedKeys={treeExpandedKeys}
             />
+          )}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="默认首页">
+          {getFieldDecorator('fIndexPage', {})(
+            <Select style={{ width: '100%' }} placeholder="请选择默认首页" allowClear={true}>
+              {Object.keys(pageMapper).map(x => (
+                <Option key={x} value={x}>
+                  {pageMapper[x]}
+                </Option>
+              ))}
+            </Select>
           )}
         </FormItem>
       </Modal>
