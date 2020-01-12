@@ -49,29 +49,45 @@ export default {
           payload: response,
         });
       }
+      const { type } = payload;
       // Login successfully
       if (response.status === 'ok') {
-        reloadAuthorized();
-        const urlParams = new URL(window.location.href);
-        const params = getPageQuery();
-        let { redirect } = params;
-        if (redirect) {
-          const redirectUrlParams = new URL(redirect);
-          if (redirectUrlParams.origin === urlParams.origin) {
-            redirect = redirect.substr(urlParams.origin.length);
-            if (redirect.match(/^\/.*#/)) {
-              redirect = redirect.substr(redirect.indexOf('#') + 1);
-            }
-          } else {
-            window.location.href = redirect;
-            return;
-          }
-        }
-        // 快速操作界面
-        if (response.currentUser.indexPage === 'quickOps') {
-          yield put(routerRedux.replace('/quickOps'));
+        const {
+          currentUser: { indexPage, currentAuthority, authorizedDeptList },
+        } = response;
+        if (!currentAuthority || currentAuthority.length <= 0) {
+          yield put({
+            type: 'changeLoginStatus',
+            payload: { type, status: 'error', message: '用户未授权' },
+          });
+        } else if (!authorizedDeptList || authorizedDeptList.length <= 0) {
+          yield put({
+            type: 'changeLoginStatus',
+            payload: { type, status: 'error', message: '用户未授权岗位' },
+          });
         } else {
-          yield put(routerRedux.replace(redirect || '/'));
+          reloadAuthorized();
+          const urlParams = new URL(window.location.href);
+          const params = getPageQuery();
+          let { redirect } = params;
+          if (redirect) {
+            const redirectUrlParams = new URL(redirect);
+            if (redirectUrlParams.origin === urlParams.origin) {
+              redirect = redirect.substr(urlParams.origin.length);
+              if (redirect.match(/^\/.*#/)) {
+                redirect = redirect.substr(redirect.indexOf('#') + 1);
+              }
+            } else {
+              window.location.href = redirect;
+              return;
+            }
+          }
+          // 快速操作界面
+          if (indexPage === 'quickOps') {
+            yield put(routerRedux.replace('/quickOps'));
+          } else {
+            yield put(routerRedux.replace(redirect || '/'));
+          }
         }
       }
     },

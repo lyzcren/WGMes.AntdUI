@@ -60,6 +60,7 @@ export default {
       const unitConverters = yield call(fakeGetUnitConvertersWithMatch, fDeptID);
       const matchConverter = getMatchConverter(data, unitConverters);
       // console.log(matchConverter);
+      data.fUnitName = data.fUnitName ? data.fUnitName : '';
       if (matchConverter) {
         const {
           fItemID,

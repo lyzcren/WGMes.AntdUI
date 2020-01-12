@@ -66,20 +66,15 @@ class ColumnConfig {
       width: 100,
     },
     {
-      title: '副单位',
-      dataIndex: 'fUnitName2',
-      width: 100,
-    },
-    {
       title: '操作',
       fixed: 'right',
-      width: 200,
+      width: 120,
       render: (text, record) => (
         <Fragment>
           <Authorized authority="Product_Update">
-            <a onClick={() => this.updateModalVisible(record)}>路线</a>
+            <a onClick={() => this.updateModalVisible(record)}>默认工艺路线</a>
           </Authorized>
-          <Authorized authority="Product_Active">
+          {/* <Authorized authority="Product_Active">
             <Divider type="vertical" />
             <a onClick={() => this.handleActive(record)}>{record.fIsActive ? '禁用' : '启用'}</a>
           </Authorized>
@@ -88,7 +83,7 @@ class ColumnConfig {
             <Popconfirm title="是否要删除此行？" onConfirm={() => this.delete(record)}>
               <a>删除</a>
             </Popconfirm>
-          </Authorized>
+          </Authorized> */}
         </Fragment>
       ),
     },

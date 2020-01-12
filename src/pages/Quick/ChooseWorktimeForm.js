@@ -43,11 +43,13 @@ export class ChooseWorktimeForm extends PureComponent {
         afterClose={() => handleModalVisible()}
       >
         <Card bordered={false} loading={loading}>
-          {worktimeList.map(worktime => (
-            <Button key={worktime.guid} onClick={() => handleSubmit(worktime)}>
-              {worktime.fWorkTimeName}
-            </Button>
-          ))}
+          {worktimeList &&
+            worktimeList.length > 0 &&
+            worktimeList.map(worktime => (
+              <Button key={worktime.guid} onClick={() => handleSubmit(worktime)}>
+                {worktime.fWorkTimeName}
+              </Button>
+            ))}
         </Card>
       </Modal>
     );

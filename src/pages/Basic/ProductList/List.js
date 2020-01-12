@@ -625,17 +625,23 @@ class TableList extends PureComponent {
               <div className={styles.tableListForm}>{this.renderForm()}</div>
               <div className={styles.tableListOperator}>
                 <Authorized authority="Product_Create">
-                  {/* <Button icon="plus" type="primary" onClick={() => this.handleImport(true)}>
-                    从 ERP 手动导入
-                  </Button> */}
-                  <Button
-                    icon="plus"
-                    type="primary"
-                    loading={isSyncing}
-                    onClick={() => this.handleSync()}
+                  <Dropdown
+                    overlay={
+                      <Menu>
+                        <Menu.Item key="k3" onClick={() => this.handleSync()}>
+                          金蝶 K3
+                        </Menu.Item>
+                        <Menu.Item key="k3Cloud">金蝶 K3 Cloud</Menu.Item>
+                        <Menu.Item key="digiwin">鼎捷 ERP</Menu.Item>
+                        <Menu.Item key="other">其他 ERP</Menu.Item>
+                      </Menu>
+                    }
                   >
-                    从 ERP 一键同步
-                  </Button>
+                    <Button icon="plus" type="primary" loading={isSyncing}>
+                      从 ERP 同步
+                      <Icon type="down" />
+                    </Button>
+                  </Dropdown>
                 </Authorized>
                 <Authorized authority="Product_Export">
                   <Dropdown
@@ -651,7 +657,7 @@ class TableList extends PureComponent {
                     </Button>
                   </Dropdown>
                 </Authorized>
-                {selectedRows.length > 0 && (
+                {/* {selectedRows.length > 0 && (
                   <span>
                     <Authorized authority="Product_Delete">
                       <Button onClick={this.handleBatchDeleteClick}>批量删除</Button>
@@ -664,17 +670,7 @@ class TableList extends PureComponent {
                       </Dropdown>
                     </Authorized>
                   </span>
-                )}
-                <div style={{ float: 'right', marginRight: 24 }}>
-                  <Button
-                    icon="menu"
-                    onClick={() => {
-                      if (this.showConfig) this.showConfig();
-                    }}
-                  >
-                    列配置
-                  </Button>
-                </div>
+                )} */}
               </div>
               <WgStandardTable
                 rowKey="fItemID"

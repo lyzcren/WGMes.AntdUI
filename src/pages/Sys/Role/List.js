@@ -644,16 +644,6 @@ class TableList extends PureComponent {
                     </Dropdown>
                   </span>
                 )}
-                <div style={{ float: 'right', marginRight: 24 }}>
-                  <Button
-                    icon="menu"
-                    onClick={() => {
-                      if (this.showConfig) this.showConfig();
-                    }}
-                  >
-                    列配置
-                  </Button>
-                </div>
               </div>
               <WgStandardTable
                 rowKey="fItemID"

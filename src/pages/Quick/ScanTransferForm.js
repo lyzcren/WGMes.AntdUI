@@ -46,7 +46,7 @@ export class ScanTransferForm extends PureComponent {
       form,
       handleSign,
       scanSign: { data },
-      dept: { fDeptID },
+      dept: { fItemID: fDeptID },
       operator: { fEmpID },
       worktime: { fWorkTimeID },
       machine,

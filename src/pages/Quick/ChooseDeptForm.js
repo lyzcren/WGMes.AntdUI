@@ -17,7 +17,13 @@ export class ChooseDeptForm extends PureComponent {
   }
 
   render() {
-    const { loading, modalVisible, handleModalVisible, handleSubmit, deptList } = this.props;
+    const {
+      loading,
+      modalVisible,
+      handleModalVisible,
+      handleSubmit,
+      authorizedDeptList,
+    } = this.props;
     const footer = (
       <div>
         <Button
@@ -43,11 +49,13 @@ export class ChooseDeptForm extends PureComponent {
         afterClose={() => handleModalVisible()}
       >
         <Card bordered={false} loading={loading}>
-          {deptList.map(dept => (
-            <Button key={dept.fDeptID} onClick={() => handleSubmit(dept)}>
-              {dept.fDeptName}
-            </Button>
-          ))}
+          {authorizedDeptList &&
+            authorizedDeptList.length > 0 &&
+            authorizedDeptList.map(dept => (
+              <Button key={dept.fItemID} onClick={() => handleSubmit(dept)}>
+                {dept.fName}
+              </Button>
+            ))}
         </Card>
       </Modal>
     );

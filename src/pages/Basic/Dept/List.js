@@ -641,9 +641,23 @@ class TableList extends PureComponent {
     return (
       <div>
         <Authorized authority="Dept_Create">
-          <Button icon="plus" type="primary" onClick={() => this.handleSync()}>
-            从 ERP 同步
-          </Button>
+          <Dropdown
+            overlay={
+              <Menu>
+                <Menu.Item key="k3" onClick={() => this.handleSync()}>
+                  金蝶 K3
+                </Menu.Item>
+                <Menu.Item key="k3Cloud">金蝶 K3 Cloud</Menu.Item>
+                <Menu.Item key="digiwin">鼎捷 ERP</Menu.Item>
+                <Menu.Item key="other">其他 ERP</Menu.Item>
+              </Menu>
+            }
+          >
+            <Button icon="plus" type="primary">
+              从 ERP 同步
+              <Icon type="down" />
+            </Button>
+          </Dropdown>
         </Authorized>
         <Authorized authority="Dept_Create">
           <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
@@ -678,16 +692,6 @@ class TableList extends PureComponent {
             </Authorized>
           </span>
         )}
-        <div style={{ float: 'right', marginRight: 24 }}>
-          <Button
-            icon="menu"
-            onClick={() => {
-              if (this.showConfig) this.showConfig();
-            }}
-          >
-            列配置
-          </Button>
-        </div>
       </div>
     );
   }
@@ -734,56 +738,68 @@ class TableList extends PureComponent {
               >
                 修改
               </a>
+            </Authorized>
+            <Authorized authority={['Dept_Update', 'Dept_Delete']}>
               <Divider type="vertical" />
             </Authorized>
             <Authorized authority="Dept_Delete">
               <Popconfirm title="是否要删除此行？" onConfirm={() => this.handleDelete(record)}>
-                <a disabled={!hasAuthority('Dept_Delete') || record.fIsFromErp}>删除</a>
+                <a
+                  disabled={
+                    !hasAuthority('Dept_Delete') || record.fParentID <= 0 || record.fIsFromErp
+                  }
+                >
+                  删除
+                </a>
               </Popconfirm>
             </Authorized>
-            <Dropdown
-              overlay={
-                <Menu>
-                  <Menu.Item
-                    key="updateBillNoRule"
-                    disabled={
-                      !hasAuthority('BillNoRule_Update') || record.fTypeNumber !== 'WorkShop'
-                    }
-                    onClick={() => this.handleUpdateFixModalVisible(true, record)}
-                  >
-                    编码规则
-                  </Menu.Item>
-                  <Menu.Item
-                    key="updateParams"
-                    disabled={!hasAuthority('Dept_Update') || record.fTypeNumber !== 'Process'}
-                    onClick={() => this.handleTechParamModalVisible(true, record)}
-                  >
-                    工艺参数
-                  </Menu.Item>
-                  {hasAuthority('UnitConverter_Read') && (
+            {record.fParentID > 0 && (
+              <Dropdown
+                overlay={
+                  <Menu>
                     <Menu.Item
-                      key="unitConverter"
-                      disabled={!hasAuthority('Dept_Update') || record.fTypeNumber !== 'Process'}
-                      onClick={() => this.handleUnitConverterModalVisible(true, record)}
+                      key="updateBillNoRule"
+                      disabled={
+                        !hasAuthority('BillNoRule_Update') || record.fTypeNumber !== 'WorkShop'
+                      }
+                      onClick={() => this.handleUpdateFixModalVisible(true, record)}
                     >
-                      单位转换
+                      编码规则
                     </Menu.Item>
-                  )}
-                  <Menu.Item
-                    key="active"
-                    disabled={!hasAuthority('Dept_Active')}
-                    onClick={() => this.handleActive(record, !record.fIsActive)}
-                  >
-                    {record.fIsActive ? '禁用' : '启用'}
-                  </Menu.Item>
-                </Menu>
-              }
-            >
-              <a>
-                <Divider type="vertical" />
-                更多 <Icon type="down" />
-              </a>
-            </Dropdown>
+                    <Menu.Item
+                      key="updateParams"
+                      disabled={!hasAuthority('Dept_Update') || record.fTypeNumber !== 'Process'}
+                      onClick={() => this.handleTechParamModalVisible(true, record)}
+                    >
+                      工艺参数
+                    </Menu.Item>
+                    {hasAuthority('UnitConverter_Read') && (
+                      <Menu.Item
+                        key="unitConverter"
+                        disabled={!hasAuthority('Dept_Update') || record.fTypeNumber !== 'Process'}
+                        onClick={() => this.handleUnitConverterModalVisible(true, record)}
+                      >
+                        单位转换
+                      </Menu.Item>
+                    )}
+                    <Menu.Item
+                      key="active"
+                      disabled={
+                        !hasAuthority('Dept_Active') || record.fParentID <= 0 || record.fIsFromErp
+                      }
+                      onClick={() => this.handleActive(record, !record.fIsActive)}
+                    >
+                      {record.fIsActive ? '禁用' : '启用'}
+                    </Menu.Item>
+                  </Menu>
+                }
+              >
+                <a>
+                  <Divider type="vertical" />
+                  更多 <Icon type="down" />
+                </a>
+              </Dropdown>
+            )}
           </Fragment>
         ),
       },

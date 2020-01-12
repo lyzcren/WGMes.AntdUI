@@ -49,11 +49,11 @@ class QuickOpsPage extends Component {
       scanRefund: false,
       scanTake: false,
     },
-    deptList: [],
+    authorizedDeptList: [],
     machineList: [],
     worktimeList: [],
     operatorList: [],
-    dept: { fDeptID: 0, fDeptName: '<请选择>' },
+    dept: { fItemID: 0, fName: '<请选择>' },
     machine: { fItemID: 0, fName: '<请选择>' },
     worktime: { fWorkTimeID: 0, fWorkTimeName: '<请选择>' },
     operator: { fEmpID: 0, fEmpName: '<请选择>' },
@@ -77,15 +77,15 @@ class QuickOpsPage extends Component {
       const {
         user: { currentUser },
       } = this.props;
-      const { deptList, fBindEmpID, fBindEmpName, fBindEmpNumber } = currentUser;
+      const { authorizedDeptList, fBindEmpID, fBindEmpName, fBindEmpNumber } = currentUser;
       const deptId = getDeptId();
-      if (deptList.length >= 1) {
-        this.setState({ deptList });
-        const dept = deptList.find(x => x.fDeptID == deptId);
+      if (authorizedDeptList.length >= 1) {
+        this.setState({ authorizedDeptList });
+        const dept = authorizedDeptList.find(x => x.fItemID == deptId);
         if (deptId && dept) {
           this.handleDeptChanged(dept);
         } else {
-          this.handleDeptChanged(deptList[0]);
+          this.handleDeptChanged(authorizedDeptList[0]);
         }
       }
       const operator = getOperator();
@@ -107,9 +107,9 @@ class QuickOpsPage extends Component {
 
   handleDeptChanged = newDept => {
     const { dispatch } = this.props;
-    const { fDeptID } = newDept;
+    const { fItemID: fDeptID } = newDept;
     this.setState({ dept: newDept });
-    setDeptId(newDept.fDeptID);
+    setDeptId(newDept.fItemID);
 
     dispatch({
       type: 'quickOps/getMachine',
@@ -118,7 +118,8 @@ class QuickOpsPage extends Component {
       const { machineList } = this.props.quickOps;
       this.setState({ machineList });
       const machineId = getMachineId();
-      const machine = machineList.find(x => x.fItemID == machineId);
+      const machine =
+        machineList && machineList.length > 0 ? machineList.find(x => x.fItemID == machineId) : {};
       if (machineId && machine) {
         this.setState({ machine });
       }
@@ -130,7 +131,10 @@ class QuickOpsPage extends Component {
       const { worktimeList } = this.props.quickOps;
       this.setState({ worktimeList });
       const worktimeId = getWorkTimeId();
-      const worktime = worktimeList.find(x => x.fWorkTimeID == worktimeId);
+      const worktime =
+        worktimeList && worktimeList.length > 0
+          ? worktimeList.find(x => x.fWorkTimeID == worktimeId)
+          : {};
       if (worktimeId && worktime) {
         this.setState({ worktime });
       }
@@ -142,9 +146,9 @@ class QuickOpsPage extends Component {
   };
 
   changeDept = dept => {
-    const { fDeptID } = dept;
+    const { fItemID } = dept;
     this.handleDeptChanged(dept);
-    if (dept.fDeptID != this.state.fDeptID) {
+    if (fItemID != this.state.fDeptID) {
       this.setState({ machine: { fItemID: 0, fName: '<请选择>' } });
       this.setState({ worktime: { fWorkTimeID: 0, fWorkTimeName: '<请选择>' } });
     }
@@ -155,7 +159,7 @@ class QuickOpsPage extends Component {
     const { machineList, dept } = this.state;
     if (machineList && machineList.length > 0) {
       this.handleModalVisible({ key: 'chooseMachine', flag: true });
-    } else if (dept.fDeptID > 0) {
+    } else if (dept.fItemID > 0) {
       message.warning('暂无机台');
     } else {
       message.warning('请先选择岗位');
@@ -172,7 +176,7 @@ class QuickOpsPage extends Component {
     const { worktimeList, dept } = this.state;
     if (worktimeList && worktimeList.length > 0) {
       this.handleModalVisible({ key: 'chooseWorktime', flag: true });
-    } else if (dept.fDeptID > 0) {
+    } else if (dept.fItemID > 0) {
       message.warning('当前岗位暂无班次');
     } else {
       message.warning('请先选择岗位');
@@ -205,7 +209,7 @@ class QuickOpsPage extends Component {
 
   scanReject = () => {
     const { dept, operator } = this.state;
-    if (!dept || !dept.fDeptID) {
+    if (!dept || !dept.fItemID) {
       message.warning('请先选择岗位');
     } else if (!operator || !operator.fEmpID) {
       message.warning('请先选择操作员');
@@ -225,7 +229,7 @@ class QuickOpsPage extends Component {
 
   scanRefund = () => {
     const { dept, operator } = this.state;
-    if (!dept || !dept.fDeptID) {
+    if (!dept || !dept.fItemID) {
       message.warning('请先选择岗位');
     } else if (!operator || !operator.fEmpID) {
       message.warning('请先选择操作员');
@@ -245,7 +249,7 @@ class QuickOpsPage extends Component {
     const { login } = this.props;
     const { currentUser } = this.props.user;
     const {
-      deptList,
+      authorizedDeptList,
       machineList,
       worktimeList,
       operatorList,
@@ -301,7 +305,7 @@ class QuickOpsPage extends Component {
               <span className={styles.text_gradient}>
                 <Icon type="double-right" /> 岗 位：
               </span>
-              <span className={styles.text_gradient_info}>{dept.fDeptName}</span>
+              <span className={styles.text_gradient_info}>{dept.fName}</span>
             </h2>
           </Row>
           <Row gutter={8}>
@@ -335,7 +339,7 @@ class QuickOpsPage extends Component {
           handleModalVisible={flag => this.handleModalVisible({ key: 'chooseDept', flag })}
           handleSubmit={this.changeDept}
           modalVisible={modalVisible.chooseDept}
-          deptList={deptList}
+          authorizedDeptList={authorizedDeptList}
         />
         <ChooseMachineForm
           dispatch

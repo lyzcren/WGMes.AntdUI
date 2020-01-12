@@ -621,7 +621,7 @@ class Transfer extends PureComponent {
                   >
                     <FormItem key={`paramsID${d.fParamID}`} label={d.fParamName}>
                       {getFieldDecorator(`paramsID${d.fParamID}`, {
-                        rules: [{ required: false, message: '' }],
+                        rules: [{ required: d.fIsRequired, message: d.fParamName + '必填' }],
                         initialValue: d.fDefaultValue,
                       })(
                         <Select

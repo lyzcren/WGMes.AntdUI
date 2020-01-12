@@ -74,7 +74,7 @@ export class RejectForm extends PureComponent {
         type: 'quickReject/reject',
         payload: {
           fFlowID: fInterID,
-          fRejectDeptID: bindDept.fDeptID,
+          fRejectDeptID: bindDept.fItemID,
           fOperatorID: bindOperator.fEmpID,
           ...fieldsValue,
         },

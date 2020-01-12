@@ -258,6 +258,12 @@ class TableList extends PureComponent {
     const queryFilters = [];
     if (fieldsValue.queryName)
       queryFilters.push({ name: 'fName', compare: '%*%', value: fieldsValue.queryName });
+    if (fieldsValue.queryNumber)
+      queryFilters.push({ name: 'fNumber', compare: '%*%', value: fieldsValue.queryNumber });
+    if (fieldsValue.queryEmpName)
+      queryFilters.push({ name: 'fBindEmpName', compare: '%*%', value: fieldsValue.queryEmpName });
+    if (fieldsValue.queryMobile)
+      queryFilters.push({ name: 'fPhone', compare: '%*%', value: fieldsValue.queryMobile });
     if (fieldsValue.queryIsActive)
       queryFilters.push({ name: 'fIsActive', compare: '=', value: fieldsValue.queryIsActive });
 
@@ -543,12 +549,17 @@ class TableList extends PureComponent {
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={8} sm={24}>
+          <Col md={6} sm={24}>
             <FormItem label="姓名">
               {getFieldDecorator('queryName')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
-          <Col md={8} sm={24}>
+          <Col md={6} sm={24}>
+            <FormItem label="用户名">
+              {getFieldDecorator('queryNumber')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={4} sm={24}>
             <FormItem label="状态">
               {getFieldDecorator('queryIsActive')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
@@ -566,9 +577,9 @@ class TableList extends PureComponent {
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
               </Button>
-              {/* <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
+              <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
                 展开 <Icon type="down" />
-              </a> */}
+              </a>
             </span>
           </Col>
         </Row>
@@ -584,50 +595,33 @@ class TableList extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline" style={{ marginRight: '30px' }}>
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem label="规则名称">
-              {getFieldDecorator('name')(<Input placeholder="请输入" />)}
+            <FormItem label="姓名">
+              {getFieldDecorator('queryName')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>
-              )}
+            <FormItem label="用户名">
+              {getFieldDecorator('queryNumber')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem label="调用次数">
-              {getFieldDecorator('number')(<InputNumber style={{ width: '100%' }} />)}
+            <FormItem label="绑定操作员">
+              {getFieldDecorator('queryEmpName')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
         </Row>
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem label="更新日期">
-              {getFieldDecorator('date')(
-                <DatePicker style={{ width: '100%' }} placeholder="请输入更新日期" />
-              )}
+            <FormItem label="移动电话">
+              {getFieldDecorator('queryMobile')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status3')(
+            <FormItem label="状态">
+              {getFieldDecorator('queryIsActive')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>
-              )}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status4')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
+                  <Option value="0">禁用</Option>
+                  <Option value="1">启用</Option>
                 </Select>
               )}
             </FormItem>
@@ -736,16 +730,6 @@ class TableList extends PureComponent {
                     </Dropdown>
                   </span>
                 )}
-                <div style={{ float: 'right', marginRight: 24 }}>
-                  <Button
-                    icon="menu"
-                    onClick={() => {
-                      if (this.showConfig) this.showConfig();
-                    }}
-                  >
-                    列配置
-                  </Button>
-                </div>
               </div>
               <WgStandardTable
                 rowKey="fItemID"

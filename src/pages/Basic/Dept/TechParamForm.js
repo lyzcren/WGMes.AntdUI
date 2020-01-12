@@ -103,6 +103,7 @@ export class TechParamForm extends PureComponent {
       guid: `NEW_TEMP_ID_${this.index}`,
       fParamID: '',
       fDefaultValue: '',
+      fIsRequired: '',
     };
     newData.push(newItem);
     this.index += 1;
@@ -120,12 +121,12 @@ export class TechParamForm extends PureComponent {
     }
   }
 
-  handleFieldChange(e, fieldName, guid) {
+  handleFieldChange(guid, fieldName, value) {
     const { data } = this.state;
     const newData = data.map(item => ({ ...item }));
     const target = this.getRowByKey(guid, newData);
     if (target) {
-      target[fieldName] = e.target.value;
+      target[fieldName] = value;
       this.setState({ data: newData });
     }
   }
@@ -198,14 +199,29 @@ export class TechParamForm extends PureComponent {
         title: '默认值',
         dataIndex: 'fDefaultValue',
         key: 'fDefaultValue',
-        width: '40%',
+        width: '20%',
         render: (text, record) => {
           return (
             <Input
               value={text}
-              onChange={e => this.handleFieldChange(e, 'fDefaultValue', record.guid)}
+              onChange={e => this.handleFieldChange(record.guid, 'fDefaultValue', e.target.value)}
               onKeyPress={e => this.handleKeyPress(e, record.guid)}
               placeholder="参数值"
+            />
+          );
+        },
+      },
+      {
+        title: '是否必填',
+        dataIndex: 'fIsRequired',
+        key: 'fIsRequired',
+        width: '20%',
+        render: (text, record) => {
+          return (
+            <Switch
+              checked={text}
+              onChange={(checked, e) => this.handleFieldChange(record.guid, 'fIsRequired', checked)}
+              onKeyPress={e => this.handleKeyPress(e, record.guid)}
             />
           );
         },
@@ -232,6 +248,7 @@ export class TechParamForm extends PureComponent {
             修改 <Tag color="blue"> {formVals.fName}</Tag> 工艺参数
           </div>
         }
+        width={650}
         visible={modalVisible}
         onOk={this.okHandle}
         onCancel={() => handleModalVisible(false, values)}

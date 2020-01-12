@@ -56,7 +56,7 @@ export class SignForm extends PureComponent {
     const { formVals } = this.state;
     const filterDepts = currentUser.fIsAdmin
       ? nextDepts
-      : nextDepts.filter(x => currentUser.deptList.find(y => x.fDeptID === y.fDeptID));
+      : nextDepts.filter(x => currentUser.authorizedDeptList.find(y => x.fDeptID === y.fItemID));
 
     return (
       <Modal

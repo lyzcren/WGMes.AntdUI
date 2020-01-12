@@ -45,7 +45,7 @@ export class ScanSignForm extends PureComponent {
       form,
       handleSign,
       scanSign: { data },
-      dept: { fDeptID },
+      dept: { fItemID: fDeptID },
     } = this.props;
     const fFullBatchNo = form.getFieldValue('fFullBatchNo');
     dispatch({

@@ -43,11 +43,13 @@ export class ChooseMachineForm extends PureComponent {
         afterClose={() => handleModalVisible()}
       >
         <Card bordered={false} loading={loading}>
-          {machineList.map(machine => (
-            <Button key={machine.fItemID} onClick={() => handleSubmit(machine)}>
-              {machine.fName}
-            </Button>
-          ))}
+          {machineList &&
+            machineList.length > 0 &&
+            machineList.map(machine => (
+              <Button key={machine.fItemID} onClick={() => handleSubmit(machine)}>
+                {machine.fName}
+              </Button>
+            ))}
         </Card>
       </Modal>
     );

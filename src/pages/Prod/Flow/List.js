@@ -561,7 +561,9 @@ class TableList extends PureComponent {
         } = this.props;
         const filterDepts = currentUser.fIsAdmin
           ? nextDepts
-          : nextDepts.filter(x => currentUser.deptList.find(y => x.fDeptID === y.fDeptID));
+          : nextDepts.filter(x =>
+              currentUser.authorizedDeptList.find(y => x.fDeptID === y.fItemID)
+            );
         if (!nextDepts || nextDepts.length <= 0) {
           message.warning('无可签收岗位.');
         } else if (!filterDepts || filterDepts.length <= 0) {
@@ -1177,17 +1179,6 @@ class TableList extends PureComponent {
             </Button>
           </Authorized>
         )}
-
-        <div style={{ float: 'right', marginRight: 24 }}>
-          <Button
-            icon="menu"
-            onClick={() => {
-              if (this.showConfig) this.showConfig();
-            }}
-          >
-            列配置
-          </Button>
-        </div>
       </div>
     );
   }

@@ -19,6 +19,12 @@ class ColumnConfig {
       sorter: true,
     },
     {
+      title: '序列号',
+      dataIndex: 'fSerialNumber',
+      width: 160,
+      sorter: true,
+    },
+    {
       title: '岗位',
       dataIndex: 'fDeptName',
       width: 160,

@@ -40,11 +40,6 @@ class ColumnConfig {
       width: 100,
     },
     {
-      title: '副单位',
-      dataIndex: 'fUnitName2',
-      width: 100,
-    },
-    {
       title: '操作',
       fixed: 'right',
       width: 100,

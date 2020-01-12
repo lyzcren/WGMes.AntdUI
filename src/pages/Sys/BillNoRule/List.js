@@ -246,18 +246,6 @@ class TableList extends PureComponent {
               </a>
             </span>
           </Col>
-          <Col md={8} sm={24}>
-            <div style={{ float: 'right', marginRight: 24 }}>
-              <Button
-                icon="menu"
-                onClick={() => {
-                  if (this.showConfig) this.showConfig();
-                }}
-              >
-                列配置
-              </Button>
-            </div>
-          </Col>
         </Row>
       </Form>
     );

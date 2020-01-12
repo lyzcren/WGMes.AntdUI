@@ -68,7 +68,7 @@ export class ScanRejectForm extends PureComponent {
       } = this.props;
       if (!flow || Object.keys(flow).length <= 0) {
         message.warning('未找到流程单');
-      } else if (flow.fNextDeptIDList.indexOf(dept.fDeptID) < 0) {
+      } else if (flow.fNextDeptIDList.indexOf(dept.fItemID) < 0) {
         message.warning('当前岗位无法拒签');
       } else {
         this.handleModalVisible({ key: 'reject', flag: true }, flow);

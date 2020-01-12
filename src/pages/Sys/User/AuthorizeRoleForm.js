@@ -35,11 +35,18 @@ export class AuthorizeRoleForm extends PureComponent {
 
   columns = [
     {
-      title: '角色',
+      title: '角色名称',
       dataIndex: 'fName',
     },
     {
-      title: '状态',
+      title: '是否启用',
+      dataIndex: 'fIsActive',
+      render(val) {
+        return val ? <Tag color="blue">已启用</Tag> : <Tag>已禁用</Tag>;
+      },
+    },
+    {
+      title: '角色授权状态',
       dataIndex: 'fIsAuthorized',
       render(val) {
         return val ? <Tag color="blue">已授权</Tag> : <Tag>未授权</Tag>;
@@ -199,15 +206,15 @@ export class AuthorizeRoleForm extends PureComponent {
       >
         <Form onSubmit={this.handleSearch} layout="inline">
           <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-            <Col md={10} sm={2}>
+            <Col md={10} sm={0}>
               <FormItem label="角色">
                 {form.getFieldDecorator('roleName')(<Input placeholder="请输入" />)}
               </FormItem>
             </Col>
             <Col md={8} sm={0}>
-              <FormItem label="状态">
+              <FormItem label="是否授权">
                 {form.getFieldDecorator('fIsAuthorized')(
-                  <Select placeholder="请选择" style={{ width: '124px' }}>
+                  <Select placeholder="请选择" allowClear={true} style={{ width: '114px' }}>
                     <Option value="true">已授权</Option>
                     <Option value="false">未授权</Option>
                   </Select>

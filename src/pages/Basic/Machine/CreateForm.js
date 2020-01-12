@@ -85,6 +85,9 @@ export class CreateForm extends PureComponent {
             initialValue: billNo.Machine,
           })(<Input placeholder="请输入" />)}
         </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="序列号">
+          {form.getFieldDecorator('fSerialNumber', {})(<Input placeholder="请输入" />)}
+        </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="岗位">
           {form.getFieldDecorator('fDeptID', {
             rules: [{ required: true, message: '请选择岗位' }],
