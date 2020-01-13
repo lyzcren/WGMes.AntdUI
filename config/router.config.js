@@ -345,6 +345,13 @@ export default [
             authority: ['Route_Read'],
             routes: [
               {
+                path: '/techStd/route/create',
+                name: 'create',
+                component: './Tech/Route/Create',
+                authority: ['Route_Create'],
+                hideInMenu: true,
+              },
+              {
                 path: '/techStd/route/profile',
                 name: 'profile',
                 component: './Tech/Route/Profile',

@@ -18,7 +18,8 @@ const { Description } = DescriptionList;
 const ButtonGroup = Button.Group;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ routeManage, routeProfile, loading, menu }) => ({
+@connect(({ basicData, routeManage, routeProfile, loading, menu }) => ({
+  basicData,
   routeManage,
   routeProfile,
   loading: loading.models.routeProfile,
@@ -32,6 +33,12 @@ class TableList extends PureComponent {
     const {
       data: { fInterID },
     } = this.props;
+
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'basicData/getProcessDeptTree',
+    });
+
     this.loadData(fInterID);
   }
 
@@ -132,6 +139,7 @@ class TableList extends PureComponent {
       routeProfile: { data, steps, currentStep },
       loading,
       form: { getFieldDecorator },
+      basicData: { processDeptTree },
     } = this.props;
 
     const description = (
@@ -234,9 +242,18 @@ class TableList extends PureComponent {
                   <Card title={`第 ${currentStep + 1} 步`} bordered>
                     <DeptForm
                       loading={loading}
-                      route={data}
+                      key={data.fInterID}
+                      processDeptTree={processDeptTree}
                       depts={steps[currentStep].depts}
                       currentStep={currentStep}
+                      onChange={depts => {
+                        console.log(depts);
+                        const { dispatch } = this.props;
+                        dispatch({
+                          type: 'routeProfile/changeStep',
+                          payload: { depts },
+                        });
+                      }}
                     />
                   </Card>
                 </div>

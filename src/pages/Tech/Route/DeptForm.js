@@ -26,20 +26,9 @@ const { Option } = Select;
 const TypeData = GlobalConst.DefectTypeData;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ routeProfile, basicData }) => ({
-  routeProfile,
-  basicData,
-}))
 @Form.create()
 /* eslint react/no-multi-comp:0 */
 class DeptForm extends PureComponent {
-  // static defaultProps = {
-  //   handleSubmit: () => { },
-  //   handleModalVisible: () => { },
-  //   depts: [],
-  //   currentStep: 0,
-  // };
-
   MaxEntryID = 0;
 
   cacheOriginData = {};
@@ -52,88 +41,68 @@ class DeptForm extends PureComponent {
     this.state = {
       loading: false,
       /* eslint-disable-next-line react/no-unused-state */
-      depts: props.depts,
-      currentStep: props.currentStep,
+      // depts: props.depts,
+      // currentStep: props.currentStep,
     };
   }
 
-  componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'basicData/getProcessDeptTree',
-    });
-  }
-
-  componentDidUpdate(preProps) {
-    const {
-      route: { fInterID },
-      depts,
-      currentStep,
-    } = this.props;
-    if (fInterID !== preProps.route.fInterID || currentStep !== preProps.currentStep) {
-      this.setState({ fInterID, depts, currentStep });
-      this.MaxEntryID = depts.length > 0 ? Math.max(...depts.map(d => d.fEntryID)) : 0;
-    }
-  }
+  // componentDidUpdate (preProps) {
+  //   const {
+  //     fInterID,
+  //     depts,
+  //     currentStep,
+  //   } = this.props;
+  //   if (fInterID !== preProps.fInterID || currentStep !== preProps.currentStep) {
+  //     this.setState({ fInterID, depts, currentStep });
+  //     this.MaxEntryID = depts.length > 0 ? Math.max(...depts.map(d => d.fEntryID)) : 0;
+  //   }
+  // }
 
   getRowByKey(fEntryID, newData) {
-    const { depts } = this.state;
+    const { depts } = this.props;
     return (newData || depts).filter(item => item.fEntryID === fEntryID)[0];
   }
 
   newItem = () => {
-    const { dispatch } = this.props;
-    const { depts } = this.state;
+    const { depts, onChange } = this.props;
     const newData = depts.map(item => ({ ...item }));
     newData.push({
       fEntryID: ++this.MaxEntryID,
       fDeptID: '',
       fDeptName: '',
     });
-    this.setState({ depts: newData });
+
+    if (onChange) onChange(newData);
   };
 
   remove(fEntryID) {
-    const { depts } = this.state;
+    const { depts, onChange } = this.props;
     const newData = depts.filter(v => v.fEntryID !== fEntryID);
-    this.setState({ depts: newData });
 
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'routeProfile/changeStep',
-      payload: { depts: newData },
-    });
+    if (onChange) onChange(newData);
   }
 
   handleDeptChange(deptId, deptName, fEntryID) {
-    const { dispatch } = this.props;
-    const { depts } = this.state;
+    const { depts, onChange } = this.props;
     const newData = depts.map(item => ({ ...item }));
     const target = this.getRowByKey(fEntryID, newData);
     if (target) {
       target.fDeptID = deptId;
       target.fDeptName = deptName;
-      this.setState({ depts: newData });
     }
-    dispatch({
-      type: 'routeProfile/changeStep',
-      payload: { depts: newData },
-    });
+
+    if (onChange) onChange(newData);
   }
 
   handleFieldChange(fieldName, value, fEntryID) {
-    const { dispatch } = this.props;
-    const { depts } = this.state;
+    const { depts, onChange } = this.props;
     const newData = depts.map(item => ({ ...item }));
     const target = this.getRowByKey(fEntryID, newData);
     if (target) {
       target[fieldName] = value;
-      this.setState({ depts: newData });
     }
-    dispatch({
-      type: 'routeProfile/changeStep',
-      payload: { depts: newData },
-    });
+
+    if (onChange) onChange(newData);
   }
 
   render() {
@@ -141,10 +110,12 @@ class DeptForm extends PureComponent {
       form: { getFieldDecorator },
       modalVisible,
       handleModalVisible,
-      basicData: { processDeptTree },
+      processDeptTree,
+      depts,
+      currentStep,
     } = this.props;
     const profileLoading = this.props.loading;
-    const { loading, depts, currentStep } = this.state;
+    const { loading } = this.state;
 
     const columns = [
       {

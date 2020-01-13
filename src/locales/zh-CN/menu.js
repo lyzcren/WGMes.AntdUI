@@ -79,7 +79,8 @@ export default {
   'menu.techStd.defect': '不良类型',
   'menu.techStd.param': '工艺参数',
   'menu.techStd.route': '工艺路线',
-  'menu.techStd.route.profile': '工艺路线详情',
+  'menu.techStd.route.profile': '查看工艺路线',
+  'menu.techStd.route.create': '创建工艺路线',
   // 基础资料
   'menu.basic': '基础资料',
   'menu.basic.product': '物料',

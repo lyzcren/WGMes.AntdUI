@@ -256,6 +256,14 @@ class TableList extends PureComponent {
     });
   };
 
+  handleCreatePageVisible = flag => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/openMenu',
+      payload: { path: '/techStd/route/create' },
+    });
+  };
+
   handleProfileModalVisible = (flag, record) => {
     const { dispatch } = this.props;
     dispatch({
@@ -544,11 +552,7 @@ class TableList extends PureComponent {
     return (
       <div style={{ overflow: 'hidden' }}>
         <Authorized authority="Route_Create">
-          <Button
-            icon="plus"
-            type="primary"
-            onClick={() => this.handleModalVisible({ key: 'add', flag: true })}
-          >
+          <Button icon="plus" type="primary" onClick={() => this.handleCreatePageVisible(true)}>
             新建
           </Button>
         </Authorized>
