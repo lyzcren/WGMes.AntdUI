@@ -1,11 +1,4 @@
-import {
-  fakeQuery,
-  fakeRemove,
-  fakeAdd,
-  fakeUpdate,
-  fakeActive,
-  fakeCheck,
-} from '@/services/Tech/Route';
+import { fakeQuery, fakeRemove, fakeActive, fakeCheck } from '@/services/Tech/Route';
 
 export default {
   namespace: 'routeManage',
@@ -29,24 +22,8 @@ export default {
         payload: response,
       });
     },
-    *add({ payload, callback }, { call, put }) {
-      const response = yield call(fakeAdd, payload);
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
-      if (callback) callback();
-    },
     *remove({ payload, callback }, { call, put }) {
       const response = yield call(fakeRemove, payload);
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
-      if (callback) callback();
-    },
-    *update({ payload, callback }, { call, put }) {
-      const response = yield call(fakeUpdate, payload);
       yield put({
         type: 'saveData',
         payload: response,

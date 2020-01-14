@@ -41,7 +41,7 @@ class ParamForm extends PureComponent {
   }
 
   okHandle = () => {
-    const { dispatch, form, handleModalVisible, handleSubmit } = this.props;
+    const { dispatch, form, handleModalVisible } = this.props;
     const {
       data,
       formVals: { fInterID },

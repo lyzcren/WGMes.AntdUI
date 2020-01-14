@@ -81,6 +81,7 @@ export default {
   'menu.techStd.route': '工艺路线',
   'menu.techStd.route.profile': '查看工艺路线',
   'menu.techStd.route.create': '创建工艺路线',
+  'menu.techStd.route.update': '修改工艺路线',
   // 基础资料
   'menu.basic': '基础资料',
   'menu.basic.product': '物料',

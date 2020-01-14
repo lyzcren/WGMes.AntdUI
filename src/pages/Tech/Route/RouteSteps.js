@@ -135,7 +135,7 @@ class RouteStep extends PureComponent {
   };
 
   render() {
-    const { loading, processDeptTree, steps, currentStep, changeCurrent } = this.props;
+    const { loading, processDeptTree, steps, currentStep } = this.props;
     this.checkEmptyRow(steps, currentStep);
     const depts = steps[currentStep].depts;
 
@@ -199,11 +199,9 @@ class RouteStep extends PureComponent {
         width: 100,
         render: (text, record) => (
           <span>
-            {record.fDeptID > 0 && (
-              <Popconfirm title="是否要删除此行？" onConfirm={() => this.remove(record.fEntryID)}>
-                <a>删除</a>
-              </Popconfirm>
-            )}
+            <Popconfirm title="是否要删除此行？" onConfirm={() => this.remove(record.fEntryID)}>
+              <a disabled={!record.fDeptID}>删除</a>
+            </Popconfirm>
           </span>
         ),
       },

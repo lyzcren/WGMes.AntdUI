@@ -17,8 +17,6 @@ import {
 
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
-import UpdateForm from './UpdateForm';
-import CreateForm from './CreateForm';
 import ParamForm from './ParamForm';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
@@ -49,15 +47,12 @@ class TableList extends PureComponent {
       exporting: false,
       // 新增界面
       modalVisible: {
-        add: false,
-        update: false,
         param: false,
       },
       formValues: {},
       currentFormValues: {},
       // 其他
       expandForm: false,
-      renderCreateForm: true,
       selectedRows: [],
       queryFilters: [],
     };
@@ -79,8 +74,7 @@ class TableList extends PureComponent {
     // 列配置相关方法
     ColumnConfig.ProfileModalVisibleCallback = record =>
       this.handleProfileModalVisible(true, record);
-    ColumnConfig.UpdateModalVisibleCallback = record =>
-      this.handleModalVisible({ key: 'update', flag: true }, record);
+    ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdatePageVisible(record);
     ColumnConfig.DeleteCallback = record => this.handleDelete(record);
     ColumnConfig.ActiveCallback = record => this.handleActive(record, !record.fIsActive);
     ColumnConfig.CheckCallback = record =>
@@ -246,17 +240,16 @@ class TableList extends PureComponent {
   };
 
   handleModalVisible = ({ key, flag }, record) => {
-    const { modalVisible, currentFormValues, renderCreateForm } = this.state;
+    const { modalVisible, currentFormValues } = this.state;
     modalVisible[key] = !!flag;
     currentFormValues[key] = record;
     this.setState({
       modalVisible: { ...modalVisible },
       currentFormValues: { ...currentFormValues },
-      renderCreateForm: key == 'add' ? !!flag : renderCreateForm,
     });
   };
 
-  handleCreatePageVisible = flag => {
+  handleCreatePageVisible = () => {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
@@ -264,53 +257,27 @@ class TableList extends PureComponent {
     });
   };
 
-  handleProfileModalVisible = (flag, record) => {
+  handleUpdatePageVisible = record => {
     const { dispatch } = this.props;
+    const { fInterID } = record;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/techStd/route/profile', data: record },
+      payload: {
+        path: '/techStd/route/update',
+        location: { fInterID, record },
+      },
     });
   };
 
-  handleAdd = fields => {
+  handleProfileModalVisible = (flag, record) => {
     const { dispatch } = this.props;
+    const { fInterID } = record;
     dispatch({
-      type: 'routeManage/add',
-      payload: fields,
-    }).then(() => {
-      const {
-        routeManage: { queryResult },
-      } = this.props;
-      if (queryResult.status === 'ok') {
-        message.success('添加成功');
-        this.handleModalVisible({ key: 'add' });
-        // 成功后再次刷新列表
-        this.search();
-      } else {
-        message.warning(queryResult.message);
-      }
-    });
-  };
-
-  handleUpdate = fields => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'routeManage/update',
-      payload: fields,
-    }).then(() => {
-      const {
-        routeManage: { queryResult },
-      } = this.props;
-      if (queryResult.status === 'ok') {
-        message.success('修改成功');
-        this.handleModalVisible({ key: 'update' });
-        // 成功后再次刷新列表
-        this.search();
-      } else if (queryResult.status === 'warning') {
-        message.warning(queryResult.message);
-      } else {
-        message.error(queryResult.message);
-      }
+      type: 'menu/openMenu',
+      payload: {
+        path: '/techStd/route/profile',
+        location: { fInterID, record },
+      },
     });
   };
 
@@ -540,19 +507,19 @@ class TableList extends PureComponent {
         <Menu.Item key="deactive" disabled={!hasAuthority('Route_Active')}>
           批量禁用
         </Menu.Item>
-        <Menu.Item key="check" disabled={!hasAuthority('Route_Check')}>
+        {/* <Menu.Item key="check" disabled={!hasAuthority('Route_Check')}>
           批量审批
         </Menu.Item>
         <Menu.Item key="uncheck" disabled={!hasAuthority('Route_Check')}>
           批量反审批
-        </Menu.Item>
+        </Menu.Item> */}
       </Menu>
     );
 
     return (
       <div style={{ overflow: 'hidden' }}>
         <Authorized authority="Route_Create">
-          <Button icon="plus" type="primary" onClick={() => this.handleCreatePageVisible(true)}>
+          <Button icon="plus" type="primary" onClick={() => this.handleCreatePageVisible()}>
             新建
           </Button>
         </Authorized>
@@ -588,29 +555,15 @@ class TableList extends PureComponent {
     );
   }
 
-  afterCreateFormClose = () => {
-    this.setState({ renderCreateForm: false });
-  };
-
   render() {
     const {
       routeManage: { data },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, renderCreateForm, currentFormValues } = this.state;
+    const { selectedRows, modalVisible, currentFormValues } = this.state;
 
-    const parentMethods = {
-      handleSubmit: this.handleAdd,
-      handleModalVisible: (flag, record) => this.handleModalVisible({ key: 'add', flag }, record),
-    };
-    const updateMethods = {
-      handleModalVisible: (flag, record) =>
-        this.handleModalVisible({ key: 'update', flag }, record),
-      handleSubmit: this.handleUpdate,
-    };
     const paramMethods = {
       handleModalVisible: (flag, record) => this.handleModalVisible({ key: 'param', flag }, record),
-      handleSubmit: this.handleUpdate,
     };
     return (
       <div style={{ margin: '-24px -24px 0' }}>
@@ -635,20 +588,6 @@ class TableList extends PureComponent {
               />
             </div>
           </Card>
-          {renderCreateForm && (
-            <CreateForm
-              {...parentMethods}
-              modalVisible={modalVisible.add}
-              afterClose={this.afterCreateFormClose}
-            />
-          )}
-          {currentFormValues.update && Object.keys(currentFormValues.update).length ? (
-            <UpdateForm
-              {...updateMethods}
-              updateModalVisible={modalVisible.update}
-              values={currentFormValues.update}
-            />
-          ) : null}
           {currentFormValues.param && Object.keys(currentFormValues.param).length ? (
             <ParamForm
               {...paramMethods}

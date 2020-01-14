@@ -352,6 +352,13 @@ export default [
                 hideInMenu: true,
               },
               {
+                path: '/techStd/route/update',
+                name: 'update',
+                component: './Tech/Route/Update',
+                authority: ['Route_Update'],
+                hideInMenu: true,
+              },
+              {
                 path: '/techStd/route/profile',
                 name: 'profile',
                 component: './Tech/Route/Profile',

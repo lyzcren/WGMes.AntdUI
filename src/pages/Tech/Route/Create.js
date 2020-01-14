@@ -42,6 +42,14 @@ class Create extends PureComponent {
     });
   }
 
+  changeSteps = payload => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'routeCreate/changeSteps',
+      payload,
+    });
+  };
+
   save() {
     const { dispatch, form } = this.props;
     form.validateFields((err, fieldsValue) => {
@@ -89,14 +97,14 @@ class Create extends PureComponent {
               {getFieldDecorator('fNumber', {
                 rules: [{ required: true, message: '请输入编码' }],
                 initialValue: billNo.Route,
-              })(<Input placeholder="请输入" />)}
+              })(<Input placeholder="请输入编码" />)}
             </FormItem>
           </Col>
           <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
             <FormItem label="名称">
               {getFieldDecorator('fName', {
                 rules: [{ required: true, message: '请输入名称' }],
-              })(<Input placeholder="请输入" />)}
+              })(<Input placeholder="请输入名称" />)}
             </FormItem>
           </Col>
           <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
@@ -142,24 +150,17 @@ class Create extends PureComponent {
                 processDeptTree={processDeptTree}
                 steps={steps}
                 currentStep={currentStep}
-                processDeptTree={processDeptTree}
-                onChange={payload => {
-                  const { dispatch } = this.props;
-                  dispatch({
-                    type: 'routeCreate/changeSteps',
-                    payload,
-                  });
-                }}
+                onChange={this.changeSteps}
               />
             </Card>
           </GridContent>
-          <Card title={'其他信息'}>
+          <Card title={'备注信息'}>
             <Row>
               <Col lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <FormItem label="备注">
                   {getFieldDecorator('fComments', {
                     rules: [{ required: false, message: '请输入备注' }],
-                  })(<TextArea rows={4} placeholder="请输入" />)}
+                  })(<TextArea rows={4} placeholder="请输入备注" />)}
                 </FormItem>
               </Col>
             </Row>

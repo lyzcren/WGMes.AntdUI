@@ -1,7 +1,7 @@
-import { fakeGet, fakeQuerySteps } from '@/services/Tech/Route';
+import { fakeGet, fakeQuerySteps, fakeUpdate } from '@/services/Tech/Route';
 
 export default {
-  namespace: 'routeProfile',
+  namespace: 'routeUpdate',
 
   state: {
     data: {},
@@ -53,6 +53,43 @@ export default {
           currentStep: currentStep > 0 ? currentStep : 0,
         },
       });
+    },
+    *submit({ payload }, { call, put, select }) {
+      const {
+        data: { fInterID },
+        steps,
+      } = yield select(state => state.routeUpdate);
+      const submitSteps = [];
+      steps.forEach((group, groupId) => {
+        group.depts
+          .filter(d => d.fDeptID > 0)
+          .forEach(dept => {
+            submitSteps.push({
+              fGroupID: groupId,
+              fEntryID: dept.fEntryID,
+              fDeptID: dept.fDeptID,
+              fRequireMachine: dept.fRequireMachine,
+              fAutoSign: dept.fAutoSign,
+            });
+          });
+      });
+      if (!submitSteps || submitSteps.length <= 0) {
+        yield put({
+          type: 'save',
+          payload: {
+            queryResult: {
+              status: 'warning',
+              message: '工艺路线未添加任何岗位',
+            },
+          },
+        });
+      } else {
+        const response = yield call(fakeUpdate, { ...payload, fInterID, steps: submitSteps });
+        yield put({
+          type: 'save',
+          payload: { queryResult: response },
+        });
+      }
     },
   },
 

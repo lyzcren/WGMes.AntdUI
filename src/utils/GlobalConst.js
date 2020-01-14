@@ -1,7 +1,10 @@
 import { Badge } from 'antd';
 import moment from 'moment';
 
-export const defaultDateTimeFormat = datetime => moment(datetime).format('YYYY-MM-DD HH:mm:ss');
+export const defaultDateTimeFormat = datetime => {
+  if (!datetime || !moment(datetime).isValid()) return '';
+  else return moment(datetime).format('YYYY-MM-DD HH:mm:ss');
+};
 
 export const GlobalConst = {
   passwordProgressMap: {

@@ -1,8 +1,8 @@
 import React, { Fragment } from 'react';
 import { Switch, Divider, Dropdown, Menu, Icon, Modal } from 'antd';
-import moment from 'moment';
 import Authorized from '@/utils/Authorized';
 import { hasAuthority } from '@/utils/authority';
+import { defaultDateTimeFormat } from '@/utils/GlobalConst';
 
 const activeData = ['启用', '禁用'];
 
@@ -22,7 +22,7 @@ class ColumnConfig {
       sorter: true,
     },
     {
-      title: '启用',
+      title: '是否启用',
       dataIndex: 'fIsActive',
       width: 220,
       filters: [
@@ -37,12 +37,12 @@ class ColumnConfig {
       ],
       render: val => <Switch disabled checked={val} />,
     },
-    {
-      title: '状态',
-      dataIndex: 'fStatusName',
-      width: 220,
-      sorter: true,
-    },
+    // {
+    //   title: '状态',
+    //   dataIndex: 'fStatusName',
+    //   width: 220,
+    //   sorter: true,
+    // },
     {
       title: '创建人',
       dataIndex: 'fCreatorName',
@@ -50,11 +50,24 @@ class ColumnConfig {
       sorter: true,
     },
     {
-      title: '创建日期',
+      title: '创建时间',
       dataIndex: 'fCreateDate',
       width: 220,
       sorter: true,
-      render: val => moment(val).format('YYYY-MM-DD'),
+      render: val => defaultDateTimeFormat(val),
+    },
+    {
+      title: '修改人',
+      dataIndex: 'fEditorName',
+      width: 220,
+      sorter: true,
+    },
+    {
+      title: '修改时间',
+      dataIndex: 'fEditDate',
+      width: 220,
+      sorter: true,
+      render: val => defaultDateTimeFormat(val),
     },
     {
       title: '备注',
@@ -81,9 +94,9 @@ class ColumnConfig {
                 <Menu.Item key="active" disabled={!hasAuthority('Route_Active')}>
                   {record.fIsActive ? '禁用' : '启用'}
                 </Menu.Item>
-                <Menu.Item key="check" disabled={!hasAuthority('Route_Check')}>
+                {/* <Menu.Item key="check" disabled={!hasAuthority('Route_Check')}>
                   {record.fStatusNumber === 'Created' ? '审批' : '反审批'}
-                </Menu.Item>
+                </Menu.Item> */}
                 <Menu.Item key="delete" disabled={!hasAuthority('Route_Delete')}>
                   删除
                 </Menu.Item>

@@ -51,17 +51,19 @@ export default {
       });
       if (!submitSteps || submitSteps.length <= 0) {
         yield put({
-          type: 'saveData',
+          type: 'save',
           payload: {
-            status: 'warning',
-            message: '工艺路线未添加任何岗位',
+            queryResult: {
+              status: 'warning',
+              message: '工艺路线未添加任何岗位',
+            },
           },
         });
       } else {
         const response = yield call(fakeAdd, { ...payload, steps: submitSteps });
         yield put({
-          type: 'saveData',
-          payload: response,
+          type: 'save',
+          payload: { queryResult: response },
         });
       }
     },
@@ -72,12 +74,6 @@ export default {
       return {
         ...state,
         ...action.payload,
-      };
-    },
-    saveData(state, action) {
-      return {
-        ...state,
-        queryResult: action.payload ? action.payload : {},
       };
     },
   },

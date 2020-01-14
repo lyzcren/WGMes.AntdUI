@@ -11,8 +11,8 @@ export async function fakeQuery(params) {
   });
 }
 
-export async function fakeGet(params) {
-  return request(`/api/Route/${params.fInterID}`);
+export async function fakeGet(id) {
+  return request(`/api/Route/${id}`);
 }
 
 export async function fakeRemove(params) {
