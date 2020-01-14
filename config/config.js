@@ -82,6 +82,16 @@ export default {
       secure: false,
       // pathRewrite: { '^/api/': '/api/' },
     },
+    '/print/': {
+      target: 'http://localhost:8001/',
+      changeOrigin: false,
+      secure: false,
+    },
+    '/js/': {
+      target: 'http://localhost:8001/',
+      changeOrigin: false,
+      secure: false,
+    },
   },
   ignoreMomentLocale: true,
   lessLoaderOptions: {

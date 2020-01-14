@@ -15,7 +15,6 @@ import {
   fakeGetWorkTime,
 } from '@/services/basicData';
 import { fakeGetAll as fakeGetUnit } from '@/services/Basic/Unit';
-import { fakeQueryRootUrl } from '@/services/Sys/PrintTemplate';
 import { fakeGetAll as fakeGetUnitConverter } from '@/services/Basic/UnitConverter';
 
 export default {
@@ -134,13 +133,6 @@ export default {
       yield put({
         type: 'save',
         payload: { workTimes: response },
-      });
-    },
-    *getPrintRootUrl({ payload }, { call, put }) {
-      const response = yield call(fakeQueryRootUrl, payload);
-      yield put({
-        type: 'save',
-        payload: { printUrl: response.message },
       });
     },
     *getParamType({}, { call, put }) {

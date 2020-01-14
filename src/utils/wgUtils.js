@@ -1,8 +1,8 @@
 import screenfull from 'screenfull';
 
-export function print(module, printUrl, grfId, id) {
+export function print(module, grfId, id) {
   const w = window.open('about:blank');
-  w.location.href = `${printUrl}/print/${module}/${grfId}/${id}`;
+  w.location.href = `/print/${module}/${grfId}/${id}`;
 }
 
 export function autoSreenfull() {
