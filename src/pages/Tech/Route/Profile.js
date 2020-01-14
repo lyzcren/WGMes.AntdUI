@@ -90,6 +90,20 @@ class Profile extends PureComponent {
     });
   };
 
+  handleCopyPageVisible = () => {
+    const {
+      dispatch,
+      location: { fInterID },
+    } = this.props;
+    dispatch({
+      type: 'menu/openMenu',
+      payload: {
+        path: '/techStd/route/create',
+        location: { fInterID },
+      },
+    });
+  };
+
   close() {
     const { dispatch } = this.props;
     dispatch({
@@ -136,6 +150,7 @@ class Profile extends PureComponent {
         <Button type="primary" onClick={() => this.handleUpdatePageVisible()}>
           修改
         </Button>
+        <Button onClick={() => this.handleCopyPageVisible()}>复制</Button>
         <Button onClick={() => this.close()}>关闭</Button>
       </Fragment>
     );
@@ -143,7 +158,7 @@ class Profile extends PureComponent {
     return (
       <div>
         <WgPageHeaderWrapper
-          title={'查看工艺路线'}
+          title="查看工艺路线"
           logo={
             <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
           }
@@ -156,7 +171,7 @@ class Profile extends PureComponent {
         />
         <Layout style={{ backgroundColor: '#ffffff', margin: '24px 32px 0 0' }}>
           <GridContent style={{ marginLeft: '10px' }}>
-            <Card bordered title={'工艺路线详情'}>
+            <Card bordered title="工艺路线详情">
               <ViewRouteSteps
                 loading={loading}
                 steps={steps}
@@ -165,12 +180,12 @@ class Profile extends PureComponent {
               />
             </Card>
           </GridContent>
-          <Card title={'备注信息'}>
+          <Card title="备注信息">
             <DescriptionList size="small" col="1">
               <Description term="备注">{fComments}</Description>
             </DescriptionList>
           </Card>
-          <Card title={'其他信息'}>
+          <Card title="其他信息">
             <DescriptionList size="small" col="4">
               <Description term="创建人">{fCreatorName}</Description>
               <Description term="创建日期">{defaultDateTimeFormat(fCreateDate)}</Description>

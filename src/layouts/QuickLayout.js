@@ -8,9 +8,9 @@ import WgIcon from '@/wg_components/WgIcon';
 import screenfull from 'screenfull';
 import { autoSreenfull, watchFullScreen, changeFullScreen } from '@/utils/wgUtils';
 
+import { connect } from 'dva';
 import styles from './QuickLayout.less';
 import logo from '../assets/logoOri.svg';
-import { connect } from 'dva';
 
 const links = [
   {
@@ -65,9 +65,9 @@ class QuickLayout extends React.PureComponent {
       // @TODO <DocumentTitle title={this.getPageTitle()}>
       <div className={styles.container}>
         <div className={styles.quickOps}>
-          <Tooltip title={'进入更多操作界面'}>
+          <Tooltip title="进入更多操作界面">
             <a onClick={this.moreOps} className={styles.action}>
-              <WgIcon type={'thunder'} color={'#ffffff'} size={18} />
+              <WgIcon type="thunder" color="#ffffff" size={18} />
             </a>
           </Tooltip>
           {screenfull.enabled && (

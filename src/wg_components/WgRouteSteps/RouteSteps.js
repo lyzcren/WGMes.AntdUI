@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Form, Card, Steps } from 'antd';
 
-const Step = Steps.Step;
+const { Step } = Steps;
 
 /* eslint react/no-multi-comp:0 */
 @Form.create()
@@ -20,9 +20,9 @@ class RouteSteps extends PureComponent {
               key={step.fGroupID}
               title={step.fName}
               description={
-                <div key={'desc_' + step.fGroupID}>
+                <div key={`desc_${step.fGroupID}`}>
                   {step.depts.map(dept => (
-                    <div key={'dept_' + dept.fEntryID}>{dept.fDeptName}</div>
+                    <div key={`dept_${dept.fEntryID}`}>{dept.fDeptName}</div>
                   ))}
                 </div>
               }

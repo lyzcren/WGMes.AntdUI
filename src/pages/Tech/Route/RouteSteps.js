@@ -38,7 +38,7 @@ class RouteStep extends PureComponent {
 
   getRowByKey(fEntryID, newData) {
     const { steps, currentStep } = this.props;
-    const depts = steps[currentStep].depts;
+    const { depts } = steps[currentStep];
     return (newData || depts).filter(item => item.fEntryID === fEntryID)[0];
   }
 
@@ -77,7 +77,7 @@ class RouteStep extends PureComponent {
 
   handleDeptChange(deptId, deptName, fEntryID) {
     const { steps, currentStep, onChange } = this.props;
-    const depts = steps[currentStep].depts;
+    const { depts } = steps[currentStep];
     // const newData = depts.map(item => ({ ...item }));
     const target = this.getRowByKey(fEntryID, depts);
     if (target) {
@@ -106,9 +106,7 @@ class RouteStep extends PureComponent {
     else if (!stepData.depts.find(x => !x.fDeptID)) {
       const maxEntryID = stepData.depts
         .map(x => (x.fEntryID ? x.fEntryID : 1))
-        .reduce((a, b) => {
-          return b > a ? b : a;
-        });
+        .reduce((a, b) => (b > a ? b : a));
       stepData.depts.push({
         fEntryID: maxEntryID + 1,
         fDeptID: undefined,
@@ -119,10 +117,27 @@ class RouteStep extends PureComponent {
 
   handleFieldChange(fieldName, value, fEntryID) {
     const { steps, currentStep, onChange } = this.props;
-    const depts = steps[currentStep].depts;
+    const { depts } = steps[currentStep];
     const target = this.getRowByKey(fEntryID, depts);
     if (target) {
       target[fieldName] = value;
+    }
+
+    if (onChange) onChange({ steps, currentStep });
+  }
+
+  handleAutoSignChange(fEntryID, autoSign) {
+    const { steps, currentStep, onChange } = this.props;
+    const { depts } = steps[currentStep];
+    const target = this.getRowByKey(fEntryID, depts);
+    if (depts.find(x => x.fDeptID != target.fDeptID && x.fAutoSign)) {
+      message.warning('并行岗位只允许一个岗位自动签收');
+    }
+    depts.forEach(dept => {
+      dept.fAutoSign = false;
+    });
+    if (target) {
+      target.fAutoSign = autoSign;
     }
 
     if (onChange) onChange({ steps, currentStep });
@@ -137,7 +152,7 @@ class RouteStep extends PureComponent {
   render() {
     const { loading, processDeptTree, steps, currentStep } = this.props;
     this.checkEmptyRow(steps, currentStep);
-    const depts = steps[currentStep].depts;
+    const { depts } = steps[currentStep];
 
     const columns = [
       {
@@ -188,7 +203,7 @@ class RouteStep extends PureComponent {
           <Switch
             checked={!!record.fAutoSign}
             onChange={checked => {
-              this.handleFieldChange('fAutoSign', checked, record.fEntryID);
+              this.handleAutoSignChange(record.fEntryID, checked);
             }}
           />
         ),
@@ -223,9 +238,9 @@ class RouteStep extends PureComponent {
               key={index}
               title={`第${index + 1}步`}
               description={
-                <div key={'desc_' + index}>
+                <div key={`desc_${index}`}>
                   {step.depts.map(dept => (
-                    <div key={'dept_' + dept.fEntryID}>{dept.fDeptName}</div>
+                    <div key={`dept_${dept.fEntryID}`}>{dept.fDeptName}</div>
                   ))}
                 </div>
               }
@@ -258,7 +273,7 @@ class RouteStep extends PureComponent {
         <Table
           key={`table_${currentStep}`}
           rowKey="fEntryID"
-          bordered={true}
+          bordered
           loading={loading}
           columns={columns}
           dataSource={depts}

@@ -167,7 +167,7 @@ export class UpdateForm extends PureComponent {
               treeCheckable={true}
               showCheckedStrategy={SHOW_PARENT}
               treeData={deptTreeData}
-              treeExpandedKeys={treeExpandedKeys}
+              treeDefaultExpandedKeys={treeExpandedKeys}
             />
           )}
         </FormItem>

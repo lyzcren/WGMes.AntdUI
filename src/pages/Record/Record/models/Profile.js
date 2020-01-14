@@ -15,14 +15,14 @@ export default {
       const data = yield call(fakeGet, payload);
       // 根据单位的小数位数配置相关数量的小数位
       data.fQtyDecimal = data.fQtyDecimal || 0;
-      data.fQtyFormat = '0.' + '00000000'.slice(0, data.fQtyDecimal);
+      data.fQtyFormat = `0.${'00000000'.slice(0, data.fQtyDecimal)}`;
 
       let matchConverter = null;
       if (data.fUnitConverterID) {
         matchConverter = yield call(fakeGetConverter, data.fUnitConverterID);
         if (matchConverter) {
           const { fOutUnitID, fOutUnitName, fOutUnitNumber, fDecimal } = matchConverter;
-          data.fConvertQtyFormat = '0.' + '000000000'.slice(0, fDecimal);
+          data.fConvertQtyFormat = `0.${'000000000'.slice(0, fDecimal)}`;
         }
       }
       yield put({

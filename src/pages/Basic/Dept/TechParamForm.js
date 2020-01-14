@@ -103,7 +103,7 @@ export class TechParamForm extends PureComponent {
       guid: `NEW_TEMP_ID_${this.index}`,
       fParamID: '',
       fDefaultValue: '',
-      fIsRequired: '',
+      fIsRequired: false,
     };
     newData.push(newItem);
     this.index += 1;
@@ -133,6 +133,9 @@ export class TechParamForm extends PureComponent {
 
   handleParamIdChange(value, record) {
     const { data } = this.state;
+    const {
+      basicData: { paramData },
+    } = this.props;
     const existsOne = data.find(x => x.guid != record.guid && x.fParamID == value);
     if (existsOne) {
       message.warning('存在相同的工艺参数');
@@ -142,6 +145,8 @@ export class TechParamForm extends PureComponent {
       }, 300);
     } else {
       this.handleFieldValueChange('fParamID', value, record);
+      const findParam = paramData.find(x => x.fItemID == value);
+      this.handleFieldValueChange('fIsActive', findParam.fIsActive, record);
     }
   }
 
@@ -153,8 +158,7 @@ export class TechParamForm extends PureComponent {
     if (record) {
       const item = data.find(x => x.guid == record.guid);
       item[fieldName] = value;
-      // console.log(data);
-      this.setState({ data });
+      this.setState({ data: [...data] });
     }
   }
 
@@ -167,12 +171,12 @@ export class TechParamForm extends PureComponent {
       basicData: { paramData },
     } = this.props;
     const { loading, data, formVals } = this.state;
+
     const columns = [
       {
         title: '工艺参数',
         dataIndex: 'fParamID',
         key: 'fParamID',
-        width: '40%',
         render: (text, record) => {
           return (
             <Select
@@ -187,7 +191,7 @@ export class TechParamForm extends PureComponent {
                   x => x.fItemID == record.fParamID || !data.find(y => y.fParamID == x.fItemID)
                 )
                 .map(x => (
-                  <Option key={x.fItemID} value={x.fItemID}>
+                  <Option key={x.fItemID} value={x.fItemID} disabled={!x.fIsActive}>
                     {x.fName}
                   </Option>
                 ))}
@@ -199,7 +203,7 @@ export class TechParamForm extends PureComponent {
         title: '默认值',
         dataIndex: 'fDefaultValue',
         key: 'fDefaultValue',
-        width: '20%',
+        width: 120,
         render: (text, record) => {
           return (
             <Input
@@ -215,7 +219,7 @@ export class TechParamForm extends PureComponent {
         title: '是否必填',
         dataIndex: 'fIsRequired',
         key: 'fIsRequired',
-        width: '20%',
+        width: 90,
         render: (text, record) => {
           return (
             <Switch
@@ -227,8 +231,19 @@ export class TechParamForm extends PureComponent {
         },
       },
       {
+        title: '状态',
+        dataIndex: 'fIsActive',
+        width: 60,
+        render: (text, record) => {
+          const cText =
+            record.fIsActive == true ? '启用' : record.fIsActive === false ? '禁用' : '';
+          return <Tag color={record.fIsActive ? 'blue' : ''}>{cText}</Tag>;
+        },
+      },
+      {
         title: '操作',
         key: 'action',
+        width: 60,
         render: (text, record) => {
           return (
             <span>
@@ -248,7 +263,7 @@ export class TechParamForm extends PureComponent {
             修改 <Tag color="blue"> {formVals.fName}</Tag> 工艺参数
           </div>
         }
-        width={650}
+        width={680}
         visible={modalVisible}
         onOk={this.okHandle}
         onCancel={() => handleModalVisible(false, values)}

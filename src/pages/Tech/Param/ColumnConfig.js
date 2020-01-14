@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import moment from 'moment';
-import { Switch, Popconfirm, Divider } from 'antd';
+import { Switch, Popconfirm, Divider, Tag } from 'antd';
 import Authorized from '@/utils/Authorized';
 
 const activeData = ['启用', '禁用'];
@@ -31,6 +31,22 @@ class ColumnConfig {
       width: 260,
       render(val) {
         return val.join(', ');
+      },
+    },
+    {
+      title: '适用岗位',
+      dataIndex: 'deptList',
+      width: 260,
+      render(val, record) {
+        return (
+          <div>
+            {record.deptList.map(dept => (
+              <Tag key={dept.fDeptID} color={dept.fIsDeptActive ? 'green' : ''}>
+                {dept.fDeptName}
+              </Tag>
+            ))}
+          </div>
+        );
       },
     },
     {

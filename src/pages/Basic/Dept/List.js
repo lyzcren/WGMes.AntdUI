@@ -696,115 +696,113 @@ class TableList extends PureComponent {
     );
   }
 
-  getColumnOps = () => {
-    return [
-      {
-        dataIndex: 'workTimeList',
-        render(val) {
-          return (
-            val &&
-            val.map(x => (
-              <Tag key={x.fWorkTimeID} color={x.fIsActive ? 'green' : undefined}>
-                {x.fWorkTimeName}
-              </Tag>
-            ))
-          );
-        },
+  getColumnOps = () => [
+    {
+      dataIndex: 'workTimeList',
+      render(val) {
+        return (
+          val &&
+          val.map(x => (
+            <Tag key={x.fWorkTimeID} color={x.fIsActive ? 'green' : undefined}>
+              {x.fWorkTimeName}
+            </Tag>
+          ))
+        );
       },
-      {
-        dataIndex: 'fIsActive',
-        filters: [
-          {
-            text: '启用',
-            value: 1,
-          },
-          {
-            text: '禁用',
-            value: 0,
-          },
-        ],
-        render(val) {
-          return <Switch disabled checked={val} />;
+    },
+    {
+      dataIndex: 'fIsActive',
+      filters: [
+        {
+          text: '启用',
+          value: 1,
         },
+        {
+          text: '禁用',
+          value: 0,
+        },
+      ],
+      render(val) {
+        return <Switch disabled checked={val} />;
       },
-      {
-        dataIndex: 'operators',
-        render: (text, record) => (
-          <Fragment>
-            <Authorized authority="Dept_Update">
+    },
+    {
+      dataIndex: 'operators',
+      render: (text, record) => (
+        <Fragment>
+          <Authorized authority="Dept_Update">
+            <a
+              disabled={!hasAuthority('BillNoRule_Update') || record.fIsFromErp}
+              onClick={() => this.handleUpdateModalVisible(true, record)}
+            >
+              修改
+            </a>
+          </Authorized>
+          <Authorized authority={['Dept_Update', 'Dept_Delete']}>
+            <Divider type="vertical" />
+          </Authorized>
+          <Authorized authority="Dept_Delete">
+            <Popconfirm title="是否要删除此行？" onConfirm={() => this.handleDelete(record)}>
               <a
-                disabled={!hasAuthority('BillNoRule_Update') || record.fIsFromErp}
-                onClick={() => this.handleUpdateModalVisible(true, record)}
-              >
-                修改
-              </a>
-            </Authorized>
-            <Authorized authority={['Dept_Update', 'Dept_Delete']}>
-              <Divider type="vertical" />
-            </Authorized>
-            <Authorized authority="Dept_Delete">
-              <Popconfirm title="是否要删除此行？" onConfirm={() => this.handleDelete(record)}>
-                <a
-                  disabled={
-                    !hasAuthority('Dept_Delete') || record.fParentID <= 0 || record.fIsFromErp
-                  }
-                >
-                  删除
-                </a>
-              </Popconfirm>
-            </Authorized>
-            {record.fParentID > 0 && (
-              <Dropdown
-                overlay={
-                  <Menu>
-                    <Menu.Item
-                      key="updateBillNoRule"
-                      disabled={
-                        !hasAuthority('BillNoRule_Update') || record.fTypeNumber !== 'WorkShop'
-                      }
-                      onClick={() => this.handleUpdateFixModalVisible(true, record)}
-                    >
-                      编码规则
-                    </Menu.Item>
-                    <Menu.Item
-                      key="updateParams"
-                      disabled={!hasAuthority('Dept_Update') || record.fTypeNumber !== 'Process'}
-                      onClick={() => this.handleTechParamModalVisible(true, record)}
-                    >
-                      工艺参数
-                    </Menu.Item>
-                    {hasAuthority('UnitConverter_Read') && (
-                      <Menu.Item
-                        key="unitConverter"
-                        disabled={!hasAuthority('Dept_Update') || record.fTypeNumber !== 'Process'}
-                        onClick={() => this.handleUnitConverterModalVisible(true, record)}
-                      >
-                        单位转换
-                      </Menu.Item>
-                    )}
-                    <Menu.Item
-                      key="active"
-                      disabled={
-                        !hasAuthority('Dept_Active') || record.fParentID <= 0 || record.fIsFromErp
-                      }
-                      onClick={() => this.handleActive(record, !record.fIsActive)}
-                    >
-                      {record.fIsActive ? '禁用' : '启用'}
-                    </Menu.Item>
-                  </Menu>
+                disabled={
+                  !hasAuthority('Dept_Delete') || record.fParentID <= 0 || record.fIsFromErp
                 }
               >
-                <a>
-                  <Divider type="vertical" />
-                  更多 <Icon type="down" />
-                </a>
-              </Dropdown>
-            )}
-          </Fragment>
-        ),
-      },
-    ];
-  };
+                删除
+              </a>
+            </Popconfirm>
+          </Authorized>
+          {record.fParentID > 0 && (
+            <Dropdown
+              overlay={
+                <Menu>
+                  <Menu.Item
+                    key="updateBillNoRule"
+                    disabled={
+                      !hasAuthority('BillNoRule_Update') || record.fTypeNumber !== 'WorkShop'
+                    }
+                    onClick={() => this.handleUpdateFixModalVisible(true, record)}
+                  >
+                    编码规则
+                  </Menu.Item>
+                  <Menu.Item
+                    key="updateParams"
+                    disabled={!hasAuthority('Dept_Update') || record.fTypeNumber !== 'Process'}
+                    onClick={() => this.handleTechParamModalVisible(true, record)}
+                  >
+                    工艺参数
+                  </Menu.Item>
+                  {hasAuthority('UnitConverter_Read') && (
+                    <Menu.Item
+                      key="unitConverter"
+                      disabled={!hasAuthority('Dept_Update') || record.fTypeNumber !== 'Process'}
+                      onClick={() => this.handleUnitConverterModalVisible(true, record)}
+                    >
+                      单位转换
+                    </Menu.Item>
+                  )}
+                  <Menu.Item
+                    key="active"
+                    disabled={
+                      !hasAuthority('Dept_Active') || record.fParentID <= 0 || record.fIsFromErp
+                    }
+                    onClick={() => this.handleActive(record, !record.fIsActive)}
+                  >
+                    {record.fIsActive ? '禁用' : '启用'}
+                  </Menu.Item>
+                </Menu>
+              }
+            >
+              <a>
+                <Divider type="vertical" />
+                更多 <Icon type="down" />
+              </a>
+            </Dropdown>
+          )}
+        </Fragment>
+      ),
+    },
+  ];
 
   render() {
     const {

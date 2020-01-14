@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
-import { Form, Input, Modal, Switch, Tag, Select } from 'antd';
+import { Form, Input, Modal, Switch, Tag, Select, TreeSelect } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import {
   validatePhone,
@@ -12,6 +12,7 @@ import {
 
 const FormItem = Form.Item;
 const { Option } = Select;
+const { SHOW_CHILD } = TreeSelect;
 
 /* eslint react/no-multi-comp:0 */
 @connect(({ basicData }) => ({
@@ -38,6 +39,9 @@ export class UpdateForm extends PureComponent {
     dispatch({
       type: 'basicData/getParamType',
     });
+    dispatch({
+      type: 'basicData/getDeptTreeData',
+    });
   }
 
   okHandle = () => {
@@ -54,12 +58,15 @@ export class UpdateForm extends PureComponent {
   render() {
     const {
       form,
-      basicData: { paramType },
+      basicData: { paramType, deptTreeData },
       updateModalVisible,
       handleModalVisible,
       values,
     } = this.props;
     const { formVals } = this.state;
+    const expandItems = deptTreeData.find(d => d.fParentID === 0);
+    const treeExpandedKeys =
+      deptTreeData && deptTreeData.length ? deptTreeData.map(d => d.key) : [];
 
     return (
       <Modal
@@ -122,6 +129,21 @@ export class UpdateForm extends PureComponent {
                 </Option>
               ))}
             </Select>
+          )}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="适用岗位">
+          {form.getFieldDecorator('deptIDs', {
+            rules: [{ required: false, message: '请选择岗位' }],
+            initialValue: formVals.deptList.map(x => x.fDeptID),
+          })(
+            <TreeSelect
+              style={{ width: '100%' }}
+              dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+              treeCheckable={true}
+              showCheckedStrategy={SHOW_CHILD}
+              treeData={deptTreeData}
+              treeDefaultExpandedKeys={treeExpandedKeys}
+            />
           )}
         </FormItem>
       </Modal>

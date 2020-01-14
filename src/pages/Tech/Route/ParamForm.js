@@ -90,19 +90,16 @@ class ParamForm extends PureComponent {
         title: '岗位',
         dataIndex: 'fDeptName',
         key: 'fDeptName',
-        width: '40%',
       },
       {
         title: '工艺参数',
         dataIndex: 'fParamName',
         key: 'fParamName',
-        width: '30%',
       },
       {
         title: '默认值',
         dataIndex: 'fDefaultValue',
         key: 'fDefaultValue',
-        width: '30%',
         render: (text, record) => (
           <Input
             value={text}
@@ -111,6 +108,16 @@ class ParamForm extends PureComponent {
             placeholder="参数值"
           />
         ),
+      },
+      {
+        title: '状态',
+        dataIndex: 'fIsActive',
+        width: 60,
+        render: (text, record) => {
+          const cText =
+            record.fIsActive == true ? '启用' : record.fIsActive === false ? '禁用' : '';
+          return <Tag color={record.fIsActive ? 'blue' : ''}>{cText}</Tag>;
+        },
       },
     ];
 

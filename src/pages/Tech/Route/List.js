@@ -72,9 +72,9 @@ class TableList extends PureComponent {
       payload: this.currentPagination,
     });
     // 列配置相关方法
-    ColumnConfig.ProfileModalVisibleCallback = record =>
-      this.handleProfileModalVisible(true, record);
+    ColumnConfig.profileModalVisible = record => this.handleProfileModalVisible(true, record);
     ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdatePageVisible(record);
+    ColumnConfig.copyHandler = record => this.handleCopyPageVisible(record);
     ColumnConfig.DeleteCallback = record => this.handleDelete(record);
     ColumnConfig.ActiveCallback = record => this.handleActive(record, !record.fIsActive);
     ColumnConfig.CheckCallback = record =>
@@ -254,6 +254,18 @@ class TableList extends PureComponent {
     dispatch({
       type: 'menu/openMenu',
       payload: { path: '/techStd/route/create' },
+    });
+  };
+
+  handleCopyPageVisible = record => {
+    const { dispatch } = this.props;
+    const { fInterID } = record;
+    dispatch({
+      type: 'menu/openMenu',
+      payload: {
+        path: '/techStd/route/create',
+        location: { fInterID, record },
+      },
     });
   };
 

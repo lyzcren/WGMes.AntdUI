@@ -9,6 +9,7 @@ import {
   fakeGetTechParamValues,
   fakeGetDefect,
   fakeGetOperatorList,
+  fakeGetDebuggerList,
   fakeGetBillNo,
   fakeKeyValues,
   fakeGetWorkTime,
@@ -30,6 +31,7 @@ export default {
     paramData: [],
     defectData: [],
     operators: [],
+    debuggers: [],
     billNo: {},
     status: {},
     workTimes: [],
@@ -101,6 +103,13 @@ export default {
       yield put({
         type: 'saveOperatorData',
         payload: response,
+      });
+    },
+    *getDebuggers({ payload }, { call, put }) {
+      const response = yield call(fakeGetDebuggerList, payload);
+      yield put({
+        type: 'save',
+        payload: { debuggers: response },
       });
     },
     *getBillNo({ payload }, { call, put }) {

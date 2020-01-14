@@ -1,12 +1,13 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Form, Input, Modal, Radio, Switch, Select } from 'antd';
+import { Form, Input, Modal, Radio, Switch, Select, TreeSelect } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 
 import styles from './List.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
+const { SHOW_CHILD } = TreeSelect;
 
 /* eslint react/no-multi-comp:0 */
 @connect(({ basicData }) => ({
@@ -29,16 +30,22 @@ export class CreateForm extends PureComponent {
     dispatch({
       type: 'basicData/getParamType',
     });
+    dispatch({
+      type: 'basicData/getDeptTreeData',
+    });
   }
 
   render() {
     const {
-      basicData: { billNo, paramType },
+      basicData: { billNo, paramType, deptTreeData },
       modalVisible,
       form,
       handleSubmit,
       handleModalVisible,
     } = this.props;
+    const expandItems = deptTreeData.find(d => d.fParentID === 0);
+    const treeExpandedKeys =
+      deptTreeData && deptTreeData.length ? deptTreeData.map(d => d.key) : [];
 
     return (
       <Modal
@@ -93,6 +100,20 @@ export class CreateForm extends PureComponent {
                 </Option>
               ))}
             </Select>
+          )}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="适用岗位">
+          {form.getFieldDecorator('deptIDs', {
+            rules: [{ required: false, message: '请选择岗位' }],
+          })(
+            <TreeSelect
+              style={{ width: '100%' }}
+              dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+              treeCheckable={true}
+              showCheckedStrategy={SHOW_CHILD}
+              treeData={deptTreeData}
+              treeDefaultExpandedKeys={treeExpandedKeys}
+            />
           )}
         </FormItem>
       </Modal>

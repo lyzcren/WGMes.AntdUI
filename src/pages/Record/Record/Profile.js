@@ -97,6 +97,8 @@ class Transfer extends PureComponent {
           fFullBatchNo,
           fOperatorName,
           fOperatorNumber,
+          fDebuggerName,
+          fDebuggerNumber,
           fMachineName,
           fMachineNumber,
           fSignDate,
@@ -183,6 +185,8 @@ class Transfer extends PureComponent {
       paramList,
       fOperatorName,
       fOperatorNumber,
+      fDebuggerName,
+      fDebuggerNumber,
       fMachineName,
       fMachineNumber,
       fSignDate,
@@ -233,6 +237,8 @@ class Transfer extends PureComponent {
             <Description term="操作员">{fOperatorName}</Description>
             <Description term="操作员编码">{fOperatorNumber}</Description>
             <Description term="机台">{fMachineName}</Description>
+            <Description term="调机员">{fDebuggerName}</Description>
+            <Description term="调机员编码">{fDebuggerNumber}</Description>
             <Description term="机台编码">{fMachineNumber}</Description>
             <Description term="签收时间">
               {fSignDate ? moment(fSignDate).format('YYYY-MM-DD HH:mm:ss') : ''}

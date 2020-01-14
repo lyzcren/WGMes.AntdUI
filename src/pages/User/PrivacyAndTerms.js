@@ -329,7 +329,7 @@ class PrivacyAndTermsPage extends Component {
               `}
           </Paragraph>
           <br />
-          <Button type="primary" className={styles.ok} href={'/user/login'}>
+          <Button type="primary" className={styles.ok} href="/user/login">
             确认
           </Button>
         </Card>

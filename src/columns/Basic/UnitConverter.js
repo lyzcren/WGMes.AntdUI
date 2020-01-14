@@ -44,9 +44,8 @@ export const columns = [
       const decimalModel = DecimalModes.find(x => x.fKey === text);
       if (decimalModel) {
         return decimalModel.fName;
-      } else {
-        return '';
       }
+      return '';
     },
   },
   {
@@ -58,9 +57,8 @@ export const columns = [
       const convertMode = ConvertModes.find(x => x.fKey === text);
       if (convertMode) {
         return convertMode.fName;
-      } else {
-        return '';
       }
+      return '';
     },
   },
   {

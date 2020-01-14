@@ -51,8 +51,8 @@ export default {
       const { fConvertDecimal, fQtyDecimal } = data;
       // 根据单位的小数位数配置相关数量的小数位
       data.fQtyDecimal = fQtyDecimal || 0;
-      data.fQtyFormat = '0.' + '00000000'.slice(0, fQtyDecimal);
-      data.fConvertQtyFormat = '0.' + '000000000'.slice(0, fConvertDecimal);
+      data.fQtyFormat = `0.${'00000000'.slice(0, fQtyDecimal)}`;
+      data.fConvertQtyFormat = `0.${'000000000'.slice(0, fConvertDecimal)}`;
       yield put({
         type: 'save',
         payload: { data, message, messageType, showSign, showTransfer, nextDepts },

@@ -58,6 +58,9 @@ export async function fakeGetOperatorList(params) {
   }
   return request(`/api/emp/getOperatorList`);
 }
+export async function fakeGetDebuggerList() {
+  return request(`/api/emp/debuggerList`);
+}
 
 export async function fakeGetBillNo(params) {
   const url = `/api/billNoRule?fNumber=${params.fNumber}`;

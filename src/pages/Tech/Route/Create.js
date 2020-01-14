@@ -5,7 +5,6 @@ import { Layout, Row, Col, Card, Form, Button, message, Select, Steps, Input, Sw
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import DescriptionList from '@/components/DescriptionList';
-import DeptForm from './DeptForm';
 import RouteSteps from './RouteSteps';
 
 import styles from './List.less';
@@ -26,10 +25,28 @@ const { TextArea } = Input;
 }))
 @Form.create()
 class Create extends PureComponent {
+  static defaultProps = { location: {} };
+
   state = {};
 
   componentDidMount() {
-    const { dispatch } = this.props;
+    this.initData();
+  }
+
+  componentDidUpdate(prevProps) {
+    const {
+      location: { fInterID },
+    } = this.props;
+    const {
+      location: { fInterID: prevInterID },
+    } = prevProps;
+    if (fInterID != prevInterID) {
+      this.initData();
+    }
+  }
+
+  initData = () => {
+    const { dispatch, location } = this.props;
     dispatch({
       type: 'basicData/getBillNo',
       payload: { fNumber: 'Route' },
@@ -37,10 +54,13 @@ class Create extends PureComponent {
     dispatch({
       type: 'basicData/getProcessDeptTree',
     });
-    dispatch({
-      type: 'routeCreate/initModel',
-    });
-  }
+    if (location && location.fInterID) {
+      dispatch({
+        type: 'routeCreate/initModel',
+        payload: { fInterID: location.fInterID },
+      });
+    }
+  };
 
   changeSteps = payload => {
     const { dispatch } = this.props;
@@ -83,7 +103,11 @@ class Create extends PureComponent {
 
   render() {
     const {
-      routeCreate: { steps, currentStep },
+      routeCreate: {
+        data: { fName, fComments },
+        steps,
+        currentStep,
+      },
       loading,
       form: { getFieldDecorator },
       basicData: { billNo, processDeptTree },
@@ -104,6 +128,7 @@ class Create extends PureComponent {
             <FormItem label="名称">
               {getFieldDecorator('fName', {
                 rules: [{ required: true, message: '请输入名称' }],
+                initialValue: fName,
               })(<Input placeholder="请输入名称" />)}
             </FormItem>
           </Col>
@@ -131,7 +156,7 @@ class Create extends PureComponent {
     return (
       <div>
         <WgPageHeaderWrapper
-          title={'新建工艺路线'}
+          title="新建工艺路线"
           logo={
             <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
           }
@@ -144,7 +169,7 @@ class Create extends PureComponent {
         />
         <Layout style={{ backgroundColor: '#ffffff', margin: '24px 32px 0 0' }}>
           <GridContent style={{ marginLeft: '10px' }}>
-            <Card bordered title={'工艺路线详情'}>
+            <Card bordered title="工艺路线详情">
               <RouteSteps
                 loading={loading}
                 processDeptTree={processDeptTree}
@@ -154,12 +179,13 @@ class Create extends PureComponent {
               />
             </Card>
           </GridContent>
-          <Card title={'备注信息'}>
+          <Card title="备注信息">
             <Row>
               <Col lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <FormItem label="备注">
                   {getFieldDecorator('fComments', {
                     rules: [{ required: false, message: '请输入备注' }],
+                    initialValue: fComments,
                   })(<TextArea rows={4} placeholder="请输入备注" />)}
                 </FormItem>
               </Col>

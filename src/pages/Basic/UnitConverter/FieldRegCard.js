@@ -190,10 +190,9 @@ class FieldRegCard extends PureComponent {
                 ))}
               </Select>
             );
-          } else {
-            const findItem = fields.find(x => x.dataIndex === record.fField);
-            return findItem ? findItem.title : '';
           }
+          const findItem = fields.find(x => x.dataIndex === record.fField);
+          return findItem ? findItem.title : '';
         },
       },
       {
@@ -221,10 +220,9 @@ class FieldRegCard extends PureComponent {
                 ))}
               </Select>
             );
-          } else {
-            const findItem = matchTypes.find(x => x.fKey === record.fMatchType);
-            return findItem ? findItem.fValue : '';
           }
+          const findItem = matchTypes.find(x => x.fKey === record.fMatchType);
+          return findItem ? findItem.fValue : '';
         },
       },
       {
@@ -244,9 +242,8 @@ class FieldRegCard extends PureComponent {
                 placeholder="请填写匹配内容/正则表达式"
               />
             );
-          } else {
-            return text;
           }
+          return text;
         },
       },
       {
@@ -266,9 +263,8 @@ class FieldRegCard extends PureComponent {
                 placeholder="请填写备注"
               />
             );
-          } else {
-            return text;
           }
+          return text;
         },
       },
       {
@@ -316,7 +312,7 @@ class FieldRegCard extends PureComponent {
           dataSource={data}
           pagination={false}
           // 以下属性与列配置相关
-          configKey={'UnitConverter_FieldRegex'}
+          configKey="UnitConverter_FieldRegex"
           showAlert={false}
           selectabel={false}
         />
@@ -324,7 +320,7 @@ class FieldRegCard extends PureComponent {
           style={{ width: '100%', marginTop: 16, marginBottom: 8 }}
           type="dashed"
           onClick={this.newItem}
-          icon={'plus'}
+          icon="plus"
         >
           {'新增'}
         </Button>

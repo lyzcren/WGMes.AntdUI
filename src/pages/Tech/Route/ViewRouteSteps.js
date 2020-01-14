@@ -38,7 +38,7 @@ class ViewRouteSteps extends PureComponent {
 
   getRowByKey(fEntryID, newData) {
     const { steps, currentStep } = this.props;
-    const depts = steps[currentStep].depts;
+    const { depts } = steps[currentStep];
     return (newData || depts).filter(item => item.fEntryID === fEntryID)[0];
   }
 
@@ -106,9 +106,9 @@ class ViewRouteSteps extends PureComponent {
               key={index}
               title={`第${index + 1}步`}
               description={
-                <div key={'desc_' + index}>
+                <div key={`desc_${index}`}>
                   {step.depts.map(dept => (
-                    <div key={'dept_' + dept.fEntryID}>{dept.fDeptName}</div>
+                    <div key={`dept_${dept.fEntryID}`}>{dept.fDeptName}</div>
                   ))}
                 </div>
               }
@@ -137,7 +137,7 @@ class ViewRouteSteps extends PureComponent {
         <Table
           key={`table_${currentStep}`}
           rowKey="fEntryID"
-          bordered={true}
+          bordered
           loading={loading}
           columns={columns}
           dataSource={depts}

@@ -1,5 +1,5 @@
 export const getMatchConverter = (data, unitConverters) => {
-  for (let unitConverter of unitConverters) {
+  for (const unitConverter of unitConverters) {
     if (isMatch(data, unitConverter)) {
       return unitConverter;
     }
@@ -9,7 +9,7 @@ export const getMatchConverter = (data, unitConverters) => {
 
 const isMatch = (data, unitConverter) => {
   const { expressions, fInUnitName, fInUnitCaseSensitive } = unitConverter;
-  for (let expression of expressions) {
+  for (const expression of expressions) {
     const { fField, fMatchTypeNumber, fExpression } = expression;
     if (!fInUnitName) {
       return false;
@@ -69,7 +69,7 @@ export const getConverterRate = (data, unitConverter) => {
   }
   const { expressions } = unitConverter;
   let calcExpression = unitConverter.fFormula;
-  for (let expression of expressions) {
+  for (const expression of expressions) {
     const { fField, fMatchTypeNumber, fExpression } = expression;
     // 当匹配为“正则匹配”时，取出正则分组作为后续计算换算率的参数
     if (fMatchTypeNumber === 'Regex') {
@@ -93,7 +93,7 @@ export const getConverterRate = (data, unitConverter) => {
   }
 };
 
-/// 计算转换后的数量
+// / 计算转换后的数量
 export const getConvertQty = (data, unitConverter, qty) => {
   if (!unitConverter || Object.keys(unitConverter) <= 0) return qty;
   const unitRate = getConverterRate(data, unitConverter);
@@ -113,7 +113,7 @@ export const getConvertQty = (data, unitConverter, qty) => {
   return convertQty;
 };
 
-/// 计算单位转换前的数量
+// / 计算单位转换前的数量
 export const getUnconvertQty = (data, unitConverter, qty) => {
   if (!unitConverter || Object.keys(unitConverter) <= 0) return qty;
   const unitRate = getConverterRate(data, unitConverter);
@@ -172,12 +172,12 @@ export const getConvertQtyWithDecimal = (data, unitConverter, qty) => {
 };
 
 export const round2 = (num, decimalPlaces) => {
-  var d = decimalPlaces || 0;
-  var m = Math.pow(10, d);
-  var n = +(d ? num * m : num).toFixed(8); // Avoid rounding errors
-  var i = Math.floor(n),
-    f = n - i;
-  var e = 1e-8; // Allow for rounding errors in f
-  var r = f > 0.5 - e && f < 0.5 + e ? (i % 2 == 0 ? i : i + 1) : Math.round(n);
+  const d = decimalPlaces || 0;
+  const m = Math.pow(10, d);
+  const n = +(d ? num * m : num).toFixed(8); // Avoid rounding errors
+  const i = Math.floor(n);
+  const f = n - i;
+  const e = 1e-8; // Allow for rounding errors in f
+  const r = f > 0.5 - e && f < 0.5 + e ? (i % 2 == 0 ? i : i + 1) : Math.round(n);
   return d ? r / m : r;
 };

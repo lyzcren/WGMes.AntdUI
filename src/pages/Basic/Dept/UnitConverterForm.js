@@ -81,35 +81,31 @@ class UnitConverterForm extends PureComponent {
       {
         title: '单位转换',
         dataIndex: 'fItemID',
-        render: (val, record) => {
-          return (
-            <Select
-              style={{ width: '100%' }}
-              dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-              defaultValue={val}
-              onChange={value => this.handleItemChange(value, record)}
-            >
-              {unitConverters &&
-                unitConverters.map(unitConverter => (
-                  <Option key={unitConverter.fItemID} value={unitConverter.fItemID}>
-                    {unitConverter.fName}
-                  </Option>
-                ))}
-            </Select>
-          );
-        },
+        render: (val, record) => (
+          <Select
+            style={{ width: '100%' }}
+            dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+            defaultValue={val}
+            onChange={value => this.handleItemChange(value, record)}
+          >
+            {unitConverters &&
+              unitConverters.map(unitConverter => (
+                <Option key={unitConverter.fItemID} value={unitConverter.fItemID}>
+                  {unitConverter.fName}
+                </Option>
+              ))}
+          </Select>
+        ),
       },
       {
         title: '操作',
         dataIndex: 'operators',
         width: 80,
-        render: (text, record) => {
-          return (
-            <span>
-              <a onClick={e => this.remove(record.guid)}>删除</a>
-            </span>
-          );
-        },
+        render: (text, record) => (
+          <span>
+            <a onClick={e => this.remove(record.guid)}>删除</a>
+          </span>
+        ),
       },
     ];
 
@@ -144,7 +140,7 @@ class UnitConverterForm extends PureComponent {
           style={{ width: '100%', marginTop: 16, marginBottom: 8 }}
           type="dashed"
           onClick={this.newItem}
-          icon={'plus'}
+          icon="plus"
         >
           {'新增'}
         </Button>

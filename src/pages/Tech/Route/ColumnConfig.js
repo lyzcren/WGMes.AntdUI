@@ -94,6 +94,9 @@ class ColumnConfig {
                 <Menu.Item key="active" disabled={!hasAuthority('Route_Active')}>
                   {record.fIsActive ? '禁用' : '启用'}
                 </Menu.Item>
+                <Menu.Item key="copy" disabled={!hasAuthority('Route_Create')}>
+                  复制
+                </Menu.Item>
                 {/* <Menu.Item key="check" disabled={!hasAuthority('Route_Check')}>
                   {record.fStatusNumber === 'Created' ? '审批' : '反审批'}
                 </Menu.Item> */}
@@ -113,12 +116,9 @@ class ColumnConfig {
     },
   ];
 
-  // 路线方法
-  ProfileModalVisibleCallback = record => {};
-
-  profileModalVisible = record => {
-    this.ProfileModalVisibleCallback(record);
-  };
+  // 复制
+  copyHandler = record => {};
+  profileModalVisible = record => {};
 
   // 修改方法
   UpdateModalVisibleCallback = record => {};
@@ -155,8 +155,9 @@ class ColumnConfig {
 
   moreBtnClick = (key, record) => {
     if (key === 'active') this.handleActive(record);
+    if (key === 'copy') this.copyHandler(record);
     if (key === 'check') this.handleCheck(record);
-    else if (key === 'delete') {
+    if (key === 'delete') {
       Modal.confirm({
         title: '删除工艺路线',
         content: '确定删除工艺路线吗？',

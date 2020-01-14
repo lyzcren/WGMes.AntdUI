@@ -154,9 +154,9 @@ export default class GlobalHeaderRight extends PureComponent {
             console.log('enter', value); // eslint-disable-line
           }}
         /> */}
-        <Tooltip title={'进入快速操作界面'}>
+        <Tooltip title="进入快速操作界面">
           <a onClick={this.quickOps} className={styles.action}>
-            <WgIcon type={'thunder'} color={'#001529'} size={18} />
+            <WgIcon type="thunder" color="#001529" size={18} />
           </a>
         </Tooltip>
         <Tooltip title={formatMessage({ id: 'component.globalHeader.help' })}>

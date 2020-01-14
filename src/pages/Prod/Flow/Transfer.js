@@ -31,9 +31,9 @@ import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import DescriptionList from '@/components/DescriptionList';
 import Authorized from '@/utils/Authorized';
 import { hasAuthority } from '@/utils/authority';
+import { isArray } from 'util';
 import { ViewUnitConverterForm } from './ViewUnitConverter';
 
-import { isArray } from 'util';
 import styles from './List.less';
 
 const FormItem = Form.Item;
@@ -101,6 +101,9 @@ class Transfer extends PureComponent {
     dispatch({
       type: 'basicData/getOperator',
     });
+    dispatch({
+      type: 'basicData/getDebuggers',
+    });
   }
 
   transfer() {
@@ -116,6 +119,7 @@ class Transfer extends PureComponent {
 
       const newData = { ...data };
       newData.fOperatorID = fieldsValue.fOperatorID;
+      newData.fDebuggerID = fieldsValue.fDebuggerID;
       newData.fMachineID = fieldsValue.fMachineID;
       newData.fMoldID = fieldsValue.fMoldID;
       newData.fBeginDate = fBeginDate ? fBeginDate.format('YYYY-MM-DD HH:mm:ss') : undefined;
@@ -316,9 +320,9 @@ class Transfer extends PureComponent {
           <Description term="盘点盈亏数量">
             {`${numeral(data.fInvCheckDeltaQty).format(fQtyFormat)} ${data.fUnitName}`}
           </Description>
-          <Description term="取走数量">{`${numeral(data.fTakeQty).format(fQtyFormat)} ${
-            data.fUnitName
-          }`}</Description>
+          <Description term="取走数量">
+            {`${numeral(data.fTakeQty).format(fQtyFormat)} ${data.fUnitName}`}
+          </Description>
         </DescriptionList>
       </div>
     );
@@ -351,7 +355,7 @@ class Transfer extends PureComponent {
       flowTransfer: { data, machineData, defectList, paramList, workTimes, matchConverter },
       loading,
       form: { getFieldDecorator },
-      basicData: { defectData, operators },
+      basicData: { defectData, operators, debuggers },
       fBindEmpID,
       location: { fEmpID, tabMode },
     } = this.props;
@@ -429,6 +433,30 @@ class Transfer extends PureComponent {
                       >
                         {operators &&
                           operators.map(x => (
+                            <Option key={x.fItemID} value={x.fItemID}>
+                              {`${x.fName} - ${x.fNumber}`}
+                            </Option>
+                          ))}
+                      </Select>
+                    )}
+                  </FormItem>
+                </Col>
+                <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
+                  <FormItem key="fDebuggerID" label="调机员">
+                    {getFieldDecorator('fDebuggerID', {
+                      rules: [{ required: data.fRequireDebugger, message: '请选择调机员' }],
+                    })(
+                      <Select
+                        placeholder="请选择调机员"
+                        autoFocus
+                        showSearch
+                        filterOption={(input, option) =>
+                          option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                        onChange={this.handleOperatorChange}
+                      >
+                        {debuggers &&
+                          debuggers.map(x => (
                             <Option key={x.fItemID} value={x.fItemID}>
                               {`${x.fName} - ${x.fNumber}`}
                             </Option>
@@ -621,7 +649,7 @@ class Transfer extends PureComponent {
                   >
                     <FormItem key={`paramsID${d.fParamID}`} label={d.fParamName}>
                       {getFieldDecorator(`paramsID${d.fParamID}`, {
-                        rules: [{ required: d.fIsRequired, message: d.fParamName + '必填' }],
+                        rules: [{ required: d.fIsRequired, message: `${d.fParamName}必填` }],
                         initialValue: d.fDefaultValue,
                       })(
                         <Select

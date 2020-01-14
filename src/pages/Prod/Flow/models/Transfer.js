@@ -37,7 +37,7 @@ export default {
       data.fPassQty = data.fInputQty + data.fInvCheckDeltaQty - data.fTakeQty;
       // 根据单位的小数位数配置相关数量的小数位
       data.fQtyDecimal = data.fQtyDecimal || 0;
-      data.fQtyFormat = '0.' + '00000000'.slice(0, data.fQtyDecimal);
+      data.fQtyFormat = `0.${'00000000'.slice(0, data.fQtyDecimal)}`;
 
       const { fRouteID, fRouteEntryID, fDeptID, fUnitConverterID } = data;
       // getParams
@@ -77,7 +77,7 @@ export default {
         data.fConvertMode = fConvertMode;
         data.fConvertRate = getConverterRate(data, matchConverter);
         data.fConvertDecimal = fDecimal;
-        data.fConvertQtyFormat = '0.' + '000000000'.slice(0, fDecimal);
+        data.fConvertQtyFormat = `0.${'000000000'.slice(0, fDecimal)}`;
         // 转换的投入数量
         const convertInputQty = getConvertQtyWithDecimal(data, matchConverter, data.fInputQty);
         data.fConvertInputQty = convertInputQty;
@@ -95,7 +95,7 @@ export default {
         payload: {
           data,
           defectList: defectList || [],
-          paramList,
+          paramList: paramList.filter(x => x.fIsActive),
           machineData,
           workTimes,
           unitConverters,
@@ -182,7 +182,9 @@ export default {
       const allChangeQty = data.fInvCheckDeltaQty - data.fTakeQty - data.fDefectQty;
       // 计算相关数量
       data.fPassQty = data.fInputQty + allChangeQty;
-      data.fConvertPassQty = getConvertQtyWithDecimal(data, matchConverter, data.fPassQty);
+      if (matchConverter) {
+        data.fConvertPassQty = getConvertQtyWithDecimal(data, matchConverter, data.fPassQty);
+      }
       return {
         ...state,
         data,

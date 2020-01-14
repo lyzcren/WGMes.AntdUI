@@ -174,7 +174,7 @@ class Update extends PureComponent {
     return (
       <div>
         <WgPageHeaderWrapper
-          title={'修改工艺路线'}
+          title="修改工艺路线"
           logo={
             <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
           }
@@ -187,7 +187,7 @@ class Update extends PureComponent {
         />
         <Layout style={{ backgroundColor: '#ffffff', margin: '24px 32px 0 0' }}>
           <GridContent style={{ marginLeft: '10px' }}>
-            <Card bordered title={'工艺路线详情'}>
+            <Card bordered title="工艺路线详情">
               <RouteSteps
                 loading={loading}
                 processDeptTree={processDeptTree}
@@ -197,7 +197,7 @@ class Update extends PureComponent {
               />
             </Card>
           </GridContent>
-          <Card title={'备注信息'}>
+          <Card title="备注信息">
             <Row>
               <Col lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
                 <FormItem label="备注">
@@ -209,7 +209,7 @@ class Update extends PureComponent {
               </Col>
             </Row>
           </Card>
-          <Card title={'其他信息'}>
+          <Card title="其他信息">
             <DescriptionList size="small" col="4">
               <Description term="创建人">{fCreatorName}</Description>
               <Description term="创建日期">{defaultDateTimeFormat(fCreateDate)}</Description>
