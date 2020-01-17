@@ -62,15 +62,15 @@ class ParamForm extends PureComponent {
     });
   };
 
-  getRowByKey(fEntryID, newData) {
+  getRowByKey(key, newData) {
     const { data } = this.state;
-    return (newData || data).filter(item => item.fEntryID === fEntryID)[0];
+    return (newData || data).filter(item => item.key === key)[0];
   }
 
-  handleFieldChange(e, fieldName, fEntryID) {
+  handleFieldChange(e, fieldName, key) {
     const { data } = this.state;
     const newData = data.map(item => ({ ...item }));
-    const target = this.getRowByKey(fEntryID, newData);
+    const target = this.getRowByKey(key, newData);
     if (target) {
       target[fieldName] = e.target.value;
       this.setState({ data: newData });
@@ -103,8 +103,8 @@ class ParamForm extends PureComponent {
         render: (text, record) => (
           <Input
             value={text}
-            onChange={e => this.handleFieldChange(e, 'fDefaultValue', record.fEntryID)}
-            onKeyPress={e => this.handleKeyPress(e, record.fEntryID)}
+            onChange={e => this.handleFieldChange(e, 'fDefaultValue', record.key)}
+            onKeyPress={e => this.handleKeyPress(e, record.key)}
             placeholder="参数值"
           />
         ),
@@ -120,6 +120,7 @@ class ParamForm extends PureComponent {
         },
       },
     ];
+    console.log(data);
 
     return (
       <Modal
@@ -135,13 +136,7 @@ class ParamForm extends PureComponent {
         onCancel={() => handleModalVisible(false, values)}
         afterClose={() => handleModalVisible()}
       >
-        <Table
-          rowKey="fEntryID"
-          loading={loading}
-          columns={columns}
-          dataSource={data}
-          pagination={false}
-        />
+        <Table loading={loading} columns={columns} dataSource={data} pagination={false} />
       </Modal>
     );
   }

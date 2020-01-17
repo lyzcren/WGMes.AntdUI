@@ -71,11 +71,14 @@ export class ScanTransferForm extends PureComponent {
         message.warning('流程单无产出');
       } else if (data.fStatusNumber === 'BeforeProduce') {
         message.warning('流程单未生产');
-      } else if (data.fEndProduceDeptIDList.indexOf(fDeptID) >= 0) {
+      } else if (data.fFinishedRecords.find(x => x.fDeptID == fDeptID)) {
         message.warning('当前工序已完成');
       } else if (data.fCurrentDeptID == fDeptID && data.fRecordStatusNumber == 'ManufTransfered') {
         message.warning('当前工序已转出');
-      } else if (data.fAllDeptIDList.indexOf(fDeptID) >= 0 && data.fCurrentDeptID != fDeptID) {
+      } else if (
+        data.fRecords.find(x => x.fDeptID == fDeptID) >= 0 &&
+        data.fCurrentDeptID != fDeptID
+      ) {
         message.warning('当前工序未生产');
       } else {
         dispatch(

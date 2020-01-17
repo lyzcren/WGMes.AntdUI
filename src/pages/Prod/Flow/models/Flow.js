@@ -30,18 +30,20 @@ export default {
   effects: {
     *fetch({ payload }, { call, put }) {
       const response = yield call(fakeQuery, payload);
+      const list = response.list.map(x => {
+        return { ...x, key: `${x.fInterID}${x.fRecordID || 0}` };
+      });
       yield put({
-        type: 'saveQueryData',
-        payload: response,
+        type: 'save',
+        payload: { data: { ...response, list } },
       });
     },
-    *sign({ payload, callback }, { call, put }) {
+    *sign({ payload }, { call, put }) {
       const response = yield call(fakeSign, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
-      if (callback) callback();
     },
     *cancelTransfer({ payload }, { call, put }) {
       const response = yield call(fakeCancelTransfer, payload);
@@ -109,12 +111,6 @@ export default {
       return {
         ...state,
         ...action.payload,
-      };
-    },
-    saveQueryData(state, action) {
-      return {
-        ...state,
-        data: action.payload,
       };
     },
     saveData(state, action) {

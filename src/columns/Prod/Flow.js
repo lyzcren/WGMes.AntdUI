@@ -23,12 +23,30 @@ export const columns = [
     width: 120,
   },
   {
-    title: '状态',
+    title: '当前岗位',
+    dataIndex: 'fRecordDeptName',
+    width: 150,
+  },
+  {
+    title: '当前岗位状态',
+    dataIndex: 'fRecordStatusNumber',
+    width: 150,
+  },
+  {
+    title: '下道岗位',
+    dataIndex: 'fNextRecords',
+    width: 150,
+    render: (val, record) => {
+      return record.fNextRecords.map(rcd => rcd.fDeptName).join(', ');
+    },
+  },
+  {
+    title: '流程单状态',
     dataIndex: 'fStatusNumber',
     width: 150,
   },
   {
-    title: '当前岗位',
+    title: '在制岗位',
     dataIndex: 'fCurrentDeptName',
     width: 150,
   },

@@ -97,8 +97,6 @@ class TableList extends PureComponent {
       selectedRows: [],
       queryFilters: [],
       queryDeptID: null,
-      queryStatusNumber: null,
-      queryRecordStatusNumber: null,
       queryBatchNo: props.fBatchNo,
     };
     // 列表查询参数
@@ -194,54 +192,18 @@ class TableList extends PureComponent {
     };
     // 查询条件处理
     const queryFilters = [];
-    if (fieldsValue.queryCurrentDeptID) {
-      // 当前岗位可签收
-      if (fieldsValue.queryRecordStatusNumber === 'ManufWait4Sign') {
-        queryFilters.push({
-          name: 'fNextDeptIDs',
-          compare: '%*%',
-          value: fieldsValue.queryCurrentDeptID,
-        });
-        queryFilters.push({ name: 'fRecordStatusNumber', compare: '=', value: 'ManufTransfered' });
-      } else if (fieldsValue.queryRecordStatusNumber) {
-        queryFilters.push({
-          name: 'fCurrentDeptID',
-          compare: '=',
-          value: fieldsValue.queryCurrentDeptID,
-        });
-        queryFilters.push({
-          name: 'fRecordStatusNumber',
-          compare: '=',
-          value: fieldsValue.queryRecordStatusNumber,
-        });
-      } else {
-        queryFilters.push({
-          name: 'fCurrentDeptID',
-          compare: '=',
-          value: fieldsValue.queryCurrentDeptID,
-        });
-      }
+    if (fieldsValue.queryDeptID) {
+      queryFilters.push({ name: 'fRecordDeptID', compare: '=', value: fieldsValue.queryDeptID });
     }
-    if (fieldsValue.queryAllDeptID)
-      queryFilters.push({ name: 'fAllDeptIDs', compare: '%*%', value: fieldsValue.queryAllDeptID });
-    if (fieldsValue.queryEndProduceDeptID)
+    if (fieldsValue.queryStatus !== undefined)
+      queryFilters.push({ name: 'fStatus', compare: '=', value: fieldsValue.queryStatus });
+    if (fieldsValue.queryRecordStatus !== undefined) {
       queryFilters.push({
-        name: 'fEndProduceDeptIDs',
-        compare: '%*%',
-        value: fieldsValue.queryEndProduceDeptID,
-      });
-    if (fieldsValue.queryNextDeptID)
-      queryFilters.push({
-        name: 'fNextDeptIDs',
-        compare: '%*%',
-        value: fieldsValue.queryNextDeptID,
-      });
-    if (fieldsValue.queryStatusNumber)
-      queryFilters.push({
-        name: 'fStatusNumber',
+        name: 'fRecordStatus',
         compare: '=',
-        value: fieldsValue.queryStatusNumber,
+        value: fieldsValue.queryRecordStatus,
       });
+    }
     if (fieldsValue.queryBatchNo)
       queryFilters.push({ name: 'fFullBatchNo', compare: '%*%', value: fieldsValue.queryBatchNo });
     if (fieldsValue.queryMoBillNo)
@@ -324,22 +286,15 @@ class TableList extends PureComponent {
 
   search = () => {
     const { dispatch, form } = this.props;
+    const fieldsValue = form.getFieldsValue();
+    console.log(fieldsValue);
 
-    form.validateFields((err, fieldsValue) => {
-      if (err) return;
-
-      const pagination = this.getSearchParam(fieldsValue);
-      dispatch({
-        type: 'flowManage/fetch',
-        payload: pagination,
-      });
-      this.setState({
-        queryDeptID: fieldsValue.queryCurrentDeptID,
-        queryStatusNumber: fieldsValue.queryStatusNumber,
-        queryRecordStatusNumber: fieldsValue.queryRecordStatusNumber,
-      });
-      this.handleSelectRows([]);
+    const pagination = this.getSearchParam(fieldsValue);
+    dispatch({
+      type: 'flowManage/fetch',
+      payload: pagination,
     });
+    this.handleSelectRows([]);
   };
 
   handleFormReset = () => {
@@ -365,10 +320,30 @@ class TableList extends PureComponent {
     this.handleSelectRows([]);
   };
 
-  selectChange = () => {
+  queryDeptChange = value => {
+    const {
+      form: { getFieldValue },
+    } = this.props;
+    const queryStatus = getFieldValue('queryStatus');
+    if (queryStatus !== undefined) {
+      message.warning('当指定岗位时流程单状态变更为关联岗位状态，请重新选择查询条件中的状态');
+    }
+    this.setState({
+      queryDeptID: value,
+    });
+
     setTimeout(() => {
       this.search();
-    }, 0);
+    }, 200);
+  };
+
+  selectChange = value => {
+    setTimeout(() => {
+      const {
+        form: { getFieldValue },
+      } = this.props;
+      this.search();
+    }, 200);
   };
 
   handleExport = e => {
@@ -394,19 +369,29 @@ class TableList extends PureComponent {
     });
   };
 
-  statusFilter = () => {
+  statusFilter = hasDeptId => {
     const {
       basicData: {
-        status: { flowStatus },
+        status: { flowStatus, recordStatus },
       },
     } = this.props;
-    const badgeStatus = !flowStatus
-      ? []
-      : flowStatus.map(x => ({
-          text: <Badge color={x.fColor} text={x.fValue} />,
-          value: x.fKeyName,
-        }));
-    return badgeStatus;
+    if (hasDeptId) {
+      const badgeStatus = !recordStatus
+        ? []
+        : recordStatus.map(x => ({
+            text: <Badge color={x.fColor} text={x.fValue} />,
+            value: x.fKeyName,
+          }));
+      return badgeStatus;
+    } else {
+      const badgeStatus = !flowStatus
+        ? []
+        : flowStatus.map(x => ({
+            text: <Badge color={x.fColor} text={x.fValue} />,
+            value: x.fKeyName,
+          }));
+      return badgeStatus;
+    }
   };
 
   // 应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
@@ -744,9 +729,9 @@ class TableList extends PureComponent {
     // 指定岗位则判断签收岗位是否包含指定的岗位，否则则判断当前是否有岗位可签收
     const canSign =
       !record.fCancellation &&
-      record.fNextDeptIDList &&
+      record.fNextRecords.length > 0 &&
       record.fRecordStatusNumber !== 'ManufProducing' &&
-      (!queryDeptID || record.fNextDeptIDList.includes(queryDeptID));
+      (!queryDeptID || record.fNextRecords.find(x => x.fDeptID == queryDeptID));
     const canTransfer =
       !record.fCancellation &&
       record.fRecordStatusNumber === 'ManufProducing' &&
@@ -764,7 +749,7 @@ class TableList extends PureComponent {
     // 已签收生产中，且非首岗位，可退回
     if (
       record.fRecordStatusNumber === 'ManufProducing' &&
-      record.fEndProduceDeptIDList.length > 0 &&
+      record.fFinishedRecords.length > 0 &&
       !record.fCancellation
     )
       menus.push(<Menu.Item key="refund">退回</Menu.Item>);
@@ -870,33 +855,14 @@ class TableList extends PureComponent {
         status: { flowStatus, recordStatus },
       },
     } = this.props;
-    const { queryBatchNo } = this.state;
+    const { queryDeptID, queryBatchNo } = this.state;
 
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={4} sm={24}>
-            <FormItem label="流程单状态">
-              {getFieldDecorator('queryStatusNumber')(
-                <Select
-                  placeholder="请选择"
-                  style={{ width: '100%' }}
-                  allowClear
-                  onChange={this.selectChange}
-                >
-                  {flowStatus &&
-                    flowStatus.map(x => (
-                      <Option key={x.fKeyName} value={x.fKeyName}>
-                        <Badge color={x.fColor} text={x.fValue} />
-                      </Option>
-                    ))}
-                </Select>
-              )}
-            </FormItem>
-          </Col>
-          <Col md={4} sm={24}>
-            <FormItem label="当前岗位">
-              {getFieldDecorator('queryCurrentDeptID', {
+          <Col md={6} sm={24}>
+            <FormItem label="岗位">
+              {getFieldDecorator('queryDeptID', {
                 rules: [{ required: false, message: '请选择岗位' }],
               })(
                 <TreeSelect
@@ -904,30 +870,52 @@ class TableList extends PureComponent {
                   treeData={authorizeProcessTree}
                   treeDefaultExpandAll
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                  onChange={this.selectChange}
+                  onChange={this.queryDeptChange}
                   allowClear
                 />
               )}
             </FormItem>
           </Col>
-          <Col md={4} sm={24}>
-            <FormItem label="岗位状态">
-              {getFieldDecorator('queryRecordStatusNumber')(
-                <Select
-                  placeholder="请选择"
-                  style={{ width: '100%' }}
-                  allowClear
-                  onChange={this.selectChange}
-                >
-                  {recordStatus &&
-                    recordStatus.map(x => (
-                      <Option key={x.fKeyName} value={x.fKeyName}>
-                        <Badge color={x.fColor} text={x.fValue} />
-                      </Option>
-                    ))}
-                </Select>
-              )}
-            </FormItem>
+          <Col md={6} sm={24}>
+            {queryDeptID > 0 ? (
+              <FormItem label="状态">
+                {getFieldDecorator('queryRecordStatus', {
+                  // valuePropName: ''
+                })(
+                  <Select
+                    placeholder="请选择"
+                    style={{ width: '100%' }}
+                    allowClear
+                    onChange={this.selectChange}
+                  >
+                    {recordStatus &&
+                      recordStatus.map(x => (
+                        <Option key={x.fKey} value={x.fKey}>
+                          <Badge color={x.fColor} text={x.fValue} />
+                        </Option>
+                      ))}
+                  </Select>
+                )}
+              </FormItem>
+            ) : (
+              <FormItem label="状态">
+                {getFieldDecorator('queryStatus')(
+                  <Select
+                    placeholder="请选择"
+                    style={{ width: '100%' }}
+                    allowClear
+                    onChange={this.selectChange}
+                  >
+                    {flowStatus &&
+                      flowStatus.map(x => (
+                        <Option key={x.fKey} value={x.fKey}>
+                          <Badge color={x.fColor} text={x.fValue} />
+                        </Option>
+                      ))}
+                  </Select>
+                )}
+              </FormItem>
+            )}
           </Col>
           <Col md={6} sm={24}>
             <FormItem label="批号">
@@ -962,9 +950,68 @@ class TableList extends PureComponent {
         status: { flowStatus, recordStatus },
       },
     } = this.props;
+    const { queryDeptID } = this.state;
+
     return (
       <Form onSubmit={this.handleSearch} layout="inline" style={{ marginRight: '30px' }}>
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+          <Col md={8} sm={24}>
+            <FormItem label="岗位">
+              {getFieldDecorator('queryDeptID', {
+                rules: [{ required: false, message: '请选择岗位' }],
+              })(
+                <TreeSelect
+                  style={{ width: '100%' }}
+                  treeData={authorizeProcessTree}
+                  treeDefaultExpandAll
+                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                  onChange={this.selectChange}
+                  allowClear
+                />
+              )}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            {queryDeptID > 0 ? (
+              <FormItem label="状态">
+                {getFieldDecorator('queryRecordStatus', {
+                  // valuePropName: ''
+                })(
+                  <Select
+                    placeholder="请选择"
+                    style={{ width: '100%' }}
+                    allowClear
+                    onChange={this.selectChange}
+                  >
+                    {recordStatus &&
+                      recordStatus.map(x => (
+                        <Option key={x.fKey} value={x.fKey}>
+                          <Badge color={x.fColor} text={x.fValue} />
+                        </Option>
+                      ))}
+                  </Select>
+                )}
+              </FormItem>
+            ) : (
+              <FormItem label="状态">
+                {getFieldDecorator('queryStatus')(
+                  <Select
+                    placeholder="请选择"
+                    style={{ width: '100%' }}
+                    allowClear
+                    onChange={this.selectChange}
+                  >
+                    {flowStatus &&
+                      flowStatus.map(x => (
+                        <Option key={x.fKey} value={x.fKey}>
+                          <Badge color={x.fColor} text={x.fValue} />
+                        </Option>
+                      ))}
+                  </Select>
+                )}
+              </FormItem>
+            )}
+          </Col>
           <Col md={8} sm={24}>
             <FormItem label="批号">
               {getFieldDecorator('queryBatchNo')(<Input placeholder="请输入" />)}
@@ -978,71 +1025,6 @@ class TableList extends PureComponent {
           <Col md={8} sm={24}>
             <FormItem label="订单号">
               {getFieldDecorator('querySoBillNo')(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="流程单状态">
-              {getFieldDecorator('queryStatusNumber')(
-                <Select placeholder="请选择" style={{ width: '100%' }} onChange={this.selectChange}>
-                  {flowStatus &&
-                    flowStatus.map(x => (
-                      <Option key={x.fKeyName} value={x.fKeyName}>
-                        <Badge color={x.fColor} text={x.fValue} />
-                      </Option>
-                    ))}
-                </Select>
-              )}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="当前岗位">
-              {getFieldDecorator('queryCurrentDeptID', {
-                rules: [{ required: false, message: '请选择岗位' }],
-              })(
-                <TreeSelect
-                  style={{ width: '100%' }}
-                  treeData={authorizeProcessTree}
-                  treeDefaultExpandAll
-                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                  onChange={this.selectChange}
-                  allowClear
-                />
-              )}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="岗位状态">
-              {getFieldDecorator('queryRecordStatusNumber')(
-                <Select
-                  placeholder="请选择"
-                  style={{ width: '100%' }}
-                  allowClear
-                  onChange={this.selectChange}
-                >
-                  {recordStatus &&
-                    recordStatus.map(x => (
-                      <Option key={x.fKeyName} value={x.fKeyName}>
-                        <Badge color={x.fColor} text={x.fValue} />
-                      </Option>
-                    ))}
-                </Select>
-              )}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="包含岗位">
-              {getFieldDecorator('queryAllDeptID', {
-                rules: [{ required: false, message: '请选择岗位' }],
-              })(
-                <TreeSelect
-                  style={{ width: '100%' }}
-                  treeData={authorizeProcessTree}
-                  treeDefaultExpandAll
-                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                  onChange={this.selectChange}
-                  allowClear
-                />
-              )}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
@@ -1187,22 +1169,30 @@ class TableList extends PureComponent {
       dispatch,
       flowManage: { data, queryResult },
       loading,
+      basicData: {
+        status: { flowStatus, recordStatus },
+      },
     } = this.props;
-    const {
-      queryDeptID,
-      queryStatusNumber,
-      selectedRows,
-      modalVisible,
-      currentFormValues,
-    } = this.state;
+    const { queryDeptID, selectedRows, modalVisible, currentFormValues } = this.state;
 
     const columns = ColumnConfig.getColumns({
       columnOps: [
         {
           dataIndex: 'fStatusNumber',
-          filters: this.statusFilter(),
+          filters: (flowStatus || []).map(x => ({
+            text: <Badge color={x.fColor} text={x.fValue} />,
+            value: x.fKeyName,
+          })),
+        },
+        {
+          dataIndex: 'fRecordStatusNumber',
+          filters: (recordStatus || []).map(x => ({
+            text: <Badge color={x.fColor} text={x.fValue} />,
+            value: x.fKeyName,
+          })),
         },
       ],
+      queryDeptID,
     });
 
     const signMethods = {
@@ -1219,7 +1209,6 @@ class TableList extends PureComponent {
               <div className={styles.tableListForm}>{this.renderForm()}</div>
               <div className={styles.tableListOperator}>{this.reanderOperator()}</div>
               <WgStandardTable
-                rowKey="fInterID"
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}

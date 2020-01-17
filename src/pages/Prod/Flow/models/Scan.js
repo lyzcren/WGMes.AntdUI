@@ -27,7 +27,6 @@ export default {
       let showSign = false;
       let showTransfer = false;
       let messageType = '';
-      const { fNextDeptIDList } = data;
       const nextDepts = yield call(fakeGetDepts, { fInterID: data.fInterID });
       if (!data) {
         message = `未找到流程单【${fFullBatchNo}】.`;

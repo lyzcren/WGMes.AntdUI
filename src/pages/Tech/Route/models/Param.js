@@ -13,22 +13,23 @@ export default {
   },
 
   effects: {
-    *fetchParams({ payload, callback }, { call, put }) {
+    *fetchParams({ payload }, { call, put }) {
       const response = yield call(fakeQueryParams, payload);
+      const list = response.map(x => {
+        return { ...x, key: `${x.fDeptID}${x.fParamID}` };
+      });
       yield put({
         type: 'save',
-        payload: response,
+        payload: { data: list },
       });
-      if (callback) callback();
     },
-    *saveParams({ payload, callback }, { call, put }) {
+    *saveParams({ payload }, { call, put }) {
       const response = yield call(fakeSaveParams, payload);
 
       yield put({
-        type: 'saveData',
-        payload: response,
+        type: 'save',
+        payload: { queryResult: response },
       });
-      if (callback) callback();
     },
   },
 
@@ -36,13 +37,7 @@ export default {
     save(state, action) {
       return {
         ...state,
-        data: action.payload,
-      };
-    },
-    saveData(state, action) {
-      return {
-        ...state,
-        queryResult: action.payload ? action.payload : {},
+        ...action.payload,
       };
     },
   },

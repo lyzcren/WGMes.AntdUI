@@ -16,7 +16,7 @@ class ColumnConfig {
 
   statusFilter = [];
 
-  getColumns = ({ columnOps }) => {
+  getColumns = ({ columnOps, queryDeptID }) => {
     const defaultColumnOps = [
       {
         dataIndex: 'fFullBatchNo',
@@ -42,11 +42,15 @@ class ColumnConfig {
             : '',
       },
       {
+        dataIndex: 'fRecordStatusNumber',
+        render: (val, record) => {
+          return <Badge color={record.fRecordStatusColor} text={record.fRecordStatusName} />;
+        },
+        filters: this.statusFilter,
+      },
+      {
         dataIndex: 'fStatusNumber',
         render: (val, record) => {
-          if (record.fCancellation) {
-            return <Badge color="#696969" text="已作废" />;
-          }
           return <Badge color={record.fStatusColor} text={record.fStatusName} />;
         },
         filters: this.statusFilter,
@@ -68,21 +72,30 @@ class ColumnConfig {
         render: (text, record) => this.renderOperation(text, record),
       },
     ];
-    const newColumns = (columns || []).map(column => {
-      let retColumn = column;
-      const defaultColumnOp = defaultColumnOps
-        .filter(x => x.dataIndex)
-        .find(x => x.dataIndex === column.dataIndex);
-      if (defaultColumnOp) {
-        retColumn = { ...retColumn, ...defaultColumnOp };
-      }
-      if (columnOps) {
-        const columnOp = columnOps.find(x => x.dataIndex === column.dataIndex) || [];
-        retColumn = { ...retColumn, ...columnOp };
-      }
+    const newColumns = (columns || [])
+      // 按是否选择岗位判断应该显示“流程单状态”或“生产记录状态”
+      .filter(x =>
+        queryDeptID
+          ? x.dataIndex !== 'fStatusNumber'
+          : x.dataIndex !== 'fRecordDeptName' &&
+            x.dataIndex !== 'fRecordStatusNumber' &&
+            x.dataIndex !== 'fNextRecords'
+      )
+      .map(column => {
+        let retColumn = column;
+        const defaultColumnOp = defaultColumnOps
+          .filter(x => x.dataIndex)
+          .find(x => x.dataIndex === column.dataIndex);
+        if (defaultColumnOp) {
+          retColumn = { ...retColumn, ...defaultColumnOp };
+        }
+        if (columnOps) {
+          const columnOp = columnOps.find(x => x.dataIndex === column.dataIndex) || [];
+          retColumn = { ...retColumn, ...columnOp };
+        }
 
-      return retColumn;
-    });
+        return retColumn;
+      });
 
     return newColumns;
   };
