@@ -435,7 +435,7 @@ class TableList extends PureComponent {
       updateHandler: record => this.openUpdatePage(record),
       deleteHandler: record => this.deleteRecord(record),
     });
-    console.log(data);
+    // console.log(data);
 
     return (
       <div style={{ margin: '-24px -24px 0' }}>

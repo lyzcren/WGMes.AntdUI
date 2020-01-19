@@ -61,7 +61,12 @@ export default {
                   new Date(record.fBeginDate),
                   new Date(record.fTransferDateTime)
                 )}】` +
-                  `，良率：${numeral((record.fPassQty * 100) / record.fInputQty).format('0.00')}%`}
+                  `，岗位良率：${numeral((record.fPassQty * 100) / record.fInputQty).format(
+                    '0.00'
+                  )}%` +
+                  `，工段良率：${numeral((record.fPassQty * 100) / record.fFlowInputQty).format(
+                    '0.00'
+                  )}%`}
               </span>
             );
           } else if (record.fStatusNumber === 'ManufProducing') {

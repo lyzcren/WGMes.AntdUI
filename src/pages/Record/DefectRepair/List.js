@@ -293,7 +293,7 @@ class TableList extends PureComponent {
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={6} sm={24}>
+          {/* <Col md={6} sm={24}>
             <FormItem label="岗位">
               {getFieldDecorator('queryDept', {
                 rules: [{ required: false, message: '请选择岗位' }],
@@ -307,7 +307,7 @@ class TableList extends PureComponent {
                 />
               )}
             </FormItem>
-          </Col>
+          </Col> */}
           <Col md={6} sm={24}>
             <FormItem label="任务单号">
               {getFieldDecorator('queryMoBillNo')(<Input placeholder="请输入" />)}

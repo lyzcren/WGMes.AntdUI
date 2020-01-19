@@ -21,11 +21,13 @@ class ColumnConfig {
           title: '车间',
           dataIndex: 'fWorkShopName',
           width: 150,
+          sorter: true,
         },
         {
           title: '车间编码',
           dataIndex: 'fWorkShopNumber',
           width: 150,
+          sorter: true,
         },
       ];
     }
@@ -36,11 +38,13 @@ class ColumnConfig {
           title: '岗位',
           dataIndex: 'fDeptName',
           width: 150,
+          sorter: true,
         },
         {
           title: '岗位编码',
           dataIndex: 'fDeptNumber',
           width: 150,
+          sorter: true,
         },
       ];
     }
@@ -51,6 +55,7 @@ class ColumnConfig {
           title: '生产任务单',
           dataIndex: 'fMoBillNo',
           width: 150,
+          sorter: true,
         },
       ];
     }
@@ -61,6 +66,7 @@ class ColumnConfig {
           title: '批号',
           dataIndex: 'fFullBatchNo',
           width: 150,
+          sorter: true,
         },
       ];
     }
@@ -71,6 +77,7 @@ class ColumnConfig {
           title: '物料名称',
           dataIndex: 'fProductName',
           width: 220,
+          sorter: true,
         },
         {
           title: '物料全称',
@@ -81,6 +88,7 @@ class ColumnConfig {
           title: '物料编码',
           dataIndex: 'fProductNumber',
           width: 220,
+          sorter: true,
         },
         {
           title: '规格型号',

@@ -134,9 +134,9 @@ class Create extends PureComponent {
           return {
             ...x,
             fRecordID: x.fInterID,
-            fQty: fQty !== undefined ? fQty : '',
+            fQty: fQty !== undefined ? fQty : x.fInputQty,
             fInvQty: x.fInputQty,
-            fDeltaQty: fQty !== undefined ? fQty - x.fInputQty : '',
+            fDeltaQty: fQty !== undefined ? fQty - x.fInputQty : 0,
             fRowComments,
             fEntryID: entryId++,
           };

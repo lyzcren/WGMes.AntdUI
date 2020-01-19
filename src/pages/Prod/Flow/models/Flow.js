@@ -30,9 +30,7 @@ export default {
   effects: {
     *fetch({ payload }, { call, put }) {
       const response = yield call(fakeQuery, payload);
-      const list = response.list.map(x => {
-        return { ...x, key: `${x.fInterID}${x.fRecordID || 0}` };
-      });
+      const list = response.list.map(x => ({ ...x, key: `${x.fInterID}${x.fRecordID || 0}` }));
       yield put({
         type: 'save',
         payload: { data: { ...response, list } },

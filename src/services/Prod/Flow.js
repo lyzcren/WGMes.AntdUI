@@ -11,7 +11,11 @@ export async function fakeQuery(params) {
   });
 }
 
-export async function fakeGet(params) {
+export async function fakeGet(id) {
+  return request(`/api/Flow/${id}`);
+}
+
+export async function fakeGetByBatchNo(params) {
   return request(`/api/Flow?${stringify(params)}`);
 }
 

@@ -125,12 +125,12 @@ class ColumnConfig {
     columns = [
       ...columns,
       {
-        title: '生产时长',
+        title: '生产时长（分钟）',
         dataIndex: 'fProduceMinute',
         width: 100,
       },
       {
-        title: '停线时长',
+        title: '停线时长（分钟）',
         dataIndex: 'fStopMinute',
         width: 100,
       },

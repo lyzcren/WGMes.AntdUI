@@ -1,3 +1,6 @@
+import { Tag } from 'antd';
+import { defaultDateTimeFormat } from '@/utils/GlobalConst';
+
 export const columns = [
   {
     title: '批号',
@@ -26,6 +29,13 @@ export const columns = [
     title: '当前岗位',
     dataIndex: 'fRecordDeptName',
     width: 150,
+    render: (val, record) => {
+      if (record.fIsReproduce) {
+        return `${val}（重做）`;
+      } 
+        return val;
+      
+    },
   },
   {
     title: '当前岗位状态',
@@ -36,9 +46,7 @@ export const columns = [
     title: '下道岗位',
     dataIndex: 'fNextRecords',
     width: 150,
-    render: (val, record) => {
-      return record.fNextRecords.map(rcd => rcd.fDeptName).join(', ');
-    },
+    render: (val, record) => record.fNextRecords.map(rcd => rcd.fDeptName).join(', '),
   },
   {
     title: '流程单状态',
@@ -104,6 +112,72 @@ export const columns = [
     sorter: true,
     width: 150,
   },
+
+  {
+    title: '自动签收',
+    dataIndex: 'fAutoSign',
+    sorter: true,
+    width: 90,
+    render: (val, record) => val ? <Tag color="green">是</Tag> : <Tag>否</Tag>,
+  },
+  {
+    title: '签收人',
+    dataIndex: 'fSignUserName',
+    sorter: true,
+    width: 150,
+    render: (text, record) => record.fSignDate && !record.fSignUserName ? '自动签收' : record.fSignUserName,
+  },
+  {
+    title: '签收日期',
+    dataIndex: 'fSignDate',
+    sorter: true,
+    width: 180,
+    render: (text, record) => defaultDateTimeFormat(text),
+  },
+  {
+    title: '开工日期',
+    dataIndex: 'fBeginDate',
+    sorter: true,
+    width: 180,
+    render: (text, record) => defaultDateTimeFormat(text),
+  },
+  {
+    title: '机台名称',
+    dataIndex: 'fMachineName',
+    sorter: true,
+    width: 150,
+  },
+  {
+    title: '机台编码',
+    dataIndex: 'fMachineNumber',
+    sorter: true,
+    width: 150,
+  },
+  {
+    title: '操作员',
+    dataIndex: 'fOperatorName',
+    sorter: true,
+    width: 150,
+  },
+  {
+    title: '操作员编码',
+    dataIndex: 'fOperatorNumber',
+    sorter: true,
+    width: 150,
+  },
+  {
+    title: '调机员',
+    dataIndex: 'fDebuggerName',
+    sorter: true,
+    width: 150,
+  },
+  {
+    title: '调机员编码',
+    dataIndex: 'fDebuggerNumber',
+    sorter: true,
+    width: 150,
+  },
+
   {
     title: '优先级',
     dataIndex: 'fPriority',

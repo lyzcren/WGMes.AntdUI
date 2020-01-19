@@ -11,16 +11,17 @@ import {
 } from '@/utils/unitConvertUtil';
 import { exists } from 'fs';
 import numeral from 'numeral';
+import { isArray } from 'util';
 
 export default {
   namespace: 'flowTransfer',
 
   state: {
-    data: {},
-    defect: [],
+    data: {
+      defectList: [],
+      paramList: [],
+    },
     machineData: [],
-    defectList: [],
-    paramList: [],
     workTimes: [],
     unitConverters: [],
     matchConverter: {},
@@ -34,26 +35,57 @@ export default {
   effects: {
     *initModel({ payload }, { call, put }) {
       const data = yield call(fakeGetProducingRecord, payload);
-      data.fPassQty = data.fInputQty + data.fInvCheckDeltaQty - data.fTakeQty;
+      const { fRouteID, fRouteEntryID, fDeptID, fUnitConverterID } = data;
       // 根据单位的小数位数配置相关数量的小数位
       data.fQtyDecimal = data.fQtyDecimal || 0;
       data.fQtyFormat = `0.${'00000000'.slice(0, data.fQtyDecimal)}`;
 
-      const { fRouteID, fRouteEntryID, fDeptID, fUnitConverterID } = data;
-      // getParams
-      const paramList = yield call(fakeQueryParams, {
+      // getDefect 不良项处理
+      const defaultDefectList = yield call(fakeGetDeptDefect, { fDeptID });
+      const mergeDefectList = [
+        ...defaultDefectList
+          .filter(df => !data.defectList.find(rdf => rdf.fDefectID === df.fItemID))
+          .map(df => ({ fDefectID: df.fItemID, fDefectName: df.fName, fQty: 0 })),
+        ...data.defectList,
+      ];
+      data.defectList = mergeDefectList;
+      data.fPassQty = data.fCurrentPassQty - data.fDefectQty;
+
+      // getParams 工艺参数处理
+      const defaultParamList = yield call(fakeQueryParams, {
         fInterID: fRouteID,
         fEntryID: fRouteEntryID,
       });
-      paramList.forEach(p => {
-        if (!p.values.includes(p.fDefaultValue)) {
-          p.values.unshift(p.fDefaultValue);
+      const mergeParamList = [];
+      data.paramList.forEach(dp => {
+        let findParam = mergeParamList.find(md => md.fParamID === dp.fParamID);
+        if (findParam) {
+          findParam.values = [...findParam.values, dp.fValue];
+        } else {
+          findParam = { ...dp };
+          findParam.fValue = undefined;
+          findParam.values = [dp.fValue];
+          mergeParamList.push(findParam);
         }
       });
+
+      defaultParamList.forEach(p => {
+        if (p.fDefaultValue && !p.values.includes(p.fDefaultValue)) {
+          p.values.unshift(p.fDefaultValue);
+        }
+        const findParam = mergeParamList.find(rp => rp.fParamID === p.fParamID);
+        if (findParam) {
+          p.fDefaultValue = findParam.values;
+        }
+        // 多选框，默认值需要是数组
+        if (p.fTypeNumber === 'TagSelect' && !isArray(p.fDefaultValue)) {
+          p.fDefaultValue = [p.fDefaultValue];
+        }
+      });
+      data.paramList = defaultParamList.filter(x => x.fIsActive);
+
       // getMachineData
       const machineData = yield call(fakeMachineData, { fDeptID });
-      // getDefect
-      const defectList = yield call(fakeGetDeptDefect, { fDeptID });
       // getWorkTimes
       const workTimes = yield call(fakeGetWorkTimes, fDeptID);
       // getUnitConverters
@@ -82,11 +114,7 @@ export default {
         const convertInputQty = getConvertQtyWithDecimal(data, matchConverter, data.fInputQty);
         data.fConvertInputQty = convertInputQty;
         // 转化后的合格数量
-        const convertPassQty = getConvertQtyWithDecimal(
-          data,
-          matchConverter,
-          data.fCurrentPassQty ? data.fCurrentPassQty : data.fInputQty
-        );
+        const convertPassQty = getConvertQtyWithDecimal(data, matchConverter, data.fCurrentPassQty);
         data.fConvertPassQty = convertPassQty;
       }
 
@@ -94,8 +122,8 @@ export default {
         type: 'save',
         payload: {
           data,
-          defectList: defectList || [],
-          paramList: paramList.filter(x => x.fIsActive),
+          // defectList: defectList || [],
+          // paramList: paramList.filter(x => x.fIsActive),
           machineData,
           workTimes,
           unitConverters,
@@ -104,15 +132,16 @@ export default {
       });
     },
     *changeParam({ payload }, { call, put, select }) {
-      const { fParamID, fValue } = payload;
-      const { paramList } = yield select(state => state.flowTransfer);
+      const { fParamID, values } = payload;
+      const { data } = yield select(state => state.flowTransfer);
+      const { paramList } = data;
       const existsOne = paramList.find(x => x.fParamID == fParamID);
       if (existsOne) {
-        existsOne.fValue = fValue;
+        existsOne.values = values;
       }
       yield put({
         type: 'save',
-        payload: { paramList },
+        payload: { data: { ...data, paramList } },
       });
     },
     *changeDefect({ payload }, { call, put }) {
@@ -122,22 +151,23 @@ export default {
       });
     },
     *addDefect({ payload }, { call, put, select }) {
-      const { fDefectID, fValue } = payload;
-      const { defectList } = yield select(state => state.flowTransfer);
+      const { fDefectID, fQty } = payload;
+      const { data } = yield select(state => state.flowTransfer);
+      const { defectList } = data;
       const { defectData } = yield select(state => state.basicData);
       const existsOne = defectList.find(x => x.fItemID === fDefectID);
       const findItem = defectData.find(x => x.fItemID === fDefectID);
 
       if (existsOne) {
-        existsOne.fValue = fValue;
+        existsOne.fQty = fQty;
       } else if (findItem) {
         const newItem = { ...findItem };
-        newItem.fValue = fValue;
+        newItem.fQty = fQty;
         defectList.push(newItem);
       }
       put({
         type: 'save',
-        payload: { defectList: defectList || [] },
+        payload: { data: { ...data, defectList: defectList || [] } },
       });
     },
     *transfer({ payload }, { call, put }) {
@@ -165,30 +195,31 @@ export default {
     },
     changeDefectReducer(state, action) {
       const {
-        payload: { fDefectID, fValue },
+        payload: { fDefectID, fQty },
       } = action;
-      const { data, matchConverter, defect } = state;
-      const existsDefect = defect.find(d => d.fDefectID === fDefectID);
+      const { data, matchConverter } = state;
+      const { defectList } = data;
+      const existsDefect = defectList.find(d => d.fDefectID === fDefectID);
+
       if (existsDefect) {
-        existsDefect.fValue = fValue;
+        existsDefect.fQty = fQty;
       } else {
-        defect.push({ fDefectID, fValue });
+        defectList.push({ fDefectID, fQty });
       }
-      const defectQty = defect
-        .map(x => (x.fValue ? x.fValue : 0))
+      const defectQty = defectList
+        .map(x => (x.fQty ? x.fQty : 0))
         .reduce((sum, x) => (sum += x * 1.0));
       data.fDefectQty = defectQty;
       // 所有变化的数量（取走、盘点、不良）
       const allChangeQty = data.fInvCheckDeltaQty - data.fTakeQty - data.fDefectQty;
       // 计算相关数量
-      data.fPassQty = data.fInputQty + allChangeQty;
+      data.fPassQty = data.fCurrentPassQty + allChangeQty;
       if (matchConverter) {
         data.fConvertPassQty = getConvertQtyWithDecimal(data, matchConverter, data.fPassQty);
       }
       return {
         ...state,
-        data,
-        defect,
+        data: { ...data, defectList },
       };
     },
   },

@@ -24,9 +24,9 @@ const IntroduceRow = memo(
       <Tabs style={{ marginTop: -23 }} onChange={onTabChange}>
         {workshops.map(workshop => {
           const percent =
-            workshop.totalInputQty === 0
+            workshop.totalProducedQty === 0
               ? 0
-              : (workshop.totalPassQty / workshop.totalInputQty) * 100;
+              : (workshop.totalPassQty / workshop.totalProducedQty) * 100;
           return (
             <TabPane tab={workshop.fName} key={workshop.fItemID}>
               <Row gutter={24}>
@@ -59,49 +59,48 @@ const IntroduceRow = memo(
                     </Trend>
                   </ChartCard>
                 </Col>
-
                 <Col {...topColResponsiveProps}>
                   <ChartCard
                     bordered={false}
                     loading={loading}
-                    title="完工数量"
+                    title="已开工数量"
                     action={
-                      <Tooltip title="已完工流程单数量">
+                      <Tooltip title="生产生产任务汇报数量">
                         <Icon type="info-circle-o" />
                       </Tooltip>
                     }
-                    total={`${numeral(workshop.totalPassQty).format('0,0')}`}
+                    total={`${numeral(workshop.totalProducedQty).format('0,0')}`}
                     footer={
                       <Field
-                        label="今日完工数量"
-                        value={`${numeral(workshop.todayPassQty).format('0,0')}`}
+                        label="今日开工数量"
+                        value={`${numeral(workshop.todayProducedQty).format('0,0')}`}
                       />
                     }
                     contentHeight={46}
                   >
-                    <MiniArea color="#975FE4" data={visitData} />
+                    <MiniBar data={visitData} />
                   </ChartCard>
                 </Col>
                 <Col {...topColResponsiveProps}>
                   <ChartCard
                     bordered={false}
                     loading={loading}
-                    title="汇报数量"
+                    title="良品数量"
                     action={
-                      <Tooltip title="生产流程单汇报数量">
+                      <Tooltip title="流程单良品数量">
                         <Icon type="info-circle-o" />
                       </Tooltip>
                     }
-                    total={`${numeral(workshop.totalReportQty).format('0,0')}`}
+                    total={`${numeral(workshop.totalPassQty).format('0,0')}`}
                     footer={
                       <Field
-                        label="今日汇报"
-                        value={`${numeral(workshop.todayReportQty).format('0,0')}`}
+                        label="今日良品数量"
+                        value={`${numeral(workshop.todayPassQty).format('0,0')}`}
                       />
                     }
                     contentHeight={46}
                   >
-                    <MiniBar data={visitData} />
+                    <MiniArea color="#975FE4" data={visitData} />
                   </ChartCard>
                 </Col>
                 <Col {...topColResponsiveProps}>

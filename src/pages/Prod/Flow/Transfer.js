@@ -33,6 +33,7 @@ import Authorized from '@/utils/Authorized';
 import { hasAuthority } from '@/utils/authority';
 import { isArray } from 'util';
 import { ViewUnitConverterForm } from './ViewUnitConverter';
+import { defaultDateTimeFormat } from '@/utils/GlobalConst';
 
 import styles from './List.less';
 
@@ -127,19 +128,6 @@ class Transfer extends PureComponent {
         ? fTransferDateTime.format('YYYY-MM-DD HH:mm:ss')
         : undefined;
       newData.fWorkTimeID = fieldsValue.fWorkTimeID;
-      newData.defects = [];
-      newData.params = [];
-      for (const key in fieldsValue) {
-        if (key.indexOf('detailDefectID') === 0 && fieldsValue[key]) {
-          newData.defects.push({
-            fDefectID: key.replace('detailDefectID', ''),
-            fValue: fieldsValue[key],
-          });
-        } else if (key.indexOf('paramsID') === 0) {
-          const paramValue = isArray(fieldsValue[key]) ? fieldsValue[key] : [fieldsValue[key]];
-          newData.params.push({ fParamID: key.replace('paramsID', ''), fValue: paramValue });
-        }
-      }
 
       dispatch({
         type: 'flowTransfer/transfer',
@@ -191,12 +179,12 @@ class Transfer extends PureComponent {
     }
   };
 
-  handleFieldChange(fValue, fDefectID) {
-    fValue = fValue || 0;
+  handleFieldChange(fQty, fDefectID) {
+    fQty = fQty || 0;
     const { dispatch } = this.props;
     dispatch({
       type: 'flowTransfer/changeDefect',
-      payload: { fDefectID, fValue },
+      payload: { fDefectID, fQty },
     });
   }
 
@@ -208,7 +196,7 @@ class Transfer extends PureComponent {
         type: 'flowTransfer/changeDefect',
         payload: {
           fDefectID: fieldsValue.fOtherDefectID,
-          fValue: fieldsValue.fOtherDefectValue * 1.0,
+          fQty: fieldsValue.fOtherDefectValue * 1.0,
         },
       }).then(() => {
         const { flowTransfer } = this.props;
@@ -217,7 +205,7 @@ class Transfer extends PureComponent {
       });
       dispatch({
         type: 'flowTransfer/addDefect',
-        payload: { fDefectID: fieldsValue.fOtherDefectID, fValue: e.target.value * 1.0 },
+        payload: { fDefectID: fieldsValue.fOtherDefectID, fQty: e.target.value * 1.0 },
       }).then(() => {
         const { flowTransfer } = this.props;
         // 使其他不良下拉框获取焦点
@@ -229,12 +217,11 @@ class Transfer extends PureComponent {
     }
   }
 
-  handleParamChange(e, fParamID) {
-    const fValue = e.target.value;
+  handleParamChange(fParamID, values) {
     const { dispatch } = this.props;
     dispatch({
       type: 'flowTransfer/changeParam',
-      payload: { fParamID, fValue },
+      payload: { fParamID, values },
     });
   }
 
@@ -323,6 +310,17 @@ class Transfer extends PureComponent {
           <Description term="取走数量">
             {`${numeral(data.fTakeQty).format(fQtyFormat)} ${data.fUnitName}`}
           </Description>
+          <Description term="不良数量">
+            {`${numeral(data.fDefectQty).format(fQtyFormat)} ${data.fUnitName}`}
+          </Description>
+
+          <Description term="签收人">
+            {`${data.fAutoSign ? '自动签收' : data.fSignUserName}`}
+          </Description>
+          <Description term="签收日期">{`${defaultDateTimeFormat(data.fSignDate)}`}</Description>
+          <Description term="下道岗位">
+            {`${data.fNextRecords ? data.fNextRecords.map(rcd => rcd.fDeptName).join(', ') : ''}`}
+          </Description>
         </DescriptionList>
       </div>
     );
@@ -352,27 +350,34 @@ class Transfer extends PureComponent {
 
   render() {
     const {
-      flowTransfer: { data, machineData, defectList, paramList, workTimes, matchConverter },
+      flowTransfer: { data, machineData, workTimes, matchConverter },
       loading,
       form: { getFieldDecorator },
       basicData: { defectData, operators, debuggers },
       fBindEmpID,
       location: { fEmpID, tabMode },
     } = this.props;
+    const { defectList, paramList } = data;
 
     const { showMoreDefect, moreDefectValue, unitConverterVisible } = this.state;
     const { fQtyDecimal, fConvertDecimal } = data;
     const defectQtyDecimal = fQtyDecimal;
+    const defaultOperatorId = data.fOperatorID ? data.fOperatorID : fEmpID || (fBindEmpID || null);
+    const defaultDebuggerId = data.fDebuggerID ? data.fDebuggerID : null;
+    const beginDate = data.fBeginDate ? data.fBeginDate : data.fSignDate;
+    const endDate = data.fTransferDateTime ? data.fTransferDateTime : new Date();
     // 默认机台
-    const defaultMachineID =
-      machineData && machineData.find(x => x.fItemID === this.state.fMachineID)
-        ? this.state.fMachineID
-        : null;
+    const defaultMachineID = data.fMachineID
+      ? data.fMachineID
+      : machineData && machineData.find(x => x.fItemID === this.state.fMachineID)
+      ? this.state.fMachineID
+      : null;
     // 默认班次
-    const defaultWorkTimeID =
-      workTimes && workTimes.find(x => x.fWorkTimeID === this.state.fWorkTimeID)
-        ? this.state.fWorkTimeID
-        : null;
+    const defaultWorkTimeID = data.fWorkTimeID
+      ? data.fWorkTimeID
+      : workTimes && workTimes.find(x => x.fWorkTimeID === this.state.fWorkTimeID)
+      ? this.state.fWorkTimeID
+      : null;
     const currentTime = new Date();
     // 根据当前时间推算班次信息
     const currentWorkTime =
@@ -420,7 +425,7 @@ class Transfer extends PureComponent {
                   <FormItem key="fOperatorID" label="操作员">
                     {getFieldDecorator('fOperatorID', {
                       rules: [{ required: true, message: '请选择操作员' }],
-                      initialValue: fEmpID || (fBindEmpID || null),
+                      initialValue: defaultOperatorId,
                     })(
                       <Select
                         placeholder="请选择操作员"
@@ -445,6 +450,7 @@ class Transfer extends PureComponent {
                   <FormItem key="fDebuggerID" label="调机员">
                     {getFieldDecorator('fDebuggerID', {
                       rules: [{ required: data.fRequireDebugger, message: '请选择调机员' }],
+                      initialValue: defaultDebuggerId,
                     })(
                       <Select
                         placeholder="请选择调机员"
@@ -519,7 +525,7 @@ class Transfer extends PureComponent {
                   <FormItem key="fBeginDate" label="生产时间">
                     {getFieldDecorator('fBeginDate', {
                       rules: [{ required: true, message: '请选择生产时间' }],
-                      initialValue: [moment(data.fSignDate), moment()],
+                      initialValue: [moment(beginDate), moment(endDate)],
                     })(
                       <RangePicker
                         showTime={{ format: 'HH:mm' }}
@@ -562,13 +568,13 @@ class Transfer extends PureComponent {
                     md={12}
                     sm={24}
                   >
-                    <FormItem key={`detailDefectID${d.fItemID}`} label={d.fName}>
-                      {getFieldDecorator(`detailDefectID${d.fItemID}`, {
+                    <FormItem key={`detailDefectID${d.fDefectID}`} label={d.fDefectName}>
+                      {getFieldDecorator(`detailDefectID${d.fDefectID}`, {
                         rules: [{ required: false, message: '' }],
-                        initialValue: d.fValue,
+                        initialValue: d.fQty,
                       })(
                         <InputNumber
-                          onChange={val => this.handleFieldChange(val, d.fItemID)}
+                          onChange={val => this.handleFieldChange(val, d.fDefectID)}
                           style={{ width: '100%' }}
                           placeholder="请输入数量"
                           min={Math.pow(0.1, defectQtyDecimal)}
@@ -598,7 +604,7 @@ class Transfer extends PureComponent {
                           ref={c => (this.otherDefectRef = c)}
                         >
                           {defectData
-                            .filter(x => !defectList.find(y => y.fItemID === x.fItemID))
+                            .filter(x => !defectList.find(y => y.fDefectID === x.fItemID))
                             .map(x => (
                               <Option key={x.fItemID} value={x.fItemID}>
                                 {`${x.fName} - ${x.fNumber}`}
@@ -659,7 +665,7 @@ class Transfer extends PureComponent {
                             option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                           }
                           placeholder="请选择"
-                          onChange={val => console.log(val)}
+                          onChange={val => this.handleParamChange(d.fParamID, val)}
                         >
                           {d.values.map(x => (
                             <Option key={x} value={x}>

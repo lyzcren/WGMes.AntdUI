@@ -118,6 +118,7 @@ class ColumnConfig {
 
   // 复制
   copyHandler = record => {};
+
   profileModalVisible = record => {};
 
   // 修改方法

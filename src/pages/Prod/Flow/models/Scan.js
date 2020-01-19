@@ -1,4 +1,4 @@
-import { fakeGet, fakeGetDepts } from '@/services/Prod/Flow';
+import { fakeGetByBatchNo as fakeGet, fakeGetDepts } from '@/services/Prod/Flow';
 
 export default {
   namespace: 'flowScan',

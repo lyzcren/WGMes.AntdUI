@@ -15,9 +15,7 @@ export default {
   effects: {
     *fetchParams({ payload }, { call, put }) {
       const response = yield call(fakeQueryParams, payload);
-      const list = response.map(x => {
-        return { ...x, key: `${x.fDeptID}${x.fParamID}` };
-      });
+      const list = response.map(x => ({ ...x, key: `${x.fDeptID}${x.fParamID}` }));
       yield put({
         type: 'save',
         payload: { data: list },

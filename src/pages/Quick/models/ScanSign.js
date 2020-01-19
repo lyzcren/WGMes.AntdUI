@@ -1,4 +1,4 @@
-import { fakeGet, fakeSign } from '@/services/Prod/Flow';
+import { fakeGetByBatchNo as fakeGet, fakeSign } from '@/services/Prod/Flow';
 
 export default {
   namespace: 'scanSign',

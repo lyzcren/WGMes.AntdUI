@@ -1,6 +1,6 @@
 import { fakeMachineData } from '@/services/basicData';
 import { fakeGetWorkTimes } from '@/services/Basic/Dept';
-import { fakeGet } from '@/services/Prod/Flow';
+import { fakeGetByBatchNo as fakeGet } from '@/services/Prod/Flow';
 import { fakeTake } from '@/services/Prod/Take';
 import { routerRedux } from 'dva/router';
 

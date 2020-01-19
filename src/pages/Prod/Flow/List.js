@@ -287,7 +287,7 @@ class TableList extends PureComponent {
   search = () => {
     const { dispatch, form } = this.props;
     const fieldsValue = form.getFieldsValue();
-    console.log(fieldsValue);
+    // console.log(fieldsValue);
 
     const pagination = this.getSearchParam(fieldsValue);
     dispatch({
@@ -383,7 +383,7 @@ class TableList extends PureComponent {
             value: x.fKeyName,
           }));
       return badgeStatus;
-    } else {
+    } 
       const badgeStatus = !flowStatus
         ? []
         : flowStatus.map(x => ({
@@ -391,7 +391,7 @@ class TableList extends PureComponent {
             value: x.fKeyName,
           }));
       return badgeStatus;
-    }
+    
   };
 
   // 应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
@@ -503,6 +503,22 @@ class TableList extends PureComponent {
         successCallback: this.search,
       },
     });
+  };
+
+  profileVisible = record => {
+    const { dispatch } = this.props;
+    const { fRecordID, fInterID, fCurrentRecordID } = record;
+    if (fRecordID) {
+      dispatch({
+        type: 'menu/openMenu',
+        payload: { path: '/record/record/profile', data: { fInterID: fRecordID } },
+      });
+    } else {
+      dispatch({
+        type: 'menu/openMenu',
+        payload: { path: '/prod/flow/profile', data: record },
+      });
+    }
   };
 
   handleBatchSign = () => {
@@ -729,13 +745,10 @@ class TableList extends PureComponent {
     // 指定岗位则判断签收岗位是否包含指定的岗位，否则则判断当前是否有岗位可签收
     const canSign =
       !record.fCancellation &&
-      record.fNextRecords.length > 0 &&
+      record.fRemaindRecords.length > 0 &&
       record.fRecordStatusNumber !== 'ManufProducing' &&
-      (!queryDeptID || record.fNextRecords.find(x => x.fDeptID == queryDeptID));
-    const canTransfer =
-      !record.fCancellation &&
-      record.fRecordStatusNumber === 'ManufProducing' &&
-      (!queryDeptID || record.fCurrentDeptID === queryDeptID);
+      (!queryDeptID || record.fRemaindRecords.find(x => x.fDeptID == queryDeptID));
+    const canTransfer = !record.fCancellation && record.fRecordStatusNumber === 'ManufProducing';
 
     const menus = [];
     // 转出中
@@ -773,6 +786,7 @@ class TableList extends PureComponent {
     const operators = [];
     if (
       record.fStatusNumber === 'BeforeProduce' ||
+      record.fRecordStatusNumber === 'ManufWait4Sign' ||
       (record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufTransfered') ||
       (record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufCancel') ||
       record.fRecordStatusNumber === 'ManufRefund'
@@ -800,11 +814,7 @@ class TableList extends PureComponent {
         </Authorized>
       );
     }
-    if (
-      !record.fCancellation &&
-      record.fStatusNumber === 'Producing' &&
-      record.fRecordStatusNumber === 'ManufProducing'
-    ) {
+    if (!record.fCancellation && record.fRecordStatusNumber === 'ManufProducing') {
       operators.push(
         <Authorized key="transfer" authority="Flow_Transfer">
           <Divider type="vertical" />
@@ -825,9 +835,13 @@ class TableList extends PureComponent {
 
     return (
       <Fragment>
-        <Authorized authority="Record_Read">
-          <a onClick={() => this.viewRecord(record)}>执行情况</a>
-        </Authorized>
+        {/* <Authorized authority="Record_Read"> */}
+        <a onClick={() => this.profileVisible(record)}>详情</a>
+        <Divider type="vertical" />
+        <a disabled={!hasAuthority('Record_Read')} onClick={() => this.viewRecord(record)}>
+          执行情况
+        </a>
+        {/* </Authorized> */}
         {operators.map(x => x)}
         {menus.length > 0 && (
           <Dropdown

@@ -109,6 +109,13 @@ export default [
                 authority: ['Flow_Transfer'],
                 hideInMenu: true,
               },
+              {
+                path: '/prod/flow/profile',
+                name: 'profile',
+                component: './Prod/Flow/Profile',
+                authority: ['Flow_Read'],
+                hideInMenu: true,
+              },
             ],
           },
           {
@@ -226,7 +233,7 @@ export default [
         name: 'record',
         icon: 'book',
         authority: [
-          'Mission_Read',
+          'MissionInput_Read',
           'Record_Read',
           'RecordTake_Read',
           'Flow_ChangeRoute',
@@ -239,7 +246,7 @@ export default [
             path: '/record/missionInput',
             name: 'missionInput',
             component: './Record/MissionInput/List',
-            authority: ['Mission_Read'],
+            authority: ['MissionInput_Read'],
           },
           {
             path: '/record/record',

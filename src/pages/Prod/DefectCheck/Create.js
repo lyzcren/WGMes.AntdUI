@@ -91,9 +91,9 @@ class Create extends PureComponent {
             fDefectName: x.fDefectName,
             fMoBillNo: x.fMoBillNo,
             fUnitName: x.fUnitName,
-            fQty: fQty !== undefined ? fQty : '',
+            fQty: fQty !== undefined ? fQty : x.fQty,
             fInvQty: x.fQty,
-            fDeltaQty: fQty !== undefined ? fQty - x.fQty : '',
+            fDeltaQty: fQty !== undefined ? fQty - x.fQty : 0,
             fRowComments,
             fEntryID: entryId++,
           };

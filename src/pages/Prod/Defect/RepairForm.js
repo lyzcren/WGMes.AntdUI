@@ -124,7 +124,7 @@ export class RepairForm extends PureComponent {
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="规格型号">
           {formVals.fModel}
         </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="车间">
+        {/* <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="车间">
           {form.getFieldDecorator('fWorkshop', {
             rules: [{ required: true, message: '请选择车间' }],
             initialValue: workshop ? workshop.fItemID : null,
@@ -142,6 +142,9 @@ export class RepairForm extends PureComponent {
                 ))}
             </Select>
           )}
+        </FormItem> */}
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="规格型号">
+          {formVals.fWorkShopName}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="工艺路线">
           {form.getFieldDecorator('fRouteID', {

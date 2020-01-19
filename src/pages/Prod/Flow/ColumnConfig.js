@@ -43,16 +43,12 @@ class ColumnConfig {
       },
       {
         dataIndex: 'fRecordStatusNumber',
-        render: (val, record) => {
-          return <Badge color={record.fRecordStatusColor} text={record.fRecordStatusName} />;
-        },
+        render: (val, record) => <Badge color={record.fRecordStatusColor} text={record.fRecordStatusName} />,
         filters: this.statusFilter,
       },
       {
         dataIndex: 'fStatusNumber',
-        render: (val, record) => {
-          return <Badge color={record.fStatusColor} text={record.fStatusName} />;
-        },
+        render: (val, record) => <Badge color={record.fStatusColor} text={record.fStatusName} />,
         filters: this.statusFilter,
       },
       {
@@ -79,7 +75,17 @@ class ColumnConfig {
           ? x.dataIndex !== 'fStatusNumber'
           : x.dataIndex !== 'fRecordDeptName' &&
             x.dataIndex !== 'fRecordStatusNumber' &&
-            x.dataIndex !== 'fNextRecords'
+            x.dataIndex !== 'fNextRecords' &&
+            x.dataIndex !== 'fAutoSign' &&
+            x.dataIndex !== 'fSignUserName' &&
+            x.dataIndex !== 'fSignDate' &&
+            x.dataIndex !== 'fBeginDate' &&
+            x.dataIndex !== 'fMachineName' &&
+            x.dataIndex !== 'fMachineNumber' &&
+            x.dataIndex !== 'fOperatorName' &&
+            x.dataIndex !== 'fOperatorNumber' &&
+            x.dataIndex !== 'fDebuggerName' &&
+            x.dataIndex !== 'fDebuggerNumber'
       )
       .map(column => {
         let retColumn = column;

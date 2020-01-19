@@ -9,17 +9,20 @@ class ColumnConfig {
       title: '单号',
       dataIndex: 'fBillNo',
       width: 160,
+      sorter: true,
       render: (val, record) => <a onClick={() => this.profileCallback(record)}>{val}</a>,
     },
     {
       title: '岗位',
       dataIndex: 'fDeptName',
       width: 160,
+      sorter: true,
     },
     {
       title: '日期',
       dataIndex: 'fDate',
       width: 160,
+      sorter: true,
       render: (val, record) => moment(val).format('YYYY-MM-DD'),
     },
     {
@@ -31,17 +34,20 @@ class ColumnConfig {
       title: '状态',
       dataIndex: 'fStatusName',
       width: 160,
+      sorter: true,
       render: (val, record) => <Badge color={record.fStatusColor} text={val} />,
     },
     {
       title: '创建人',
       dataIndex: 'fCreatorName',
       width: 160,
+      sorter: true,
     },
     {
       title: '审核人',
       dataIndex: 'fCheckerName',
       width: 160,
+      sorter: true,
     },
     {
       title: '备注',

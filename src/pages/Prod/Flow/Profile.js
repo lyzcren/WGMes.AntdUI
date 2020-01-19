@@ -15,6 +15,7 @@ import {
   Menu,
   InputNumber,
   DatePicker,
+  Tag,
 } from 'antd';
 import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import DescriptionList from '@/components/DescriptionList';
@@ -23,16 +24,13 @@ import { defaultDateTimeFormat } from '@/utils/GlobalConst';
 
 import styles from './List.less';
 
-const FormItem = Form.Item;
 const { Description } = DescriptionList;
-const ButtonGroup = Button.Group;
-const { RangePicker } = DatePicker;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ recordProfile, basicData, loading, menu }) => ({
-  recordProfile,
+@connect(({ flowProfile, basicData, loading, menu }) => ({
+  flowProfile,
   basicData,
-  loading: loading.models.recordProfile,
+  loading: loading.models.flowProfile,
   menu,
 }))
 @Form.create()
@@ -63,7 +61,7 @@ class Profile extends PureComponent {
     const { dispatch } = this.props;
 
     dispatch({
-      type: 'recordProfile/initModel',
+      type: 'flowProfile/initModel',
       payload: { fInterID },
     });
   }
@@ -72,13 +70,13 @@ class Profile extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
-      payload: { path: '/record/record/profile' },
+      payload: { path: '/prod/flow/profile' },
     });
   }
 
   renderDescription = () => {
     const {
-      recordProfile: {
+      flowProfile: {
         data: {
           defectList,
           paramList,
@@ -88,12 +86,11 @@ class Profile extends PureComponent {
           fProductName,
           fModel,
           fUnitName,
-          fFlowInputQty,
           fInputQty,
-          fPassQty,
-          fInvCheckDeltaQty,
-          fTakeQty,
-          fDefectQty,
+          fCurrentPassQty,
+          fTotalInvCheckDeltaQty,
+          fTotalTakeQty,
+          fTotalDefectQty,
           fStatusName,
           fDeptName,
           fFullBatchNo,
@@ -119,6 +116,7 @@ class Profile extends PureComponent {
           fAutoSign,
           fSignUserName,
           fSignDate,
+          fWorkShopName,
           fMesSelf001,
           fMesSelf002,
           fMesSelf003,
@@ -148,41 +146,23 @@ class Profile extends PureComponent {
           <Description term="父件型号">{fMesSelf002}</Description>
           <Description term="底色编号">{fMesSelf001}</Description>
           <Description term="内部订单号">{fMesSelf003}</Description>
+          <Description term="车间">{fWorkShopName}</Description>
 
-          <Description term="流程单数量">{numeral(fFlowInputQty).format(fQtyFormat)}</Description>
           <Description term="投入数量">
-            {numeral(fInputQty).format(fQtyFormat)}
-            {fConvertUnitName ? (
-              <a>
-                （{`${numeral(fConvertInputQty).format(fConvertQtyFormat)} ${fConvertUnitName}`}）
-              </a>
-            ) : null}
+            {`${numeral(fInputQty).format(fQtyFormat)} ${fUnitName}`}
           </Description>
           <Description term="合格数量">
-            {numeral(fPassQty).format(fQtyFormat)}
-            {fConvertUnitName ? (
-              <a>
-                （{`${numeral(fConvertPassQty).format(fConvertQtyFormat)} ${fConvertUnitName}`}）
-              </a>
-            ) : null}
+            {`${numeral(fCurrentPassQty).format(fQtyFormat)} ${fUnitName}`}
           </Description>
-          <Description term="盘点盈亏数量">
-            {`${numeral(fInvCheckDeltaQty).format(fQtyFormat)} ${fUnitName}`}
+          <Description term="总盘点盈亏数量">
+            {`${numeral(fTotalInvCheckDeltaQty).format(fQtyFormat)} ${fUnitName}`}
           </Description>
-          <Description term="取走数量">{`${numeral(fTakeQty).format(
+          <Description term="总取走数量">{`${numeral(fTotalTakeQty).format(
             fQtyFormat
           )} ${fUnitName}`}
           </Description>
-          <Description term="不良数量">
-            {`${numeral(fDefectQty).format(fQtyFormat)} ${fUnitName}`}
-          </Description>
-
-          <Description term="签收人">
-            {`${fAutoSign ? '自动签收' : fSignUserName || ''}`}
-          </Description>
-          <Description term="签收日期">{`${defaultDateTimeFormat(fSignDate)}`}</Description>
-          <Description term="下道岗位">
-            {`${fNextRecords ? fNextRecords.map(rcd => rcd.fDeptName).join(', ') : ''}`}
+          <Description term="总不良数量">
+            {`${numeral(fTotalDefectQty).format(fQtyFormat)} ${fUnitName}`}
           </Description>
         </DescriptionList>
       </div>
@@ -191,15 +171,19 @@ class Profile extends PureComponent {
 
   render() {
     const {
-      recordProfile: { data },
+      flowProfile: { data },
       loading,
       form: { getFieldDecorator },
     } = this.props;
     const {
+      fCurrentDeptName,
       fFullBatchNo,
-      fPassQty,
+      fCurrentPassQty,
+      fCurrentRecordStatusName,
+      fCurrentDeptNumber,
+      fCurrentRecordStatusColor,
       fInputQty,
-      fDeptName,
+      fStatusName,
       defectList,
       paramList,
       fOperatorName,
@@ -229,19 +213,19 @@ class Profile extends PureComponent {
         <Col xs={24} sm={12}>
           <div className={styles.textSecondary}>良率</div>
           <div className={styles.heading}>
-            {`${numeral((fPassQty * 100) / fInputQty).format('0.00')}%`}
+            {`${numeral((fCurrentPassQty * 100) / fInputQty).format('0.00')}%`}
           </div>
         </Col>
         <Col xs={24} sm={12}>
-          <div className={styles.textSecondary}>岗位</div>
-          <div className={styles.heading}>{fDeptName}</div>
+          <div className={styles.textSecondary}>状态</div>
+          <div className={styles.heading}>{fStatusName}</div>
         </Col>
       </Row>
     );
 
     return (
       <WgPageHeaderWrapper
-        title={`生产记录：${fFullBatchNo}`}
+        title={`流程单详情：${fFullBatchNo}`}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }
@@ -251,9 +235,18 @@ class Profile extends PureComponent {
         wrapperClassName={styles.advancedForm}
         loading={loading}
       >
-        <Card title="基本信息" style={{ marginBottom: 24 }} bordered={false}>
+        <Card title="在制岗位信息" style={{ marginBottom: 24 }} bordered={false}>
           <DescriptionList className={styles.headerList} size="small" col="4">
-            <Description term="操作员">{fOperatorName}</Description>
+            <Description term="在制岗位">{fCurrentDeptName}</Description>
+            <Description term="在制岗位编码">{fCurrentDeptNumber}</Description>
+            <Description term="状态">
+              {fCurrentDeptName ? (
+                <span style={{ color: fCurrentRecordStatusColor }}>{fCurrentRecordStatusName}</span>
+              ) : (
+                ''
+              )}
+            </Description>
+            {/* <Description term="操作员">{fOperatorName}</Description>
             <Description term="操作员编码">{fOperatorNumber}</Description>
             <Description term="机台">{fMachineName}</Description>
             <Description term="调机员">{fDebuggerName}</Description>
@@ -271,7 +264,7 @@ class Profile extends PureComponent {
                 : ''}
             </Description>
             <Description term="班次">{fWorkTimeName}</Description>
-            <Description term="班次编码">{fWorkTimeNumber}</Description>
+            <Description term="班次编码">{fWorkTimeNumber}</Description> */}
           </DescriptionList>
         </Card>
         {defectList && defectList.length > 0 && (
@@ -289,7 +282,7 @@ class Profile extends PureComponent {
           <Card title="工艺参数" style={{ marginBottom: 24 }} bordered={false}>
             <DescriptionList className={styles.headerList} size="small" col="3">
               {paramList.map((d, i) => (
-                <Description key={`${d.fParamID}${d.fValue}`} term={d.fParamName}>
+                <Description key={`${d.ParamID}${d.fValue}`} term={d.fParamName}>
                   {d.fValue}
                 </Description>
               ))}
