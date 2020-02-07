@@ -100,4 +100,5 @@ export default {
   'menu.sysConfig.role': '角色管理',
   'menu.sysConfig.billNoRule': '编码规则',
   'menu.sysConfig.printTemplate': '打印模板',
+  'menu.sysConfig.businessConfig': '业务设置',
 };

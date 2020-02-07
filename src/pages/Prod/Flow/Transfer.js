@@ -425,7 +425,9 @@ class Transfer extends PureComponent {
                   <FormItem key="fOperatorID" label="操作员">
                     {getFieldDecorator('fOperatorID', {
                       rules: [{ required: true, message: '请选择操作员' }],
-                      initialValue: defaultOperatorId,
+                      initialValue: operators.find(x => x.fItemID === defaultOperatorId)
+                        ? defaultOperatorId
+                        : null,
                     })(
                       <Select
                         placeholder="请选择操作员"

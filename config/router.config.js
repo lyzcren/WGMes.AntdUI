@@ -483,6 +483,12 @@ export default [
             component: './Sys/PrintTemplate/List',
             authority: ['PrintTemplate_Read'],
           },
+          {
+            path: '/sysConfig/businessConfig',
+            name: 'businessConfig',
+            component: './Sys/BusinessConfig/List',
+            authority: ['BusinessConfig_Read'],
+          },
         ],
       },
       // {

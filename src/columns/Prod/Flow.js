@@ -32,9 +32,8 @@ export const columns = [
     render: (val, record) => {
       if (record.fIsReproduce) {
         return `${val}（重做）`;
-      } 
-        return val;
-      
+      }
+      return val;
     },
   },
   {
@@ -118,14 +117,15 @@ export const columns = [
     dataIndex: 'fAutoSign',
     sorter: true,
     width: 90,
-    render: (val, record) => val ? <Tag color="green">是</Tag> : <Tag>否</Tag>,
+    render: (val, record) => (val ? <Tag color="green">是</Tag> : <Tag>否</Tag>),
   },
   {
     title: '签收人',
     dataIndex: 'fSignUserName',
     sorter: true,
     width: 150,
-    render: (text, record) => record.fSignDate && !record.fSignUserName ? '自动签收' : record.fSignUserName,
+    render: (text, record) =>
+      record.fSignDate && !record.fSignUserName ? '自动签收' : record.fSignUserName,
   },
   {
     title: '签收日期',

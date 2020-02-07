@@ -169,9 +169,8 @@ class Profile extends PureComponent {
           <Description term="盘点盈亏数量">
             {`${numeral(fInvCheckDeltaQty).format(fQtyFormat)} ${fUnitName}`}
           </Description>
-          <Description term="取走数量">{`${numeral(fTakeQty).format(
-            fQtyFormat
-          )} ${fUnitName}`}
+          <Description term="取走数量">
+            {`${numeral(fTakeQty).format(fQtyFormat)} ${fUnitName}`}
           </Description>
           <Description term="不良数量">
             {`${numeral(fDefectQty).format(fQtyFormat)} ${fUnitName}`}

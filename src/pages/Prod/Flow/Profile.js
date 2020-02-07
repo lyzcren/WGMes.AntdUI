@@ -157,9 +157,8 @@ class Profile extends PureComponent {
           <Description term="总盘点盈亏数量">
             {`${numeral(fTotalInvCheckDeltaQty).format(fQtyFormat)} ${fUnitName}`}
           </Description>
-          <Description term="总取走数量">{`${numeral(fTotalTakeQty).format(
-            fQtyFormat
-          )} ${fUnitName}`}
+          <Description term="总取走数量">
+            {`${numeral(fTotalTakeQty).format(fQtyFormat)} ${fUnitName}`}
           </Description>
           <Description term="总不良数量">
             {`${numeral(fTotalDefectQty).format(fQtyFormat)} ${fUnitName}`}

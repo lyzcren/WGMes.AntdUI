@@ -43,7 +43,9 @@ class ColumnConfig {
       },
       {
         dataIndex: 'fRecordStatusNumber',
-        render: (val, record) => <Badge color={record.fRecordStatusColor} text={record.fRecordStatusName} />,
+        render: (val, record) => (
+          <Badge color={record.fRecordStatusColor} text={record.fRecordStatusName} />
+        ),
         filters: this.statusFilter,
       },
       {

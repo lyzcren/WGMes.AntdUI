@@ -116,3 +116,13 @@ export const DecimalModes = [
 export const ConvertModes = [{ fKey: 'multi', fName: '乘' }, { fKey: 'div', fName: '除' }];
 
 export const pageMapper = { mission: '生产任务单', flow: '流程单', quickOps: '快速操作' };
+
+export const modeValueMaps = {
+  account: 0x1,
+  idcard: 0x2,
+};
+
+export const loginModeMaps = {
+  account: '账号登录',
+  idcard: '刷卡登录',
+};

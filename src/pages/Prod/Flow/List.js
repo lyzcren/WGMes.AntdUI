@@ -383,15 +383,14 @@ class TableList extends PureComponent {
             value: x.fKeyName,
           }));
       return badgeStatus;
-    } 
-      const badgeStatus = !flowStatus
-        ? []
-        : flowStatus.map(x => ({
-            text: <Badge color={x.fColor} text={x.fValue} />,
-            value: x.fKeyName,
-          }));
-      return badgeStatus;
-    
+    }
+    const badgeStatus = !flowStatus
+      ? []
+      : flowStatus.map(x => ({
+          text: <Badge color={x.fColor} text={x.fValue} />,
+          value: x.fKeyName,
+        }));
+    return badgeStatus;
   };
 
   // 应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
@@ -748,7 +747,10 @@ class TableList extends PureComponent {
       record.fRemaindRecords.length > 0 &&
       record.fRecordStatusNumber !== 'ManufProducing' &&
       (!queryDeptID || record.fRemaindRecords.find(x => x.fDeptID == queryDeptID));
-    const canTransfer = !record.fCancellation && record.fRecordStatusNumber === 'ManufProducing';
+    const canTransfer =
+      !record.fCancellation &&
+      (record.fRecordStatusNumber === 'ManufProducing' ||
+        record.fCurrentRecordStatusNumber === 'ManufProducing');
 
     const menus = [];
     // 转出中
@@ -814,7 +816,11 @@ class TableList extends PureComponent {
         </Authorized>
       );
     }
-    if (!record.fCancellation && record.fRecordStatusNumber === 'ManufProducing') {
+    if (
+      !record.fCancellation &&
+      (record.fRecordStatusNumber === 'ManufProducing' ||
+        record.fCurrentRecordStatusNumber === 'ManufProducing')
+    ) {
       operators.push(
         <Authorized key="transfer" authority="Flow_Transfer">
           <Divider type="vertical" />

@@ -8,16 +8,27 @@ import styles from './Login.less';
 
 const { Tab, UserName, Password, IdCard, Submit } = Login;
 
-@connect(({ user, loading, menu }) => ({
+@connect(({ global, user, loading, menu }) => ({
+  global,
   user,
   submitting: loading.effects['user/login'],
   menu,
 }))
 class LoginPage extends Component {
   state = {
-    type: 'account',
+    type: '',
     autoLogin: false,
   };
+
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'global/fetchBusinessConfig',
+    }).then(config => {
+      console.log(config);
+      this.setState({ type: config.defaultLoginMode });
+    });
+  }
 
   onTabChange = type => {
     this.setState({ type });
@@ -65,81 +76,95 @@ class LoginPage extends Component {
   );
 
   render() {
-    const { user, submitting } = this.props;
+    const {
+      global: {
+        businessConfig: { allowLoginModes },
+      },
+      user,
+      submitting,
+    } = this.props;
     const { type, autoLogin } = this.state;
+
     return (
       <div className={styles.main}>
-        <Login
-          defaultActiveKey={type}
-          onTabChange={this.onTabChange}
-          onSubmit={this.handleSubmit}
-          ref={form => {
-            this.loginForm = form;
-          }}
-        >
-          <Tab key="account" tab={formatMessage({ id: 'app.login.tab-login-credentials' })}>
-            {user.status === 'error' &&
-              user.type === 'account' &&
-              !submitting &&
-              // this.renderMessage(formatMessage({ id: 'app.login.message-invalid-credentials' }))}
-              this.renderMessage(user.message)}
-            <UserName
-              name="userName"
-              autoFocus
-              placeholder={`${formatMessage({ id: 'app.login.userName' })}`}
-              rules={[
-                {
-                  required: true,
-                  message: formatMessage({ id: 'validation.userName.required' }),
-                },
-              ]}
-            />
-            <Password
-              name="password"
-              placeholder={`${formatMessage({ id: 'app.login.password' })}`}
-              rules={[
-                {
-                  required: true,
-                  message: formatMessage({ id: 'validation.password.required' }),
-                },
-              ]}
-              onPressEnter={() =>
-                this.loginForm.validateFields(['password', 'userName'], this.handleSubmit)
-              }
-            />
-          </Tab>
-          <Tab key="idcard" tab={formatMessage({ id: 'app.login.tab-login-idcard' })}>
-            {user.status === 'error' &&
-              user.type === 'idcard' &&
-              !submitting &&
-              this.renderMessage('卡号错误')}
-            <IdCard
-              name="idcard"
-              autoFocus
-              placeholder={formatMessage({ id: 'form.idcard-number.placeholder' })}
-              rules={[
-                {
-                  required: true,
-                  message: formatMessage({ id: 'validation.idcard-number.required' }),
-                },
-              ]}
-              onPressEnter={() => this.loginForm.validateFields(['idcard'], this.handleSubmit)}
-            />
-          </Tab>
-          {type !== 'idcard' && (
-            <div>
-              <Checkbox checked={autoLogin} onChange={this.changeAutoLogin}>
-                <FormattedMessage id="app.login.remember-me" />
-              </Checkbox>
-              {/* <a style={{ float: 'right' }} href="">
+        {type && (
+          <Login
+            defaultActiveKey={type}
+            onTabChange={this.onTabChange}
+            onSubmit={this.handleSubmit}
+            ref={form => {
+              this.loginForm = form;
+            }}
+          >
+            {allowLoginModes.includes('account') && (
+              <Tab key="account" tab={formatMessage({ id: 'app.login.tab-login-credentials' })}>
+                {user.status === 'error' &&
+                  user.type === 'account' &&
+                  !submitting &&
+                  // this.renderMessage(formatMessage({ id: 'app.login.message-invalid-credentials' }))}
+                  this.renderMessage(user.message)}
+                <UserName
+                  name="userName"
+                  autoFocus
+                  placeholder={`${formatMessage({ id: 'app.login.userName' })}`}
+                  rules={[
+                    {
+                      required: true,
+                      message: formatMessage({ id: 'validation.userName.required' }),
+                    },
+                  ]}
+                />
+                <Password
+                  name="password"
+                  placeholder={`${formatMessage({ id: 'app.login.password' })}`}
+                  rules={[
+                    {
+                      required: true,
+                      message: formatMessage({ id: 'validation.password.required' }),
+                    },
+                  ]}
+                  onPressEnter={() =>
+                    this.loginForm.validateFields(['password', 'userName'], this.handleSubmit)
+                  }
+                />
+              </Tab>
+            )}
+            {allowLoginModes.includes('idcard') && (
+              <Tab key="idcard" tab={formatMessage({ id: 'app.login.tab-login-idcard' })}>
+                {user.status === 'error' &&
+                  user.type === 'idcard' &&
+                  !submitting &&
+                  this.renderMessage('卡号错误')}
+                <IdCard
+                  name="idcard"
+                  autoFocus
+                  placeholder={formatMessage({ id: 'form.idcard-number.placeholder' })}
+                  rules={[
+                    {
+                      required: true,
+                      message: formatMessage({ id: 'validation.idcard-number.required' }),
+                    },
+                  ]}
+                  onPressEnter={() => this.loginForm.validateFields(['idcard'], this.handleSubmit)}
+                />
+              </Tab>
+            )}
+            {type === 'account' && allowLoginModes && (
+              <div>
+                <Checkbox checked={autoLogin} onChange={this.changeAutoLogin}>
+                  <FormattedMessage id="app.login.remember-me" />
+                </Checkbox>
+                {/* <a style={{ float: 'right' }} href="">
                 <FormattedMessage id="app.login.forgot-password" />
               </a> */}
-            </div>
-          )}
-          <Submit loading={submitting}>
-            <FormattedMessage id="app.login.login" />
-          </Submit>
-          {/* <div className={styles.other}>
+              </div>
+            )}
+            {allowLoginModes && (
+              <Submit loading={submitting}>
+                <FormattedMessage id="app.login.login" />
+              </Submit>
+            )}
+            {/* <div className={styles.other}>
             <FormattedMessage id="app.login.sign-in-with" />
             <Icon type="alipay-circle" className={styles.icon} theme="outlined" />
             <Icon type="taobao-circle" className={styles.icon} theme="outlined" />
@@ -148,7 +173,8 @@ class LoginPage extends Component {
               <FormattedMessage id="app.login.signup" />
             </Link>
           </div> */}
-        </Login>
+          </Login>
+        )}
       </div>
     );
   }

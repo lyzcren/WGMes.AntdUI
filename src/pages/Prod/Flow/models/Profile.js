@@ -13,10 +13,10 @@ export default {
   effects: {
     *initModel({ payload }, { call, put }) {
       const data = yield call(fakeGet, payload.fInterID);
-      console.log(data);
       // 根据单位的小数位数配置相关数量的小数位
       data.fQtyDecimal = data.fQtyDecimal || 0;
       data.fQtyFormat = `0.${'00000000'.slice(0, data.fQtyDecimal)}`;
+      data.fUnitName = data.fUnitName ? data.fUnitName : '';
 
       let matchConverter = null;
       if (data.fUnitConverterID) {

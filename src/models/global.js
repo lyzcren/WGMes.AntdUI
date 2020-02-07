@@ -1,5 +1,7 @@
 import { queryNotices } from '@/services/api';
 import { routerRedux } from 'dva/router';
+import { fakeFetch } from '@/services/Sys/BusinessConfig';
+import { modeValueMaps } from '@/utils/GlobalConst';
 
 export default {
   namespace: 'global',
@@ -9,6 +11,7 @@ export default {
     notices: [],
     loadedAllNotices: false,
     isFullScreen: false,
+    businessConfig: { allowLoginModes: '', defaultLoginMode: [] },
   },
 
   effects: {
@@ -95,6 +98,25 @@ export default {
         },
       });
     },
+    *fetchBusinessConfig({}, { call, put }) {
+      const response = yield call(fakeFetch);
+      let configs = {};
+      response.forEach(item => {
+        const { fNumber, fValue } = item;
+        if (fNumber === 'allowLoginModes') {
+          configs[fNumber] = Object.keys(modeValueMaps).filter(x => modeValueMaps[x] & fValue);
+        } else if (fNumber === 'defaultLoginMode') {
+          configs[fNumber] = Object.keys(modeValueMaps).find(x => modeValueMaps[x] == fValue);
+        } else {
+          configs[fNumber] = fValue;
+        }
+      });
+      yield put({
+        type: 'saveBusinessConfig',
+        payload: { ...configs },
+      });
+      return configs;
+    },
     *fullScreen({ payload }, { put }) {
       const { isFullScreen } = payload;
       yield put({
@@ -111,6 +133,12 @@ export default {
   },
 
   reducers: {
+    saveBusinessConfig(state, { payload }) {
+      return {
+        ...state,
+        businessConfig: payload,
+      };
+    },
     changeLayoutCollapsed(state, { payload }) {
       return {
         ...state,
