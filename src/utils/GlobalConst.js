@@ -123,6 +123,13 @@ export const modeValueMaps = {
 };
 
 export const loginModeMaps = {
-  account: '账号登录',
+  account: '账号密码登录',
   idcard: '刷卡登录',
+};
+
+export const erpTypeMaps = {
+  k3: '金蝶 K3',
+  k3Cloud: '金蝶 K3 Cloud',
+  digiwin: '鼎捷 ERP',
+  other: '其他 ERP',
 };

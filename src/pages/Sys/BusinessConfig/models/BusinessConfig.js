@@ -1,4 +1,4 @@
-import { fakeFetch, fakeUpdateBasic } from '@/services/Sys/BusinessConfig';
+import { fakeUpdateBasic, fakeUpdateSync } from '@/services/Sys/BusinessConfig';
 import { modeValueMaps } from '@/utils/GlobalConst';
 
 export default {
@@ -9,24 +9,6 @@ export default {
   },
 
   effects: {
-    *fetch({}, { call, put }) {
-      const response = yield call(fakeFetch);
-      let configs = {};
-      response.forEach(item => {
-        const { fNumber, fValue } = item;
-        if (fNumber === 'allowLoginModes') {
-          configs[fNumber] = Object.keys(modeValueMaps).filter(x => modeValueMaps[x] & fValue);
-        } else if (fNumber === 'defaultLoginMode') {
-          configs[fNumber] = Object.keys(modeValueMaps).find(x => modeValueMaps[x] == fValue);
-        } else {
-          configs[fNumber] = fValue;
-        }
-      });
-      yield put({
-        type: 'save',
-        payload: { ...configs },
-      });
-    },
     *updateBasic({ payload }, { call, put, select }) {
       const { allowLoginModes, defaultLoginMode } = payload;
       const allowLoginModesValue = allowLoginModes.reduce((acc, cur) => {
@@ -39,6 +21,14 @@ export default {
         defaultLoginMode: defaultLoginModeValue,
       };
       const response = yield call(fakeUpdateBasic, newPayload);
+      yield put({
+        type: 'save',
+        payload: { ...payload },
+      });
+      return response;
+    },
+    *updateSync({ payload }, { call, put, select }) {
+      const response = yield call(fakeUpdateSync, payload);
       yield put({
         type: 'save',
         payload: { ...payload },

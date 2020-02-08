@@ -1,6 +1,6 @@
 import { queryNotices } from '@/services/api';
 import { routerRedux } from 'dva/router';
-import { fakeFetch } from '@/services/Sys/BusinessConfig';
+import { fakeFetchBasic, fakeFetchSync } from '@/services/Sys/BusinessConfig';
 import { modeValueMaps } from '@/utils/GlobalConst';
 
 export default {
@@ -11,7 +11,8 @@ export default {
     notices: [],
     loadedAllNotices: false,
     isFullScreen: false,
-    businessConfig: { allowLoginModes: '', defaultLoginMode: [] },
+    basicBusinessConfig: { allowLoginModes: ['account', 'idcard'], defaultLoginMode: 'account' },
+    syncBusinessConfig: {},
   },
 
   effects: {
@@ -98,8 +99,8 @@ export default {
         },
       });
     },
-    *fetchBusinessConfig({}, { call, put }) {
-      const response = yield call(fakeFetch);
+    *fetchBasicBusinessConfig({}, { call, put }) {
+      const response = yield call(fakeFetchBasic);
       let configs = {};
       response.forEach(item => {
         const { fNumber, fValue } = item;
@@ -112,7 +113,20 @@ export default {
         }
       });
       yield put({
-        type: 'saveBusinessConfig',
+        type: 'saveBasicBusinessConfig',
+        payload: { ...configs },
+      });
+      return configs;
+    },
+    *fetchSyncBusinessConfig({}, { call, put }) {
+      const response = yield call(fakeFetchSync);
+      let configs = {};
+      response.forEach(item => {
+        const { fNumber, fValue } = item;
+        configs[fNumber] = fValue;
+      });
+      yield put({
+        type: 'saveSyncBusinessConfig',
         payload: { ...configs },
       });
       return configs;
@@ -133,10 +147,16 @@ export default {
   },
 
   reducers: {
-    saveBusinessConfig(state, { payload }) {
+    saveBasicBusinessConfig(state, { payload }) {
       return {
         ...state,
-        businessConfig: payload,
+        basicBusinessConfig: payload,
+      };
+    },
+    saveSyncBusinessConfig(state, { payload }) {
+      return {
+        ...state,
+        syncBusinessConfig: payload,
       };
     },
     changeLayoutCollapsed(state, { payload }) {

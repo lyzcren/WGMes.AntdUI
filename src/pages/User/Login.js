@@ -23,9 +23,8 @@ class LoginPage extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'global/fetchBusinessConfig',
+      type: 'global/fetchBasicBusinessConfig',
     }).then(config => {
-      console.log(config);
       this.setState({ type: config.defaultLoginMode });
     });
   }
@@ -78,7 +77,7 @@ class LoginPage extends Component {
   render() {
     const {
       global: {
-        businessConfig: { allowLoginModes },
+        basicBusinessConfig: { allowLoginModes },
       },
       user,
       submitting,

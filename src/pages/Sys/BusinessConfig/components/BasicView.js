@@ -36,9 +36,19 @@ class BasicView extends PureComponent {
         value: item,
       };
     }),
-    allowLoginModes: Object.keys(loginModeMaps),
-    defaultLoginMode: 'number',
+    allowLoginModes: this.props.global.basicBusinessConfig.allowLoginModes,
+    defaultLoginMode: this.props.global.basicBusinessConfig.defaultLoginMode,
   };
+
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'global/fetchBasicBusinessConfig',
+    }).then(config => {
+      const { allowLoginModes, defaultLoginMode } = config;
+      this.setState({ allowLoginModes, defaultLoginMode });
+    });
+  }
 
   onChange = allowLoginModes => {
     const { defaultLoginMode } = this.state;
@@ -53,10 +63,12 @@ class BasicView extends PureComponent {
   };
 
   getAvatarURL() {
-    const { businessConfig } = this.props;
-    if (businessConfig) {
-      if (businessConfig.avatar) {
-        return businessConfig.avatar;
+    const {
+      global: { basicBusinessConfig },
+    } = this.props;
+    if (basicBusinessConfig) {
+      if (basicBusinessConfig.avatar) {
+        return basicBusinessConfig.avatar;
       }
       const url = 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png';
       return url;
@@ -80,7 +92,7 @@ class BasicView extends PureComponent {
         } else if (response.status === 'warning') {
           message.warning(response.message);
         } else if (response.status === 'err') {
-          message.warning(response.message);
+          message.error(response.message);
         }
       });
     });
@@ -89,15 +101,8 @@ class BasicView extends PureComponent {
   render() {
     const {
       form: { getFieldDecorator },
-      businessConfig,
     } = this.props;
-    const { checkGroupOptions } = this.state;
-    const allowLoginModes = businessConfig.allowLoginModes
-      ? businessConfig.allowLoginModes
-      : this.state.allowLoginModes;
-    const defaultLoginMode = businessConfig.defaultLoginMode
-      ? businessConfig.defaultLoginMode
-      : this.state.defaultLoginMode;
+    const { checkGroupOptions, allowLoginModes, defaultLoginMode } = this.state;
 
     return (
       <div className={styles.baseView} ref={this.getViewDom}>
@@ -137,6 +142,7 @@ class BasicView extends PureComponent {
   }
 }
 
-export default connect(({ businessConfig }) => ({
+export default connect(({ global, businessConfig }) => ({
+  global,
   businessConfig: businessConfig,
 }))(Form.create()(BasicView));

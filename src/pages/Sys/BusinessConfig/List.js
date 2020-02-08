@@ -27,13 +27,6 @@ class TableList extends PureComponent {
     },
   };
 
-  componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'businessConfig/fetch',
-    });
-  }
-
   getMenu = () => {
     const { menuMap } = this.state;
     return Object.keys(menuMap).map(item => <Item key={item}>{menuMap[item]}</Item>);
