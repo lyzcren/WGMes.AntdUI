@@ -17,7 +17,8 @@ import PageLoading from '@/components/PageLoading';
 import WgSiderMenu from '@/wg_components/WgSiderMenu';
 import { getToken } from '@/utils/token';
 
-import logo from '../assets/logo.svg';
+// import logo from '../assets/logo.svg';
+import { logoUrl } from '@/utils/GlobalConst';
 import styles from './BasicLayout.less';
 
 const { TabPane } = Tabs;
@@ -287,7 +288,7 @@ class WgBasicLayout extends React.PureComponent {
       <Layout>
         {isTop && !isMobile ? null : (
           <WgSiderMenu
-            logo={logo}
+            logo={logoUrl}
             theme={navTheme}
             onCollapse={this.handleMenuCollapse}
             menuData={menuData}
@@ -304,7 +305,7 @@ class WgBasicLayout extends React.PureComponent {
           <Header
             menuData={menuData}
             handleMenuCollapse={this.handleMenuCollapse}
-            logo={logo}
+            logo={logoUrl}
             isMobile={isMobile}
             {...this.props}
           />

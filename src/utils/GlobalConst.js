@@ -133,3 +133,5 @@ export const erpTypeMaps = {
   digiwin: '鼎捷 ERP',
   other: '其他 ERP',
 };
+
+export const logoUrl = '/api/businessConfig/logo.png';

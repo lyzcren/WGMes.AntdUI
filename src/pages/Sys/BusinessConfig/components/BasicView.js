@@ -3,7 +3,8 @@ import { connect } from 'dva';
 import { Form, Icon, Button, Upload, Checkbox, Input, message, Select } from 'antd';
 import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
-import { loginModeMaps } from '@/utils/GlobalConst';
+import { loginModeMaps, logoUrl } from '@/utils/GlobalConst';
+import { getToken } from '@/utils/token';
 
 import styles from './BasicView.less';
 
@@ -11,16 +12,16 @@ const CheckboxGroup = Checkbox.Group;
 const FormItem = Form.Item;
 
 // 头像组件 方便以后独立，增加裁剪之类的功能
-const AvatarView = ({ avatar }) => (
+const AvatarView = ({ avatar, uploadProps, isUploading }) => (
   <Fragment>
-    <div className={styles.avatar_title}>Logo</div>
+    <div className={styles.avatar_title}>菜单栏Logo（建议510*110）</div>
     <div className={styles.avatar}>
       <img src={avatar} alt="avatar" />
     </div>
-    <Upload showUploadList={false}>
+    <Upload showUploadList={false} {...uploadProps}>
       <div className={styles.button_view}>
-        <Button>
-          <Icon type={'upload'} />
+        <Button loading={isUploading} disabled={isUploading}>
+          {!isUploading && <Icon type={'upload'} />}
           更换Logo
         </Button>
       </div>
@@ -38,6 +39,8 @@ class BasicView extends PureComponent {
     }),
     allowLoginModes: this.props.global.basicBusinessConfig.allowLoginModes,
     defaultLoginMode: this.props.global.basicBusinessConfig.defaultLoginMode,
+    isUploading: false,
+    uploadLogoTimestamp: '',
   };
 
   componentDidMount() {
@@ -66,14 +69,15 @@ class BasicView extends PureComponent {
     const {
       global: { basicBusinessConfig },
     } = this.props;
-    if (basicBusinessConfig) {
-      if (basicBusinessConfig.avatar) {
-        return basicBusinessConfig.avatar;
-      }
-      const url = 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png';
-      return url;
-    }
-    return 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png';
+    const { uploadLogoTimestamp } = this.state;
+    // if (basicBusinessConfig) {
+    //   if (basicBusinessConfig.avatar) {
+    //     return basicBusinessConfig.avatar;
+    //   }
+    //   const url = 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png';
+    //   return url;
+    // }
+    return `${logoUrl}?timestamp=${uploadLogoTimestamp}`;
   }
 
   handlerSubmit = event => {
@@ -98,11 +102,39 @@ class BasicView extends PureComponent {
     });
   };
 
+  onFileChange = info => {
+    // if (info.file.status === 'removed') {
+    // }
+    if (info.file.status === 'uploading') {
+      console.log(info.file, info.fileList);
+      this.setState({ isUploading: true });
+    }
+    if (info.file.status !== 'uploading') {
+      console.log(info.file, info.fileList);
+      this.setState({ isUploading: false });
+    }
+    if (info.file.status === 'done') {
+      this.setState({ uploadLogoTimestamp: new Date().valueOf() });
+      message.success(`${info.file.name} 文件上传成功.`);
+    } else if (info.file.status === 'error') {
+      message.error(`${info.file.name} 文件上传失败.`);
+    }
+  };
+
   render() {
     const {
       form: { getFieldDecorator },
     } = this.props;
-    const { checkGroupOptions, allowLoginModes, defaultLoginMode } = this.state;
+    const { checkGroupOptions, allowLoginModes, defaultLoginMode, isUploading } = this.state;
+    const uploadProps = {
+      name: 'file',
+      action: '/api/businessConfig/logo',
+      headers: {
+        enctype: 'multipart/form-data',
+        wgToken: getToken(),
+      },
+      onChange: this.onFileChange,
+    };
 
     return (
       <div className={styles.baseView} ref={this.getViewDom}>
@@ -135,7 +167,11 @@ class BasicView extends PureComponent {
           </Form>
         </div>
         <div className={styles.right}>
-          <AvatarView avatar={this.getAvatarURL()} />
+          <AvatarView
+            avatar={this.getAvatarURL()}
+            uploadProps={uploadProps}
+            isUploading={isUploading}
+          />
         </div>
       </div>
     );
