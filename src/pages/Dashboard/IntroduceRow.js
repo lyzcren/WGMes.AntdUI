@@ -19,14 +19,10 @@ const topColResponsiveProps = {
 };
 
 const IntroduceRow = memo(
-  ({ loading, visitData, workshops, onTabChange }) =>
+  ({ loading, workshops, onTabChange }) =>
     workshops && (
       <Tabs style={{ marginTop: -23 }} onChange={onTabChange}>
         {workshops.map(workshop => {
-          const percent =
-            workshop.totalProducedQty === 0
-              ? 0
-              : (workshop.totalPassQty / workshop.totalProducedQty) * 100;
           return (
             <TabPane tab={workshop.fName} key={workshop.fItemID}>
               <Row gutter={24}>
@@ -49,14 +45,7 @@ const IntroduceRow = memo(
                     }
                     contentHeight={46}
                   >
-                    <Trend flag="up" style={{ marginRight: 16 }}>
-                      周同比
-                      <span className={styles.trendText}>--%</span>
-                    </Trend>
-                    <Trend flag="down">
-                      日同比
-                      <span className={styles.trendText}>--%</span>
-                    </Trend>
+                    <MiniBar data={workshop.inputData} />
                   </ChartCard>
                 </Col>
                 <Col {...topColResponsiveProps}>
@@ -69,16 +58,16 @@ const IntroduceRow = memo(
                         <Icon type="info-circle-o" />
                       </Tooltip>
                     }
-                    total={`${numeral(workshop.totalProducedQty).format('0,0')}`}
+                    total={`${numeral(workshop.totalBeginQty).format('0,0')}`}
                     footer={
                       <Field
                         label="今日开工数量"
-                        value={`${numeral(workshop.todayProducedQty).format('0,0')}`}
+                        value={`${numeral(workshop.todayBeginQty).format('0,0')}`}
                       />
                     }
                     contentHeight={46}
                   >
-                    <MiniBar data={visitData} />
+                    <MiniBar data={workshop.beginData} />
                   </ChartCard>
                 </Col>
                 <Col {...topColResponsiveProps}>
@@ -100,7 +89,7 @@ const IntroduceRow = memo(
                     }
                     contentHeight={46}
                   >
-                    <MiniArea color="#975FE4" data={visitData} />
+                    <MiniArea color="#975FE4" data={workshop.passData} />
                   </ChartCard>
                 </Col>
                 <Col {...topColResponsiveProps}>
@@ -113,22 +102,21 @@ const IntroduceRow = memo(
                         <Icon type="info-circle-o" />
                       </Tooltip>
                     }
-                    total={`${numeral(percent).format('0,0')}% `}
+                    total={`${numeral(workshop.totalPassRate * 100).format('0,0')}% `}
                     footer={
-                      <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-                        <Trend flag="up" style={{ marginRight: 16 }}>
-                          周同比
-                          <span className={styles.trendText}>--%</span>
-                        </Trend>
-                        <Trend flag="down">
-                          日同比
-                          <span className={styles.trendText}>--%</span>
-                        </Trend>
-                      </div>
+                      <Field
+                        label="今日一次良率"
+                        value={`${numeral(workshop.todayPassRate * 100).format('0,0')}% `}
+                      />
                     }
                     contentHeight={46}
                   >
-                    <MiniProgress percent={percent} strokeWidth={8} target={80} color="#13C2C2" />
+                    <MiniProgress
+                      percent={workshop.todayPassRate * 100.0}
+                      strokeWidth={8}
+                      target={80}
+                      color="#13C2C2"
+                    />
                   </ChartCard>
                 </Col>
               </Row>

@@ -9,7 +9,7 @@ import styles from './Analysis.less';
 import PageLoading from '@/components/PageLoading';
 
 const IntroduceRow = React.lazy(() => import('./IntroduceRow'));
-const SalesCard = React.lazy(() => import('./SalesCard'));
+const ProduceCard = React.lazy(() => import('./ProduceCard'));
 const TopSearch = React.lazy(() => import('./TopSearch'));
 const ProportionSales = React.lazy(() => import('./ProportionSales'));
 const OfflineData = React.lazy(() => import('./OfflineData'));
@@ -105,25 +105,7 @@ class Analysis extends Component {
   render() {
     const { workShopId, rangePickerValue, salesType, currentTabKey } = this.state;
     const { chart, loading } = this.props;
-    const {
-      workshops,
-      processes,
-      visitData,
-      visitData2,
-      salesData,
-      searchData,
-      offlineData,
-      offlineChartData,
-      salesTypeData,
-      salesTypeDataOnline,
-      salesTypeDataOffline,
-    } = chart;
-    let salesPieData;
-    if (salesType === 'all') {
-      salesPieData = salesTypeData;
-    } else {
-      salesPieData = salesType === 'online' ? salesTypeDataOnline : salesTypeDataOffline;
-    }
+    const { workshops, processes, producesData, offlineData, offlineChartData } = chart;
     const filterProcesses = !processes
       ? []
       : processes.filter(x => workShopId <= 0 || x.fWorkShop === workShopId * 1);
@@ -136,15 +118,14 @@ class Analysis extends Component {
           <IntroduceRow
             loading={loading}
             workshops={workshops}
-            visitData={visitData}
             onTabChange={this.handleWorkShopChange}
           />
         </Suspense>
         <Suspense fallback={null}>
-          <SalesCard
+          <ProduceCard
             processes={filterProcesses}
             rangePickerValue={rangePickerValue}
-            salesData={salesData}
+            producesData={producesData}
             isActive={this.isActive}
             handleRangePickerChange={this.handleRangePickerChange}
             loading={loading}

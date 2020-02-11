@@ -31,18 +31,18 @@ const passRateListData = [
   { x: '12月', y: 98 },
 ];
 
-const SalesCard = memo(
+const ProduceCard = memo(
   ({
     processes,
     rangePickerValue,
-    salesData,
+    producesData,
     isActive,
     handleRangePickerChange,
     loading,
     selectDate,
   }) => (
     <Card loading={loading} bordered={false} bodyStyle={{ padding: 0 }}>
-      <div className={styles.salesCard}>
+      <div className={styles.produceCard}>
         <Tabs
           tabBarExtraContent={
             <div className={styles.salesExtraWrap}>
@@ -75,7 +75,7 @@ const SalesCard = memo(
               <Row>
                 <Col xl={16} lg={12} md={12} sm={24} xs={24}>
                   <div className={styles.salesBar}>
-                    <Bar height={250} title="产量" data={salesData} />
+                    <Bar height={250} title="产量" data={producesData} />
                     <Bar
                       color="rgba(24, 205, 104, 0.85)"
                       scale={{ x: { type: 'cat' }, y: { min: 60 } }}
@@ -116,4 +116,4 @@ const SalesCard = memo(
   )
 );
 
-export default SalesCard;
+export default ProduceCard;

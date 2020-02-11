@@ -9,7 +9,7 @@ const ProportionSales = memo(
   ({ dropdownGroup, salesType, loading, salesPieData, handleChangeSalesType }) => (
     <Card
       loading={loading}
-      className={styles.salesCard}
+      className={styles.produceCard}
       bordered={false}
       title={
         <FormattedMessage

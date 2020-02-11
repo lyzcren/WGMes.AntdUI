@@ -817,9 +817,8 @@ class TableList extends PureComponent {
       );
     }
     if (
-      !record.fCancellation &&
-      (record.fRecordStatusNumber === 'ManufProducing' ||
-        record.fCurrentRecordStatusNumber === 'ManufProducing')
+      (!record.fCancellation && record.fRecordStatusNumber === 'ManufProducing') ||
+      (!record.fRecordStatusNumber && record.fCurrentRecordStatusNumber === 'ManufProducing')
     ) {
       operators.push(
         <Authorized key="transfer" authority="Flow_Transfer">
