@@ -21,9 +21,9 @@ for (let i = 0; i < fakeY2.length; i += 1) {
   });
 }
 
-const producesData = [];
+const produceData = [];
 for (let i = 0; i < 12; i += 1) {
-  producesData.push({
+  produceData.push({
     x: `${i + 1}月`,
     y: Math.floor(Math.random() * 1000) + 200,
   });
@@ -181,7 +181,7 @@ radarOriginData.forEach(item => {
 const getFakeChartData = {
   visitData,
   visitData2,
-  producesData,
+  produceData,
   searchData,
   offlineData,
   offlineChartData,

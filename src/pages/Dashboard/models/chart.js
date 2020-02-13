@@ -1,5 +1,4 @@
-import { fakeChartData } from '@/services/api';
-import { fakeAnalysis } from '@/services/Chart/Analysis';
+import { fakeAnalysis, fakeChartData } from '@/services/Chart/Analysis';
 
 export default {
   namespace: 'chart',
@@ -9,15 +8,9 @@ export default {
     processes: [],
     visitData: [],
     visitData2: [],
-    producesData: [],
-    searchData: [],
-    offlineData: [],
-    offlineChartData: [],
-    salesTypeData: [],
-    salesTypeDataOnline: [],
-    salesTypeDataOffline: [],
-    radarData: [],
-    loading: false,
+    produceData: [],
+    passRateData: [],
+    topProduces: [],
   },
 
   effects: {
@@ -26,20 +19,6 @@ export default {
       const response = {
         workshops: workshops.workshops,
         processes: workshops.processes,
-        producesData: [
-          { x: '1月', y: 942 },
-          { x: '2月', y: 703 },
-          { x: '3月', y: 797 },
-          { x: '4月', y: 781 },
-          { x: '5月', y: 344 },
-          { x: '6月', y: 735 },
-          { x: '7月', y: 544 },
-          { x: '8月', y: 962 },
-          { x: '9月', y: 775 },
-          { x: '10月', y: 1001 },
-          { x: '11月', y: 497 },
-          { x: '12月', y: 612 },
-        ],
       };
       // console.log(response);
       yield put({
@@ -47,14 +26,20 @@ export default {
         payload: response,
       });
     },
-    *fetchSalesData(_, { call, put }) {
-      console.log('fetchSalesData');
-      const response = yield call(fakeChartData);
+    *fetchSalesData({ payload }, { call, put }) {
+      const { beginDate, endDate } = payload;
+      const response = yield call(fakeChartData, {
+        ...payload,
+        beginDate: beginDate.format('YYYY-MM-DD'),
+        endDate: endDate.format('YYYY-MM-DD'),
+      });
       console.log(response);
       yield put({
         type: 'save',
         payload: {
-          producesData: response.producesData,
+          produceData: response.produceData,
+          passRateData: response.passRateData,
+          topProduces: response.topProduces,
         },
       });
     },
@@ -69,16 +54,13 @@ export default {
     },
     clear() {
       return {
+        workshops: [],
+        processes: [],
         visitData: [],
         visitData2: [],
-        producesData: [],
-        searchData: [],
-        offlineData: [],
-        offlineChartData: [],
-        salesTypeData: [],
-        salesTypeDataOnline: [],
-        salesTypeDataOffline: [],
-        radarData: [],
+        produceData: [],
+        passRateData: [],
+        topProduces: [],
       };
     },
   },

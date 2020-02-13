@@ -20,10 +20,10 @@ const OfflineData = React.lazy(() => import('./OfflineData'));
 }))
 class Analysis extends Component {
   state = {
-    workShopId: 0,
-    salesType: 'all',
-    currentTabKey: '',
-    rangePickerValue: getTimeDistance('year'),
+    workshop: {},
+    processes: [],
+    deptId: 0,
+    rangePickerValue: getTimeDistance('month'),
   };
 
   componentDidMount() {
@@ -35,7 +35,13 @@ class Analysis extends Component {
         const {
           chart: { workshops },
         } = this.props;
-        this.setState({ workShopId: workshops && workshops[0] ? workshops[0].fItemID : 0 });
+        const workshop = workshops ? workshops[0] : {};
+        const processes = workshop.processes || [];
+        this.setState({ workshop: workshop, processes });
+        // 统计行加载完成后，默认条件加载产量图表
+        if (processes.length > 0) {
+          this.handleProcessChange(processes[0].fItemID);
+        }
       });
     });
   }
@@ -49,41 +55,49 @@ class Analysis extends Component {
     clearTimeout(this.timeoutId);
   }
 
-  handleChangeSalesType = e => {
-    this.setState({
-      salesType: e.target.value,
-    });
-  };
-
-  handleTabChange = key => {
-    this.setState({
-      currentTabKey: key,
-    });
-  };
-
   handleRangePickerChange = rangePickerValue => {
     const { dispatch } = this.props;
+    const { deptId } = this.state;
     this.setState({
       rangePickerValue,
     });
 
     dispatch({
       type: 'chart/fetchSalesData',
+      payload: { deptId, beginDate: rangePickerValue[0], endDate: rangePickerValue[1] },
     });
   };
 
   handleWorkShopChange = workShopId => {
-    this.setState({ workShopId });
+    const {
+      chart: { workshops },
+    } = this.props;
+    const workshop = workshops.find(x => x.fItemID == workShopId);
+    const { processes } = workshop;
+    this.setState({ workshop, processes });
+  };
+
+  handleProcessChange = deptId => {
+    const { dispatch } = this.props;
+    const { rangePickerValue } = this.state;
+    this.setState({ deptId });
+    dispatch({
+      type: 'chart/fetchSalesData',
+      payload: { deptId, beginDate: rangePickerValue[0], endDate: rangePickerValue[1] },
+    });
   };
 
   selectDate = type => {
     const { dispatch } = this.props;
+    const { deptId } = this.state;
+    const rangePickerValue = getTimeDistance(type);
     this.setState({
-      rangePickerValue: getTimeDistance(type),
+      rangePickerValue,
     });
 
     dispatch({
       type: 'chart/fetchSalesData',
+      payload: { deptId, beginDate: rangePickerValue[0], endDate: rangePickerValue[1] },
     });
   };
 
@@ -103,14 +117,9 @@ class Analysis extends Component {
   };
 
   render() {
-    const { workShopId, rangePickerValue, salesType, currentTabKey } = this.state;
+    const { workshop, processes, rangePickerValue } = this.state;
     const { chart, loading } = this.props;
-    const { workshops, processes, producesData, offlineData, offlineChartData } = chart;
-    const filterProcesses = !processes
-      ? []
-      : processes.filter(x => workShopId <= 0 || x.fWorkShop === workShopId * 1);
-
-    const activeKey = currentTabKey || (offlineData[0] && offlineData[0].name);
+    const { workshops, produceData, passRateData, topProduces } = chart;
 
     return (
       <GridContent>
@@ -123,24 +132,18 @@ class Analysis extends Component {
         </Suspense>
         <Suspense fallback={null}>
           <ProduceCard
-            processes={filterProcesses}
+            processes={processes}
             rangePickerValue={rangePickerValue}
-            producesData={producesData}
+            produceData={produceData}
+            passRateData={passRateData}
+            topProduces={topProduces}
             isActive={this.isActive}
             handleRangePickerChange={this.handleRangePickerChange}
             loading={loading}
             selectDate={this.selectDate}
+            onTabChange={this.handleProcessChange}
           />
         </Suspense>
-        {/* <Suspense fallback={null}>
-          <OfflineData
-            activeKey={activeKey}
-            loading={loading}
-            offlineData={offlineData}
-            offlineChartData={offlineChartData}
-            handleTabChange={this.handleTabChange}
-          />
-        </Suspense> */}
       </GridContent>
     );
   }

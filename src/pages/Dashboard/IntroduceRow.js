@@ -112,7 +112,7 @@ const IntroduceRow = memo(
                     contentHeight={46}
                   >
                     <MiniProgress
-                      percent={workshop.todayPassRate * 100.0}
+                      percent={workshop.totalPassRate * 100.0}
                       strokeWidth={8}
                       target={80}
                       color="#13C2C2"
