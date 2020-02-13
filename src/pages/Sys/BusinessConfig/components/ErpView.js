@@ -35,7 +35,7 @@ class ErpView extends PureComponent {
     });
   }
 
-  handlerSubmit = event => {
+  handleSubmit = event => {
     event.preventDefault();
     const { form, dispatch } = this.props;
     form.validateFields((err, fieldsValue) => {
@@ -63,7 +63,6 @@ class ErpView extends PureComponent {
       erpTypes,
     } = this.props;
     const { erpType, erpConnectionString, moSyncSql } = this.state;
-    console.log(erpTypes);
 
     return (
       <div className={styles.baseView} ref={this.getViewDom}>
@@ -95,7 +94,7 @@ class ErpView extends PureComponent {
                 initialValue: moSyncSql,
               })(<TextArea style={{ minHeight: 250 }} placeholder="请输入生产任务单同步SQL" />)}
             </FormItem>
-            <Button type="primary" onClick={this.handlerSubmit}>
+            <Button type="primary" onClick={this.handleSubmit}>
               保存修改
             </Button>
           </Form>

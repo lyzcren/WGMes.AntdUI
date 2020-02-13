@@ -80,7 +80,7 @@ class BasicView extends PureComponent {
     return `${logoUrl}?timestamp=${uploadLogoTimestamp}`;
   }
 
-  handlerSubmit = event => {
+  handleSubmit = event => {
     event.preventDefault();
     const { form, dispatch } = this.props;
     form.validateFields((err, fieldsValue) => {
@@ -161,7 +161,7 @@ class BasicView extends PureComponent {
                 </Select>
               )}
             </FormItem>
-            <Button type="primary" onClick={this.handlerSubmit}>
+            <Button type="primary" onClick={this.handleSubmit}>
               保存修改
             </Button>
           </Form>

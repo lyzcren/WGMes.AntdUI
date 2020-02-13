@@ -1,6 +1,6 @@
 import { queryNotices } from '@/services/api';
 import { routerRedux } from 'dva/router';
-import { fakeFetchBasic, fakeFetchSync } from '@/services/Sys/BusinessConfig';
+import { fakeFetchBasic, fakeFetchSync, fakeFetchInv } from '@/services/Sys/BusinessConfig';
 import { modeValueMaps } from '@/utils/GlobalConst';
 
 export default {
@@ -13,6 +13,7 @@ export default {
     isFullScreen: false,
     basicBusinessConfig: { allowLoginModes: ['account', 'idcard'], defaultLoginMode: 'account' },
     syncBusinessConfig: {},
+    invBusinessConfig: {},
   },
 
   effects: {
@@ -131,6 +132,19 @@ export default {
       });
       return configs;
     },
+    *fetchInvBusinessConfig(_, { call, put }) {
+      const response = yield call(fakeFetchInv);
+      let configs = {};
+      response.forEach(item => {
+        const { fNumber, fValue } = item;
+        configs[fNumber] = fValue;
+      });
+      yield put({
+        type: 'saveInvBusinessConfig',
+        payload: { ...configs },
+      });
+      return configs;
+    },
     *fullScreen({ payload }, { put }) {
       const { isFullScreen } = payload;
       yield put({
@@ -157,6 +171,12 @@ export default {
       return {
         ...state,
         syncBusinessConfig: payload,
+      };
+    },
+    saveInvBusinessConfig(state, { payload }) {
+      return {
+        ...state,
+        invBusinessConfig: payload,
       };
     },
     changeLayoutCollapsed(state, { payload }) {

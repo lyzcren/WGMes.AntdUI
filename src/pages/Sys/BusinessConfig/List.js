@@ -7,6 +7,7 @@ import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import BasicView from './components/BasicView';
 import ErpView from './components/ErpView';
 import FieldsView from './components/FieldsView';
+import InvView from './components/InvView';
 
 import styles from './List.less';
 
@@ -23,6 +24,7 @@ class TableList extends PureComponent {
     menuMap: {
       basic: '基础设置',
       erp: '同步设置',
+      inv: '库存设置',
       fields: '自定义字段',
     },
   };
@@ -50,6 +52,8 @@ class TableList extends PureComponent {
         return <BasicView />;
       case 'erp':
         return <ErpView />;
+      case 'inv':
+        return <InvView />;
       case 'fields':
         return <FieldsView />;
       default:

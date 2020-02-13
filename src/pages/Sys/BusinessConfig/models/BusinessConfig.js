@@ -1,4 +1,5 @@
-import { fakeUpdateBasic, fakeUpdateSync } from '@/services/Sys/BusinessConfig';
+import { fakeUpdateBasic, fakeUpdateSync, fakeUpdateInv } from '@/services/Sys/BusinessConfig';
+import { fakeKeyValues } from '@/services/basicData';
 import { modeValueMaps } from '@/utils/GlobalConst';
 
 export default {
@@ -6,6 +7,7 @@ export default {
 
   state: {
     defaultLoginMode: 'idCard',
+    invTypes: [],
   },
 
   effects: {
@@ -27,11 +29,27 @@ export default {
       });
       return response;
     },
-    *updateSync({ payload }, { call, put, select }) {
+    *updateSync({ payload }, { call, put }) {
       const response = yield call(fakeUpdateSync, payload);
       yield put({
         type: 'save',
         payload: { ...payload },
+      });
+      return response;
+    },
+    *updateInv({ payload }, { call, put }) {
+      const response = yield call(fakeUpdateInv, payload);
+      yield put({
+        type: 'save',
+        payload: { ...payload },
+      });
+      return response;
+    },
+    *getInvTypes(_, { call, put }) {
+      const response = yield call(fakeKeyValues, 'invType');
+      yield put({
+        type: 'save',
+        payload: { invTypes: response },
       });
       return response;
     },
