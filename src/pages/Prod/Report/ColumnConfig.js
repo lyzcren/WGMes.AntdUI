@@ -12,6 +12,12 @@ class ColumnConfig {
       sorter: true,
     },
     {
+      title: '状态',
+      dataIndex: 'fStatusName',
+      width: 150,
+      sorter: true,
+    },
+    {
       title: '创建人',
       dataIndex: 'fCreatorName',
       width: 220,
@@ -45,7 +51,7 @@ class ColumnConfig {
     {
       title: '操作',
       dataIndex: 'operators',
-      width: 220,
+      width: 240,
       render: (text, record) => this.renderOperation(text, record),
     },
   ];

@@ -41,6 +41,7 @@ const ButtonGroup = Button.Group;
   reportCreate,
   reportScan,
   loading: loading.models.reportCreate,
+  loadingDetail: loading.effects['reportCreate/scan'],
   menu,
   basicData,
 }))
@@ -50,7 +51,6 @@ class Create extends PureComponent {
     scanVisible: true,
     fBillNo: '',
     fComments: '',
-    details: [],
   };
 
   componentDidMount() {
@@ -65,22 +65,33 @@ class Create extends PureComponent {
       type: 'basicData/getBillNo',
       payload: { fNumber: 'Report' },
     });
-    dispatch({
-      type: 'reportManage/fetchGroupBy',
-    });
   }
 
   handleDetailRowChange({ fEntryID }, field, value) {
-    const { details } = this.state;
+    const {
+      dispatch,
+      reportCreate: { details },
+    } = this.props;
     const findItem = details.find(x => x.fEntryID === fEntryID);
     findItem[field] = value;
-    this.setState({ details });
+
+    dispatch({
+      type: 'reportCreate/changeDetails',
+      payload: { details },
+    });
   }
 
   handleDeleteRow(record) {
-    const { fDefectInvID } = record;
-    const { details } = this.state;
-    this.setState({ details: details.filter(x => x.fDefectInvID !== fDefectInvID) });
+    const {
+      dispatch,
+      reportCreate: { details },
+    } = this.props;
+    const newDetails = details.filter(x => x.fInterID !== record.fInterID);
+
+    dispatch({
+      type: 'reportCreate/changeDetails',
+      payload: { details: newDetails },
+    });
   }
 
   showScan(flag) {
@@ -92,44 +103,28 @@ class Create extends PureComponent {
   handleScan = batchNo => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'reportScan/scan',
+      type: 'reportCreate/scan',
       payload: {
         batchNo,
       },
-    }).then(() => this.afterScan(batchNo));
-  };
-
-  afterScan = batchNo => {
-    const {
-      reportScan: { data },
-    } = this.props;
-    if (!data) {
-      message.error(`未找到流程单【${batchNo}】.`);
-    } else {
-      const { fStatusNumber } = data;
-      // 判断是否可签收
-      if (fStatusNumber !== 'EndProduce') {
-        message.info('当前流程单不可汇报.');
-      } else {
-        const { details } = this.state;
-        if (!details.find(x => x.fInterID === data.fInterID)) {
-          details.push(data);
-          this.setState({ details });
-        } else {
-          message.info('重复扫描.');
-        }
+    }).then(data => {
+      if (!data) {
+        message.error(`未找到库存信息.`);
       }
-    }
+    });
   };
 
   save(bCheck) {
-    const { form, dispatch, handleSuccess } = this.props;
-    const { details } = this.state;
+    const {
+      form,
+      dispatch,
+      handleSuccess,
+      reportCreate: { details },
+    } = this.props;
     form.validateFieldsAndScroll((err, fieldsValue) => {
       if (err) return;
 
       const payload = {
-        fGroupBy: fieldsValue.fGroupBy,
         fComments: fieldsValue.fComments,
         details,
       };
@@ -137,41 +132,42 @@ class Create extends PureComponent {
       dispatch({
         type: 'reportCreate/add',
         payload,
-      }).then(() => {
-        const {
-          reportCreate: { queryResult },
-        } = this.props;
-        const { model } = queryResult;
-
-        this.showResult(queryResult, () => {
-          message.success(`新建汇报单成功.单号：${model.fBillNo}`);
-          if (bCheck) {
-            dispatch({
-              type: 'reportManage/check',
-              payload: { fInterID: model.fInterID },
-            }).then(() => {
-              const checkResult = this.props.reportManage.queryResult;
-              this.showResult(checkResult, () => {
-                message.success(`【${model.fBillNo}】` + `审核成功`);
+      })
+        .then(queryResult => {
+          const { status, model } = queryResult;
+          if (status === 'ok') {
+            message.success(`新建汇报单成功.单号：${model.fBillNo}`);
+            if (bCheck) {
+              return dispatch({
+                type: 'reportManage/check',
+                payload: { fInterID: model.fInterID },
               });
-            });
+            }
+          } else {
+            this.showResult(queryResult);
           }
+        })
+        .then(queryResult => {
+          if (!queryResult) return;
+          if (status === 'ok') {
+            message.success(`审核成功`);
+          } else {
+            this.showResult(queryResult);
+          }
+        })
+        .then(() => {
           this.close();
           // 成功后再次刷新列表
           if (handleSuccess) handleSuccess();
         });
-      });
     });
   }
 
-  showResult(queryResult, successCallback) {
+  showResult(queryResult) {
     const { status, message, model } = queryResult;
 
     if (status === 'ok') {
-      if (successCallback) successCallback(model);
-      else {
-        message.success(message);
-      }
+      message.success(message);
     } else if (status === 'warning') {
       message.warning(message);
     } else {
@@ -192,11 +188,10 @@ class Create extends PureComponent {
       dispatch,
       basicData: { billNo, processDeptTree },
       loading,
+      loadingDetail,
       form: { getFieldDecorator },
-      reportManage: { groupBys },
+      reportCreate: { details },
     } = this.props;
-
-    const { fComments, details } = this.state;
 
     const action = (
       <Fragment>
@@ -220,6 +215,10 @@ class Create extends PureComponent {
 
     const columns = [
       {
+        title: '任务单号',
+        dataIndex: 'fMoBillNo',
+      },
+      {
         title: '批号',
         dataIndex: 'fFullBatchNo',
       },
@@ -236,16 +235,31 @@ class Create extends PureComponent {
         dataIndex: 'fProductModel',
       },
       {
-        title: '任务单号',
-        dataIndex: 'fMoBillNo',
+        title: '可汇报数量',
+        dataIndex: 'fUnReportQty',
+      },
+      {
+        title: '汇报数量',
+        dataIndex: 'fReportingQty',
+        render: (val, record) => (
+          <FormItem style={{ marginBottom: 0 }}>
+            {getFieldDecorator(`fReportingQty_${record.fInterID}`, {
+              initialValue: record.fUnReportQty,
+            })(
+              <InputNumber
+                max={record.fUnReportQty}
+                min={0}
+                onChange={value => {
+                  this.handleDetailRowChange(record, 'fReportingQty', value);
+                }}
+              />
+            )}
+          </FormItem>
+        ),
       },
       {
         title: '单位',
         dataIndex: 'fUnitName',
-      },
-      {
-        title: '数量',
-        dataIndex: 'fCurrentPassQty',
       },
       {
         title: '备注',
@@ -287,30 +301,8 @@ class Create extends PureComponent {
         wrapperClassName={styles.advancedForm}
         loading={loading}
       >
-        <Card title="基础信息" style={{ marginBottom: 24 }} bordered={false}>
-          <Form layout="vertical">
-            <Row gutter={16}>
-              <Col lg={6} md={12} sm={24}>
-                <FormItem key="fGroupBy" label="汇报明细分组">
-                  {getFieldDecorator('fGroupBy', {
-                    rules: [{ required: true, message: '请选择分组' }],
-                  })(
-                    <Select placeholder="请选择分组">
-                      {groupBys &&
-                        groupBys.map(x => (
-                          <Option key={x.fKey} value={x.fKey}>
-                            {x.fValue}
-                          </Option>
-                        ))}
-                    </Select>
-                  )}
-                </FormItem>
-              </Col>
-            </Row>
-          </Form>
-        </Card>
         <Card title="明细信息" style={{ marginBottom: 24 }} bordered={false}>
-          <Table rowKey="fEntryID" loading={loading} columns={columns} dataSource={details} />
+          <Table rowKey="fInterID" loading={loadingDetail} columns={columns} dataSource={details} />
         </Card>
         <Card title="备注信息" bordered={false}>
           <Form layout="vertical">
@@ -328,6 +320,7 @@ class Create extends PureComponent {
           handleModalVisible={flag => this.showScan(flag)}
           modalVisible={this.state.scanVisible}
           handleScan={this.handleScan}
+          loading={loadingDetail}
         />
       </WgPageHeaderWrapper>
     );

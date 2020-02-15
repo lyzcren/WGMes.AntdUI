@@ -603,7 +603,7 @@ class TableList extends PureComponent {
       },
       {
         title: '数量',
-        dataIndex: 'fPassQty',
+        dataIndex: 'fReportingQty',
       },
       {
         title: '备注',

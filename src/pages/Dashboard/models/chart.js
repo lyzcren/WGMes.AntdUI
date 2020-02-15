@@ -33,7 +33,7 @@ export default {
         beginDate: beginDate.format('YYYY-MM-DD'),
         endDate: endDate.format('YYYY-MM-DD'),
       });
-      console.log(response);
+      // console.log(response);
       yield put({
         type: 'save',
         payload: {

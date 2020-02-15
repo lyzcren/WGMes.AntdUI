@@ -13,7 +13,7 @@ class FieldsView extends PureComponent {
     const {} = this.props;
     const { selectKey } = this.state;
 
-    return <GridContent />;
+    return <GridContent>Coming Soon</GridContent>;
   }
 }
 

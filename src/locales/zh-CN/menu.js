@@ -45,6 +45,7 @@ export default {
   'menu.prod.flow.profile': '流程单详情',
   'menu.prod.flow.transfer': '流程单转序',
   'menu.prod.inv': '在制品库存',
+  'menu.prod.passInv': '待汇报库存',
   'menu.prod.defect': '不良品库存',
   'menu.prod.invCheck': '在制品盘点',
   'menu.prod.invCheck.create': '新增在制品盘点',

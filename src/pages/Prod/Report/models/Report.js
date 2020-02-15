@@ -59,13 +59,6 @@ export default {
         payload: { queryResult: response },
       });
     },
-    *fetchGroupBy({ payload }, { call, put }) {
-      const response = yield call(fakeQueryGroupBy, payload);
-      yield put({
-        type: 'save',
-        payload: { groupBys: response },
-      });
-    },
     *getPrintTemplates({ payload }, { call, put }) {
       const response = yield call(fakeQueryPrintTemplate, { number: 'prodReport' });
       yield put({

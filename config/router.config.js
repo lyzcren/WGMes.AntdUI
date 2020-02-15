@@ -125,6 +125,12 @@ export default [
             authority: ['Inv_Read'],
           },
           {
+            path: '/prod/passInv',
+            name: 'passInv',
+            component: './Prod/PassInv/List',
+            authority: ['PassInv_Read'],
+          },
+          {
             path: '/prod/defect',
             name: 'defect',
             component: './Prod/Defect/List',

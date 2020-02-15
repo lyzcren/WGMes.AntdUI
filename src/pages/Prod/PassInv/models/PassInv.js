@@ -1,20 +1,23 @@
-import { fakeScan } from '@/services/Prod/Report';
+import { fakeQuery } from '@/services/Prod/PassInv';
 
 export default {
-  namespace: 'reportScan',
+  namespace: 'passInvManage',
 
   state: {
-    data: {},
+    data: {
+      list: [],
+      pagination: {},
+    },
   },
 
   effects: {
-    *scan({ payload }, { call, put }) {
-      const response = yield call(fakeScan, payload.batchNo);
+    *fetch({ payload }, { call, put }) {
+      const response = yield call(fakeQuery, payload);
+      // console.log(response);
       yield put({
         type: 'save',
         payload: { data: response },
       });
-      return response;
     },
   },
 

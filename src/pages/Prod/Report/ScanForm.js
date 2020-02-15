@@ -7,11 +7,6 @@ import styles from './ScanForm.less';
 const FormItem = Form.Item;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ loading, menu }) => ({
-  loading: loading.models.report,
-  menu,
-}))
-/* eslint react/no-multi-comp:0 */
 @Form.create()
 export class ScanForm extends PureComponent {
   static defaultProps = {};
@@ -55,7 +50,7 @@ export class ScanForm extends PureComponent {
     const footer = (
       <div>
         <Button
-          loading={false}
+          loading={loading}
           onClick={() => handleModalVisible(false)}
           prefixCls="ant-btn"
           ghost={false}
@@ -69,6 +64,7 @@ export class ScanForm extends PureComponent {
     return (
       <Modal
         destroyOnClose
+        loading={loading}
         title="扫描"
         visible={modalVisible}
         footer={footer}
