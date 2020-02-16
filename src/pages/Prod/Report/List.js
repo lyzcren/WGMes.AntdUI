@@ -146,6 +146,12 @@ class TableList extends PureComponent {
     const queryFilters = [];
     if (fieldsValue.queryBillNo)
       queryFilters.push({ name: 'fBillNo', compare: '%*%', value: fieldsValue.queryBillNo });
+    if (fieldsValue.queryMoRptBillNo)
+      queryFilters.push({
+        name: 'fMoRptBillNo',
+        compare: '%*%',
+        value: fieldsValue.queryMoRptBillNo,
+      });
 
     this.setState({
       formValues: values,
@@ -237,12 +243,12 @@ class TableList extends PureComponent {
       switch (e.key) {
         case 'currentPage':
           pagination.exportPage = true;
-          const fileName = `不良盘点-第${pagination.current}页.xls`;
+          const fileName = `生产任务汇报-第${pagination.current}页.xls`;
           exportExcel('/api/report/export', pagination, fileName);
           break;
         case 'allPage':
           pagination.exportPage = false;
-          exportExcel('/api/report/export', pagination, '不良盘点.xls');
+          exportExcel('/api/report/export', pagination, '生产任务汇报.xls');
           break;
         default:
           break;
@@ -329,9 +335,9 @@ class TableList extends PureComponent {
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
-        message.warning(queryResult.message);
+        message.warning(`【${record.fBillNo}】${  queryResult.message}`);
       } else {
-        message.error(queryResult.message);
+        message.error(`【${record.fBillNo}】${  queryResult.message}`);
       }
     });
   };
@@ -343,10 +349,7 @@ class TableList extends PureComponent {
       payload: {
         fInterID: record.fInterID,
       },
-    }).then(() => {
-      const {
-        reportManage: { queryResult },
-      } = this.props;
+    }).then(queryResult => {
       if (queryResult.status === 'ok') {
         message.success(`【${record.fBillNo}】` + `审核成功`);
         // 成功后再次刷新列表
@@ -360,18 +363,13 @@ class TableList extends PureComponent {
   };
 
   handleUnCheck = record => {
-    message.warning('功能开发中，程序猿们正在努力。');
-    return;
     const { dispatch } = this.props;
     dispatch({
       type: 'reportManage/uncheck',
       payload: {
         fInterID: record.fInterID,
       },
-    }).then(() => {
-      const {
-        reportManage: { queryResult },
-      } = this.props;
+    }).then(queryResult => {
       if (queryResult.status === 'ok') {
         message.success(`【${record.fBillNo}】` + `反审核成功`);
         // 成功后再次刷新列表
@@ -469,6 +467,11 @@ class TableList extends PureComponent {
           <Col md={6} sm={24}>
             <FormItem label="单号">
               {getFieldDecorator('queryBillNo')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={6} sm={24}>
+            <FormItem label="ERP汇报单号">
+              {getFieldDecorator('queryMoRptBillNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={6} sm={24}>
@@ -611,12 +614,7 @@ class TableList extends PureComponent {
       },
     ];
     return (
-      <Table
-        rowKey="fDefectInvID"
-        columns={columns}
-        dataSource={record.details}
-        pagination={false}
-      />
+      <Table rowKey="fInvID" columns={columns} dataSource={record.details} pagination={false} />
     );
   };
 

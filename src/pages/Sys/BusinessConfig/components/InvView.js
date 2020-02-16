@@ -65,7 +65,7 @@ class InvView extends PureComponent {
       <div className={styles.baseView} ref={this.getViewDom}>
         <div className={styles.left}>
           <Form layout="vertical" hideRequiredMark>
-            <FormItem label={'末岗位良品库存粒度'}>
+            <FormItem label="末岗位良品库存粒度">
               <div>
                 {getFieldDecorator(`invType`, {
                   rules: [{ required: true, message: '请选择良品库存粒度' }],
@@ -97,5 +97,5 @@ class InvView extends PureComponent {
 
 export default connect(({ global, businessConfig }) => ({
   global,
-  businessConfig: businessConfig,
+  businessConfig,
 }))(Form.create()(InvView));

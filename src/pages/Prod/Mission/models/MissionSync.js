@@ -21,6 +21,7 @@ export default {
         type: 'save',
         payload: { queryResult: response, isSyncing: true },
       });
+      return response;
     },
     *syncing({ payload }, { call, put }) {
       yield put({

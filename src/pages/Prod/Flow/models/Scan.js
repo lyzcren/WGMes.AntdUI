@@ -34,11 +34,7 @@ export default {
       } else {
         const { fStatusNumber, fRecordStatusNumber } = data;
         // 判断是否可签收
-        if (
-          fStatusNumber === 'Reported' ||
-          fStatusNumber === 'EndProduce' ||
-          fStatusNumber === 'NonProduced'
-        ) {
+        if (fStatusNumber === 'EndProduce' || fStatusNumber === 'NonProduced') {
           messageType = 'warning';
           message = '当前流程单已结束生产.';
         } else if (fRecordStatusNumber !== 'ManufProducing') {

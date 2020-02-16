@@ -54,17 +54,17 @@ export const GlobalConst = {
       badgeStatus: 'processing',
     },
     {
-      text: '待汇报',
+      text: '已完成',
       value: 2,
       number: 'EndProduce',
       badgeStatus: 'success',
     },
-    {
-      text: '已汇报',
-      value: 3,
-      number: 'Reported',
-      badgeStatus: 'success',
-    },
+    // {
+    //   text: '已汇报',
+    //   value: 3,
+    //   number: 'Reported',
+    //   badgeStatus: 'success',
+    // },
     {
       text: '无产出',
       value: 4,

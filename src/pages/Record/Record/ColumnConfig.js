@@ -2,6 +2,7 @@ import React, { Fragment } from 'react';
 import moment from 'moment';
 import numeral from 'numeral';
 import QRCode from 'qrcode.react';
+import WgIcon from '@/wg_components/WgIcon';
 import { Switch, Popconfirm, Divider, Badge, Tooltip } from 'antd';
 import Authorized from '@/utils/Authorized';
 
@@ -19,7 +20,13 @@ class ColumnConfig {
               placement="topLeft"
               title={<QRCode value={val} size={200} fgColor="#000000" />}
             >
-              <QRCode style={{ marginRight: '6px' }} value={val} size={19} fgColor="#666666" />
+              <WgIcon
+                style={{ marginRight: '6px' }}
+                type="barcode"
+                value={val}
+                size={19}
+                color="#666666"
+              />
             </Tooltip>
           )}
           <a onClick={() => this.profileVisible(record)}>{val}</a>

@@ -8,13 +8,14 @@ export default {
   },
 
   effects: {
-    *add({ payload }, { call, put }) {
-      const response = yield call(fakeAdd, payload);
-
+    *init({ _ }, { call, put }) {
       yield put({
         type: 'save',
-        payload: { queryResult: response || {} },
+        payload: { details: [] },
       });
+    },
+    *submit({ payload }, { call, put }) {
+      const response = yield call(fakeAdd, payload);
 
       return response;
     },
@@ -28,14 +29,21 @@ export default {
     *scan({ payload }, { call, put, select }) {
       const response = yield call(fakeScan, payload.batchNo);
       const details = yield select(state => state.reportCreate.details);
-      if (response && !details.find(x => x.fInterID === response.fInterID)) {
-        details.push(response);
+      if (response) {
+        // 设置默认汇报数量为可汇报数量
+        response.fReportingQty = response.fUnReportQty;
+        if (!details.find(x => x.fInterID === response.fInterID)) {
+          details.push(response);
+        }
+        yield put({
+          type: 'save',
+          payload: { details },
+        });
       }
-      yield put({
-        type: 'save',
-        payload: { details },
-      });
-      return response;
+      if (response) {
+        return { success: true };
+      }
+      return { success: false, message: '未找到待汇报库存' };
     },
   },
 

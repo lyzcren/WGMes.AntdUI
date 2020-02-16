@@ -12,12 +12,10 @@ const { TextArea } = Input;
 
 class ErpView extends PureComponent {
   static defaultProps = {
-    erpTypes: Object.keys(erpTypeMaps).map(item => {
-      return {
-        label: erpTypeMaps[item],
-        value: item,
-      };
-    }),
+    erpTypes: Object.keys(erpTypeMaps).map(item => ({
+      label: erpTypeMaps[item],
+      value: item,
+    })),
   };
 
   state = {
@@ -68,7 +66,7 @@ class ErpView extends PureComponent {
       <div className={styles.baseView} ref={this.getViewDom}>
         <div className={styles.left}>
           <Form layout="vertical" hideRequiredMark>
-            <FormItem label={'ERP类型'}>
+            <FormItem label="ERP类型">
               {getFieldDecorator(`erpType`, {
                 rules: [{ required: true, message: '请选择ERP类型' }],
                 initialValue: erpType,
@@ -106,5 +104,5 @@ class ErpView extends PureComponent {
 
 export default connect(({ global, businessConfig }) => ({
   global,
-  businessConfig: businessConfig,
+  businessConfig,
 }))(Form.create()(ErpView));

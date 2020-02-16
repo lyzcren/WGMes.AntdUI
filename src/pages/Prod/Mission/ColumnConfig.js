@@ -188,6 +188,11 @@ class ColumnConfig {
       width: 150,
     },
     {
+      title: '已汇报数量',
+      dataIndex: 'fReportedQty',
+      width: 150,
+    },
+    {
       title: '单位',
       dataIndex: 'FUnitName',
       width: 150,

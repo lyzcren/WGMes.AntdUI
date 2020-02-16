@@ -102,7 +102,7 @@ export default {
     },
     *fetchBasicBusinessConfig({}, { call, put }) {
       const response = yield call(fakeFetchBasic);
-      let configs = {};
+      const configs = {};
       response.forEach(item => {
         const { fNumber, fValue } = item;
         if (fNumber === 'allowLoginModes') {
@@ -121,7 +121,7 @@ export default {
     },
     *fetchSyncBusinessConfig({}, { call, put }) {
       const response = yield call(fakeFetchSync);
-      let configs = {};
+      const configs = {};
       response.forEach(item => {
         const { fNumber, fValue } = item;
         configs[fNumber] = fValue;
@@ -134,7 +134,7 @@ export default {
     },
     *fetchInvBusinessConfig(_, { call, put }) {
       const response = yield call(fakeFetchInv);
-      let configs = {};
+      const configs = {};
       response.forEach(item => {
         const { fNumber, fValue } = item;
         configs[fNumber] = fValue;

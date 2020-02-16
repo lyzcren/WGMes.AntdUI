@@ -13,9 +13,10 @@ export default {
   effects: {
     *updateBasic({ payload }, { call, put, select }) {
       const { allowLoginModes, defaultLoginMode } = payload;
-      const allowLoginModesValue = allowLoginModes.reduce((acc, cur) => {
-        return acc | modeValueMaps[cur];
-      }, 0);
+      const allowLoginModesValue = allowLoginModes.reduce(
+        (acc, cur) => acc | modeValueMaps[cur],
+        0
+      );
       const defaultLoginModeValue = modeValueMaps[defaultLoginMode];
       const newPayload = {
         ...payload,

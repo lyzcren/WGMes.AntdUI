@@ -305,6 +305,10 @@ class TableList extends PureComponent {
         fBeginDate: fieldsValue.fBeginDate ? fieldsValue.fBeginDate.format('YYYY-MM-DD') : null,
         fEndDate: fieldsValue.fEndDate ? fieldsValue.fEndDate.format('YYYY-MM-DD') : null,
       },
+    }).then(result => {
+      if (result.status === 'err') {
+        message.error(result.message);
+      }
     });
 
     setTimeout(() => {

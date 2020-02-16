@@ -19,7 +19,7 @@ import { getToken } from '@/utils/token';
 
 // import logo from '../assets/logo.svg';
 import { logoUrl } from '@/utils/GlobalConst';
-import styles from './BasicLayout.less';
+import styles from './WgBasicLayout.less';
 
 const { TabPane } = Tabs;
 

@@ -61,3 +61,13 @@ export async function fakeCheck(params) {
     },
   });
 }
+
+export async function fakeUncheck(params) {
+  return request(`/api/report/uncheck/${params.fInterID}`, {
+    method: 'PUT',
+    body: {
+      ...params,
+      method: 'update',
+    },
+  });
+}

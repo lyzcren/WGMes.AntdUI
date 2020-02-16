@@ -37,7 +37,7 @@ class Analysis extends Component {
         } = this.props;
         const workshop = workshops ? workshops[0] : {};
         const processes = workshop.processes || [];
-        this.setState({ workshop: workshop, processes });
+        this.setState({ workshop, processes });
         // 统计行加载完成后，默认条件加载产量图表
         if (processes.length > 0) {
           this.handleProcessChange(processes[0].fItemID);

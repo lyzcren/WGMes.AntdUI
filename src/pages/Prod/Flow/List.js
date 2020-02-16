@@ -782,16 +782,18 @@ class TableList extends PureComponent {
     if (record.fStatusNumber === 'Producing' && !record.fCancellation)
       menus.push(<Menu.Item key="split">分批</Menu.Item>);
     // 作废
-    if (record.fStatusNumber !== 'Reported' && !record.fCancellation)
-      menus.push(<Menu.Item key="cancel">作废</Menu.Item>);
+    if (!record.fCancellation) menus.push(<Menu.Item key="cancel">作废</Menu.Item>);
 
     const operators = [];
     if (
       record.fStatusNumber === 'BeforeProduce' ||
-      record.fRecordStatusNumber === 'ManufWait4Sign' ||
-      (record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufTransfered') ||
-      (record.fStatusNumber === 'Producing' && record.fRecordStatusNumber === 'ManufCancel') ||
-      record.fRecordStatusNumber === 'ManufRefund'
+      (record.fStatusNumber === 'Producing' &&
+        (record.fRecordStatusNumber === 'ManufWait4Sign' ||
+          record.fCurrentRecordStatusNumber === 'ManufWait4Sign' ||
+          record.fCurrentRecordStatusNumber === 'ManufTransfered' ||
+          record.fRecordStatusNumber === 'ManufTransfered' ||
+          record.fRecordStatusNumber === 'ManufCancel' ||
+          record.fRecordStatusNumber === 'ManufRefund'))
     ) {
       operators.push(
         <Authorized key="sign" authority="Flow_Sign">

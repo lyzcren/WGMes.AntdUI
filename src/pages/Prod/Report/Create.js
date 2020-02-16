@@ -49,23 +49,20 @@ const ButtonGroup = Button.Group;
 class Create extends PureComponent {
   state = {
     scanVisible: true,
-    fBillNo: '',
-    fComments: '',
   };
 
   componentDidMount() {
-    this.loadData();
-  }
-
-  componentDidUpdate(preProps) {}
-
-  loadData() {
     const { dispatch } = this.props;
     dispatch({
       type: 'basicData/getBillNo',
       payload: { fNumber: 'Report' },
     });
+    dispatch({
+      type: 'reportCreate/init',
+    });
   }
+
+  componentDidUpdate(preProps) {}
 
   handleDetailRowChange({ fEntryID }, field, value) {
     const {
@@ -107,9 +104,9 @@ class Create extends PureComponent {
       payload: {
         batchNo,
       },
-    }).then(data => {
-      if (!data) {
-        message.error(`未找到库存信息.`);
+    }).then(result => {
+      if (!result.success) {
+        message.warning(result.message);
       }
     });
   };
@@ -123,6 +120,10 @@ class Create extends PureComponent {
     } = this.props;
     form.validateFieldsAndScroll((err, fieldsValue) => {
       if (err) return;
+      if (details.length <= 0) {
+        message.warning(`未录入汇报明细，无法保存.`);
+        return;
+      }
 
       const payload = {
         fComments: fieldsValue.fComments,
@@ -130,7 +131,7 @@ class Create extends PureComponent {
       };
 
       dispatch({
-        type: 'reportCreate/add',
+        type: 'reportCreate/submit',
         payload,
       })
         .then(queryResult => {
@@ -149,6 +150,7 @@ class Create extends PureComponent {
         })
         .then(queryResult => {
           if (!queryResult) return;
+          const { status, model } = queryResult;
           if (status === 'ok') {
             message.success(`审核成功`);
           } else {
@@ -244,6 +246,7 @@ class Create extends PureComponent {
         render: (val, record) => (
           <FormItem style={{ marginBottom: 0 }}>
             {getFieldDecorator(`fReportingQty_${record.fInterID}`, {
+              rules: [{ required: true, message: '请输入投入数量' }],
               initialValue: record.fUnReportQty,
             })(
               <InputNumber

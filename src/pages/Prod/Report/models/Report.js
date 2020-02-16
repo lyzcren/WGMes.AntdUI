@@ -4,6 +4,7 @@ import {
   fakeAdd,
   fakeUpdate,
   fakeCheck,
+  fakeUncheck,
   fakeQueryGroupBy,
 } from '@/services/Prod/Report';
 import { fakeQueryPrintTemplate } from '@/services/Sys/PrintTemplate';
@@ -58,6 +59,17 @@ export default {
         type: 'save',
         payload: { queryResult: response },
       });
+
+      return response;
+    },
+    *uncheck({ payload }, { call, put }) {
+      const response = yield call(fakeUncheck, payload);
+      yield put({
+        type: 'save',
+        payload: { queryResult: response },
+      });
+
+      return response;
     },
     *getPrintTemplates({ payload }, { call, put }) {
       const response = yield call(fakeQueryPrintTemplate, { number: 'prodReport' });

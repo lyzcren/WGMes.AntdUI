@@ -21,7 +21,7 @@ const AvatarView = ({ avatar, uploadProps, isUploading }) => (
     <Upload showUploadList={false} {...uploadProps}>
       <div className={styles.button_view}>
         <Button loading={isUploading} disabled={isUploading}>
-          {!isUploading && <Icon type={'upload'} />}
+          {!isUploading && <Icon type="upload" />}
           更换Logo
         </Button>
       </div>
@@ -31,12 +31,10 @@ const AvatarView = ({ avatar, uploadProps, isUploading }) => (
 
 class BasicView extends PureComponent {
   state = {
-    checkGroupOptions: Object.keys(loginModeMaps).map(item => {
-      return {
-        label: loginModeMaps[item],
-        value: item,
-      };
-    }),
+    checkGroupOptions: Object.keys(loginModeMaps).map(item => ({
+      label: loginModeMaps[item],
+      value: item,
+    })),
     allowLoginModes: this.props.global.basicBusinessConfig.allowLoginModes,
     defaultLoginMode: this.props.global.basicBusinessConfig.defaultLoginMode,
     isUploading: false,
@@ -140,12 +138,12 @@ class BasicView extends PureComponent {
       <div className={styles.baseView} ref={this.getViewDom}>
         <div className={styles.left}>
           <Form layout="vertical" hideRequiredMark>
-            <FormItem label={'允许登录方式'}>
+            <FormItem label="允许登录方式">
               {getFieldDecorator(`allowLoginModes`, {
                 initialValue: allowLoginModes,
               })(<CheckboxGroup options={checkGroupOptions} onChange={this.onChange} />)}
             </FormItem>
-            <FormItem label={'默认登录方式'}>
+            <FormItem label="默认登录方式">
               {getFieldDecorator(`defaultLoginMode`, {
                 rules: [{ required: true, message: '请选择默认登录方式' }],
                 initialValue: defaultLoginMode,
@@ -180,5 +178,5 @@ class BasicView extends PureComponent {
 
 export default connect(({ global, businessConfig }) => ({
   global,
-  businessConfig: businessConfig,
+  businessConfig,
 }))(Form.create()(BasicView));

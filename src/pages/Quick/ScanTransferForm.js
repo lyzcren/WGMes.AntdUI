@@ -65,7 +65,7 @@ export class ScanTransferForm extends PureComponent {
         message.warning('未找到流程单');
       } else if (data.fCancellation) {
         message.warning('流程单已作废');
-      } else if (data.fStatusNumber === 'EndProduce' || data.fStatusNumber === 'Reported') {
+      } else if (data.fStatusNumber === 'EndProduce') {
         message.warning('流程单已完成');
       } else if (data.fStatusNumber === 'NonProduced') {
         message.warning('流程单无产出');

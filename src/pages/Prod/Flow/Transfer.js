@@ -579,7 +579,7 @@ class Transfer extends PureComponent {
                           onChange={val => this.handleFieldChange(val, d.fDefectID)}
                           style={{ width: '100%' }}
                           placeholder="请输入数量"
-                          min={Math.pow(0.1, defectQtyDecimal)}
+                          min={0}
                           step={Math.pow(0.1, defectQtyDecimal)}
                           precision={defectQtyDecimal}
                         />
