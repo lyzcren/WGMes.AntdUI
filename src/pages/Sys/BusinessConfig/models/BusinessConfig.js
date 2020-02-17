@@ -1,4 +1,4 @@
-import { fakeUpdateBasic, fakeUpdateSync, fakeUpdateInv } from '@/services/Sys/BusinessConfig';
+import { fakeUpdateBasic, fakeUpdateSync, fakeUpdateProd } from '@/services/Sys/BusinessConfig';
 import { fakeKeyValues } from '@/services/basicData';
 import { modeValueMaps } from '@/utils/GlobalConst';
 
@@ -38,8 +38,8 @@ export default {
       });
       return response;
     },
-    *updateInv({ payload }, { call, put }) {
-      const response = yield call(fakeUpdateInv, payload);
+    *updateProd({ payload }, { call, put }) {
+      const response = yield call(fakeUpdateProd, payload);
       yield put({
         type: 'save',
         payload: { ...payload },

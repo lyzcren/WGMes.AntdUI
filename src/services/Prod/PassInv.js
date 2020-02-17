@@ -10,3 +10,7 @@ export async function fakeQuery(params) {
     },
   });
 }
+
+export async function fakeFecthReportInv(params) {
+  return request(`/api/passInv/getReportInv?${stringify(params)}`);
+}

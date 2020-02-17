@@ -1,6 +1,6 @@
 import { queryNotices } from '@/services/api';
 import { routerRedux } from 'dva/router';
-import { fakeFetchBasic, fakeFetchSync, fakeFetchInv } from '@/services/Sys/BusinessConfig';
+import { fakeFetchBasic, fakeFetchSync, fakeFetchProd } from '@/services/Sys/BusinessConfig';
 import { modeValueMaps } from '@/utils/GlobalConst';
 
 export default {
@@ -13,7 +13,7 @@ export default {
     isFullScreen: false,
     basicBusinessConfig: { allowLoginModes: ['account', 'idcard'], defaultLoginMode: 'account' },
     syncBusinessConfig: {},
-    invBusinessConfig: {},
+    prodBusinessConfig: {},
   },
 
   effects: {
@@ -132,15 +132,15 @@ export default {
       });
       return configs;
     },
-    *fetchInvBusinessConfig(_, { call, put }) {
-      const response = yield call(fakeFetchInv);
+    *fetchProdBusinessConfig(_, { call, put }) {
+      const response = yield call(fakeFetchProd);
       const configs = {};
       response.forEach(item => {
         const { fNumber, fValue } = item;
         configs[fNumber] = fValue;
       });
       yield put({
-        type: 'saveInvBusinessConfig',
+        type: 'saveProdBusinessConfig',
         payload: { ...configs },
       });
       return configs;
@@ -173,10 +173,10 @@ export default {
         syncBusinessConfig: payload,
       };
     },
-    saveInvBusinessConfig(state, { payload }) {
+    saveProdBusinessConfig(state, { payload }) {
       return {
         ...state,
-        invBusinessConfig: payload,
+        prodBusinessConfig: payload,
       };
     },
     changeLayoutCollapsed(state, { payload }) {

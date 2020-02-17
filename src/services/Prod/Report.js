@@ -1,3 +1,4 @@
+import { stringify } from 'qs';
 import request from '@/utils/request';
 
 export async function fakeQuery(params) {
@@ -10,12 +11,8 @@ export async function fakeQuery(params) {
   });
 }
 
-export async function fakeScan(batchNo) {
-  return request(`/api/report/scan?batchNo=${batchNo}`);
-}
-
-export async function fakeQueryGroupBy() {
-  return request('/api/report/groupBys');
+export async function fakeScan(params) {
+  return request(`/api/report/scan?${stringify(params)}`);
 }
 
 export async function fakeGet(params) {
@@ -52,11 +49,10 @@ export async function fakeRemove(params) {
   });
 }
 
-export async function fakeCheck(params) {
-  return request(`/api/report/check/${params.fInterID}`, {
+export async function fakeCheck(id) {
+  return request(`/api/report/check/${id}`, {
     method: 'PUT',
     body: {
-      ...params,
       method: 'update',
     },
   });

@@ -335,9 +335,9 @@ class TableList extends PureComponent {
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
-        message.warning(`【${record.fBillNo}】${  queryResult.message}`);
+        message.warning(`【${record.fBillNo}】${queryResult.message}`);
       } else {
-        message.error(`【${record.fBillNo}】${  queryResult.message}`);
+        message.error(`【${record.fBillNo}】${queryResult.message}`);
       }
     });
   };

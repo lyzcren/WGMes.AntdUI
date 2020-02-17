@@ -12,8 +12,8 @@ export async function fakeFetchSync() {
   return request('/api/BusinessConfig/sync');
 }
 
-export async function fakeFetchInv() {
-  return request('/api/BusinessConfig/inv');
+export async function fakeFetchProd() {
+  return request('/api/BusinessConfig/prod');
 }
 
 export async function fakeUpdateBasic(params) {
@@ -36,8 +36,8 @@ export async function fakeUpdateSync(params) {
   });
 }
 
-export async function fakeUpdateInv(params) {
-  return request('/api/BusinessConfig/inv', {
+export async function fakeUpdateProd(params) {
+  return request('/api/BusinessConfig/prod', {
     method: 'PUT',
     body: {
       ...params,

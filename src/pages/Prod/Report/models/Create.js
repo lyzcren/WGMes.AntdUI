@@ -1,4 +1,4 @@
-import { fakeAdd, fakeScan } from '@/services/Prod/Report';
+import { fakeAdd, fakeCheck, fakeScan } from '@/services/Prod/Report';
 
 export default {
   namespace: 'reportCreate',
@@ -15,7 +15,11 @@ export default {
       });
     },
     *submit({ payload }, { call, put }) {
-      const response = yield call(fakeAdd, payload);
+      const { check } = payload;
+      let response = yield call(fakeAdd, payload);
+      if (check && response.model) {
+        response = yield call(fakeCheck, response.model.fInterID);
+      }
 
       return response;
     },
@@ -27,7 +31,7 @@ export default {
       });
     },
     *scan({ payload }, { call, put, select }) {
-      const response = yield call(fakeScan, payload.batchNo);
+      const response = yield call(fakeScan, payload);
       const details = yield select(state => state.reportCreate.details);
       if (response) {
         // 设置默认汇报数量为可汇报数量

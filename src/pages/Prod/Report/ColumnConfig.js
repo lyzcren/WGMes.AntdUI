@@ -12,6 +12,18 @@ class ColumnConfig {
       sorter: true,
     },
     {
+      title: '岗位',
+      dataIndex: 'fDeptName',
+      width: 150,
+      sorter: true,
+    },
+    {
+      title: '岗位编码',
+      dataIndex: 'fDeptNumber',
+      width: 150,
+      sorter: true,
+    },
+    {
       title: '状态',
       dataIndex: 'fStatusName',
       width: 80,

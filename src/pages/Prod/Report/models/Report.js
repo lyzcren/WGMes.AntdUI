@@ -54,7 +54,7 @@ export default {
       });
     },
     *check({ payload }, { call, put }) {
-      const response = yield call(fakeCheck, payload);
+      const response = yield call(fakeCheck, payload.fInterID);
       yield put({
         type: 'save',
         payload: { queryResult: response },

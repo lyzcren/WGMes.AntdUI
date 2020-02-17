@@ -1,5 +1,6 @@
 import React, { PureComponent, Fragment } from 'react';
 import moment from 'moment';
+import numeral from 'numeral';
 import { connect } from 'dva';
 import {
   Layout,
@@ -18,13 +19,15 @@ import {
   Menu,
   Dropdown,
   Icon,
+  Modal,
 } from 'antd';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import DescriptionList from '@/components/DescriptionList';
 import Authorized from '@/utils/Authorized';
 import { hasAuthority } from '@/utils/authority';
-import { ScanForm } from './ScanForm';
+import { ScanForm } from './components/ScanForm';
+import { ChooseForm } from './components/ChooseForm';
 
 import styles from './List.less';
 
@@ -48,7 +51,8 @@ const ButtonGroup = Button.Group;
 @Form.create()
 class Create extends PureComponent {
   state = {
-    scanVisible: true,
+    scanVisible: false,
+    addVisible: false,
   };
 
   componentDidMount() {
@@ -56,6 +60,9 @@ class Create extends PureComponent {
     dispatch({
       type: 'basicData/getBillNo',
       payload: { fNumber: 'Report' },
+    });
+    dispatch({
+      type: 'basicData/getAuthorizeProcessTree',
     });
     dispatch({
       type: 'reportCreate/init',
@@ -97,11 +104,30 @@ class Create extends PureComponent {
     });
   }
 
+  showAdd(flag) {
+    const {
+      form: { getFieldValue },
+    } = this.props;
+    const deptId = getFieldValue('fDeptID');
+    if (!deptId) {
+      message.info('请先选择岗位');
+      return;
+    }
+    this.setState({
+      addVisible: !!flag,
+    });
+  }
+
   handleScan = batchNo => {
-    const { dispatch } = this.props;
+    const {
+      dispatch,
+      form: { getFieldValue },
+    } = this.props;
+    const deptId = getFieldValue('fDeptID');
     dispatch({
       type: 'reportCreate/scan',
       payload: {
+        deptId,
         batchNo,
       },
     }).then(result => {
@@ -126,42 +152,19 @@ class Create extends PureComponent {
       }
 
       const payload = {
-        fComments: fieldsValue.fComments,
+        ...fieldsValue,
         details,
       };
 
       dispatch({
         type: 'reportCreate/submit',
-        payload,
-      })
-        .then(queryResult => {
-          const { status, model } = queryResult;
-          if (status === 'ok') {
-            message.success(`新建汇报单成功.单号：${model.fBillNo}`);
-            if (bCheck) {
-              return dispatch({
-                type: 'reportManage/check',
-                payload: { fInterID: model.fInterID },
-              });
-            }
-          } else {
-            this.showResult(queryResult);
-          }
-        })
-        .then(queryResult => {
-          if (!queryResult) return;
-          const { status, model } = queryResult;
-          if (status === 'ok') {
-            message.success(`审核成功`);
-          } else {
-            this.showResult(queryResult);
-          }
-        })
-        .then(() => {
-          this.close();
-          // 成功后再次刷新列表
-          if (handleSuccess) handleSuccess();
-        });
+        payload: { ...payload, check: bCheck },
+      }).then(queryResult => {
+        this.showResult(queryResult);
+        // 成功后再次刷新列表
+        if (handleSuccess) handleSuccess();
+        this.close();
+      });
     });
   }
 
@@ -169,11 +172,11 @@ class Create extends PureComponent {
     const { status, message, model } = queryResult;
 
     if (status === 'ok') {
-      message.success(message);
+      message.success(queryResult.message);
     } else if (status === 'warning') {
-      message.warning(message);
+      message.warning(queryResult.message);
     } else {
-      message.error(message);
+      message.error(queryResult.message);
     }
   }
 
@@ -185,36 +188,74 @@ class Create extends PureComponent {
     });
   }
 
-  render() {
+  handleDeptChange = value => {
     const {
-      dispatch,
-      basicData: { billNo, processDeptTree },
-      loading,
-      loadingDetail,
-      form: { getFieldDecorator },
       reportCreate: { details },
     } = this.props;
+    if (details.length > 0) {
+      Modal.confirm({
+        title: '变更岗位',
+        content: '变更岗位将清空明细信息，是否继续？',
+        okText: '确认',
+        cancelText: '取消',
+        onOk: this.clearDetails,
+      });
+    }
+  };
 
-    const action = (
-      <Fragment>
-        <ButtonGroup>
-          <Button icon="scan" onClickCapture={() => this.showScan(true)}>
-            扫码
-          </Button>
-          <Button type="primary" onClickCapture={() => this.save()}>
-            保存
-          </Button>
-          <Button onClickCapture={() => this.save(true)}>审核</Button>
-          {/* <Dropdown overlay={menu} placement="bottomRight">
+  clearDetails = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'reportCreate/changeDetails',
+      payload: { details: [] },
+    });
+  };
+
+  handleSelectRows = (rows, rowsUnSelect) => {
+    const {
+      dispatch,
+      reportCreate: { details },
+    } = this.props;
+    rows.forEach(row => {
+      if (!details.find(d => d.fInterID === row.fInterID)) {
+        // 设置默认汇报数量为可汇报数量
+        details.push({ ...row, fReportingQty: row.fUnReportQty });
+      }
+    });
+    const newDetails = details.filter(d => !rowsUnSelect.find(r => r.fInterID === d.fInterID));
+    dispatch({
+      type: 'reportCreate/changeDetails',
+      payload: { details: newDetails },
+    });
+  };
+
+  renderActions = () => (
+    <Fragment>
+      <ButtonGroup>
+        <Button icon="add_manually" onClickCapture={() => this.showAdd(true)}>
+          手动添加
+        </Button>
+        <Button icon="scan" onClickCapture={() => this.showScan(true)}>
+          扫码
+        </Button>
+        <Button type="primary" onClickCapture={() => this.save()}>
+          保存
+        </Button>
+        <Button onClickCapture={() => this.save(true)}>审核</Button>
+        {/* <Dropdown overlay={menu} placement="bottomRight">
             <Button>
               <Icon type="ellipsis" />
             </Button>
           </Dropdown> */}
-        </ButtonGroup>
-        <Button onClick={() => this.close()}>关闭</Button>
-      </Fragment>
-    );
+      </ButtonGroup>
+      <Button onClick={() => this.close()}>关闭</Button>
+    </Fragment>
+  );
 
+  getColumns = () => {
+    const {
+      form: { getFieldDecorator },
+    } = this.props;
     const columns = [
       {
         title: '任务单号',
@@ -292,39 +333,132 @@ class Create extends PureComponent {
       },
     ];
 
+    return columns;
+  };
+
+  renderBaseCard = () => {
+    const {
+      basicData: { authorizeProcessTree },
+      form: { getFieldDecorator },
+    } = this.props;
+    return (
+      <Card title="基本信息" style={{ marginBottom: 24 }} bordered={false}>
+        <Form layout="vertical">
+          <Row gutter={16}>
+            <Col lg={8} md={8} sm={24}>
+              <FormItem label="岗位">
+                {getFieldDecorator('fDeptID', {
+                  rules: [{ required: true, message: '请输入岗位' }],
+                  // initialValue: authorizeProcessTree[0].fDeptID,
+                })(
+                  <TreeSelect
+                    treeData={authorizeProcessTree}
+                    treeDefaultExpandAll
+                    dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                    onChange={this.handleDeptChange}
+                  />
+                )}
+              </FormItem>
+            </Col>
+          </Row>
+        </Form>
+      </Card>
+    );
+  };
+
+  renderDetailsCard = () => {
+    const {
+      loadingDetail,
+      reportCreate: { details },
+    } = this.props;
+    const sum = details.reduce((acc, cur) => acc.add(cur.fReportingQty), numeral());
+
+    return (
+      <Card title="明细信息" style={{ marginBottom: 24 }} bordered={false}>
+        <Table
+          rowKey="fInterID"
+          loading={loadingDetail}
+          columns={this.getColumns()}
+          dataSource={details}
+          footer={() => `总汇报数量：${sum ? sum.value() : 0}`}
+        />
+      </Card>
+    );
+  };
+
+  renderCommentsCard = () => {
+    const {
+      form: { getFieldDecorator },
+    } = this.props;
+    return (
+      <Card title="备注信息" bordered={false}>
+        <Form layout="vertical">
+          <Row gutter={16}>
+            <Col lg={12} md={12} sm={24}>
+              {getFieldDecorator('fComments', {})(
+                <TextArea style={{ minHeight: 32 }} placeholder="请输入备注" rows={4} />
+              )}
+            </Col>
+          </Row>
+        </Form>
+      </Card>
+    );
+  };
+
+  renderScanForm = () => {
+    const { loadingDetail } = this.props;
+    return (
+      <ScanForm
+        handleModalVisible={flag => this.showScan(flag)}
+        modalVisible={this.state.scanVisible}
+        handleScan={this.handleScan}
+        loading={loadingDetail}
+      />
+    );
+  };
+
+  renderChooseForm = () => {
+    const {
+      loading,
+      reportCreate: { details },
+      form: { getFieldValue },
+    } = this.props;
+    const deptId = getFieldValue('fDeptID');
+    return deptId ? (
+      <ChooseForm
+        handleModalVisible={flag => this.showAdd(flag)}
+        modalVisible={this.state.addVisible}
+        deptId={deptId}
+        selectedRowKeys={details.map(d => d.fInterID)}
+        handleSelectRows={this.handleSelectRows}
+        loading={loading}
+      />
+    ) : null;
+  };
+
+  render() {
+    const {
+      basicData: { billNo },
+      loading,
+    } = this.props;
+
     return (
       <WgPageHeaderWrapper
         title={`生产任务汇报：${billNo.Report}`}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }
-        action={action}
+        action={this.renderActions()}
         // content={description}
         // extraContent={extra}
         wrapperClassName={styles.advancedForm}
         loading={loading}
       >
-        <Card title="明细信息" style={{ marginBottom: 24 }} bordered={false}>
-          <Table rowKey="fInterID" loading={loadingDetail} columns={columns} dataSource={details} />
-        </Card>
-        <Card title="备注信息" bordered={false}>
-          <Form layout="vertical">
-            <Row gutter={16}>
-              <Col lg={12} md={12} sm={24}>
-                {getFieldDecorator('fComments', {})(
-                  <TextArea style={{ minHeight: 32 }} placeholder="请输入备注" rows={4} />
-                )}
-              </Col>
-            </Row>
-          </Form>
-        </Card>
-        <ScanForm
-          dispatch
-          handleModalVisible={flag => this.showScan(flag)}
-          modalVisible={this.state.scanVisible}
-          handleScan={this.handleScan}
-          loading={loadingDetail}
-        />
+        {this.renderBaseCard()}
+        {this.renderDetailsCard()}
+        {this.renderCommentsCard()}
+        {this.renderScanForm()}
+        {this.renderChooseForm()}
       </WgPageHeaderWrapper>
     );
   }

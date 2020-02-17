@@ -4,13 +4,13 @@ import { Form, Icon, Button, Checkbox, Input, message, Select, Typography } from
 import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 
-import styles from './InvView.less';
+import styles from './ProdView.less';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
 const { Text } = Typography;
 
-class InvView extends PureComponent {
+class ProdView extends PureComponent {
   static defaultProps = {};
 
   state = {
@@ -26,7 +26,7 @@ class InvView extends PureComponent {
       this.setState({ invTypes });
     });
     dispatch({
-      type: 'global/fetchInvBusinessConfig',
+      type: 'global/fetchProdBusinessConfig',
     }).then(config => {
       const { invType } = config;
       this.setState({ invType });
@@ -41,7 +41,7 @@ class InvView extends PureComponent {
         return;
       }
       dispatch({
-        type: 'businessConfig/updateInv',
+        type: 'businessConfig/updateProd',
         payload: fieldsValue,
       }).then(response => {
         if (!response || response.status === 'ok') {
@@ -98,4 +98,4 @@ class InvView extends PureComponent {
 export default connect(({ global, businessConfig }) => ({
   global,
   businessConfig,
-}))(Form.create()(InvView));
+}))(Form.create()(ProdView));

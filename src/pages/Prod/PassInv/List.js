@@ -55,7 +55,7 @@ class TableList extends PureComponent {
     queryProductNumber: '',
   };
 
-  columnConfigKey = 'inv';
+  columnConfigKey = 'passInv';
 
   // 列表查询参数
   currentPagination = {
@@ -78,7 +78,7 @@ class TableList extends PureComponent {
       type: 'basicData/getAuthorizeProcessTree',
     });
     dispatch({
-      type: 'global/fetchInvBusinessConfig',
+      type: 'global/fetchProdBusinessConfig',
     });
   }
 
@@ -315,7 +315,7 @@ class TableList extends PureComponent {
       passInvManage: { data },
       loading,
       global: {
-        invBusinessConfig: { invType },
+        prodBusinessConfig: { invType },
       },
     } = this.props;
 
