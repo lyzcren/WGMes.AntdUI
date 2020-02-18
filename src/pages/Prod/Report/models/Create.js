@@ -36,6 +36,7 @@ export default {
       if (response) {
         // 设置默认汇报数量为可汇报数量
         response.fReportingQty = response.fUnReportQty;
+        response.fInvID = response.fInterID;
         if (!details.find(x => x.fInterID === response.fInterID)) {
           details.push(response);
         }

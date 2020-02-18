@@ -31,11 +31,11 @@ import { formatMessage, FormattedMessage } from 'umi/locale';
 
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import Authorized from '@/utils/Authorized';
-import { default as ColumnConfig } from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
-import { print } from '@/utils/wgUtils';
+import { print, getColumns } from '@/utils/wgUtils';
 import WgStandardTable from '@/wg_components/WgStandardTable';
+import { columns } from '@/columns/Prod/Report';
 
 import styles from './List.less';
 
@@ -57,9 +57,6 @@ const getValue = obj =>
 class TableList extends PureComponent {
   constructor(props) {
     super(props);
-
-    // 指定操作列
-    ColumnConfig.renderOperation = this.renderOperation;
 
     this.state = {
       // 界面是否可见
@@ -144,14 +141,86 @@ class TableList extends PureComponent {
     };
     // 查询条件处理
     const queryFilters = [];
-    if (fieldsValue.queryBillNo)
-      queryFilters.push({ name: 'fBillNo', compare: '%*%', value: fieldsValue.queryBillNo });
-    if (fieldsValue.queryMoRptBillNo)
+    const detailFilters = [];
+    // 表头查询条件
+    if (fieldsValue.fDeptID)
+      queryFilters.push({ name: 'fDeptID', compare: '=', value: fieldsValue.fDeptID });
+    if (fieldsValue.fBillNo)
+      queryFilters.push({ name: 'fBillNo', compare: '%*%', value: fieldsValue.fBillNo });
+    if (fieldsValue.fMoRptBillNo)
+      queryFilters.push({ name: 'fMoRptBillNo', compare: '%*%', value: fieldsValue.fMoRptBillNo });
+    if (fieldsValue.fCreatorName)
+      queryFilters.push({ name: 'fCreatorName', compare: '%*%', value: fieldsValue.fCreatorName });
+    if (fieldsValue.fCreatorNumber)
       queryFilters.push({
-        name: 'fMoRptBillNo',
+        name: 'fCreatorNumber',
         compare: '%*%',
-        value: fieldsValue.queryMoRptBillNo,
+        value: fieldsValue.fCreatorNumber,
       });
+    // if (fieldsValue.fCreateDate)
+    //   queryFilters.push({ name: 'fCreateDate', compare: '%*%', value: fieldsValue.fCreateDate });
+    if (fieldsValue.fEditorName)
+      queryFilters.push({ name: 'fEditorName', compare: '%*%', value: fieldsValue.fEditorName });
+    if (fieldsValue.fEditorNumber)
+      queryFilters.push({
+        name: 'fEditorNumber',
+        compare: '%*%',
+        value: fieldsValue.fEditorNumber,
+      });
+    // if (fieldsValue.fEditDate)
+    //   queryFilters.push({ name: 'fEditDate', compare: '%*%', value: fieldsValue.fEditDate });
+    if (fieldsValue.fCheckerName)
+      queryFilters.push({ name: 'fCheckerName', compare: '%*%', value: fieldsValue.fCheckerName });
+    if (fieldsValue.fCheckerNumber)
+      queryFilters.push({
+        name: 'fCheckerNumber',
+        compare: '%*%',
+        value: fieldsValue.fCheckerNumber,
+      });
+    // if (fieldsValue.fCheckDate)
+    //   queryFilters.push({ name: 'fCheckDate', compare: '%*%', value: fieldsValue.fCheckDate });
+
+    // 明细列查询条件
+    if (fieldsValue.fSoBillNo)
+      detailFilters.push({ name: 'fSoBillNo', compare: '%*%', value: fieldsValue.fSoBillNo });
+    if (fieldsValue.fMoBillNo)
+      detailFilters.push({ name: 'fMoBillNo', compare: '%*%', value: fieldsValue.fMoBillNo });
+    if (fieldsValue.fFullBatchNo)
+      detailFilters.push({ name: 'fFullBatchNo', compare: '%*%', value: fieldsValue.fFullBatchNo });
+    if (fieldsValue.fWorkShopName)
+      detailFilters.push({
+        name: 'fWorkShopName',
+        compare: '%*%',
+        value: fieldsValue.fWorkShopName,
+      });
+    if (fieldsValue.fWorkShopNumber)
+      detailFilters.push({
+        name: 'fWorkShopNumber',
+        compare: '%*%',
+        value: fieldsValue.fWorkShopNumber,
+      });
+    if (fieldsValue.fProductName)
+      detailFilters.push({ name: 'fProductName', compare: '%*%', value: fieldsValue.fProductName });
+    if (fieldsValue.fProductFullName)
+      detailFilters.push({
+        name: 'fProductFullName',
+        compare: '%*%',
+        value: fieldsValue.fProductFullName,
+      });
+    if (fieldsValue.fProductNumber)
+      detailFilters.push({
+        name: 'fProductNumber',
+        compare: '%*%',
+        value: fieldsValue.fProductNumber,
+      });
+    if (fieldsValue.fProductModel)
+      detailFilters.push({
+        name: 'fProductModel',
+        compare: '%*%',
+        value: fieldsValue.fProductModel,
+      });
+    if (fieldsValue.fRowComments)
+      detailFilters.push({ name: 'fRowComments', compare: '%*%', value: fieldsValue.fRowComments });
 
     this.setState({
       formValues: values,
@@ -162,6 +231,7 @@ class TableList extends PureComponent {
       ...this.currentPagination,
       current: 1,
       queryFilters,
+      detailFilters,
     };
 
     return this.currentPagination;
@@ -188,12 +258,14 @@ class TableList extends PureComponent {
     this.setState({
       formValues: {},
       queryFilters: [],
+      detailFilters: [],
     });
 
     this.currentPagination = {
       ...this.currentPagination,
       current: 1,
       queryFilters: [],
+      detailFilters: [],
     };
 
     dispatch({
@@ -405,18 +477,25 @@ class TableList extends PureComponent {
     });
   };
 
-  renderOperation = (val, record) => {
+  queryDeptChange = value => {
+    setTimeout(() => {
+      this.search();
+    }, 200);
+  };
+
+  renderOperation = record => {
     const {
       reportManage: { printTemplates },
     } = this.props;
     return (
       <Fragment>
         <a onClick={() => this.handleProfile(record)}>详情</a>
-        <Authorized authority="Report_Update">
+        {/* <Authorized authority="Report_Update">
+          <Divider type="vertical" />
           <a disabled={record.fStatus != 0} onClick={() => this.handleUpdate(record)}>
             修改
           </a>
-        </Authorized>
+        </Authorized> */}
         <Authorized authority="Report_Check">
           <Divider type="vertical" />
           {record.fStatus === 0 ? (
@@ -465,13 +544,29 @@ class TableList extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={6} sm={24}>
+            <FormItem label="岗位">
+              {getFieldDecorator('fDeptID', {
+                rules: [{ required: false, message: '请选择岗位' }],
+              })(
+                <TreeSelect
+                  style={{ width: '100%' }}
+                  treeData={authorizeProcessTree}
+                  treeDefaultExpandAll
+                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                  onChange={this.queryDeptChange}
+                  allowClear
+                />
+              )}
+            </FormItem>
+          </Col>
+          <Col md={6} sm={24}>
             <FormItem label="单号">
-              {getFieldDecorator('queryBillNo')(<Input placeholder="请输入" />)}
+              {getFieldDecorator('fBillNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={6} sm={24}>
             <FormItem label="ERP汇报单号">
-              {getFieldDecorator('queryMoRptBillNo')(<Input placeholder="请输入" />)}
+              {getFieldDecorator('fMoRptBillNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={6} sm={24}>
@@ -482,7 +577,7 @@ class TableList extends PureComponent {
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
               </Button>
-              <a style={{ marginLeft: 8 }} onClick={this.toggleForm} hidden>
+              <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
                 展开 <Icon type="down" />
               </a>
             </span>
@@ -493,7 +588,141 @@ class TableList extends PureComponent {
   }
 
   renderAdvancedForm() {
-    return renderSimpleForm;
+    const {
+      form: { getFieldDecorator },
+      basicData: {
+        authorizeProcessTree,
+        status: { flowStatus, recordStatus },
+      },
+    } = this.props;
+    const { fDeptID } = this.state;
+
+    return (
+      <Form onSubmit={this.handleSearch} layout="inline" style={{ marginRight: '30px' }}>
+        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+          <Col md={8} sm={24}>
+            <FormItem label="岗位">
+              {getFieldDecorator('fDeptID', {
+                rules: [{ required: false, message: '请选择岗位' }],
+              })(
+                <TreeSelect
+                  style={{ width: '100%' }}
+                  treeData={authorizeProcessTree}
+                  treeDefaultExpandAll
+                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                  onChange={this.queryDeptChange}
+                  allowClear
+                />
+              )}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="单号">
+              {getFieldDecorator('fBillNo')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="ERP汇报单号">
+              {getFieldDecorator('fMoRptBillNo')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="创建人">
+              {getFieldDecorator('fCreatorName')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="创建人编码">
+              {getFieldDecorator('fCreatorNumber')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="修改人">
+              {getFieldDecorator('fEditorName')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="修改人编码">
+              {getFieldDecorator('fEditorNumber')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="审核人">
+              {getFieldDecorator('fCheckerName')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="审核人编码">
+              {getFieldDecorator('fCheckerNumber')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+
+          <Col md={8} sm={24}>
+            <FormItem label="订单号">
+              {getFieldDecorator('fSoBillNo')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="任务单号">
+              {getFieldDecorator('fMoBillNo')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="批号">
+              {getFieldDecorator('fFullBatchNo')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="车间">
+              {getFieldDecorator('fWorkShopName')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="车间编码">
+              {getFieldDecorator('fWorkShopNumber')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="产品名称">
+              {getFieldDecorator('fProductName')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="产品全称">
+              {getFieldDecorator('fProductFullName')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="产品编码">
+              {getFieldDecorator('fProductNumber')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="规格型号">
+              {getFieldDecorator('fProductModel')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="行备注">
+              {getFieldDecorator('fRowComments')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+        </Row>
+        <div style={{ overflow: 'hidden' }}>
+          <div style={{ float: 'right', marginBottom: 24 }}>
+            <Button type="primary" htmlType="submit">
+              查询
+            </Button>
+            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
+              重置
+            </Button>
+            <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
+              收起 <Icon type="up" />
+            </a>
+          </div>
+        </div>
+      </Form>
+    );
   }
 
   renderForm() {
@@ -554,27 +783,23 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/report/create', handleSuccess: this.search },
+      payload: { path: '/prod/report/create', handleChange: this.search },
     });
   }
 
   handleProfile(record) {
-    message.warning('功能开发中，程序猿们正在努力。');
-    return;
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/report/profile', record, handleSuccess: this.search },
+      payload: { path: '/prod/report/profile', id: record.fInterID, handleChange: this.search },
     });
   }
 
   handleUpdate(record) {
-    message.warning('功能开发中，程序猿们正在努力。');
-    return;
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/report/update', record, handleSuccess: this.search },
+      payload: { path: '/prod/report/update', id: record.fInterID, handleChange: this.search },
     });
   }
 
@@ -618,6 +843,24 @@ class TableList extends PureComponent {
     );
   };
 
+  getColumns = () => {
+    const columnOps = [
+      {
+        dataIndex: 'fBillNo',
+        render: (val, record) => <a onClick={() => this.handleProfile(record)}>{val}</a>,
+      },
+      {
+        dataIndex: 'operators',
+        width: 240,
+        render: (text, record) => this.renderOperation(record),
+      },
+    ];
+    return getColumns({
+      columns,
+      columnOps,
+    });
+  };
+
   render() {
     const {
       dispatch,
@@ -638,7 +881,7 @@ class TableList extends PureComponent {
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
-                columns={ColumnConfig.columns}
+                columns={this.getColumns()}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
                 expandedRowRender={this.expandedRowRender}

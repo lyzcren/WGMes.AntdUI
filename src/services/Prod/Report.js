@@ -15,8 +15,8 @@ export async function fakeScan(params) {
   return request(`/api/report/scan?${stringify(params)}`);
 }
 
-export async function fakeGet(params) {
-  return request(`/api/report/${params.id}`);
+export async function fakeGet(id) {
+  return request(`/api/report/${id}`);
 }
 
 export async function fakeAdd(params) {
@@ -58,11 +58,10 @@ export async function fakeCheck(id) {
   });
 }
 
-export async function fakeUncheck(params) {
-  return request(`/api/report/uncheck/${params.fInterID}`, {
+export async function fakeUncheck(id) {
+  return request(`/api/report/uncheck/${id}`, {
     method: 'PUT',
     body: {
-      ...params,
       method: 'update',
     },
   });

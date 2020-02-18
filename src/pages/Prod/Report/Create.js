@@ -29,7 +29,7 @@ import { hasAuthority } from '@/utils/authority';
 import { ScanForm } from './components/ScanForm';
 import { ChooseForm } from './components/ChooseForm';
 
-import styles from './List.less';
+import styles from './Create.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -68,8 +68,6 @@ class Create extends PureComponent {
       type: 'reportCreate/init',
     });
   }
-
-  componentDidUpdate(preProps) {}
 
   handleDetailRowChange({ fEntryID }, field, value) {
     const {
@@ -141,7 +139,7 @@ class Create extends PureComponent {
     const {
       form,
       dispatch,
-      handleSuccess,
+      handleChange,
       reportCreate: { details },
     } = this.props;
     form.validateFieldsAndScroll((err, fieldsValue) => {
@@ -162,7 +160,7 @@ class Create extends PureComponent {
       }).then(queryResult => {
         this.showResult(queryResult);
         // 成功后再次刷新列表
-        if (handleSuccess) handleSuccess();
+        if (handleChange) handleChange();
         this.close();
       });
     });
@@ -200,15 +198,28 @@ class Create extends PureComponent {
         cancelText: '取消',
         onOk: this.clearDetails,
       });
+    } else if (value) {
+      setTimeout(() => {
+        this.showAdd(true);
+      }, 100);
     }
   };
 
   clearDetails = () => {
-    const { dispatch } = this.props;
+    const {
+      dispatch,
+      form: { getFieldValue },
+    } = this.props;
     dispatch({
       type: 'reportCreate/changeDetails',
       payload: { details: [] },
     });
+    setTimeout(() => {
+      const deptId = getFieldValue('fDeptID');
+      if (deptId) {
+        this.showAdd(true);
+      }
+    }, 100);
   };
 
   handleSelectRows = (rows, rowsUnSelect) => {
@@ -286,9 +297,9 @@ class Create extends PureComponent {
         dataIndex: 'fReportingQty',
         render: (val, record) => (
           <FormItem style={{ marginBottom: 0 }}>
-            {getFieldDecorator(`fReportingQty_${record.fInterID}`, {
+            {getFieldDecorator(`fReportingQty_${record.fInvID}`, {
               rules: [{ required: true, message: '请输入投入数量' }],
-              initialValue: record.fUnReportQty,
+              initialValue: record.fReportingQty,
             })(
               <InputNumber
                 max={record.fUnReportQty}
@@ -310,7 +321,7 @@ class Create extends PureComponent {
         dataIndex: 'fRowComments',
         render: (val, record) => (
           <FormItem style={{ marginBottom: 0 }}>
-            {getFieldDecorator(`fRowComments_${record.fInterID}`, {
+            {getFieldDecorator(`fRowComments_${record.fInvID}`, {
               initialValue: record.fRowComments,
             })(
               <Input
@@ -342,7 +353,7 @@ class Create extends PureComponent {
       form: { getFieldDecorator },
     } = this.props;
     return (
-      <Card title="基本信息" style={{ marginBottom: 24 }} bordered={false}>
+      <Card title="基本信息" bordered={false}>
         <Form layout="vertical">
           <Row gutter={16}>
             <Col lg={8} md={8} sm={24}>
@@ -374,13 +385,15 @@ class Create extends PureComponent {
     const sum = details.reduce((acc, cur) => acc.add(cur.fReportingQty), numeral());
 
     return (
-      <Card title="明细信息" style={{ marginBottom: 24 }} bordered={false}>
+      <Card title="明细信息" bordered={false}>
         <Table
-          rowKey="fInterID"
+          rowKey="fInvID"
+          bordered
           loading={loadingDetail}
           columns={this.getColumns()}
           dataSource={details}
           footer={() => `总汇报数量：${sum ? sum.value() : 0}`}
+          pagination={false}
         />
       </Card>
     );
@@ -451,7 +464,7 @@ class Create extends PureComponent {
         action={this.renderActions()}
         // content={description}
         // extraContent={extra}
-        wrapperClassName={styles.advancedForm}
+        wrapperClassName={styles.main}
         loading={loading}
       >
         {this.renderBaseCard()}

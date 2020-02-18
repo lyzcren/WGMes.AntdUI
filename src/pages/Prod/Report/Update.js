@@ -1,12 +1,16 @@
 import React, { PureComponent, Fragment } from 'react';
 import moment from 'moment';
+import numeral from 'numeral';
 import { connect } from 'dva';
 import {
+  Layout,
   Row,
   Col,
   Card,
+  Select,
   Form,
   Button,
+  TreeSelect,
   DatePicker,
   Table,
   Input,
@@ -15,170 +19,177 @@ import {
   Menu,
   Dropdown,
   Icon,
+  Modal,
 } from 'antd';
+import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
+import DescriptionList from '@/components/DescriptionList';
+import Authorized from '@/utils/Authorized';
+import { hasAuthority } from '@/utils/authority';
+import { defaultDateTimeFormat } from '@/utils/GlobalConst';
 
-import styles from './List.less';
+import { ScanForm } from './components/ScanForm';
+import { ChooseForm } from './components/ChooseForm';
+
+import styles from './Update.less';
 
 const FormItem = Form.Item;
-// const { Option } = Select;
+const { Option } = Select;
 const { TextArea } = Input;
+const { Header, Footer, Sider, Content } = Layout;
+const { Description } = DescriptionList;
 const ButtonGroup = Button.Group;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ reportManage, reportUpdate, loading, menu, basicData }) => ({
+@connect(({ reportManage, reportUpdate, reportScan, loading, menu, basicData }) => ({
   reportManage,
   reportUpdate,
+  reportScan,
   loading: loading.models.reportUpdate,
+  loadingDetail: loading.effects['reportUpdate/scan'],
   menu,
   basicData,
 }))
 @Form.create()
 class Update extends PureComponent {
   state = {
-    fInterID: null,
-    fBillNo: '',
-    fDate: Date.now(),
-    fTotalDeltaQty: 0,
-    fDeptID: null,
-    fComments: '',
-    details: [],
+    scanVisible: false,
+    addVisible: false,
   };
 
   componentDidMount() {
-    const { record } = this.props;
-    this.setState({ ...record });
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'basicData/getAuthorizeProcessTree',
+    });
     this.loadData();
   }
 
-  componentDidUpdate(preProps) {
-    const preRecord = preProps.record;
-    const { record } = this.props;
-    if (preRecord.fInterID !== record.fInterID) {
-      this.setState({ ...record });
-    }
-  }
-
-  loadData() {}
-
-  handleDeptChange(val) {
-    const { form, dispatch } = this.props;
+  loadData = () => {
+    const { dispatch, id } = this.props;
     dispatch({
-      type: 'reportUpdate/getInvByDept',
-      payload: { id: val },
-    }).then(() => {
-      const {
-        reportUpdate: { details },
-      } = this.props;
-      if (details) {
-        let entryId = 1;
-        const currentDetail = details.map(x => {
-          const fQty = form.getFieldValue(`fQty_${x.fInterID}`);
-          const fRowComments = form.getFieldValue(`fRowComments_${x.fInterID}`);
-          return {
-            fDefectInvID: x.fInterID,
-            fProductName: x.fProductName,
-            fProductNumber: x.fProductNumber,
-            fProductModel: x.fProductModel,
-            fFullBatchNo: x.fFullBatchNo,
-            fUnitName: x.fUnitName,
-            fQty: fQty !== undefined ? fQty : '',
-            fInvQty: x.fInputQty,
-            fDeltaQty: fQty !== undefined ? fQty - x.fInputQty : '',
-            fRowComments,
-            fEntryID: entryId++,
-          };
-        });
+      type: 'reportUpdate/init',
+      payload: { id },
+    });
+  };
 
-        this.setState({ details: currentDetail });
-      } else {
-        message.warning('当前岗位无不良品库存.');
-      }
+  handleDetailRowChange({ fEntryID }, field, value) {
+    const {
+      dispatch,
+      reportUpdate: { details },
+    } = this.props;
+    const findItem = details.find(x => x.fEntryID === fEntryID);
+    findItem[field] = value;
+
+    dispatch({
+      type: 'reportUpdate/changeDetails',
+      payload: { details },
     });
   }
 
-  handleDetailRowChange({ fEntryID }, field, value) {
-    const { details } = this.state;
-    const findItem = details.find(x => x.fEntryID === fEntryID);
-    findItem[field] = value;
-    if (field === 'fQty') {
-      findItem.fDeltaQty = findItem.fQty - findItem.fInvQty;
-    }
-    this.setState({ details });
-  }
-
   handleDeleteRow(record) {
-    const { fDefectInvID } = record;
-    const { details } = this.state;
-    this.setState({ details: details.filter(x => x.fDefectInvID !== fDefectInvID) });
+    const {
+      dispatch,
+      reportUpdate: { details },
+    } = this.props;
+    const newDetails = details.filter(x => x.fInterID !== record.fInterID);
+
+    dispatch({
+      type: 'reportUpdate/changeDetails',
+      payload: { details: newDetails },
+    });
   }
 
-  reloadDetails = () => {
-    const { fDeptID } = this.state;
-    this.handleDeptChange(fDeptID);
-  };
+  showScan(flag) {
+    this.setState({
+      scanVisible: !!flag,
+    });
+  }
 
-  deleteNonQtyDetails = () => {
-    const { details } = this.state;
-    this.setState({ details: details.filter(x => x.fQty !== '') });
+  showAdd(flag) {
+    const {
+      form: { getFieldValue },
+    } = this.props;
+    const deptId = getFieldValue('fDeptID');
+    if (!deptId) {
+      message.info('请先选择岗位');
+      return;
+    }
+    this.setState({
+      addVisible: !!flag,
+    });
+  }
+
+  handleScan = batchNo => {
+    const {
+      dispatch,
+      form: { getFieldValue },
+    } = this.props;
+    const deptId = getFieldValue('fDeptID');
+    dispatch({
+      type: 'reportUpdate/scan',
+      payload: {
+        deptId,
+        batchNo,
+      },
+    }).then(result => {
+      if (!result.success) {
+        message.warning(result.message);
+      }
+    });
   };
 
   save(bCheck) {
-    const { form, dispatch, handleSuccess } = this.props;
-    const { fInterID, fBillNo, details } = this.state;
+    const {
+      form,
+      id,
+      dispatch,
+      handleChange,
+      reportUpdate: { details },
+    } = this.props;
     form.validateFieldsAndScroll((err, fieldsValue) => {
       if (err) return;
+      if (details.length <= 0) {
+        message.warning(`未录入汇报明细，无法保存.`);
+        return;
+      }
 
       const payload = {
-        fInterID,
-        fDate: fieldsValue.fDate,
-        fComments: fieldsValue.fComments,
+        ...fieldsValue,
         details,
       };
 
       dispatch({
-        type: 'reportUpdate/update',
-        payload,
-      }).then(() => {
-        const {
-          reportUpdate: { queryResult },
-        } = this.props;
-
-        this.showResult(queryResult, model => {
-          message.success(`修改盘点单成功，单号：${fBillNo}`);
-          if (bCheck) {
-            dispatch({
-              type: 'reportManage/check',
-              payload: { fInterID },
-            }).then(() => {
-              const checkResult = this.props.reportManage.queryResult;
-              this.showResult(checkResult, () => {
-                message.success(`【${fBillNo}】` + `审核成功`);
-              });
-            });
+        type: 'reportUpdate/submit',
+        payload: { ...payload, id, check: bCheck },
+      }).then(queryResult => {
+        const { status } = queryResult;
+        if (status === 'ok') {
+          message.success(queryResult.message);
+          if (!bCheck) {
+            this.loadData(id);
+          } else {
+            this.openProfile();
+            this.close();
           }
-          this.close();
-          // 成功后再次刷新列表
-          if (handleSuccess) handleSuccess();
-        });
+        } else if (status === 'warning') {
+          message.warning(queryResult.message);
+        } else {
+          message.error(queryResult.message);
+        }
+        // 成功后再次刷新列表
+        if (handleChange) handleChange();
       });
     });
   }
 
-  showResult(queryResult, successCallback) {
-    const { status, message, model } = queryResult;
-
-    if (status === 'ok') {
-      if (successCallback) successCallback(model);
-      else {
-        message.success(message);
-      }
-    } else if (status === 'warning') {
-      message.warning(message);
-    } else {
-      message.error(message);
-    }
-  }
+  openProfile = () => {
+    const { id, dispatch, handleChange } = this.props;
+    dispatch({
+      type: 'menu/openMenu',
+      payload: { path: '/prod/report/profile', id, handleChange: this.search },
+    });
+  };
 
   close() {
     const { dispatch } = this.props;
@@ -188,42 +199,96 @@ class Update extends PureComponent {
     });
   }
 
-  render() {
+  handleDeptChange = value => {
     const {
-      loading,
-      form: { getFieldDecorator },
+      reportUpdate: { details },
     } = this.props;
+    if (details.length > 0) {
+      Modal.confirm({
+        title: '变更岗位',
+        content: '变更岗位将清空明细信息，是否继续？',
+        okText: '确认',
+        cancelText: '取消',
+        onOk: this.clearDetails,
+      });
+    } else if (value) {
+      setTimeout(() => {
+        this.showAdd(true);
+      }, 100);
+    }
+  };
 
-    const { fBillNo, fDeptName, fDate, fComments, details } = this.state;
+  clearDetails = () => {
+    const {
+      dispatch,
+      form: { getFieldValue },
+    } = this.props;
+    dispatch({
+      type: 'reportUpdate/changeDetails',
+      payload: { details: [] },
+    });
+    setTimeout(() => {
+      const deptId = getFieldValue('fDeptID');
+      if (deptId) {
+        this.showAdd(true);
+      }
+    }, 100);
+  };
 
-    const menu = (
-      <Menu>
-        <Menu.Item key="reloadDetails" onClick={this.reloadDetails}>
-          重载明细
-        </Menu.Item>
-        <Menu.Item key="deleteNonQtyDetails" onClick={this.deleteNonQtyDetails}>
-          删除未盘点明细
-        </Menu.Item>
-      </Menu>
-    );
-    const action = (
-      <Fragment>
-        <ButtonGroup>
-          <Button type="primary" onClickCapture={() => this.save()}>
-            保存
-          </Button>
-          <Button onClickCapture={() => this.save(true)}>审核</Button>
-          <Dropdown overlay={menu} placement="bottomRight">
+  handleSelectRows = (rows, rowsUnSelect) => {
+    const {
+      dispatch,
+      reportUpdate: { details },
+    } = this.props;
+    rows.forEach(row => {
+      if (!details.find(d => d.fInterID === row.fInterID)) {
+        // 设置默认汇报数量为可汇报数量
+        details.push({ ...row, fReportingQty: row.fUnReportQty });
+      }
+    });
+    const newDetails = details.filter(d => !rowsUnSelect.find(r => r.fInterID === d.fInterID));
+    dispatch({
+      type: 'reportUpdate/changeDetails',
+      payload: { details: newDetails },
+    });
+  };
+
+  renderActions = () => (
+    <Fragment>
+      <ButtonGroup>
+        <Button icon="add_manually" onClickCapture={() => this.showAdd(true)}>
+          手动添加
+        </Button>
+        <Button icon="scan" onClickCapture={() => this.showScan(true)}>
+          扫码
+        </Button>
+        <Button type="primary" onClickCapture={() => this.save()}>
+          保存
+        </Button>
+        <Button onClickCapture={() => this.save(true)}>审核</Button>
+        {/* <Dropdown overlay={menu} placement="bottomRight">
             <Button>
               <Icon type="ellipsis" />
             </Button>
-          </Dropdown>
-        </ButtonGroup>
-        <Button onClick={() => this.close()}>关闭</Button>
-      </Fragment>
-    );
+          </Dropdown> */}
+      </ButtonGroup>
+      <Button onClick={() => this.close()}>关闭</Button>
+    </Fragment>
+  );
 
+  getColumns = () => {
+    const {
+      form: { getFieldDecorator },
+    } = this.props;
     const columns = [
+      {
+        title: '任务单号',
+        dataIndex: 'fMoBillNo',
+      },
+      {
+        title: '批号',
+        dataIndex: 'fFullBatchNo',
+      },
       {
         title: '产品',
         dataIndex: 'fProductName',
@@ -237,48 +302,39 @@ class Update extends PureComponent {
         dataIndex: 'fProductModel',
       },
       {
-        title: '不良',
-        dataIndex: 'fDefectName',
+        title: '可汇报数量',
+        dataIndex: 'fUnReportQty',
       },
       {
-        title: '任务单号',
-        dataIndex: 'fMoBillNo',
-      },
-      {
-        title: '单位',
-        dataIndex: 'fUnitName',
-      },
-      {
-        title: '盘点数量',
-        dataIndex: 'fQty',
+        title: '汇报数量',
+        dataIndex: 'fReportingQty',
         render: (val, record) => (
           <FormItem style={{ marginBottom: 0 }}>
-            {getFieldDecorator(`fQty_${record.fDefectInvID}`, {
-              rules: [{ required: true, message: '请输入' }],
-              initialValue: record.fQty,
+            {getFieldDecorator(`fReportingQty_${record.fInvID}`, {
+              rules: [{ required: true, message: '请输入投入数量' }],
+              initialValue: record.fReportingQty,
             })(
               <InputNumber
+                max={record.fUnReportQty}
                 min={0}
-                onChange={value => this.handleDetailRowChange(record, 'fQty', value)}
+                onChange={value => {
+                  this.handleDetailRowChange(record, 'fReportingQty', value);
+                }}
               />
             )}
           </FormItem>
         ),
       },
       {
-        title: '数量',
-        dataIndex: 'fInvQty',
-      },
-      {
-        title: '盈亏',
-        dataIndex: 'fDeltaQty',
+        title: '单位',
+        dataIndex: 'fUnitName',
       },
       {
         title: '备注',
         dataIndex: 'fRowComments',
         render: (val, record) => (
           <FormItem style={{ marginBottom: 0 }}>
-            {getFieldDecorator(`fRowComments_${record.fDefectInvID}`, {
+            {getFieldDecorator(`fRowComments_${record.fInvID}`, {
               initialValue: record.fRowComments,
             })(
               <Input
@@ -301,60 +357,159 @@ class Update extends PureComponent {
       },
     ];
 
+    return columns;
+  };
+
+  renderBaseCard = () => {
+    const {
+      basicData: { authorizeProcessTree },
+      form: { getFieldDecorator },
+      reportUpdate: { fDeptID },
+    } = this.props;
+    return (
+      <Card title="基本信息" bordered={false}>
+        <Form layout="vertical">
+          <Row gutter={16}>
+            <Col lg={8} md={8} sm={24}>
+              <FormItem label="岗位">
+                {getFieldDecorator('fDeptID', {
+                  rules: [{ required: true, message: '请输入岗位' }],
+                  initialValue: fDeptID,
+                })(
+                  <TreeSelect
+                    treeData={authorizeProcessTree}
+                    treeDefaultExpandAll
+                    dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                    onChange={this.handleDeptChange}
+                  />
+                )}
+              </FormItem>
+            </Col>
+          </Row>
+        </Form>
+      </Card>
+    );
+  };
+
+  renderDetailsCard = () => {
+    const {
+      loadingDetail,
+      reportUpdate: { details },
+    } = this.props;
+    const sum = details.reduce((acc, cur) => acc.add(cur.fReportingQty), numeral());
+
+    return (
+      <Card title="明细信息" bordered={false}>
+        <Table
+          rowKey="fInvID"
+          bordered
+          loading={loadingDetail}
+          columns={this.getColumns()}
+          dataSource={details}
+          footer={() => `总汇报数量：${sum ? sum.value() : 0}`}
+          pagination={false}
+        />
+      </Card>
+    );
+  };
+
+  renderCommentsCard = () => {
+    const {
+      form: { getFieldDecorator },
+      reportUpdate: { fComments },
+    } = this.props;
+    return (
+      <Card title="备注信息" bordered={false}>
+        <Form layout="vertical">
+          <Row gutter={16}>
+            <Col lg={12} md={12} sm={24}>
+              {getFieldDecorator('fComments', {
+                initialValue: fComments,
+              })(<TextArea style={{ minHeight: 32 }} placeholder="请输入备注" rows={4} />)}
+            </Col>
+          </Row>
+        </Form>
+      </Card>
+    );
+  };
+
+  renderOtherCard = () => {
+    const {
+      reportUpdate: {
+        fCreatorName,
+        fCreatorNumber,
+        fCreateDate,
+        fCheckerName,
+        fCheckerNumber,
+        fCheckDate,
+      },
+    } = this.props;
+    return (
+      <Card title="其他信息" bordered={false}>
+        <DescriptionList className={styles.headerList} size="small" col={4}>
+          <Description term="创建人">{fCreatorName}</Description>
+          <Description term="创建人编码">{fCreatorNumber}</Description>
+          <Description term="创建日期">{defaultDateTimeFormat(fCreateDate)}</Description>
+        </DescriptionList>
+      </Card>
+    );
+  };
+
+  renderScanForm = () => {
+    const { loadingDetail } = this.props;
+    return (
+      <ScanForm
+        handleModalVisible={flag => this.showScan(flag)}
+        modalVisible={this.state.scanVisible}
+        handleScan={this.handleScan}
+        loading={loadingDetail}
+      />
+    );
+  };
+
+  renderChooseForm = () => {
+    const {
+      loading,
+      reportUpdate: { details },
+      form: { getFieldValue },
+    } = this.props;
+    const deptId = getFieldValue('fDeptID');
+    return deptId ? (
+      <ChooseForm
+        handleModalVisible={flag => this.showAdd(flag)}
+        modalVisible={this.state.addVisible}
+        deptId={deptId}
+        selectedRowKeys={details.map(d => d.fInterID)}
+        handleSelectRows={this.handleSelectRows}
+        loading={loading}
+      />
+    ) : null;
+  };
+
+  render() {
+    const {
+      reportUpdate: { fBillNo },
+      loading,
+    } = this.props;
+
     return (
       <WgPageHeaderWrapper
-        title={`不良盘点单：${fBillNo}`}
+        title={`生产任务汇报：${fBillNo}`}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }
-        action={action}
+        action={this.renderActions()}
         // content={description}
         // extraContent={extra}
-        wrapperClassName={styles.advancedForm}
+        wrapperClassName={styles.main}
         loading={loading}
       >
-        <Card title="基本信息" style={{ marginBottom: 24 }} bordered={false}>
-          <Form layout="vertical">
-            <Row gutter={16}>
-              <Col lg={6} md={12} sm={24}>
-                <FormItem label="单号">
-                  {getFieldDecorator('fBillNo', {
-                    initialValue: fBillNo,
-                  })(<Input readOnly />)}
-                </FormItem>
-              </Col>
-              <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-                <FormItem label="岗位">
-                  {getFieldDecorator('fDeptName', {
-                    initialValue: fDeptName,
-                  })(<Input readOnly />)}
-                </FormItem>
-              </Col>
-              <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-                <FormItem label="日期">
-                  {getFieldDecorator('fDate', {
-                    rules: [{ required: false, message: '请选择' }],
-                    initialValue: moment(fDate),
-                  })(<DatePicker format="YYYY-MM-DD" />)}
-                </FormItem>
-              </Col>
-            </Row>
-          </Form>
-        </Card>
-        <Card title="明细信息" style={{ marginBottom: 24 }} bordered={false}>
-          <Table rowKey="fEntryID" loading={loading} columns={columns} dataSource={details} />
-        </Card>
-        <Card title="备注信息" bordered={false}>
-          <Form layout="vertical">
-            <Row gutter={16}>
-              <Col lg={12} md={12} sm={24}>
-                {getFieldDecorator('fComments', {
-                  initialValue: fComments,
-                })(<TextArea style={{ minHeight: 32 }} placeholder="请输入备注" rows={4} />)}
-              </Col>
-            </Row>
-          </Form>
-        </Card>
+        {this.renderBaseCard()}
+        {this.renderDetailsCard()}
+        {this.renderCommentsCard()}
+        {this.renderOtherCard()}
+        {this.renderScanForm()}
+        {this.renderChooseForm()}
       </WgPageHeaderWrapper>
     );
   }

@@ -2,21 +2,46 @@ import React, { PureComponent, Fragment } from 'react';
 import moment from 'moment';
 import numeral from 'numeral';
 import { connect } from 'dva';
-import { Row, Col, Card, Form, Button, Table, Input, message } from 'antd';
+import {
+  Layout,
+  Row,
+  Col,
+  Card,
+  Select,
+  Form,
+  Button,
+  TreeSelect,
+  DatePicker,
+  Table,
+  Input,
+  InputNumber,
+  message,
+  Menu,
+  Dropdown,
+  Icon,
+  Modal,
+} from 'antd';
+import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import DescriptionList from '@/components/DescriptionList';
+import Authorized from '@/utils/Authorized';
+import { hasAuthority } from '@/utils/authority';
+import { defaultDateTimeFormat } from '@/utils/GlobalConst';
 
-import styles from './List.less';
+import { ScanForm } from './components/ScanForm';
+import { ChooseForm } from './components/ChooseForm';
+
+import styles from './Profile.less';
 
 const FormItem = Form.Item;
-const { Description } = DescriptionList;
-// const { Option } = Select;
+const { Option } = Select;
 const { TextArea } = Input;
+const { Header, Footer, Sider, Content } = Layout;
+const { Description } = DescriptionList;
 const ButtonGroup = Button.Group;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ reportManage, reportProfile, loading, menu, basicData }) => ({
-  reportManage,
+@connect(({ reportProfile, loading, menu, basicData }) => ({
   reportProfile,
   loading: loading.models.reportProfile,
   menu,
@@ -24,114 +49,70 @@ const ButtonGroup = Button.Group;
 }))
 @Form.create()
 class Profile extends PureComponent {
-  state = {
-    fInterID: null,
-    fBillNo: '',
-    fDate: Date.now(),
-    fTotalDeltaQty: 0,
-    fDeptID: null,
-    fComments: '',
-    details: [],
-    handleSuccess: () => {},
-  };
+  state = {};
 
   componentDidMount() {
-    const { handleSuccess } = this.props;
-    this.setState({ handleSuccess });
-    this.reload();
-  }
-
-  componentDidProfile(preProps) {
-    const preRecord = preProps.record;
-    const { record } = this.props;
-    if (preRecord.fInterID !== record.fInterID) {
-      this.reload();
-    }
-  }
-
-  reload() {
-    const {
-      dispatch,
-      record: { fInterID },
-      handleSuccess,
-    } = this.props;
+    const { dispatch, id } = this.props;
     dispatch({
-      type: 'reportProfile/get',
-      payload: {
-        fInterID,
-      },
-    }).then(() => {
-      const {
-        reportProfile: { profile },
-      } = this.props;
-      this.setState({ ...profile, handleSuccess });
+      type: 'reportProfile/init',
+      payload: { id },
     });
   }
 
-  handleUpdate() {
-    const { dispatch } = this.props;
-    const { handleSuccess } = this.state;
+  update() {
+    const { dispatch, id, handleChange } = this.props;
+
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/report/update', record: this.state, handleSuccess },
+      payload: { path: '/prod/report/update', id, handleChange },
+    }).then(() => {
+      this.close();
     });
-    this.close();
   }
 
-  check = () => {
-    const { dispatch } = this.props;
-    const { fInterID, fBillNo, handleSuccess } = this.state;
-    dispatch({
-      type: 'reportManage/check',
-      payload: {
-        fInterID,
-      },
-    }).then(() => {
-      const {
-        reportManage: { queryResult },
-      } = this.props;
-      this.showResult(queryResult, () => {
-        message.success(`【${fBillNo}】` + `反审核成功`);
-        this.reload();
-        // 成功后再次刷新列表
-        if (handleSuccess) handleSuccess();
-      });
-    });
-  };
+  check() {
+    const { dispatch, id, handleChange } = this.props;
 
-  uncheck = () => {
-    const { dispatch } = this.props;
-    const { fInterID, fBillNo, handleSuccess } = this.state;
     dispatch({
-      type: 'reportManage/uncheck',
-      payload: {
-        fInterID,
-      },
-    }).then(() => {
-      const {
-        reportManage: { queryResult },
-      } = this.props;
-      this.showResult(queryResult, () => {
-        message.success(`【${fBillNo}】` + `审核成功`);
-        this.reload();
-        // 成功后再次刷新列表
-        if (handleSuccess) handleSuccess();
+      type: 'reportProfile/check',
+      payload: { id },
+    }).then(queryResult => {
+      this.showResult(queryResult);
+      dispatch({
+        type: 'reportProfile/init',
+        payload: { id },
       });
+      // 成功后再次刷新列表
+      if (handleChange) handleChange();
     });
-  };
+  }
 
-  showResult(queryResult, successCallback) {
+  uncheck() {
+    const { dispatch, id, handleChange } = this.props;
+
+    dispatch({
+      type: 'reportProfile/uncheck',
+      payload: { id },
+    }).then(queryResult => {
+      this.showResult(queryResult);
+      dispatch({
+        type: 'reportProfile/init',
+        payload: { id },
+      });
+      // 成功后再次刷新列表
+      if (handleChange) handleChange();
+    });
+  }
+
+  showResult(queryResult) {
     const { status, message, model } = queryResult;
 
     if (status === 'ok') {
-      if (successCallback) successCallback(model);
-      else {
-        message.success(message);
-      }
+      message.success(queryResult.message);
     } else if (status === 'warning') {
-      message.warning(message);
+      message.warning(queryResult.message);
     } else {
-      message.error(message);
+      message.error(queryResult.message);
     }
   }
 
@@ -143,38 +124,45 @@ class Profile extends PureComponent {
     });
   }
 
-  render() {
+  renderActions = () => {
     const {
-      loading,
-      form: { getFieldDecorator },
+      reportProfile: { fStatusNumber },
     } = this.props;
-
-    const {
-      fBillNo,
-      fDeptName,
-      fDate,
-      fComments,
-      fStatus,
-      fStatusName,
-      fTotalDeltaQty,
-      details,
-    } = this.state;
-
-    const action = (
+    return (
       <Fragment>
         <ButtonGroup>
-          {fStatus === 0 && <Button onClickCapture={() => this.handleUpdate()}>修改</Button>}
-          {fStatus === 0 ? (
+          {fStatusNumber === 'Created' && hasAuthority('Report_Update') ? (
+            <Button type={'primary'} onClickCapture={() => this.update()}>
+              修改
+            </Button>
+          ) : null}
+          {fStatusNumber === 'Created' && hasAuthority('Report_Check') ? (
             <Button onClickCapture={() => this.check()}>审核</Button>
-          ) : (
-            <Button onClickCapture={() => this.uncheck()}>反审核</Button>
-          )}
+          ) : null}
+          {fStatusNumber === 'Checked' && hasAuthority('Report_Check') ? (
+            <Button type={'danger'} onClickCapture={() => this.uncheck()}>
+              反审核
+            </Button>
+          ) : null}
         </ButtonGroup>
         <Button onClick={() => this.close()}>关闭</Button>
       </Fragment>
     );
+  };
 
+  getColumns = () => {
+    const {
+      form: { getFieldDecorator },
+    } = this.props;
     const columns = [
+      {
+        title: '任务单号',
+        dataIndex: 'fMoBillNo',
+      },
+      {
+        title: '批号',
+        dataIndex: 'fFullBatchNo',
+      },
       {
         title: '产品',
         dataIndex: 'fProductName',
@@ -188,28 +176,12 @@ class Profile extends PureComponent {
         dataIndex: 'fProductModel',
       },
       {
-        title: '不良',
-        dataIndex: 'fDefectName',
-      },
-      {
-        title: '任务单号',
-        dataIndex: 'fMoBillNo',
+        title: '汇报数量',
+        dataIndex: 'fReportingQty',
       },
       {
         title: '单位',
         dataIndex: 'fUnitName',
-      },
-      {
-        title: '盘点数量',
-        dataIndex: 'fQty',
-      },
-      {
-        title: '数量',
-        dataIndex: 'fInvQty',
-      },
-      {
-        title: '盈亏',
-        dataIndex: 'fDeltaQty',
       },
       {
         title: '备注',
@@ -217,43 +189,107 @@ class Profile extends PureComponent {
       },
     ];
 
-    const description = (
-      <DescriptionList className={styles.headerList} size="small" col="3">
-        <Description term="单号">{fBillNo}</Description>
-        <Description term="岗位">{fDeptName}</Description>
-        <Description term="日期">{moment(fDate).format('YYYY-MM-DD')}</Description>
-        <Description term="备注">{fComments}</Description>
-      </DescriptionList>
-    );
+    return columns;
+  };
 
-    const extra = (
-      <Row>
-        <Col xs={24} sm={12}>
-          <div className={styles.textSecondary}>盈亏</div>
-          <div className={styles.heading}>{numeral(fTotalDeltaQty).format('0.00')}</div>
-        </Col>
-        <Col xs={24} sm={12}>
-          <div className={styles.textSecondary}>状态</div>
-          <div className={styles.heading}>{fStatusName}</div>
-        </Col>
-      </Row>
+  renderBaseCard = () => {
+    const {
+      reportProfile: { fDeptName, fDeptNumber },
+    } = this.props;
+    return (
+      <Card title="基本信息" bordered={false}>
+        <DescriptionList className={styles.headerList} size="small" col="4">
+          <Description term="岗位">{fDeptName}</Description>
+          <Description term="岗位编码">{fDeptNumber}</Description>
+        </DescriptionList>
+      </Card>
     );
+  };
+
+  renderDetailsCard = () => {
+    const {
+      loading,
+      reportProfile: { details },
+    } = this.props;
+    const sum = details.reduce((acc, cur) => acc.add(cur.fReportingQty), numeral());
+
+    return (
+      <Card title="明细信息" bordered={false}>
+        <Table
+          rowKey="fInvID"
+          bordered
+          loading={loading}
+          columns={this.getColumns()}
+          dataSource={details}
+          footer={() => `总汇报数量：${sum ? sum.value() : 0}`}
+          pagination={false}
+        />
+      </Card>
+    );
+  };
+
+  renderCommentsCard = () => {
+    const {
+      reportProfile: { fComments },
+    } = this.props;
+    return (
+      <Card title="备注信息" bordered={false}>
+        <DescriptionList className={styles.headerList} size="small">
+          <Description term="备注">{fComments}</Description>
+        </DescriptionList>
+      </Card>
+    );
+  };
+
+  renderOtherCard = () => {
+    const {
+      reportProfile: {
+        fCreatorName,
+        fCreatorNumber,
+        fCreateDate,
+        fCheckerName,
+        fCheckerNumber,
+        fCheckDate,
+      },
+    } = this.props;
+    return (
+      <Card title="其他信息" bordered={false}>
+        <DescriptionList className={styles.headerList} size="small" col={4}>
+          <Description term="创建人">{fCreatorName}</Description>
+          <Description term="创建人编码">{fCreatorNumber}</Description>
+          <Description term="创建日期">{defaultDateTimeFormat(fCreateDate)}</Description>
+        </DescriptionList>
+        <DescriptionList className={styles.headerList} size="small" col={4}>
+          <Description term="审核人">{fCheckerName}</Description>
+          <Description term="审核人编码">{fCheckerNumber}</Description>
+          <Description term="审核日期">{defaultDateTimeFormat(fCheckDate)}</Description>
+        </DescriptionList>
+      </Card>
+    );
+  };
+
+  render() {
+    const {
+      reportProfile: { fBillNo },
+      loading,
+    } = this.props;
 
     return (
       <WgPageHeaderWrapper
-        title={`不良盘点单：${fBillNo}`}
+        title={`生产任务汇报：${fBillNo}`}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }
-        action={action}
-        content={description}
-        extraContent={extra}
-        wrapperClassName={styles.advancedForm}
+        action={this.renderActions()}
+        // content={description}
+        // extraContent={extra}
+        wrapperClassName={styles.main}
         loading={loading}
       >
-        <Card title="明细信息" style={{ marginBottom: 24 }} bordered={false}>
-          <Table rowKey="fEntryID" loading={loading} columns={columns} dataSource={details} />
-        </Card>
+        {this.renderBaseCard()}
+        {this.renderDetailsCard()}
+        {this.renderCommentsCard()}
+        {this.renderOtherCard()}
       </WgPageHeaderWrapper>
     );
   }

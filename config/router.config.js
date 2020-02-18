@@ -75,6 +75,7 @@ export default [
           'Mission_Read',
           'Flow_Read',
           'Inv_Read',
+          'PassInv_Read',
           'ProdDefect_Read',
           'InvCheck_Read',
           'DefectCheck_Read',

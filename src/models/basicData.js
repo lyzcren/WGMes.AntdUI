@@ -17,6 +17,16 @@ import {
 import { fakeGetAll as fakeGetUnit } from '@/services/Basic/Unit';
 import { fakeGetAll as fakeGetUnitConverter } from '@/services/Basic/UnitConverter';
 
+const activeDeptFilter = depts => {
+  const newDepts = depts.filter(dept => {
+    if (dept.children && dept.children.length > 0) {
+      dept.children = activeDeptFilter(dept.children);
+    }
+    return !dept.disabled || dept.children.length > 0;
+  });
+  return newDepts;
+};
+
 export default {
   namespace: 'basicData',
 
@@ -57,9 +67,10 @@ export default {
     },
     *getAuthorizeProcessTree({ payload }, { call, put }) {
       const response = yield call(fakeGetAuthorizeProcessTree, payload);
+      const authorizeProcessTree = activeDeptFilter(response);
       yield put({
         type: 'save',
-        payload: { authorizeProcessTree: response },
+        payload: { authorizeProcessTree },
       });
     },
     *getWorkShops({ payload }, { call, put }) {

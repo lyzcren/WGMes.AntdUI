@@ -63,7 +63,8 @@ export default {
       return response;
     },
     *uncheck({ payload }, { call, put }) {
-      const response = yield call(fakeUncheck, payload);
+      const { fInterID } = payload;
+      const response = yield call(fakeUncheck, fInterID);
       yield put({
         type: 'save',
         payload: { queryResult: response },

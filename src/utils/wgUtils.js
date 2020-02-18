@@ -42,3 +42,17 @@ export function changeFullScreen() {
     }
   } catch (error) {}
 }
+
+export function getColumns({ columns, columnOps }) {
+  const newColumns = (columns || []).map(column => {
+    if (columnOps) {
+      const columnOp = columnOps.find(x => x.dataIndex === column.dataIndex) || [];
+      const retColumn = { ...column, ...columnOp };
+      return retColumn;
+    }
+
+    return column;
+  });
+
+  return newColumns;
+}
