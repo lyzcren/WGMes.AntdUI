@@ -132,7 +132,7 @@ class Profile extends PureComponent {
       <Fragment>
         <ButtonGroup>
           {fStatusNumber === 'Created' && hasAuthority('Report_Update') ? (
-            <Button type={'primary'} onClickCapture={() => this.update()}>
+            <Button type="primary" onClickCapture={() => this.update()}>
               修改
             </Button>
           ) : null}
@@ -140,7 +140,7 @@ class Profile extends PureComponent {
             <Button onClickCapture={() => this.check()}>审核</Button>
           ) : null}
           {fStatusNumber === 'Checked' && hasAuthority('Report_Check') ? (
-            <Button type={'danger'} onClickCapture={() => this.uncheck()}>
+            <Button type="danger" onClickCapture={() => this.uncheck()}>
               反审核
             </Button>
           ) : null}

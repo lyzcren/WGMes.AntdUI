@@ -56,3 +56,24 @@ export function getColumns({ columns, columnOps }) {
 
   return newColumns;
 }
+
+const getValue = obj =>
+  Object.keys(obj)
+    .map(key => `'${obj[key]}'`)
+    .join(',');
+
+export function getFiltersAndSorter({ filters = {}, sorter = {} }) {
+  const result = {};
+  if (filters && Object.keys(filters).length > 0) {
+    result.filters = Object.keys(filters).reduce((obj, key) => {
+      const newObj = { ...obj };
+      newObj[key] = getValue(filters[key]);
+      return newObj;
+    }, {});
+  }
+  if (sorter && Object.keys(sorter).length > 0) {
+    result.sorter = {};
+    result.sorter[sorter.field] = sorter.order.replace('ascend', 'asc').replace('descend', 'desc');
+  }
+  return result;
+}

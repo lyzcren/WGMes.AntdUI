@@ -78,9 +78,18 @@ class WgStandardTable extends PureComponent {
   };
 
   handleTableChange = (pagination, filters, sorter) => {
-    const { onChange } = this.props;
+    const { dispatch, fetchType, onChange } = this.props;
     if (onChange) {
       onChange(pagination, filters, sorter);
+    } else if (fetchType) {
+      dispatch({
+        type: fetchType,
+        payload: {
+          ...pagination,
+          filters,
+          sorter,
+        },
+      });
     }
   };
 

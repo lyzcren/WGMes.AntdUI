@@ -1,5 +1,7 @@
 import { defaultDateTimeFormat } from '@/utils/GlobalConst';
 
+export const columnConfigKey = 'report';
+
 export const columns = [
   {
     title: '单号',

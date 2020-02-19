@@ -1,74 +1,57 @@
-import {
-  fakeQuery,
-  fakeRemove,
-  fakeAdd,
-  fakeUpdate,
-  fakeCheck,
-  fakeUncheck,
-  fakeQueryGroupBy,
-} from '@/services/Prod/Report';
+import { fakeQuery, fakeRemove, fakeCheck, fakeUncheck } from '@/services/Prod/Report';
 import { fakeQueryPrintTemplate } from '@/services/Sys/PrintTemplate';
+import { getFiltersAndSorter } from '@/utils/wgUtils';
 
 export default {
   namespace: 'reportManage',
 
   state: {
-    data: {
-      list: [],
-      pagination: {},
+    list: [],
+    pagination: {
+      current: 1,
+      pageSize: 10,
     },
-    queryResult: {
-      status: 'ok',
-      message: '',
-    },
+    selectedRows: [],
     printTemplates: [],
   },
 
   effects: {
-    *fetch({ payload }, { call, put }) {
-      const response = yield call(fakeQuery, payload);
+    *fetch({ payload = {} }, { call, put, select }) {
+      const reportManage = yield select(state => state.reportManage);
+      const { pagination } = reportManage;
+      const filtersAndSorter = getFiltersAndSorter(payload);
+      const currentPagination = { ...pagination, ...payload, ...filtersAndSorter };
+
+      const response = yield call(fakeQuery, currentPagination);
       yield put({
         type: 'save',
-        payload: { data: response },
+        payload: {
+          pagination: currentPagination,
+          ...response,
+        },
       });
     },
-    *add({ payload }, { call, put }) {
-      const response = yield call(fakeAdd, payload);
+    *selectedRows({ payload }, { call, put, select }) {
       yield put({
         type: 'save',
-        payload: { queryResult: response },
+        payload: {
+          selectedRows: payload,
+        },
       });
     },
     *remove({ payload }, { call, put }) {
       const response = yield call(fakeRemove, payload);
-      yield put({
-        type: 'save',
-        payload: { queryResult: response },
-      });
-    },
-    *update({ payload }, { call, put }) {
-      const response = yield call(fakeUpdate, payload);
-      yield put({
-        type: 'save',
-        payload: { queryResult: response },
-      });
+
+      return response;
     },
     *check({ payload }, { call, put }) {
       const response = yield call(fakeCheck, payload.fInterID);
-      yield put({
-        type: 'save',
-        payload: { queryResult: response },
-      });
 
       return response;
     },
     *uncheck({ payload }, { call, put }) {
       const { fInterID } = payload;
       const response = yield call(fakeUncheck, fInterID);
-      yield put({
-        type: 'save',
-        payload: { queryResult: response },
-      });
 
       return response;
     },
