@@ -1,16 +1,12 @@
-import { fakeGetProducingRecord, fakeTransfer } from '@/services/Prod/Record';
+import { fakeGetUnitConvertersWithMatch, fakeGetWorkTimes } from '@/services/Basic/Dept';
 import { fakeGetDeptDefect, fakeMachineData } from '@/services/basicData';
+import { fakeGetProducingRecord, fakeTransfer } from '@/services/Prod/Record';
 import { fakeQueryParams } from '@/services/Tech/Route';
-import { fakeGetWorkTimes, fakeGetUnitConvertersWithMatch } from '@/services/Basic/Dept';
-import { defaultCipherList } from 'constants';
 import {
   getConverterRate,
-  getUnconvertQty,
-  getMatchConverter,
   getConvertQtyWithDecimal,
+  getMatchConverter,
 } from '@/utils/unitConvertUtil';
-import { exists } from 'fs';
-import numeral from 'numeral';
 import { isArray } from 'util';
 
 export default {
@@ -144,10 +140,13 @@ export default {
         payload: { data: { ...data, paramList } },
       });
     },
-    *changeDefect({ payload }, { call, put }) {
+    *changeDefect({ payload }, { call, put, select }) {
+      const { fDefectID, fQty } = payload;
+      const { defectData } = yield select(state => state.basicData);
+      const defect = defectData.find(d => d.fItemID == fDefectID);
       yield put({
         type: 'changeDefectReducer',
-        payload,
+        payload: { defect, fQty },
       });
     },
     *addDefect({ payload }, { call, put, select }) {
@@ -171,7 +170,6 @@ export default {
       });
     },
     *transfer({ payload }, { call, put }) {
-      console.log(payload);
       const response = yield call(fakeTransfer, payload);
       yield put({
         type: 'saveData',
@@ -196,8 +194,10 @@ export default {
     },
     changeDefectReducer(state, action) {
       const {
-        payload: { fDefectID, fQty },
+        payload: { defect, fQty },
       } = action;
+      const { fItemID: fDefectID, fName: fDefectName, fNumber: fDefectNumber } = defect;
+
       const { data, matchConverter } = state;
       const { defectList } = data;
       const existsDefect = defectList.find(d => d.fDefectID === fDefectID);
@@ -205,7 +205,7 @@ export default {
       if (existsDefect) {
         existsDefect.fQty = fQty;
       } else {
-        defectList.push({ fDefectID, fQty });
+        defectList.push({ fDefectID, fDefectName, fDefectNumber, fQty });
       }
       const defectQty = defectList
         .map(x => (x.fQty ? x.fQty : 0))

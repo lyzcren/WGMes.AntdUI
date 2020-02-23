@@ -1,36 +1,11 @@
-import React, { PureComponent, Fragment } from 'react';
-import moment from 'moment';
-import numeral from 'numeral';
-import { connect } from 'dva';
-import {
-  Layout,
-  Row,
-  Col,
-  Card,
-  Select,
-  Form,
-  Button,
-  TreeSelect,
-  DatePicker,
-  Table,
-  Input,
-  InputNumber,
-  message,
-  Menu,
-  Dropdown,
-  Icon,
-  Modal,
-} from 'antd';
-import GridContent from '@/components/PageHeaderWrapper/GridContent';
-import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import DescriptionList from '@/components/DescriptionList';
-import Authorized from '@/utils/Authorized';
 import { hasAuthority } from '@/utils/authority';
 import { defaultDateTimeFormat } from '@/utils/GlobalConst';
-
-import { ScanForm } from './components/ScanForm';
-import { ChooseForm } from './components/ChooseForm';
-
+import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
+import { Button, Card, Form, Input, Layout, Select, Table } from 'antd';
+import { connect } from 'dva';
+import numeral from 'numeral';
+import React, { Fragment, PureComponent } from 'react';
 import styles from './Profile.less';
 
 const FormItem = Form.Item;

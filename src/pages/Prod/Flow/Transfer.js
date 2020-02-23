@@ -1,41 +1,16 @@
-import React, { PureComponent, Fragment } from 'react';
-import router from 'umi/router';
+import DescriptionList from '@/components/DescriptionList';
+import { defaultDateTimeFormat } from '@/utils/GlobalConst';
+import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
+import { Button, Card, Col, DatePicker, Form, InputNumber, Layout, Row, Select } from 'antd';
+import { connect } from 'dva';
 import moment from 'moment';
 import numeral from 'numeral';
 import QRCode from 'qrcode.react';
-import { connect } from 'dva';
-import {
-  Layout,
-  Row,
-  Col,
-  Card,
-  Form,
-  Input,
-  Select,
-  Icon,
-  Button,
-  Dropdown,
-  Menu,
-  Modal,
-  message,
-  Steps,
-  Table,
-  Tooltip,
-  Divider,
-  InputNumber,
-  DatePicker,
-} from 'antd';
-import NumericInput from '@/wg_components/WgInputNumber';
-import GridContent from '@/components/PageHeaderWrapper/GridContent';
-import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
-import DescriptionList from '@/components/DescriptionList';
-import Authorized from '@/utils/Authorized';
-import { hasAuthority } from '@/utils/authority';
-import { isArray } from 'util';
-import { ViewUnitConverterForm } from './ViewUnitConverter';
-import { defaultDateTimeFormat } from '@/utils/GlobalConst';
-
+import React, { Fragment, PureComponent } from 'react';
+import router from 'umi/router';
+import DefectDrawer from './components/DefectDrawer';
 import styles from './List.less';
+import { ViewUnitConverterForm } from './ViewUnitConverter';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -55,7 +30,6 @@ const { RangePicker } = DatePicker;
 @Form.create()
 class Transfer extends PureComponent {
   state = {
-    showMoreDefect: false,
     moreDefectValue: '',
     fBeginDate: '',
     fTransferDateTime: '',
@@ -95,9 +69,6 @@ class Transfer extends PureComponent {
     dispatch({
       type: 'flowTransfer/initModel',
       payload: { fInterID },
-    });
-    dispatch({
-      type: 'basicData/getDefectData',
     });
     dispatch({
       type: 'basicData/getOperator',
@@ -179,8 +150,7 @@ class Transfer extends PureComponent {
     }
   };
 
-  handleFieldChange(fQty, fDefectID) {
-    fQty = fQty || 0;
+  handleFieldChange(fDefectID, fQty = 0) {
     const { dispatch } = this.props;
     dispatch({
       type: 'flowTransfer/changeDefect',
@@ -224,11 +194,6 @@ class Transfer extends PureComponent {
       payload: { fParamID, values },
     });
   }
-
-  handleShowMoreDefect = () => {
-    const { showMoreDefect } = this.state;
-    this.setState({ showMoreDefect: !showMoreDefect });
-  };
 
   disabledDate = (date, fSignDate) => date < moment(fSignDate) || date >= moment();
 
@@ -353,13 +318,13 @@ class Transfer extends PureComponent {
       flowTransfer: { data, machineData, workTimes, matchConverter },
       loading,
       form: { getFieldDecorator },
-      basicData: { defectData, operators, debuggers },
+      basicData: { operators, debuggers },
       fBindEmpID,
       location: { fEmpID, tabMode },
     } = this.props;
     const { defectList, paramList } = data;
 
-    const { showMoreDefect, moreDefectValue, unitConverterVisible } = this.state;
+    const { moreDefectValue, unitConverterVisible } = this.state;
     const { fQtyDecimal, fConvertDecimal } = data;
     const defectQtyDecimal = fQtyDecimal;
     const defaultOperatorId = data.fOperatorID ? data.fOperatorID : fEmpID || (fBindEmpID || null);
@@ -576,7 +541,7 @@ class Transfer extends PureComponent {
                         initialValue: d.fQty,
                       })(
                         <InputNumber
-                          onChange={val => this.handleFieldChange(val, d.fDefectID)}
+                          onChange={val => this.handleFieldChange(d.fDefectID, val)}
                           style={{ width: '100%' }}
                           placeholder="请输入数量"
                           min={0}
@@ -588,7 +553,7 @@ class Transfer extends PureComponent {
                   </Col>
                 ))}
               </Row>
-              {showMoreDefect && (
+              {/* {showMoreDefect && (
                 <Row gutter={16}>
                   <Col lg={6} md={12} sm={24}>
                     <FormItem label="其他不良">
@@ -633,15 +598,15 @@ class Transfer extends PureComponent {
                     </FormItem>
                   </Col>
                 </Row>
-              )}
+              )} */}
             </Form>
             <Button
               style={{ width: '100%', marginTop: 16, marginBottom: 8 }}
               type="dashed"
               onClick={this.handleShowMoreDefect}
-              icon={showMoreDefect ? 'minus' : 'plus'}
+              icon={'plus'}
             >
-              {showMoreDefect ? '收起' : '更多不良'}
+              {'更多不良'}
             </Button>
           </Card>
           <Card title="工艺参数" style={{ marginBottom: 24 }} bordered={false}>
@@ -682,6 +647,11 @@ class Transfer extends PureComponent {
               </Row>
             </Form>
           </Card>
+          <DefectDrawer
+            refOpen={open => {
+              this.handleShowMoreDefect = open;
+            }}
+          />
         </WgPageHeaderWrapper>
         {matchConverter && Object.keys(matchConverter).length > 0 && (
           <ViewUnitConverterForm

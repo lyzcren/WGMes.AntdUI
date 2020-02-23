@@ -1,41 +1,12 @@
-import React, { PureComponent, Fragment } from 'react';
-import { connect } from 'dva';
-import moment from 'moment';
-import {
-  Row,
-  Col,
-  Card,
-  Form,
-  Input,
-  Select,
-  Icon,
-  Button,
-  Dropdown,
-  Menu,
-  InputNumber,
-  DatePicker,
-  Modal,
-  message,
-  Badge,
-  Table,
-  Divider,
-  Radio,
-  Popover,
-  Switch,
-  Progress,
-  notification,
-  Popconfirm,
-  TreeSelect,
-} from 'antd';
-import { formatMessage, FormattedMessage } from 'umi/locale';
-
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import { hasAuthority } from '@/utils/authority';
 import { print } from '@/utils/wgUtils';
-import QueryForm from './components/QueryForm';
+import { Card, Form, message, Select } from 'antd';
+import { connect } from 'dva';
+import React, { PureComponent } from 'react';
 import ListTableForm from './components/ListTableForm';
 import OperatorForm from './components/OperatorForm';
-
+import QueryForm from './components/QueryForm';
 import styles from './List.less';
 
 const FormItem = Form.Item;
