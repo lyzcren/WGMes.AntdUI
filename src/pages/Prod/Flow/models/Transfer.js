@@ -56,11 +56,11 @@ export default {
       data.paramList.forEach(dp => {
         let findParam = mergeParamList.find(md => md.fParamID === dp.fParamID);
         if (findParam) {
-          findParam.values = [...findParam.values, dp.fValue];
+          findParam.fValues = [...findParam.fValues, dp.fValue];
         } else {
           findParam = { ...dp };
-          findParam.fValue = undefined;
-          findParam.values = [dp.fValue];
+          findParam.fValues = [dp.fValue];
+          // findParam.fValue = undefined;
           mergeParamList.push(findParam);
         }
       });
@@ -71,12 +71,14 @@ export default {
         }
         const findParam = mergeParamList.find(rp => rp.fParamID === p.fParamID);
         if (findParam) {
-          p.fDefaultValue = findParam.values;
+          p.fDefaultValue = findParam.fValues;
         }
         // 多选框，默认值需要是数组
         if (p.fTypeNumber === 'TagSelect' && !isArray(p.fDefaultValue)) {
-          p.fDefaultValue = [p.fDefaultValue];
+          p.fDefaultValue = !!p.fDefaultValue ? [p.fDefaultValue] : [];
         }
+        // 上次转序已存在的值
+        p.fValues = findParam.fValues;
       });
       data.paramList = defaultParamList.filter(x => x.fIsActive);
 
@@ -128,12 +130,12 @@ export default {
       });
     },
     *changeParam({ payload }, { call, put, select }) {
-      const { fParamID, values } = payload;
+      const { fParamID, fValues } = payload;
       const { data } = yield select(state => state.flowTransfer);
       const { paramList } = data;
       const existsOne = paramList.find(x => x.fParamID == fParamID);
       if (existsOne) {
-        existsOne.values = values;
+        existsOne.fValues = fValues;
       }
       yield put({
         type: 'save',
@@ -175,6 +177,8 @@ export default {
         type: 'saveData',
         payload: response,
       });
+
+      return response;
     },
   },
 

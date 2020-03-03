@@ -76,8 +76,6 @@ export default {
     '/api/': {
       // 1、localhost
       target: 'http://localhost:8001/',
-      // 2、docker proxy
-      // target: 'https://172.22.144.221/',
       changeOrigin: true,
       secure: false,
       // pathRewrite: { '^/api/': '/api/' },

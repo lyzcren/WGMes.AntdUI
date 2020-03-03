@@ -1,7 +1,18 @@
 import DescriptionList from '@/components/DescriptionList';
 import { defaultDateTimeFormat } from '@/utils/GlobalConst';
 import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
-import { Button, Card, Col, DatePicker, Form, InputNumber, Layout, Row, Select } from 'antd';
+import {
+  Button,
+  Card,
+  Col,
+  DatePicker,
+  Form,
+  InputNumber,
+  Layout,
+  message,
+  Row,
+  Select,
+} from 'antd';
 import { connect } from 'dva';
 import moment from 'moment';
 import numeral from 'numeral';
@@ -9,6 +20,7 @@ import QRCode from 'qrcode.react';
 import React, { Fragment, PureComponent } from 'react';
 import router from 'umi/router';
 import DefectDrawer from './components/DefectDrawer';
+import ParamsCard from './components/ParamsCard';
 import styles from './List.less';
 import { ViewUnitConverterForm } from './ViewUnitConverter';
 
@@ -103,20 +115,17 @@ class Transfer extends PureComponent {
       dispatch({
         type: 'flowTransfer/transfer',
         payload: { ...newData },
-      }).then(() => {
-        const {
-          flowTransfer: {
-            queryResult: { status, message },
-          },
-        } = this.props;
+      }).then(queryResult => {
+        const { status } = queryResult;
         if (status === 'ok') {
           message.success('转序成功');
           if (successCallback) successCallback();
           this.close();
         } else if (status === 'warning') {
-          message.warning(message);
+          message.warning(queryResult.message);
         } else {
-          message.error(message);
+          console.log(queryResult);
+          message.error(queryResult.message);
         }
       });
     });
@@ -185,14 +194,6 @@ class Transfer extends PureComponent {
         // console.log(flowTransfer);
       });
     }
-  }
-
-  handleParamChange(fParamID, values) {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'flowTransfer/changeParam',
-      payload: { fParamID, values },
-    });
   }
 
   disabledDate = (date, fSignDate) => date < moment(fSignDate) || date >= moment();
@@ -322,7 +323,7 @@ class Transfer extends PureComponent {
       fBindEmpID,
       location: { fEmpID, tabMode },
     } = this.props;
-    const { defectList, paramList } = data;
+    const { defectList } = data;
 
     const { moreDefectValue, unitConverterVisible } = this.state;
     const { fQtyDecimal, fConvertDecimal } = data;
@@ -553,52 +554,6 @@ class Transfer extends PureComponent {
                   </Col>
                 ))}
               </Row>
-              {/* {showMoreDefect && (
-                <Row gutter={16}>
-                  <Col lg={6} md={12} sm={24}>
-                    <FormItem label="其他不良">
-                      {getFieldDecorator('fOtherDefectID', {
-                        rules: [{ required: false, message: '请选择不良' }],
-                      })(
-                        <Select
-                          showSearch
-                          autoClearSearchValue
-                          filterOption={(input, option) =>
-                            option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                          }
-                          placeholder="请选择不良"
-                          autoFocus
-                          ref={c => (this.otherDefectRef = c)}
-                        >
-                          {defectData
-                            .filter(x => !defectList.find(y => y.fDefectID === x.fItemID))
-                            .map(x => (
-                              <Option key={x.fItemID} value={x.fItemID}>
-                                {`${x.fName} - ${x.fNumber}`}
-                              </Option>
-                            ))}
-                        </Select>
-                      )}
-                    </FormItem>
-                  </Col>
-                  <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-                    <FormItem key="fOtherDefectValue" label="数量">
-                      {getFieldDecorator('fOtherDefectValue', {
-                        rules: [{ required: false, message: '请输入数量' }],
-                      })(
-                        <NumericInput
-                          style={{ width: '100%' }}
-                          placeholder="请输入数量"
-                          title="按回车确认添加"
-                          // value={moreDefectValue}
-                          // onChange={val => this.handleOtherDefectChange(val)}
-                          onPressEnter={e => this.handleOtherDefectKeyPress(e)}
-                        />
-                      )}
-                    </FormItem>
-                  </Col>
-                </Row>
-              )} */}
             </Form>
             <Button
               style={{ width: '100%', marginTop: 16, marginBottom: 8 }}
@@ -609,44 +564,7 @@ class Transfer extends PureComponent {
               {'更多不良'}
             </Button>
           </Card>
-          <Card title="工艺参数" style={{ marginBottom: 24 }} bordered={false}>
-            <Form layout="vertical">
-              <Row gutter={16}>
-                {paramList.map((d, i) => (
-                  <Col
-                    key={`paramsCol${i}`}
-                    xl={i % 3 === 0 ? {} : { span: 6, offset: 2 }}
-                    lg={i % 3 === 0 ? 6 : { span: 8 }}
-                    md={12}
-                    sm={24}
-                  >
-                    <FormItem key={`paramsID${d.fParamID}`} label={d.fParamName}>
-                      {getFieldDecorator(`paramsID${d.fParamID}`, {
-                        rules: [{ required: d.fIsRequired, message: `${d.fParamName}必填` }],
-                        initialValue: d.fDefaultValue,
-                      })(
-                        <Select
-                          mode={d.fTypeNumber === 'TagSelect' ? 'tags' : ''}
-                          showSearch
-                          filterOption={(input, option) =>
-                            option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                          }
-                          placeholder="请选择"
-                          onChange={val => this.handleParamChange(d.fParamID, val)}
-                        >
-                          {d.values.map(x => (
-                            <Option key={x} value={x}>
-                              {x}
-                            </Option>
-                          ))}
-                        </Select>
-                      )}
-                    </FormItem>
-                  </Col>
-                ))}
-              </Row>
-            </Form>
-          </Card>
+          <ParamsCard />
           <DefectDrawer
             refOpen={open => {
               this.handleShowMoreDefect = open;

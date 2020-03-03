@@ -1,26 +1,6 @@
-import React, { PureComponent, Fragment } from 'react';
-import ReactDOM from 'react-dom';
+import { Divider, Drawer, Form, Input, InputNumber } from 'antd';
 import { connect } from 'dva';
-import {
-  Form,
-  Card,
-  Button,
-  Input,
-  InputNumber,
-  Icon,
-  List,
-  Menu,
-  Dropdown,
-  Drawer,
-  Divider,
-} from 'antd';
-import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
-import GridContent from '@/components/PageHeaderWrapper/GridContent';
-import { hasAuthority } from '@/utils/authority';
-import Authorized from '@/utils/Authorized';
-import { exportExcel } from '@/utils/getExcel';
-
-import styles from './DefectDrawer.less';
+import React, { PureComponent } from 'react';
 
 const FormItem = Form.Item;
 
