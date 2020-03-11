@@ -7,9 +7,9 @@ import styles from './ScanSignForm.less';
 const FormItem = Form.Item;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ scanSign, loading, menu }) => ({
-  scanSign,
-  loading: loading.models.scanSign,
+@connect(({ quickScan, loading, menu }) => ({
+  quickScan,
+  loading: loading.models.quickScan,
   menu,
 }))
 /* eslint react/no-multi-comp:0 */
@@ -44,20 +44,17 @@ export class ScanSignForm extends PureComponent {
       dispatch,
       form,
       handleSign,
-      scanSign: { data },
+      quickScan: { data },
       dept: { fItemID: fDeptID },
     } = this.props;
     const fFullBatchNo = form.getFieldValue('fFullBatchNo');
     dispatch({
-      type: 'scanSign/signByBatchNo',
+      type: 'quickScan/signByBatchNo',
       payload: {
         fFullBatchNo,
         fDeptID,
       },
-    }).then(() => {
-      const {
-        scanSign: { queryResult },
-      } = this.props;
+    }).then(queryResult => {
       if (queryResult.status === 'ok') {
         message.success('签收成功');
       } else if (queryResult.status === 'warning') {

@@ -324,6 +324,7 @@ class Transfer extends PureComponent {
       location: { fEmpID, tabMode },
     } = this.props;
     const { defectList } = data;
+    console.log(data);
 
     const { moreDefectValue, unitConverterVisible } = this.state;
     const { fQtyDecimal, fConvertDecimal } = data;

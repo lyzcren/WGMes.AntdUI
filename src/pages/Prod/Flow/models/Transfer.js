@@ -72,13 +72,13 @@ export default {
         const findParam = mergeParamList.find(rp => rp.fParamID === p.fParamID);
         if (findParam) {
           p.fDefaultValue = findParam.fValues;
+          // 上次转序已存在的值
+          p.fValues = findParam.fValues;
         }
         // 多选框，默认值需要是数组
         if (p.fTypeNumber === 'TagSelect' && !isArray(p.fDefaultValue)) {
           p.fDefaultValue = !!p.fDefaultValue ? [p.fDefaultValue] : [];
         }
-        // 上次转序已存在的值
-        p.fValues = findParam.fValues;
       });
       data.paramList = defaultParamList.filter(x => x.fIsActive);
 

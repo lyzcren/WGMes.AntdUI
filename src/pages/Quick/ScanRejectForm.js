@@ -69,7 +69,11 @@ export class ScanRejectForm extends PureComponent {
       if (!flow || Object.keys(flow).length <= 0) {
         message.warning('未找到流程单');
       } else if (!flow.fRemaindRecords.find(x => x.fDeptID == dept.fItemID)) {
-        message.warning('当前岗位无法拒签');
+        if (flow.fFinishedRecords.find(x => x.fDeptID == dept.fItemID)) {
+          message.warning('无法拒签，当前岗位已完成。');
+        } else {
+          message.warning('无法拒签，流程单未经过当前岗位。');
+        }
       } else {
         this.handleModalVisible({ key: 'reject', flag: true }, flow);
       }

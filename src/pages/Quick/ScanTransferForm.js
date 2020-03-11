@@ -8,9 +8,9 @@ import styles from './ScanTransferForm.less';
 const FormItem = Form.Item;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ scanSign, loading, menu }) => ({
-  scanSign,
-  loading: loading.models.scanSign,
+@connect(({ quickScan, loading, menu }) => ({
+  quickScan,
+  loading: loading.models.quickScan,
   menu,
 }))
 /* eslint react/no-multi-comp:0 */
@@ -45,7 +45,7 @@ export class ScanTransferForm extends PureComponent {
       dispatch,
       form,
       handleSign,
-      scanSign: { data },
+      quickScan: { data },
       dept: { fItemID: fDeptID },
       operator: { fEmpID },
       worktime: { fWorkTimeID },
@@ -53,14 +53,12 @@ export class ScanTransferForm extends PureComponent {
     } = this.props;
     const fFullBatchNo = form.getFieldValue('fFullBatchNo');
     dispatch({
-      type: 'scanSign/get',
+      type: 'quickScan/get',
       payload: {
         fFullBatchNo,
       },
-    }).then(() => {
-      const {
-        scanSign: { data },
-      } = this.props;
+    }).then(data => {
+      console.log(data);
       if (data == null || data == '') {
         message.warning('未找到流程单');
       } else if (data.fCancellation) {
@@ -73,13 +71,20 @@ export class ScanTransferForm extends PureComponent {
         message.warning('流程单未生产');
       } else if (data.fFinishedRecords.find(x => x.fDeptID == fDeptID)) {
         message.warning('当前工序已完成');
-      } else if (data.fCurrentDeptID == fDeptID && data.fRecordStatusNumber == 'ManufTransfered') {
+      } else if (
+        data.fCurrentDeptID == fDeptID &&
+        data.fCurrentRecordStatusNumber == 'ManufTransfered'
+      ) {
         message.warning('当前工序已转出');
+      } else if (data.fCurrentRecordStatusNumber == 'ManufTransfered') {
+        message.warning('上工序已转出，流程单待签收');
       } else if (
         data.fRecords.find(x => x.fDeptID == fDeptID) >= 0 &&
         data.fCurrentDeptID != fDeptID
       ) {
         message.warning('当前工序未生产');
+      } else if (data.fRecordID <= 0) {
+        message.warning('流程单未签收');
       } else {
         dispatch(
           routerRedux.push({

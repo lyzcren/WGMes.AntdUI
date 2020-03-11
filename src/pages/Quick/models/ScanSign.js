@@ -1,7 +1,7 @@
 import { fakeGetByBatchNo as fakeGet, fakeSign } from '@/services/Prod/Flow';
 
 export default {
-  namespace: 'scanSign',
+  namespace: 'quickScan',
 
   state: {
     queryResult: {
@@ -17,6 +17,7 @@ export default {
         type: 'save',
         payload: { data: response },
       });
+      return response;
     },
     *signByBatchNo({ payload }, { call, put }) {
       const response = yield call(fakeGet, payload);
@@ -27,11 +28,14 @@ export default {
           type: 'save',
           payload: { queryResult: response },
         });
+        return response;
       } else {
+        const response = { status: 'warning', message: '未找到流程单' };
         yield put({
           type: 'save',
-          payload: { queryResult: { status: 'warning', message: '未找到流程单' } },
+          payload: { response },
         });
+        return response;
       }
     },
   },

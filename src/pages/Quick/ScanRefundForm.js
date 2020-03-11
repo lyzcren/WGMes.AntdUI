@@ -69,7 +69,7 @@ export class ScanRefundForm extends PureComponent {
       if (!flow || Object.keys(flow).length <= 0) {
         message.warning('未找到流程单');
       } else if (flow.fCurrentDeptID !== dept.fItemID) {
-        message.warning('当前岗位无法退回');
+        message.warning(`无法退回，流程单不在当前岗位。请在岗位【${flow.fCurrentDeptName}】退回。`);
       } else {
         this.handleModalVisible({ key: 'refund', flag: true }, flow);
       }
