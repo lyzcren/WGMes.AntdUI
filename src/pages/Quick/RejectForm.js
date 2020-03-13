@@ -130,7 +130,7 @@ export class RejectForm extends PureComponent {
           {values.fCurrentDeptName}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="拒收岗位">
-          {bindDept.fDeptName}
+          {bindDept.fName}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="操作员">
           {bindOperator.fEmpName}

@@ -82,12 +82,12 @@ export default {
     },
     '/print/': {
       target: 'http://localhost:8001/',
-      changeOrigin: false,
+      changeOrigin: true,
       secure: false,
     },
     '/js/': {
       target: 'http://localhost:8001/',
-      changeOrigin: false,
+      changeOrigin: true,
       secure: false,
     },
   },

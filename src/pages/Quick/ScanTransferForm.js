@@ -27,14 +27,14 @@ export class ScanTransferForm extends PureComponent {
     };
   }
 
-  componentDidMount() {
+  componentDidMount () {
     const { queryDeptID } = this.props;
     this.state = {
       queryDeptID,
     };
   }
 
-  handleKeyPress(e) {
+  handleKeyPress (e) {
     if (e.key === 'Enter') {
       this.sign();
     }
@@ -83,9 +83,11 @@ export class ScanTransferForm extends PureComponent {
         data.fCurrentDeptID != fDeptID
       ) {
         message.warning('当前工序未生产');
-      } else if (data.fRecordID <= 0) {
-        message.warning('流程单未签收');
-      } else {
+      }
+      // else if (data.fRecordID <= 0) {
+      //   message.warning('流程单未签收');
+      // }
+      else {
         dispatch(
           routerRedux.push({
             pathname: '/quickOps/transfer',
@@ -104,7 +106,7 @@ export class ScanTransferForm extends PureComponent {
     handleModalVisible(false);
   };
 
-  render() {
+  render () {
     const {
       loading,
       form: { getFieldDecorator },

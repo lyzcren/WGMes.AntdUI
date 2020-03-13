@@ -1,11 +1,16 @@
 import screenfull from 'screenfull';
 
-export function print(module, grfId, id) {
+export function print (module, grfId, id) {
   const w = window.open('about:blank');
-  w.location.href = `/print/${module}/${grfId}/${id}`;
+  let env = process.env.NODE_ENV;
+  if (env === 'development') {
+    w.location.href = `/print/${module}/${grfId}/${id}`;
+  } else {
+    w.location.href = `http://print.ywlin.cn/print/${module}/${grfId}/${id}`;
+  }
 }
 
-export function autoSreenfull() {
+export function autoSreenfull () {
   try {
     setTimeout(() => {
       if (!screenfull.isFullscreen) {
@@ -19,7 +24,7 @@ export function autoSreenfull() {
   }
 }
 
-export function watchFullScreen(dispatch) {
+export function watchFullScreen (dispatch) {
   const screenChange = () => {
     dispatch({
       type: 'global/fullScreen',
@@ -33,17 +38,17 @@ export function watchFullScreen(dispatch) {
   }
 }
 
-export function changeFullScreen() {
+export function changeFullScreen () {
   try {
     if (screenfull.isFullscreen) {
       screenfull.exit();
     } else {
       screenfull.request();
     }
-  } catch (error) {}
+  } catch (error) { }
 }
 
-export function getColumns({ columns, columnOps }) {
+export function getColumns ({ columns, columnOps }) {
   const newColumns = (columns || []).map(column => {
     if (columnOps) {
       const columnOp = columnOps.find(x => x.dataIndex === column.dataIndex) || [];
@@ -62,7 +67,7 @@ const getValue = obj =>
     .map(key => `'${obj[key]}'`)
     .join(',');
 
-export function getFiltersAndSorter({ filters = {}, sorter = {} }) {
+export function getFiltersAndSorter ({ filters = {}, sorter = {} }) {
   const result = {};
   if (filters && Object.keys(filters).length > 0) {
     result.filters = Object.keys(filters).reduce((obj, key) => {

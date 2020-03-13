@@ -17,8 +17,8 @@ const FormItem = Form.Item;
 /* eslint react/no-multi-comp:0 */
 export class ManageForm extends PureComponent {
   static defaultProps = {
-    handleSuccess: () => {},
-    handleModalVisible: () => {},
+    handleSuccess: () => { },
+    handleModalVisible: () => { },
     values: {},
     fileList: [],
   };
@@ -31,7 +31,7 @@ export class ManageForm extends PureComponent {
     };
   }
 
-  componentDidUpdate(preProps) {
+  componentDidUpdate (preProps) {
     const prevNumber = preProps.values.fNumber;
     const {
       values: { fNumber },
@@ -41,7 +41,7 @@ export class ManageForm extends PureComponent {
     }
   }
 
-  refreshFileList() {
+  refreshFileList () {
     const {
       dispatch,
       values: { fNumber },
@@ -53,6 +53,13 @@ export class ManageForm extends PureComponent {
       const {
         printTemplateManage: { printTemplates },
       } = this.props;
+      let env = process.env.NODE_ENV;
+      let printUrl = '';
+      if (env === 'development') {
+        printUrl = ``;
+      } else {
+        printUrl = `http://print.ywlin.cn`;
+      }
       if (!!printTemplates) {
         this.setState({
           fileList: printTemplates.map(x => {
@@ -61,7 +68,7 @@ export class ManageForm extends PureComponent {
               name: x.fName,
               status: 'done',
               // response: 'Server Error 500', // custom error message to show
-              url: '/api/PrintTemplate/grf?id=' + x.fInterID,
+              url: printUrl + '/api/PrintTemplate/grf?id=' + x.fInterID,
             };
           }),
         });
@@ -71,7 +78,7 @@ export class ManageForm extends PureComponent {
     });
   }
 
-  deleteTemplate(id) {
+  deleteTemplate (id) {
     const { dispatch } = this.props;
     dispatch({
       type: 'printTemplateManage/removePrintTemplate',
@@ -111,7 +118,7 @@ export class ManageForm extends PureComponent {
         okText: '确认',
         cancelText: '取消',
         onOk: () => this.deleteTemplate(info.file.uid),
-        onCancel: () => {},
+        onCancel: () => { },
       });
       return;
     }
@@ -131,7 +138,7 @@ export class ManageForm extends PureComponent {
     }
   };
 
-  render() {
+  render () {
     const { form, modalVisible, handleModalVisible, values } = this.props;
     const { formVals, fileList } = this.state;
     const footer = (
