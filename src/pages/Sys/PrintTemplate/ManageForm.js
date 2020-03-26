@@ -3,6 +3,7 @@ import { connect } from 'dva';
 import moment from 'moment';
 import { Form, Input, Modal, Switch, Tag, message, Button, Icon, Upload } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
+import { fakeGetRootUrl } from '@/services/Sys/PrintTemplate';
 
 import { getToken } from '@/utils/token';
 
@@ -17,8 +18,8 @@ const FormItem = Form.Item;
 /* eslint react/no-multi-comp:0 */
 export class ManageForm extends PureComponent {
   static defaultProps = {
-    handleSuccess: () => { },
-    handleModalVisible: () => { },
+    handleSuccess: () => {},
+    handleModalVisible: () => {},
     values: {},
     fileList: [],
   };
@@ -29,9 +30,13 @@ export class ManageForm extends PureComponent {
     this.state = {
       formVals: props.values,
     };
+    const { dispatch } = props;
+    dispatch({
+      type: 'basicData/getRootUrl',
+    });
   }
 
-  componentDidUpdate (preProps) {
+  componentDidUpdate(preProps) {
     const prevNumber = preProps.values.fNumber;
     const {
       values: { fNumber },
@@ -41,10 +46,11 @@ export class ManageForm extends PureComponent {
     }
   }
 
-  refreshFileList () {
+  refreshFileList() {
     const {
       dispatch,
       values: { fNumber },
+      basicData,
     } = this.props;
     dispatch({
       type: 'printTemplateManage/getPrintTemplates',
@@ -54,12 +60,8 @@ export class ManageForm extends PureComponent {
         printTemplateManage: { printTemplates },
       } = this.props;
       let env = process.env.NODE_ENV;
-      let printUrl = '';
-      if (env === 'development') {
-        printUrl = ``;
-      } else {
-        printUrl = `http://print.ywlin.cn`;
-      }
+      // 打印url根目录
+      const { rootUrl } = basicData;
       if (!!printTemplates) {
         this.setState({
           fileList: printTemplates.map(x => {
@@ -68,7 +70,7 @@ export class ManageForm extends PureComponent {
               name: x.fName,
               status: 'done',
               // response: 'Server Error 500', // custom error message to show
-              url: printUrl + '/api/PrintTemplate/grf?id=' + x.fInterID,
+              url: rootUrl + '/api/PrintTemplate/grf?id=' + x.fInterID,
             };
           }),
         });
@@ -78,7 +80,7 @@ export class ManageForm extends PureComponent {
     });
   }
 
-  deleteTemplate (id) {
+  deleteTemplate(id) {
     const { dispatch } = this.props;
     dispatch({
       type: 'printTemplateManage/removePrintTemplate',
@@ -118,7 +120,7 @@ export class ManageForm extends PureComponent {
         okText: '确认',
         cancelText: '取消',
         onOk: () => this.deleteTemplate(info.file.uid),
-        onCancel: () => { },
+        onCancel: () => {},
       });
       return;
     }
@@ -138,7 +140,7 @@ export class ManageForm extends PureComponent {
     }
   };
 
-  render () {
+  render() {
     const { form, modalVisible, handleModalVisible, values } = this.props;
     const { formVals, fileList } = this.state;
     const footer = (

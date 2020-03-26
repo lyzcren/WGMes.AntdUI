@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import { FormattedMessage, formatMessage } from 'umi/locale';
+import monment from 'moment';
 import Link from 'umi/link';
 import { Icon, Tooltip } from 'antd';
 import GlobalFooter from '@/components/GlobalFooter';
@@ -33,7 +34,7 @@ const links = [
 
 const copyright = (
   <Fragment>
-    Copyright <Icon type="copyright" /> 2019 望果信息科技有限公司
+    Copyright <Icon type="copyright" /> 2019~{monment().format('YYYY')} 望果信息科技有限公司
   </Fragment>
 );
 

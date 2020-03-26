@@ -9,6 +9,7 @@ iframe: 400
 ````jsx
 import GlobalFooter from 'ant-design-pro/lib/GlobalFooter';
 import { Icon } from 'antd';
+import monment from 'moment';
 
 const links = [{
   key: '帮助',
@@ -26,7 +27,7 @@ const links = [{
   blankTarget: true,
 }];
 
-const copyright = <div>Copyright <Icon type="copyright" /> 2019 望果信息科技有限公司</div>;
+const copyright = <div>Copyright <Icon type="copyright" /> 2019~{monment().format('YYYY')} 望果信息科技有限公司</div>;
 
 ReactDOM.render(
   <div style={{ background: '#f5f5f5', overflow: 'hidden' }}>

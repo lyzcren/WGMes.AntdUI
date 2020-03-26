@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import { Layout, Icon } from 'antd';
+import monment from 'moment';
 import GlobalFooter from '@/components/GlobalFooter';
 
 const { Footer } = Layout;
@@ -28,7 +29,7 @@ const FooterView = () => (
       ]}
       copyright={
         <Fragment>
-          Copyright <Icon type="copyright" /> 2019 望果信息科技有限公司
+          Copyright <Icon type="copyright" /> 2019~{monment().format('YYYY')} 望果信息科技有限公司
         </Fragment>
       }
     />

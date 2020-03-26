@@ -71,7 +71,7 @@ class ColumnConfig {
       width: 120,
       render: (text, record) => (
         <Fragment>
-          <Authorized authority="Product_Update">
+          <Authorized authority="Product_Read">
             <a onClick={() => this.updateModalVisible(record)}>默认工艺路线</a>
           </Authorized>
           {/* <Authorized authority="Product_Active">

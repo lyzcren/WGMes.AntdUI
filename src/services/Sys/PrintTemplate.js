@@ -16,3 +16,7 @@ export async function fakeRemovePrintTemplate(params) {
     },
   });
 }
+
+export async function fakeGetRootUrl() {
+  return request('/api/PrintTemplate/rootUrl');
+}

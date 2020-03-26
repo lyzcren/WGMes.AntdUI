@@ -16,6 +16,7 @@ import {
 } from '@/services/basicData';
 import { fakeGetAll as fakeGetUnit } from '@/services/Basic/Unit';
 import { fakeGetAll as fakeGetUnitConverter } from '@/services/Basic/UnitConverter';
+import { fakeGetRootUrl } from '@/services/Sys/PrintTemplate';
 
 const activeDeptFilter = depts => {
   const newDepts = depts.filter(dept => {
@@ -172,6 +173,13 @@ export default {
       yield put({
         type: 'save',
         payload: { matchTypes: response },
+      });
+    },
+    *getRootUrl({}, { call, put }) {
+      const response = yield call(fakeGetRootUrl);
+      yield put({
+        type: 'save',
+        payload: response,
       });
     },
   },

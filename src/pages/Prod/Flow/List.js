@@ -107,7 +107,7 @@ class TableList extends PureComponent {
     this.columnConfigKey = 'flow';
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props;
 
     dispatch({
@@ -129,7 +129,7 @@ class TableList extends PureComponent {
     this.searchWhereInit();
   }
 
-  componentDidUpdate (preProps) {
+  componentDidUpdate(preProps) {
     const { fBatchNo } = this.props;
     if (preProps.fBatchNo !== fBatchNo) {
       this.searchWhereInit();
@@ -216,25 +216,25 @@ class TableList extends PureComponent {
       queryFilters.push({
         name: 'fRouteNumber',
         compare: '%*%',
-        value: fieldsValue.queryRouteNumber
+        value: fieldsValue.queryRouteNumber,
       });
     if (fieldsValue.queryProductName)
       queryFilters.push({
         name: 'fProductName',
         compare: '%*%',
-        value: fieldsValue.queryProductName
+        value: fieldsValue.queryProductName,
       });
     if (fieldsValue.queryProductFullName)
       queryFilters.push({
         name: 'fProductFullName',
         compare: '%*%',
-        value: fieldsValue.queryProductFullName
+        value: fieldsValue.queryProductFullName,
       });
     if (fieldsValue.queryProductNumber)
       queryFilters.push({
         name: 'fProductNumber',
         compare: '%*%',
-        value: fieldsValue.queryProductNumber
+        value: fieldsValue.queryProductNumber,
       });
     if (fieldsValue.queryModel)
       queryFilters.push({ name: 'fProductModel', compare: '%*%', value: fieldsValue.queryModel });
@@ -242,31 +242,31 @@ class TableList extends PureComponent {
       queryFilters.push({
         name: 'fWorkShopName',
         compare: '%*%',
-        value: fieldsValue.queryWorkShopName
+        value: fieldsValue.queryWorkShopName,
       });
     if (fieldsValue.queryWorkShopNumber)
       queryFilters.push({
         name: 'fWorkShopNumber',
         compare: '%*%',
-        value: fieldsValue.queryWorkShopNumber
+        value: fieldsValue.queryWorkShopNumber,
       });
     if (fieldsValue.queryMesSelf001)
       queryFilters.push({
         name: 'fMesSelf001',
         compare: '%*%',
-        value: fieldsValue.queryMesSelf001
+        value: fieldsValue.queryMesSelf001,
       });
     if (fieldsValue.queryMesSelf002)
       queryFilters.push({
         name: 'fMesSelf002',
         compare: '%*%',
-        value: fieldsValue.queryMesSelf002
+        value: fieldsValue.queryMesSelf002,
       });
     if (fieldsValue.queryMesSelf003)
       queryFilters.push({
         name: 'fMesSelf003',
         compare: '%*%',
-        value: fieldsValue.queryMesSelf003
+        value: fieldsValue.queryMesSelf003,
       });
 
     this.setState({
@@ -379,22 +379,22 @@ class TableList extends PureComponent {
       const badgeStatus = !recordStatus
         ? []
         : recordStatus.map(x => ({
-          text: <Badge color={x.fColor} text={x.fValue} />,
-          value: x.fKeyName,
-        }));
+            text: <Badge color={x.fColor} text={x.fValue} />,
+            value: x.fKeyName,
+          }));
       return badgeStatus;
     }
     const badgeStatus = !flowStatus
       ? []
       : flowStatus.map(x => ({
-        text: <Badge color={x.fColor} text={x.fValue} />,
-        value: x.fKeyName,
-      }));
+          text: <Badge color={x.fColor} text={x.fValue} />,
+          value: x.fKeyName,
+        }));
     return badgeStatus;
   };
 
   // 应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
-  webapp_start (templateId, interIds, type) {
+  webapp_start(templateId, interIds, type) {
     // var option = {
     //   baseurl: 'http://' + window.location.host,
     //   report: '/api/PrintTemplate/grf?id=' + templateId,
@@ -561,8 +561,8 @@ class TableList extends PureComponent {
         const filterDepts = currentUser.fIsAdmin
           ? nextDepts
           : nextDepts.filter(x =>
-            currentUser.authorizedDeptList.find(y => x.fDeptID === y.fItemID)
-          );
+              currentUser.authorizedDeptList.find(y => x.fDeptID === y.fItemID)
+            );
         if (!nextDepts || nextDepts.length <= 0) {
           message.warning('无可签收岗位.');
         } else if (!filterDepts || filterDepts.length <= 0) {
@@ -795,8 +795,7 @@ class TableList extends PureComponent {
           record.fCurrentRecordStatusNumber === 'ManufWait4Sign' ||
           record.fCurrentRecordStatusNumber === 'ManufTransfered' ||
           record.fCurrentRecordStatusNumber === 'ManufCancel' ||
-          record.fCurrentRecordStatusNumber === 'ManufRefund'
-        ))
+          record.fCurrentRecordStatusNumber === 'ManufRefund'))
     ) {
       operators.push(
         <Authorized key="sign" authority="Flow_Sign">
@@ -815,9 +814,7 @@ class TableList extends PureComponent {
       operators.push(
         <Authorized key="sign4Reject" authority="Flow_Sign">
           <Divider type="vertical" />
-          <a onClick={() => this.handleSign4Reject(record)}>
-            签收(被拒)
-          </a>
+          <a onClick={() => this.handleSign4Reject(record)}>签收(被拒)</a>
         </Authorized>
       );
     }
@@ -863,7 +860,7 @@ class TableList extends PureComponent {
     );
   };
 
-  renderSimpleForm () {
+  renderSimpleForm() {
     const {
       form: { getFieldDecorator },
       basicData: {
@@ -914,24 +911,24 @@ class TableList extends PureComponent {
                 )}
               </FormItem>
             ) : (
-                <FormItem label="状态">
-                  {getFieldDecorator('queryStatus')(
-                    <Select
-                      placeholder="请选择"
-                      style={{ width: '100%' }}
-                      allowClear
-                      onChange={this.selectChange}
-                    >
-                      {flowStatus &&
-                        flowStatus.map(x => (
-                          <Option key={x.fKey} value={x.fKey}>
-                            <Badge color={x.fColor} text={x.fValue} />
-                          </Option>
-                        ))}
-                    </Select>
-                  )}
-                </FormItem>
-              )}
+              <FormItem label="状态">
+                {getFieldDecorator('queryStatus')(
+                  <Select
+                    placeholder="请选择"
+                    style={{ width: '100%' }}
+                    allowClear
+                    onChange={this.selectChange}
+                  >
+                    {flowStatus &&
+                      flowStatus.map(x => (
+                        <Option key={x.fKey} value={x.fKey}>
+                          <Badge color={x.fColor} text={x.fValue} />
+                        </Option>
+                      ))}
+                  </Select>
+                )}
+              </FormItem>
+            )}
           </Col>
           <Col md={6} sm={24}>
             <FormItem label="批号">
@@ -958,7 +955,7 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm () {
+  renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
       basicData: {
@@ -1009,24 +1006,24 @@ class TableList extends PureComponent {
                 )}
               </FormItem>
             ) : (
-                <FormItem label="状态">
-                  {getFieldDecorator('queryStatus')(
-                    <Select
-                      placeholder="请选择"
-                      style={{ width: '100%' }}
-                      allowClear
-                      onChange={this.selectChange}
-                    >
-                      {flowStatus &&
-                        flowStatus.map(x => (
-                          <Option key={x.fKey} value={x.fKey}>
-                            <Badge color={x.fColor} text={x.fValue} />
-                          </Option>
-                        ))}
-                    </Select>
-                  )}
-                </FormItem>
-              )}
+              <FormItem label="状态">
+                {getFieldDecorator('queryStatus')(
+                  <Select
+                    placeholder="请选择"
+                    style={{ width: '100%' }}
+                    allowClear
+                    onChange={this.selectChange}
+                  >
+                    {flowStatus &&
+                      flowStatus.map(x => (
+                        <Option key={x.fKey} value={x.fKey}>
+                          <Badge color={x.fColor} text={x.fValue} />
+                        </Option>
+                      ))}
+                  </Select>
+                )}
+              </FormItem>
+            )}
           </Col>
           <Col md={8} sm={24}>
             <FormItem label="批号">
@@ -1116,12 +1113,12 @@ class TableList extends PureComponent {
     );
   }
 
-  renderForm () {
+  renderForm() {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  reanderOperator () {
+  reanderOperator() {
     const { selectedRows, queryDeptID } = this.state;
     const {
       flowManage: { data, queryResult, printTemplates },
@@ -1180,7 +1177,7 @@ class TableList extends PureComponent {
     );
   }
 
-  render () {
+  render() {
     const {
       dispatch,
       flowManage: { data, queryResult },

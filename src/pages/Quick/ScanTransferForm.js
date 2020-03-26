@@ -27,14 +27,14 @@ export class ScanTransferForm extends PureComponent {
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { queryDeptID } = this.props;
     this.state = {
       queryDeptID,
     };
   }
 
-  handleKeyPress (e) {
+  handleKeyPress(e) {
     if (e.key === 'Enter') {
       this.sign();
     }
@@ -106,7 +106,7 @@ export class ScanTransferForm extends PureComponent {
     handleModalVisible(false);
   };
 
-  render () {
+  render() {
     const {
       loading,
       form: { getFieldDecorator },
