@@ -72,7 +72,8 @@ class ColumnConfig {
     {
       title: '操作',
       dataIndex: 'operators',
-      fixed: 'right',
+      // fixed: 'right',
+      autoFixed: 'right',
       width: 100,
       render: (text, record) => (
         <Fragment>

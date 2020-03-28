@@ -56,7 +56,8 @@ export const columns = [
   },
   {
     title: '操作',
-    fixed: 'right',
+    // fixed: 'right',
+    autoFixed: 'right',
     dataIndex: 'operators',
     width: 180,
   },

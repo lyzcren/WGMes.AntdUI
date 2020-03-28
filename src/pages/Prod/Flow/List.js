@@ -44,6 +44,7 @@ import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
 import { print } from '@/utils/wgUtils';
+import { mergeFields } from '@/utils/wgUtils';
 import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
@@ -56,11 +57,12 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ flowManage, loading, basicData, user }) => ({
+@connect(({ flowManage, loading, basicData, user, columnManage }) => ({
   flowManage,
   loading: loading.models.flowManage,
   basicData,
   currentUser: user.currentUser,
+  columnManage,
 }))
 @Form.create()
 class TableList extends PureComponent {
@@ -110,6 +112,9 @@ class TableList extends PureComponent {
   componentDidMount() {
     const { dispatch } = this.props;
 
+    dispatch({
+      type: 'columnManage/getFields',
+    });
     dispatch({
       type: 'basicData/getAuthorizeProcessTree',
     });
@@ -1185,10 +1190,11 @@ class TableList extends PureComponent {
       basicData: {
         status: { flowStatus, recordStatus },
       },
+      columnManage: { fields },
     } = this.props;
     const { queryDeptID, selectedRows, modalVisible, currentFormValues } = this.state;
 
-    const columns = ColumnConfig.getColumns({
+    let columns = ColumnConfig.getColumns({
       columnOps: [
         {
           dataIndex: 'fStatusNumber',
@@ -1207,6 +1213,9 @@ class TableList extends PureComponent {
       ],
       queryDeptID,
     });
+
+    // 自定义字段处理
+    columns = mergeFields(columns, fields);
 
     const signMethods = {
       dispatch,

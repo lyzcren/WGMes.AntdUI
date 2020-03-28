@@ -1,4 +1,4 @@
-import { fakeQuery } from '@/services/Rpt/PassRate';
+import { fakeQuery, fakeQueryDetails } from '@/services/Rpt/PassRate';
 
 export default {
   namespace: 'passRateManage',
@@ -12,6 +12,7 @@ export default {
       status: 'ok',
       message: '',
     },
+    details: [],
   },
 
   effects: {
@@ -19,7 +20,15 @@ export default {
       const response = yield call(fakeQuery, payload);
       yield put({
         type: 'save',
-        payload: response,
+        payload: { data: response },
+      });
+    },
+    *fetchDetails({ payload }, { call, put }) {
+      console.log(payload);
+      const response = yield call(fakeQueryDetails, payload);
+      yield put({
+        type: 'save',
+        payload: { details: response },
       });
     },
   },
@@ -28,7 +37,7 @@ export default {
     save(state, action) {
       return {
         ...state,
-        data: action.payload,
+        ...action.payload,
       };
     },
   },

@@ -272,7 +272,8 @@ export const columns = [
   {
     title: '操作',
     dataIndex: 'operators',
-    fixed: 'right',
+    // fixed: 'right',
+    autoFixed: 'right',
     width: 250,
   },
 ];

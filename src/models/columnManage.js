@@ -1,4 +1,5 @@
 import { fakeGetColumns, fakeUpdateColumns } from '@/services/Sys/tableConfig';
+import { fakeGetFields } from '@/services/Sys/BusinessConfig';
 
 const sortByEntryID = (x, y) => x.entryID - y.entryID;
 
@@ -19,6 +20,7 @@ export default {
       //   },
       // ]
     },
+    fields: [],
   },
 
   effects: {
@@ -90,6 +92,14 @@ export default {
 
       // save to server
       yield call(fakeUpdateColumns, { key, columns: columnsConfig });
+    },
+    *getFields(_, { call, put }) {
+      const response = yield call(fakeGetFields);
+      yield put({
+        type: 'save',
+        payload: { fields: response },
+      });
+      return response;
     },
   },
 

@@ -45,3 +45,14 @@ export async function fakeUpdateProd(params) {
     },
   });
 }
+
+export async function fakeGetFields() {
+  return request('/api/field');
+}
+
+export async function fakeUpdateFields(params) {
+  return request('/api/field', {
+    method: 'PUT',
+    body: params,
+  });
+}

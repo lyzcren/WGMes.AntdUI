@@ -1,4 +1,10 @@
-import { fakeUpdateBasic, fakeUpdateSync, fakeUpdateProd } from '@/services/Sys/BusinessConfig';
+import {
+  fakeUpdateBasic,
+  fakeUpdateSync,
+  fakeUpdateProd,
+  fakeGetFields,
+  fakeUpdateFields,
+} from '@/services/Sys/BusinessConfig';
 import { fakeKeyValues } from '@/services/basicData';
 import { modeValueMaps } from '@/utils/GlobalConst';
 
@@ -8,6 +14,7 @@ export default {
   state: {
     defaultLoginMode: 'idCard',
     invTypes: [],
+    fields: [],
   },
 
   effects: {
@@ -52,6 +59,18 @@ export default {
         type: 'save',
         payload: { invTypes: response },
       });
+      return response;
+    },
+    *getFields(_, { call, put }) {
+      const response = yield call(fakeGetFields);
+      yield put({
+        type: 'save',
+        payload: { fields: response },
+      });
+      return response;
+    },
+    *updateFields({ payload }, { call, put }) {
+      const response = yield call(fakeUpdateFields, payload);
       return response;
     },
   },

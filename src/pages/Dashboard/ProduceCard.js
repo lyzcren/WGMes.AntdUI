@@ -59,7 +59,7 @@ const ProduceCard = memo(
                     <Bar height={250} title="产量" data={produceData} />
                     <Bar
                       color="rgba(24, 205, 104, 0.85)"
-                      scale={{ x: { type: 'cat' }, y: { min: 60, max: 100 } }}
+                      scale={{ x: { type: 'cat' }, y: { min: 0, max: 100 } }}
                       height={250}
                       title="良率（%）"
                       data={passRateData}

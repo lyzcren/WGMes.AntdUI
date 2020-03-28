@@ -1,7 +1,7 @@
 import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
 import { Form, Card, Button, Icon, List, Menu, Divider, Table, Popconfirm, Dropdown } from 'antd';
-import { getColumns } from '@/utils/wgUtils';
+import { mergeColumns } from '@/utils/wgUtils';
 import WgStandardTable from '@/wg_components/WgStandardTable';
 import Authorized from '@/utils/Authorized';
 import { columns, columnConfigKey } from '@/columns/Prod/Report';
@@ -78,7 +78,7 @@ class ListTableForm extends PureComponent {
         render: (text, record) => this.renderRowOperation(record),
       },
     ];
-    return getColumns({
+    return mergeColumns({
       columns,
       columnOps,
     });

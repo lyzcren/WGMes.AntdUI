@@ -271,7 +271,8 @@ class FieldRegCard extends PureComponent {
         title: '操作',
         dataIndex: 'action',
         key: 'action',
-        fixed: 'right',
+        // fixed: 'right',
+        autoFixed: 'right',
         width: 120,
         render: (text, record) => {
           if (record.editable) {

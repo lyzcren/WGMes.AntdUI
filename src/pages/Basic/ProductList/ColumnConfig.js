@@ -67,7 +67,8 @@ class ColumnConfig {
     },
     {
       title: '操作',
-      fixed: 'right',
+      // fixed: 'right',
+      autoFixed: 'right',
       width: 120,
       render: (text, record) => (
         <Fragment>

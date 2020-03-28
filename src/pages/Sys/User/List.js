@@ -167,7 +167,8 @@ class TableList extends PureComponent {
       title: '操作',
       dataIndex: 'operators',
       width: 300,
-      fixed: 'right',
+      // fixed: 'right',
+      autoFixed: 'right',
       render: (text, record) => (
         <Fragment>
           <a onClick={() => this.handleUpdateModalVisible(true, record)}>修改</a>

@@ -77,7 +77,8 @@ class ColumnConfig {
     {
       title: '操作',
       width: 260,
-      fixed: 'right',
+      // fixed: 'right',
+      autoFixed: 'right',
       render: (text, record) => (
         <Fragment>
           <Authorized authority="Route_Update">

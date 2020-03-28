@@ -38,6 +38,7 @@ import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
 import { GenFlowSuccess } from './GenFlowSuccess';
 import { print } from '@/utils/wgUtils';
+import { mergeFields } from '@/utils/wgUtils';
 import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
@@ -51,12 +52,13 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ missionManage, missionSync, loading, menu, basicData }) => ({
+@connect(({ missionManage, missionSync, loading, menu, basicData, columnManage }) => ({
   missionManage,
   missionSync,
   loading: loading.models.missionManage,
   menu,
   basicData,
+  columnManage,
 }))
 @Form.create()
 class TableList extends PureComponent {
@@ -107,6 +109,9 @@ class TableList extends PureComponent {
         type: 'missionManage/getPrintTemplates',
       });
     }
+    dispatch({
+      type: 'columnManage/getFields',
+    });
 
     // 检查同步状态
     this.Checkk3Syncing();
@@ -665,6 +670,7 @@ class TableList extends PureComponent {
       missionManage: { data, queryResult, printTemplates },
       missionSync: { isSyncing, totalCount, currentCount },
       loading,
+      columnManage: { fields },
     } = this.props;
     const {
       selectedRows,
@@ -674,6 +680,9 @@ class TableList extends PureComponent {
       authorizeUserModalVisible,
       successFlows,
     } = this.state;
+
+    // 自定义字段处理
+    const columns = mergeFields(ColumnConfig.columns, fields);
 
     return (
       <div style={{ margin: '-24px -24px 0' }}>
@@ -687,7 +696,7 @@ class TableList extends PureComponent {
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
-                columns={ColumnConfig.columns}
+                columns={columns}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
                 // 以下属性与列配置相关

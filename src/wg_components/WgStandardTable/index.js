@@ -1,4 +1,5 @@
 import React, { PureComponent, Fragment } from 'react';
+import ReactDOM from 'react-dom';
 import { Table, Alert } from 'antd';
 import { connect } from 'dva';
 import { resizeComponents } from '@/utils/resizeComponents';
@@ -49,7 +50,22 @@ class WgStandardTable extends PureComponent {
       type: 'columnManage/init',
       payload: { key: configKey, columns },
     });
+    window.onresize = () => {
+      this.onDataGridWidthChanged();
+    };
   }
+
+  componentDidUpdate() {
+    this.onDataGridWidthChanged();
+  }
+
+  onDataGridWidthChanged = () => {
+    const { dataGridWidth } = this.state;
+    var elWidth = ReactDOM.findDOMNode(this.dataGrid).getBoundingClientRect().width;
+    if (this.dataGrid && dataGridWidth != elWidth) {
+      this.setState({ dataGridWidth: elWidth });
+    }
+  };
 
   static getDerivedStateFromProps(nextProps) {
     // clean state
@@ -163,7 +179,9 @@ class WgStandardTable extends PureComponent {
 
   calColumns(columnsConfig) {
     const { columns } = this.props;
-    const newColumns = [...columns];
+    const newColumns = columns.map((col, i) => {
+      return Object.assign(col);
+    });
     if (columnsConfig) {
       newColumns.forEach((column, index) => {
         const config = columnsConfig.find(x => x.dataIndex === column.dataIndex);
@@ -198,17 +216,17 @@ class WgStandardTable extends PureComponent {
       selectabel,
       ...rest
     } = this.props;
-    const { selectedRowKeys, needTotalList, modalVisible } = this.state;
+    const { selectedRowKeys, needTotalList, modalVisible, dataGridWidth } = this.state;
     const { list = [], pagination } = data;
 
-    const sortedColumns = this.calColumns(configs[configKey]);
+    let newColumns = this.calColumns(configs[configKey]);
     // 当使用 Fixed 列时，为了避免最后一行边距不够导致列宽无法调整的问题，增加长度
     const scrollxFixWidth = 80;
     const scrollX =
-      sortedColumns
+      newColumns
         .filter(x => !x.isHidden)
         .map(c => c.width)
-        .reduce((sum, width, index) => sum + width) + scrollxFixWidth;
+        .reduce((sum, width, index) => sum + width, 0) + scrollxFixWidth;
 
     const paginationProps = {
       showSizeChanger: true,
@@ -224,6 +242,14 @@ class WgStandardTable extends PureComponent {
         disabled: record.disabled,
       }),
     };
+    if (scrollX >= dataGridWidth) {
+      newColumns = newColumns.map(col => {
+        return {
+          ...col,
+          fixed: col.hasOwnProperty('autoFixed') ? col.autoFixed : col.fixed,
+        };
+      });
+    }
 
     return (
       <div className={styles.standardTable}>
@@ -262,17 +288,20 @@ class WgStandardTable extends PureComponent {
           rowKey={rowKey || 'key'}
           bordered
           scroll={{ x: scrollX }}
-          columns={sortedColumns.filter(x => !x.isHidden)}
+          columns={newColumns.filter(x => !x.isHidden)}
           components={resizeComponents}
           rowSelection={selectabel === false ? undefined : rowSelection}
           dataSource={list}
           pagination={paginationProps}
           onChange={this.handleTableChange}
+          ref={node => {
+            this.dataGrid = node;
+          }}
           {...rest}
         />
         <ColumnConfigForm
           modalVisible={modalVisible.columnConfig}
-          dataSource={sortedColumns.filter(x => !x.fixed)}
+          dataSource={newColumns.filter(x => !x.fixed)}
           loading={columnsConfigLoading}
           handleModalVisible={flag => this.handleModalVisible({ key: 'columnConfig', flag })}
           handleColumnChange={this.handleColumnChange}

@@ -135,21 +135,25 @@ class ColumnConfig {
         title: '投入数量',
         dataIndex: 'fInputQty',
         width: 100,
+        autoFixed: 'right',
       },
       {
         title: '良品数量',
         dataIndex: 'fPassQty',
         width: 100,
+        autoFixed: 'right',
       },
       {
         title: '不良数量',
         dataIndex: 'fDefectQty',
         width: 100,
+        autoFixed: 'right',
       },
       {
         title: '良率',
         dataIndex: 'fPassRate',
         width: 100,
+        autoFixed: 'right',
         render: value => `${numeral(value * 100).format('0.00')}%`,
       },
     ];

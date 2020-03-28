@@ -22,6 +22,8 @@ import Authorized from '@/utils/Authorized';
 import { exportExcel } from '@/utils/getExcel';
 import { default as ColumnConfig } from './ColumnConfig';
 import WgStandardTable from '@/wg_components/WgStandardTable';
+import DefectDrawer from './components/DefectDrawer';
+import { mergeColumns } from '@/utils/wgUtils';
 
 import styles from './List.less';
 
@@ -37,13 +39,14 @@ const getValue = obj =>
 @connect(({ passRateManage, loading, basicData }) => ({
   passRateManage,
   loading: loading.models.passRateManage,
+  defectDrawerLoading: loading.effects['passRateManage/fetchDetails'],
   basicData,
 }))
 @Form.create()
 class TableList extends PureComponent {
   state = {
     // 界面是否可见
-    modalVisible: {},
+    defectDrawerVisible: false,
     formValues: {},
     // 当前操作选中列的数据
     currentFormValues: {},
@@ -358,14 +361,142 @@ class TableList extends PureComponent {
     });
   };
 
-  render() {
+  handleDefectDrawerVisible = (flag, record) => {
+    const { dispatch } = this.props;
+    this.setState({ defectDrawerVisible: !!flag });
+    if (record) {
+      dispatch({
+        type: 'passRateManage/fetchDetails',
+        payload: {
+          ...this.currentPagination,
+          ...record,
+        },
+      });
+    }
+  };
+
+  renderDefectDrawer = () => {
+    const {
+      defectDrawerLoading,
+      passRateManage: { details },
+    } = this.props;
+    const { defectDrawerVisible } = this.state;
+    return (
+      <DefectDrawer
+        visible={defectDrawerVisible}
+        handleVisible={flag => {
+          this.handleDefectDrawerVisible(flag);
+        }}
+        loading={defectDrawerLoading}
+        defectData={details}
+      />
+    );
+  };
+
+  renderGroup = () => {
+    return (
+      <div className={styles.tableListGroup}>
+        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+          <Col md={8} sm={24}>
+            <Form layout="inline">
+              <FormItem label="时间分组">
+                <Radio.Group
+                  defaultValue=""
+                  buttonStyle="solid"
+                  onChange={e => this.changeGroupByDate(e)}
+                >
+                  <Radio.Button value="">无</Radio.Button>
+                  <Radio.Button value="groupByDate">日期</Radio.Button>
+                  <Radio.Button value="groupByWeek">周</Radio.Button>
+                  <Radio.Button value="groupByMonth">月</Radio.Button>
+                </Radio.Group>
+              </FormItem>
+            </Form>
+          </Col>
+          <Col md={16} sm={24}>
+            <Form layout="inline">
+              <FormItem>分组汇总：</FormItem>
+              <FormItem label="任务单">
+                <Switch
+                  defaultChecked={!!this.state.groupByMission}
+                  onChange={checked => this.changeGroupBy('groupByMission', checked)}
+                />
+              </FormItem>
+              <FormItem label="机台">
+                <Switch
+                  defaultChecked={!!this.state.groupByMachine}
+                  onChange={checked => this.changeGroupBy('groupByMachine', checked)}
+                />
+              </FormItem>
+              <FormItem label="操作员">
+                <Switch
+                  defaultChecked={!!this.state.groupByOperator}
+                  onChange={checked => this.changeGroupBy('groupByOperator', checked)}
+                />
+              </FormItem>
+              <FormItem label="物料">
+                <Switch
+                  defaultChecked={!!this.state.groupByProduct}
+                  onChange={checked => this.changeGroupBy('groupByProduct', checked)}
+                />
+              </FormItem>
+            </Form>
+          </Col>
+        </Row>
+      </div>
+    );
+  };
+
+  renderTable = () => {
     const {
       passRateManage: { data },
       loading,
     } = this.props;
-
     const columns = ColumnConfig.getColumns(this.state);
+    columns.push({
+      dataIndex: 'operators',
+      title: '操作',
+      width: 120,
+      autoFixed: 'right',
+      render: (text, record) => {
+        return (
+          <Fragment>
+            <a onClick={() => this.handleDefectDrawerVisible(true, record)}>不良明细</a>
+          </Fragment>
+        );
+      },
+    });
+    const retColumns = mergeColumns({
+      columns,
+      columnOps: [
+        {
+          dataIndex: 'fDefectQty',
+          render: (text, record) => {
+            return <a onClick={() => this.handleDefectDrawerVisible(true, record)}>{text}</a>;
+          },
+        },
+      ],
+    });
 
+    return (
+      <WgStandardTable
+        rowKey="rownumber"
+        loading={loading}
+        data={data}
+        columns={retColumns}
+        onChange={this.handleStandardTableChange}
+        // 以下属性与列配置相关
+        configKey={this.columnConfigKey}
+        refShowConfig={showConfig => {
+          this.showConfig = showConfig;
+        }}
+        showAlert={false}
+        selectabel={false}
+      />
+    );
+  };
+
+  render() {
     return (
       <div style={{ margin: '-24px -24px 0' }}>
         <GridContent>
@@ -374,73 +505,15 @@ class TableList extends PureComponent {
               <div className={styles.tableListForm}>{this.renderForm()}</div>
               {/* <div className={styles.tableListOperator}>
               </div> */}
-              <div className={styles.tableListGroup}>
-                <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-                  <Col md={8} sm={24}>
-                    <Form layout="inline">
-                      <FormItem label="时间分组">
-                        <Radio.Group
-                          defaultValue=""
-                          buttonStyle="solid"
-                          onChange={e => this.changeGroupByDate(e)}
-                        >
-                          <Radio.Button value="">无</Radio.Button>
-                          <Radio.Button value="groupByDate">日期</Radio.Button>
-                          <Radio.Button value="groupByWeek">周</Radio.Button>
-                          <Radio.Button value="groupByMonth">月</Radio.Button>
-                        </Radio.Group>
-                      </FormItem>
-                    </Form>
-                  </Col>
-                  <Col md={16} sm={24}>
-                    <Form layout="inline">
-                      <FormItem>分组汇总：</FormItem>
-                      <FormItem label="任务单">
-                        <Switch
-                          defaultChecked={!!this.state.groupByMission}
-                          onChange={checked => this.changeGroupBy('groupByMission', checked)}
-                        />
-                      </FormItem>
-                      <FormItem label="机台">
-                        <Switch
-                          defaultChecked={!!this.state.groupByMachine}
-                          onChange={checked => this.changeGroupBy('groupByMachine', checked)}
-                        />
-                      </FormItem>
-                      <FormItem label="操作员">
-                        <Switch
-                          defaultChecked={!!this.state.groupByOperator}
-                          onChange={checked => this.changeGroupBy('groupByOperator', checked)}
-                        />
-                      </FormItem>
-                      <FormItem label="物料">
-                        <Switch
-                          defaultChecked={!!this.state.groupByProduct}
-                          onChange={checked => this.changeGroupBy('groupByProduct', checked)}
-                        />
-                      </FormItem>
-                    </Form>
-                  </Col>
-                </Row>
-              </div>
+              {/* 分组汇总 */}
+              {this.renderGroup()}
               <div className={styles.tableListGroup} />
-              <WgStandardTable
-                rowKey="rownumber"
-                loading={loading}
-                data={data}
-                columns={columns}
-                onChange={this.handleStandardTableChange}
-                // 以下属性与列配置相关
-                configKey={this.columnConfigKey}
-                refShowConfig={showConfig => {
-                  this.showConfig = showConfig;
-                }}
-                showAlert={false}
-                selectabel={false}
-              />
+              {this.renderTable()}
             </div>
           </Card>
         </GridContent>
+        {/* 不良明细 */}
+        {this.renderDefectDrawer()}
       </div>
     );
   }

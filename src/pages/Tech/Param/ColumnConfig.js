@@ -84,7 +84,8 @@ class ColumnConfig {
       title: '操作',
       dataIndex: 'operator',
       width: 260,
-      fixed: 'right',
+      // fixed: 'right',
+      autoFixed: 'right',
       render: (text, record) => (
         <Fragment>
           <Authorized authority="Param_Update">

@@ -51,7 +51,7 @@ export function changeFullScreen() {
   } catch (error) {}
 }
 
-export function getColumns({ columns, columnOps }) {
+export function mergeColumns({ columns, columnOps }) {
   const newColumns = (columns || []).map(column => {
     if (columnOps) {
       const columnOp = columnOps.find(x => x.dataIndex === column.dataIndex) || [];
@@ -63,6 +63,20 @@ export function getColumns({ columns, columnOps }) {
   });
 
   return newColumns;
+}
+
+export function mergeFields(columns, fields) {
+  fields.forEach(field => {
+    const column = columns.find(x => x.dataIndex.toUpperCase() === field.fField.toUpperCase());
+    if (column && field.fIsShow) {
+      column.title = field.fName;
+    }
+    if (column && !field.fIsShow) {
+      columns = columns.filter(col => col.dataIndex !== column.dataIndex);
+    }
+  });
+
+  return columns;
 }
 
 const getValue = obj =>
