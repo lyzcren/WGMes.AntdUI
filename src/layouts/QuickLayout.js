@@ -17,7 +17,7 @@ const links = [
   {
     key: 'help',
     title: formatMessage({ id: 'layout.user.link.help' }),
-    href: 'http://n2027797j5.iok.la',
+    href: 'https://doc.ywlin.cn/',
     blankTarget: true,
   },
   {

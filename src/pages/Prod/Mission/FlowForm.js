@@ -17,13 +17,21 @@ const Option = Select.Option;
 export class FlowForm extends PureComponent {
   static defaultProps = {
     handleModalVisible: () => {},
-    values: {},
   };
+
+  static getDerivedStateFromProps(nextProps, preState) {
+    const { values } = nextProps;
+    const maxQty = values.fAuxInHighLimitQty - values.fInputQty;
+    const minQty = 1 / Math.pow(10, values.fQtyDecimal ? values.fQtyDecimal : 0);
+    const fCurrentInputQty = maxQty > 0 ? maxQty : minQty;
+    return { values: { ...values, fCurrentInputQty, minQty } };
+  }
 
   constructor(props) {
     super(props);
 
     this.state = {
+      values: {},
       workshop: null,
       batchNoPrefix: '',
       batchNoSuffix: '',
@@ -47,9 +55,9 @@ export class FlowForm extends PureComponent {
       type: 'basicData/getWorkShops',
     }).then(() => {
       const {
-        values,
         basicData: { workshops },
       } = this.props;
+      const { values } = this.state;
       const defaultWorkshop = workshops.find(x => x.fErpID === values.fWorkShop);
       if (defaultWorkshop) this.changeWorkshop(defaultWorkshop);
     });
@@ -75,7 +83,8 @@ export class FlowForm extends PureComponent {
   };
 
   okHandle = () => {
-    const { form, values } = this.props;
+    const { form } = this.props;
+    const { values } = this.state;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       // form.resetFields();
@@ -120,13 +129,10 @@ export class FlowForm extends PureComponent {
       form,
       modalVisible,
       handleModalVisible,
-      values,
       basicData: { workshops, routeData },
       missionManage: { billNo },
     } = this.props;
-    const { workshop, batchNoPrefix, batchNoSuffix } = this.state;
-    const maxQty = values.fAuxInHighLimitQty - values.fInputQty;
-    const minQty = 1 / Math.pow(10, values.fQtyDecimal ? values.fQtyDecimal : 0);
+    const { values, workshop, batchNoPrefix, batchNoSuffix } = this.state;
 
     return (
       <Modal
@@ -165,16 +171,16 @@ export class FlowForm extends PureComponent {
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="投入数量">
           {form.getFieldDecorator('fInputQty', {
             rules: [{ required: true, message: '请输入投入数量' }],
-            initialValue: maxQty ? maxQty : minQty,
+            initialValue: values.fCurrentInputQty,
             // })(<InputNumber placeholder="请输入" min={minQty} max={maxQty} />)} 取消最大数量限制
-          })(<InputNumber placeholder="请输入" min={minQty} />)}
+          })(<InputNumber placeholder="请输入" min={values.minQty} />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="每批数量">
           {form.getFieldDecorator('fBatchQty', {
             rules: [{ required: true, message: '请输入每批数量' }],
-            initialValue: maxQty ? maxQty : minQty,
+            initialValue: values.fCurrentInputQty,
             // })(<InputNumber placeholder="请输入" min={minQty} max={maxQty} />)} 取消最大数量限制
-          })(<InputNumber placeholder="请输入" min={minQty} />)}
+          })(<InputNumber placeholder="请输入" min={values.minQty} />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="车间">
           {/* {form.getFieldDecorator('fWorkShop', {

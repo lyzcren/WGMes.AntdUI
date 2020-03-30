@@ -196,6 +196,14 @@ class WgBasicLayout extends React.PureComponent {
     });
   };
 
+  refresh = targetKey => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/refreshMenu',
+      payload: { path: targetKey },
+    });
+  };
+
   remove = targetKey => {
     const { dispatch } = this.props;
     dispatch({
@@ -214,6 +222,9 @@ class WgBasicLayout extends React.PureComponent {
   handleDropdownMenu = e => {
     const { dispatch, activeKey } = this.props;
     switch (e.key) {
+      case 'refreshCurrent':
+        this.refresh(activeKey);
+        break;
       case 'closeCurrent':
         this.remove(activeKey);
         break;
@@ -260,15 +271,15 @@ class WgBasicLayout extends React.PureComponent {
         }}
       >
         <Button
-          icon="close"
-          shape="circle"
-          size="small"
+          icon="sync"
+          theme="twoTone"
           style={{ marginLeft: '5px', border: 0 }}
-          onClick={() => this.closeAll()}
+          onClick={() => this.refresh(activeKey)}
         />
         <Dropdown
           overlay={
             <Menu onClick={this.handleDropdownMenu} selectedKeys={[]}>
+              <Menu.Item key="refreshCurrent">刷新当前页</Menu.Item>
               <Menu.Item key="closeCurrent">关闭当前页</Menu.Item>
               <Menu.Item key="closeOther">关闭其他页</Menu.Item>
               <Menu.Item key="closeAll">关闭所有页</Menu.Item>
@@ -276,11 +287,18 @@ class WgBasicLayout extends React.PureComponent {
           }
         >
           <Button
-            icon="down"
-            shape="circle"
+            icon="down-circle"
+            theme="twoTone"
             style={{ marginLeft: '5px', marginRight: '5px', border: 0 }}
           />
         </Dropdown>
+        <Button
+          icon="close-circle"
+          theme="twoTone"
+          size="small"
+          style={{ marginLeft: '5px', border: 0 }}
+          onClick={() => this.closeAll()}
+        />
       </div>
     );
 
@@ -328,7 +346,7 @@ class WgBasicLayout extends React.PureComponent {
                 key={pane.key}
                 closable={pane.closable}
               >
-                <pane.component {...pane} />
+                <pane.component {...pane} key={`${pane.key}_${pane.timeStamp}`} />
               </TabPane>
             ))}
           </Tabs>

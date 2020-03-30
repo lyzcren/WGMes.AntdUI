@@ -194,10 +194,12 @@ class TableList extends PureComponent {
       groupByProduct: !!this.state.groupByProduct,
     };
 
-    dispatch({
-      type: 'passRateManage/fetch',
-      payload: this.currentPagination,
-    });
+    this.search();
+
+    // dispatch({
+    //   type: 'passRateManage/fetch',
+    //   payload: this.currentPagination,
+    // });
   };
 
   toggleForm = () => {

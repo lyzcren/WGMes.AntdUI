@@ -207,7 +207,7 @@ export default {
       // 主要用于修改Tab页传入附加参数
       const newPanes = panes.map(p => {
         if (p.key === activeKey) {
-          return { ...p, ...payload, key: activeKey };
+          return { ...p, ...payload, key: activeKey, timeStamp: new Date().valueOf() };
         }
         return p;
       });
@@ -224,6 +224,25 @@ export default {
           selectedKeys,
           panes: newPanes,
           routeHistory: newRouteHistory,
+        },
+      });
+    },
+    *refreshMenu({ payload }, { put, call, select }) {
+      const { path } = payload;
+      const { menuData, routeData, routeHistory, panes, activeKey } = yield select(
+        state => state.menu
+      );
+      const key = path ? path : activeKey;
+      const refreshPanel = panes.find(pane => pane.key === key);
+      if (refreshPanel) {
+        refreshPanel.timeStamp = new Date().valueOf();
+      }
+
+      yield put({
+        type: 'save',
+        payload: {
+          ...payload,
+          panes: [...panes],
         },
       });
     },
