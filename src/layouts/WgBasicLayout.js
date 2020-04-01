@@ -16,6 +16,7 @@ import Context from './MenuContext';
 import PageLoading from '@/components/PageLoading';
 import WgSiderMenu from '@/wg_components/WgSiderMenu';
 import { getToken } from '@/utils/token';
+import { hasAuthority } from '@/utils/authority';
 
 // import logo from '../assets/logo.svg';
 import { logoUrl } from '@/utils/GlobalConst';
@@ -61,7 +62,7 @@ class WgBasicLayout extends React.PureComponent {
     this.state = {};
   }
 
-  componentDidMount() {
+  componentDidMount () {
     const {
       dispatch,
       route: { routes, authority },
@@ -89,7 +90,7 @@ class WgBasicLayout extends React.PureComponent {
     }).then(this.reloadIndexPage);
   }
 
-  componentDidUpdate(preProps) {
+  componentDidUpdate (preProps) {
     // After changing to phone mode,
     // if collapsed is true, you need to click twice to display
     const { collapsed, isMobile } = this.props;
@@ -106,23 +107,58 @@ class WgBasicLayout extends React.PureComponent {
       },
     } = this.props;
     // 首次进入界面默认加载标签页
-    let defaultPath = '/dashboard/analysis';
-    if (indexPage === 'flow') {
+    let defaultPath = '';
+    if (hasAuthority('Anylasis_Read')) {
+      defaultPath = '/dashboard/analysis';
+    } else if ((defaultPath === '' || indexPage === 'flow') && hasAuthority('Flow_Read')) {
       defaultPath = '/prod/flow';
-    } else if (indexPage === 'mission') {
+    } else if ((defaultPath === '' || indexPage === 'mission') && hasAuthority('Mission_Read')) {
       defaultPath = '/prod/mission';
+    } else if (hasAuthority('Inv_Read')) {
+      defaultPath = '/prod/inv';
+    } else if (hasAuthority('PassInv_Read')) {
+      defaultPath = '/prod/passInv';
+    } else if (hasAuthority('ProdDefect_Read')) {
+      defaultPath = '/prod/defect';
+    } else if (hasAuthority('InvCheck_Read')) {
+      defaultPath = '/prod/invCheck';
+    } else if (hasAuthority('DefectCheck_Read')) {
+      defaultPath = '/prod/defectCheck';
+    } else if (hasAuthority('Report_Read')) {
+      defaultPath = '/prod/report';
+    } else if (hasAuthority('MissionInput_Read')) {
+      defaultPath = '/record/missionInput';
+    } else if (hasAuthority('Record_Read')) {
+      defaultPath = '/record/record';
+    } else if (hasAuthority('RecordTake_Read')) {
+      defaultPath = '/record/take';
+    } else if (hasAuthority('ChangeRoute_Read')) {
+      defaultPath = '/record/changeRoute';
+    } else if (hasAuthority('BatchSplit_Read')) {
+      defaultPath = '/record/batchSplit';
+    } else if (hasAuthority('DefectRepair_Read')) {
+      defaultPath = '/record/defectRepair';
+    } else if (hasAuthority('DefectScrap_Read')) {
+      defaultPath = '/record/defectScrap';
+    } else if (hasAuthority('Output_Read')) {
+      defaultPath = '/report/output';
+    } else if (hasAuthority('PassRate_Read')) {
+      defaultPath = '/report/passRate';
+    } else if (hasAuthority('MissionExecution_Read')) {
+      defaultPath = '/report/missionExecution';
+    } else if (hasAuthority('ReportWorkTime_Read')) {
+      defaultPath = '/report/workTime';
     }
-    // dispatch({
-    //   type: 'menu/getMenuData',
-    //   payload: { routes, authority, defaultActiveKey: defaultPath },
-    // })
-    dispatch({
-      type: 'menu/openMenu',
-      payload: { path: defaultPath, closable: false },
-    });
+    if (defaultPath !== '') {
+      dispatch({
+        type: 'menu/openMenu',
+        payload: { path: defaultPath, closable: false },
+      });
+
+    }
   };
 
-  getContext() {
+  getContext () {
     const { location, breadcrumbNameMap } = this.props;
     return {
       location,
@@ -177,7 +213,11 @@ class WgBasicLayout extends React.PureComponent {
   };
 
   onChange = activeKey => {
-    this.add({ path: activeKey });
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/openMenu',
+      payload: { path: activeKey, withoutRefresh: true },
+    });
   };
 
   onEdit = (targetKey, action) => {
@@ -212,7 +252,7 @@ class WgBasicLayout extends React.PureComponent {
     });
   };
 
-  closeAll() {
+  closeAll () {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeAllMenu',
@@ -239,14 +279,14 @@ class WgBasicLayout extends React.PureComponent {
     }
   };
 
-  closeOther() {
+  closeOther () {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeOtherMenu',
     });
   }
 
-  render() {
+  render () {
     const {
       navTheme,
       layout: PropsLayout,

@@ -1,5 +1,5 @@
 import { fakeQuery, fakeGet, fakeRemove, fakeSync } from '@/services/Prod/Mission';
-import { fakeAddFromMission } from '@/services/Prod/Flow';
+import { fakeAdd as fakeAddFromMission, fakeFetchFlows } from '@/services/Prod/MissionInput';
 import { fakeQueryPrintTemplate } from '@/services/Sys/PrintTemplate';
 import { fakeGetBillNo } from '@/services/basicData';
 
@@ -68,6 +68,10 @@ export default {
         type: 'save',
         payload: { billNo: response },
       });
+    },
+    *fetchFlows({ payload }, { call, put }) {
+      const response = yield call(fakeFetchFlows, payload.id);
+      return response;
     },
   },
 

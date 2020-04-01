@@ -32,12 +32,13 @@ const ButtonGroup = Button.Group;
 const { RangePicker } = DatePicker;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ flowTransfer, basicData, loading, menu, user }) => ({
+@connect(({ flowTransfer, basicData, loading, menu, user, columnManage }) => ({
   flowTransfer,
   basicData,
   loading: loading.models.flowTransfer,
   menu,
   fBindEmpID: user.currentUser.fBindEmpID,
+  columnManage,
 }))
 @Form.create()
 class Transfer extends PureComponent {
@@ -50,7 +51,7 @@ class Transfer extends PureComponent {
     unitConverterVisible: false,
   };
 
-  componentDidMount() {
+  componentDidMount () {
     // ReactDOM.findDOMNode(this.refs.select).click();
     const {
       location: {
@@ -64,7 +65,7 @@ class Transfer extends PureComponent {
     this.setState({ fMachineID, fWorkTimeID });
   }
 
-  componentDidUpdate(preProps) {
+  componentDidUpdate (preProps) {
     const {
       location: {
         data: { fInterID, fCurrentDeptID },
@@ -75,7 +76,7 @@ class Transfer extends PureComponent {
     }
   }
 
-  loadData(fInterID) {
+  loadData (fInterID) {
     const { dispatch } = this.props;
 
     dispatch({
@@ -88,9 +89,12 @@ class Transfer extends PureComponent {
     dispatch({
       type: 'basicData/getDebuggers',
     });
+    dispatch({
+      type: 'columnManage/getFields',
+    });
   }
 
-  transfer() {
+  transfer () {
     const {
       form,
       dispatch,
@@ -124,14 +128,13 @@ class Transfer extends PureComponent {
         } else if (status === 'warning') {
           message.warning(queryResult.message);
         } else {
-          console.log(queryResult);
           message.error(queryResult.message);
         }
       });
     });
   }
 
-  close() {
+  close () {
     const {
       dispatch,
       location: { tabMode },
@@ -159,7 +162,7 @@ class Transfer extends PureComponent {
     }
   };
 
-  handleFieldChange(fDefectID, fQty = 0) {
+  handleFieldChange (fDefectID, fQty = 0) {
     const { dispatch } = this.props;
     dispatch({
       type: 'flowTransfer/changeDefect',
@@ -167,7 +170,7 @@ class Transfer extends PureComponent {
     });
   }
 
-  handleOtherDefectKeyPress(e) {
+  handleOtherDefectKeyPress (e) {
     if (e.key === 'Enter') {
       const { form, dispatch } = this.props;
       const fieldsValue = form.getFieldsValue();
@@ -180,7 +183,6 @@ class Transfer extends PureComponent {
       }).then(() => {
         const { flowTransfer } = this.props;
         form.resetFields(['fOtherDefectValue']);
-        // console.log(flowTransfer);
       });
       dispatch({
         type: 'flowTransfer/addDefect',
@@ -191,7 +193,6 @@ class Transfer extends PureComponent {
         this.otherDefectRef.rcSelect.focus();
         this.setState({ moreDefectValue: '' });
         form.resetFields(['fOtherDefectID']);
-        // console.log(flowTransfer);
       });
     }
   }
@@ -211,6 +212,7 @@ class Transfer extends PureComponent {
   renderDescription = () => {
     const {
       flowTransfer: { data },
+      columnManage: { fields },
     } = this.props;
     const { fQtyFormat, fQtyDecimal } = data;
 
@@ -244,7 +246,7 @@ class Transfer extends PureComponent {
                 （
                 {`${numeral(data.fConvertInputQty).format(data.fConvertQtyFormat)} ${
                   data.fConvertUnitName
-                }`}
+                  }`}
                 ）
               </a>
             ) : null}
@@ -256,7 +258,7 @@ class Transfer extends PureComponent {
                 （
                 {`${numeral(data.fConvertPassQty).format(data.fConvertQtyFormat)} ${
                   data.fConvertUnitName
-                }`}
+                  }`}
                 ）
               </a>
             ) : null}
@@ -266,9 +268,15 @@ class Transfer extends PureComponent {
           <Description term="产品名称">{data.fProductName}</Description>
           <Description term="规格型号">{data.fModel}</Description>
 
-          <Description term="父件型号">{data.fMesSelf002}</Description>
+          {fields.filter(f => f.fIsShow).map(f => {
+            // 因WebApi中属性使用大驼峰命名法，而当前项目中属性使用小驼峰命名法，故而字段名需要做转换
+            const fieldName = f.fField.substring(0, 1).toLowerCase() + f.fField.substring(1);
+            return <Description key={f.fField} term={f.fName}>{data[fieldName]}</Description>
+          }
+          )}
+          {/* <Description term="父件型号">{data.fMesSelf002}</Description>
           <Description term="底色编号">{data.fMesSelf001}</Description>
-          <Description term="内部订单号">{data.fMesSelf003}</Description>
+          <Description term="内部订单号">{data.fMesSelf003}</Description> */}
 
           <Description term="盘点盈亏数量">
             {`${numeral(data.fInvCheckDeltaQty).format(fQtyFormat)} ${data.fUnitName}`}
@@ -314,7 +322,7 @@ class Transfer extends PureComponent {
     this.setState({ unitConverterVisible: !!flag });
   };
 
-  render() {
+  render () {
     const {
       flowTransfer: { data, machineData, workTimes, matchConverter },
       loading,
@@ -324,7 +332,6 @@ class Transfer extends PureComponent {
       location: { fEmpID, tabMode },
     } = this.props;
     const { defectList } = data;
-    console.log(data);
 
     const { moreDefectValue, unitConverterVisible } = this.state;
     const { fQtyDecimal, fConvertDecimal } = data;
@@ -337,14 +344,14 @@ class Transfer extends PureComponent {
     const defaultMachineID = data.fMachineID
       ? data.fMachineID
       : machineData && machineData.find(x => x.fItemID === this.state.fMachineID)
-      ? this.state.fMachineID
-      : null;
+        ? this.state.fMachineID
+        : null;
     // 默认班次
     const defaultWorkTimeID = data.fWorkTimeID
       ? data.fWorkTimeID
       : workTimes && workTimes.find(x => x.fWorkTimeID === this.state.fWorkTimeID)
-      ? this.state.fWorkTimeID
-      : null;
+        ? this.state.fWorkTimeID
+        : null;
     const currentTime = new Date();
     // 根据当前时间推算班次信息
     const currentWorkTime =

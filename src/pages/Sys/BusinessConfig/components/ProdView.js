@@ -1,6 +1,6 @@
 import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
-import { Form, Icon, Button, Checkbox, Input, message, Select, Typography } from 'antd';
+import { Form, Icon, Button, Switch, Input, message, Select, Typography } from 'antd';
 import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 
@@ -14,11 +14,13 @@ class ProdView extends PureComponent {
   static defaultProps = {};
 
   state = {
+    canMoreThanPlan: false,
     invType: '',
+    reportUserName: 'Administrator',
     invTypes: [],
   };
 
-  componentDidMount() {
+  componentDidMount () {
     const { dispatch } = this.props;
     dispatch({
       type: 'businessConfig/getInvTypes',
@@ -28,8 +30,8 @@ class ProdView extends PureComponent {
     dispatch({
       type: 'global/fetchProdBusinessConfig',
     }).then(config => {
-      const { invType } = config;
-      this.setState({ invType });
+      const { canMoreThanPlan, invType, reportUserName } = config;
+      this.setState({ canMoreThanPlan: canMoreThanPlan.toUpperCase() === 'TRUE', invType, reportUserName });
     });
   }
 
@@ -55,20 +57,26 @@ class ProdView extends PureComponent {
     });
   };
 
-  render() {
+  render () {
     const {
       form: { getFieldDecorator },
     } = this.props;
-    const { invTypes, invType } = this.state;
+    const { invTypes, canMoreThanPlan, invType, reportUserName } = this.state;
 
     return (
       <div className={styles.baseView} ref={this.getViewDom}>
         <div className={styles.left}>
           <Form layout="vertical" hideRequiredMark>
-            <FormItem label="末岗位良品库存粒度">
+            <FormItem label="投产数量可超出计划数量">
+              {getFieldDecorator(`canMoreThanPlan`, {
+                initialValue: canMoreThanPlan,
+                valuePropName: 'checked',
+              })(<Switch />)}
+            </FormItem>
+            <FormItem label="汇报明细汇总方式">
               <div>
                 {getFieldDecorator(`invType`, {
-                  rules: [{ required: true, message: '请选择良品库存粒度' }],
+                  rules: [{ required: true, message: '请选择汇报明细汇总方式' }],
                   initialValue: invType,
                 })(
                   <Select style={{ maxWidth: '224px' }}>
@@ -81,9 +89,15 @@ class ProdView extends PureComponent {
                 )}
                 <br />
                 <Text style={{ marginBottom: '20px' }} type="warning">
-                  注：设置良品库存最小粒度，系统在流程单完成后将良品库存以设置的粒度进行管理，此设置将同时影响生产任务汇报方式。
+                  注：设置汇报明细汇总方式，在生产任务汇报时，汇报明细将按设置的方式进行汇总汇报。设置后系统良品库存将已设置的汇报方式（任务单、流程单）进行管理。
                 </Text>
               </div>
+            </FormItem>
+            <FormItem label="汇报时使用的ERP用户名">
+              {getFieldDecorator('reportUserName', {
+                rules: [{ required: true, message: '请输入汇报时使用的ERP用户名' }],
+                initialValue: reportUserName,
+              })(<Input style={{ maxWidth: '224px' }} placeholder="请输入汇报时使用的ERP用户名" />)}
             </FormItem>
             <Button type="primary" onClick={this.handleSubmit}>
               保存修改

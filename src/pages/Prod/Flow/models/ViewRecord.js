@@ -44,7 +44,7 @@ export default {
         step.title = step.depts
           .map(dept => dept.fDeptName + (dept.fIsReproduce ? '（重做）' : ''))
           .join(' & ');
-        if (step.depts.length === 1 && step.depts[0].fStatus > 1) {
+        if (step.depts.length === 1 && step.depts[0].fInputQty > 0) {
           step.recordId = step.depts[0].fInterID;
         }
         if (step.depts.length === 1) {

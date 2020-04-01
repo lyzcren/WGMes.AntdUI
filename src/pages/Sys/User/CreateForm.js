@@ -98,7 +98,7 @@ export class CreateForm extends PureComponent {
       </div>
     ) : null;
   };
-  render() {
+  render () {
     const {
       form: { getFieldDecorator, getFieldValue },
       modalVisible,
@@ -246,7 +246,7 @@ export class CreateForm extends PureComponent {
               treeCheckable={true}
               showCheckedStrategy={SHOW_PARENT}
               treeData={deptTreeData}
-              treeExpandedKeys={treeExpandedKeys}
+              treeDefaultExpandedKeys={treeExpandedKeys}
             />
           )}
         </FormItem>

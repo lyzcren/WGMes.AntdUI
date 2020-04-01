@@ -1,10 +1,9 @@
-import { Divider, Drawer, Form, Input, InputNumber, Col, Row } from 'antd';
+import { Divider, Drawer, Table } from 'antd';
 import { connect } from 'dva';
 import React, { PureComponent } from 'react';
+import numeral from 'numeral';
 
-const FormItem = Form.Item;
 
-@Form.create()
 class DefectDrawer extends PureComponent {
   open = () => {
     const { handleVisible } = this.props;
@@ -20,18 +19,26 @@ class DefectDrawer extends PureComponent {
     }
   };
 
-  renderItem = d => {
-    return (
-      <Row key={`defectID_${d.fInterID}_${d.fEntryID}`}>
-        <Col>
-          {d.fDefectName}：{d.fQty}
-        </Col>
-      </Row>
-    );
-  };
-
-  render() {
-    const { loading, visible, defectData } = this.props;
+  render () {
+    const { loading, visible, defectData, currentRecord } = this.props;
+    const columns = [
+      {
+        title: '不良',
+        dataIndex: 'fDefectName',
+        width: 100,
+      },
+      {
+        title: '数量',
+        dataIndex: 'fQty',
+        width: 100,
+      },
+      {
+        title: '不良比例',
+        dataIndex: 'fRate',
+        width: 100,
+        render: (value, record) => `${numeral(record.fQty * 100 / currentRecord.fInputQty).format('0.00')}%`,
+      },
+    ];
 
     return (
       <Drawer
@@ -43,10 +50,15 @@ class DefectDrawer extends PureComponent {
         loading={loading}
         getContainer={false}
         style={{ position: 'absolute' }}
+        width={320}
       >
-        <Form layout="vertical" hideRequiredMark>
-          {defectData.map(d => this.renderItem(d))}
-        </Form>
+        <Table
+          rowKey={'fDefectID'}
+          bordered
+          columns={columns}
+          dataSource={defectData.filter(d => d.fQty > 0)}
+          pagination={false}
+        />
       </Drawer>
     );
   }

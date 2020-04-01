@@ -10,6 +10,16 @@ export async function fakeQuery(params) {
   });
 }
 
+export async function fakeGet(params) {
+  return request('/api/passRate/get', {
+    method: 'POST',
+    body: {
+      ...params,
+    },
+  });
+}
+
+
 export async function fakeQueryDetails(params) {
   return request('/api/passRate/details', {
     method: 'POST',

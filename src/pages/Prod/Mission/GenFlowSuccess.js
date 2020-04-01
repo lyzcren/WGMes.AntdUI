@@ -73,7 +73,6 @@ export class GenFlowSuccess extends PureComponent {
 
   render() {
     const { form, modalVisible, handleModalVisible, records, printTemplate } = this.props;
-    console.log(records);
     const batchNo = records
       .map(x => x.fBatchNo)
       .reduce((acc, cur) => {

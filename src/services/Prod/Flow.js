@@ -75,16 +75,6 @@ export async function fakeReport(params) {
   });
 }
 
-export async function fakeAddFromMission(params) {
-  return request('/api/flow/fromMission', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'fromMission',
-    },
-  });
-}
-
 export async function fakeUpdate(params) {
   return request('/api/flow/update', {
     method: 'POST',

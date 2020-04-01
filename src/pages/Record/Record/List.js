@@ -35,6 +35,7 @@ import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
 import WgStandardTable from '@/wg_components/WgStandardTable';
+import { mergeFields } from '@/utils/wgUtils';
 
 import styles from './List.less';
 
@@ -47,10 +48,11 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ recordManage, loading, basicData }) => ({
+@connect(({ recordManage, loading, basicData, columnManage }) => ({
   recordManage,
   loading: loading.models.recordManage,
   basicData,
+  columnManage
 }))
 @Form.create()
 class TableList extends PureComponent {
@@ -85,8 +87,11 @@ class TableList extends PureComponent {
     this.columnConfigKey = 'record';
   }
 
-  componentDidMount() {
+  componentDidMount () {
     const { dispatch } = this.props;
+    dispatch({
+      type: 'columnManage/getFields',
+    });
     dispatch({
       type: 'recordManage/fetch',
       payload: this.currentPagination,
@@ -109,9 +114,9 @@ class TableList extends PureComponent {
     const badgeStatus = !recordStatus
       ? []
       : recordStatus.map(x => ({
-          text: <Badge color={x.fColor} text={x.fValue} />,
-          value: x.fKeyName,
-        }));
+        text: <Badge color={x.fColor} text={x.fValue} />,
+        value: x.fKeyName,
+      }));
     return badgeStatus;
   };
 
@@ -322,7 +327,7 @@ class TableList extends PureComponent {
     });
   };
 
-  renderSimpleForm() {
+  renderSimpleForm () {
     const {
       form: { getFieldDecorator },
       basicData: {
@@ -397,7 +402,7 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm() {
+  renderAdvancedForm () {
     const {
       form: { getFieldDecorator },
       basicData: {
@@ -511,12 +516,12 @@ class TableList extends PureComponent {
     );
   }
 
-  renderForm() {
+  renderForm () {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  renderOperator() {
+  renderOperator () {
     const { selectedRows } = this.state;
 
     return (
@@ -539,11 +544,12 @@ class TableList extends PureComponent {
     );
   }
 
-  render() {
+  render () {
     const {
       dispatch,
       recordManage: { data, queryResult },
       loading,
+      columnManage: { fields },
     } = this.props;
     const {
       selectedRows,
@@ -562,7 +568,8 @@ class TableList extends PureComponent {
     };
 
     ColumnConfig.statusFilter = this.statusFilter();
-    const columns = ColumnConfig.getColumns();
+    // 自定义字段处理
+    const columns = mergeFields(ColumnConfig.getColumns(), fields);
 
     return (
       <div style={{ margin: '-24px -24px 0' }}>

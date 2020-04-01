@@ -29,11 +29,12 @@ const ButtonGroup = Button.Group;
 const { RangePicker } = DatePicker;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ recordProfile, basicData, loading, menu }) => ({
+@connect(({ recordProfile, basicData, loading, menu, columnManage }) => ({
   recordProfile,
   basicData,
   loading: loading.models.recordProfile,
   menu,
+  columnManage
 }))
 @Form.create()
 class Profile extends PureComponent {
@@ -42,7 +43,7 @@ class Profile extends PureComponent {
     fTransferDateTime: '',
   };
 
-  componentDidMount() {
+  componentDidMount () {
     // ReactDOM.findDOMNode(this.refs.select).click();
     const {
       data: { fInterID },
@@ -50,7 +51,7 @@ class Profile extends PureComponent {
     this.loadData(fInterID);
   }
 
-  componentDidUpdate(preProps) {
+  componentDidUpdate (preProps) {
     const {
       data: { fInterID },
     } = this.props;
@@ -59,16 +60,19 @@ class Profile extends PureComponent {
     }
   }
 
-  loadData(fInterID) {
+  loadData (fInterID) {
     const { dispatch } = this.props;
 
+    dispatch({
+      type: 'columnManage/getFields',
+    });
     dispatch({
       type: 'recordProfile/initModel',
       payload: { fInterID },
     });
   }
 
-  close() {
+  close () {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
@@ -78,53 +82,53 @@ class Profile extends PureComponent {
 
   renderDescription = () => {
     const {
-      recordProfile: {
-        data: {
-          defectList,
-          paramList,
-          fMoBillNo,
-          fSoBillNo,
-          fProductNumber,
-          fProductName,
-          fModel,
-          fUnitName,
-          fFlowInputQty,
-          fInputQty,
-          fPassQty,
-          fInvCheckDeltaQty,
-          fTakeQty,
-          fDefectQty,
-          fStatusName,
-          fDeptName,
-          fFullBatchNo,
-          fOperatorName,
-          fOperatorNumber,
-          fDebuggerName,
-          fDebuggerNumber,
-          fMachineName,
-          fMachineNumber,
-          fBeginDate,
-          fTransferDateTime,
-          fWorkTimeName,
-          fWorkTimeNumber,
-          fQtyDecimal,
-          fQtyFormat,
-          fConvertDecimal,
-          fConvertUnitID,
-          fConvertUnitName,
-          fConvertInputQty,
-          fConvertPassQty,
-          fConvertQtyFormat,
-          fNextRecords,
-          fAutoSign,
-          fSignUserName,
-          fSignDate,
-          fMesSelf001,
-          fMesSelf002,
-          fMesSelf003,
-        },
-      },
+      recordProfile: { data },
+      columnManage: { fields }
     } = this.props;
+    const {
+      defectList,
+      paramList,
+      fMoBillNo,
+      fSoBillNo,
+      fProductNumber,
+      fProductName,
+      fModel,
+      fUnitName,
+      fFlowInputQty,
+      fInputQty,
+      fPassQty,
+      fInvCheckDeltaQty,
+      fTakeQty,
+      fDefectQty,
+      fStatusName,
+      fDeptName,
+      fFullBatchNo,
+      fOperatorName,
+      fOperatorNumber,
+      fDebuggerName,
+      fDebuggerNumber,
+      fMachineName,
+      fMachineNumber,
+      fBeginDate,
+      fTransferDateTime,
+      fWorkTimeName,
+      fWorkTimeNumber,
+      fQtyDecimal,
+      fQtyFormat,
+      fConvertDecimal,
+      fConvertUnitID,
+      fConvertUnitName,
+      fConvertInputQty,
+      fConvertPassQty,
+      fConvertQtyFormat,
+      fNextRecords,
+      fAutoSign,
+      fSignUserName,
+      fSignDate,
+      fMesSelf001,
+      fMesSelf002,
+      fMesSelf003,
+    } = data;
 
     return (
       <div style={{ display: 'flex' }}>
@@ -144,10 +148,13 @@ class Profile extends PureComponent {
           <Description term="产品编码">{fProductNumber}</Description>
           <Description term="产品名称">{fProductName}</Description>
           <Description term="规格型号">{fModel}</Description>
-
-          <Description term="父件型号">{fMesSelf002}</Description>
-          <Description term="底色编号">{fMesSelf001}</Description>
-          <Description term="内部订单号">{fMesSelf003}</Description>
+          
+          {fields.filter(f => f.fIsShow).map(f => {
+            // 因WebApi中属性使用大驼峰命名法，而当前项目中属性使用小驼峰命名法，故而字段名需要做转换
+            const fieldName = f.fField.substring(0, 1).toLowerCase() + f.fField.substring(1);
+            return <Description key={f.fField} term={f.fName}>{data[fieldName]}</Description>
+          }
+          )}
 
           <Description term="流程单数量">{numeral(fFlowInputQty).format(fQtyFormat)}</Description>
           <Description term="投入数量">
@@ -188,7 +195,7 @@ class Profile extends PureComponent {
     );
   };
 
-  render() {
+  render () {
     const {
       recordProfile: { data },
       loading,

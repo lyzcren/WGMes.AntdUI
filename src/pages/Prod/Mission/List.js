@@ -38,7 +38,7 @@ import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
 import { GenFlowSuccess } from './GenFlowSuccess';
 import { print } from '@/utils/wgUtils';
-import { mergeFields } from '@/utils/wgUtils';
+import { mergeFields, mergeColumns } from '@/utils/wgUtils';
 import WgStandardTable from '@/wg_components/WgStandardTable';
 
 import styles from './List.less';
@@ -52,13 +52,14 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ missionManage, missionSync, loading, menu, basicData, columnManage }) => ({
+@connect(({ missionManage, missionSync, loading, menu, basicData, columnManage, global }) => ({
   missionManage,
   missionSync,
   loading: loading.models.missionManage,
   menu,
   basicData,
   columnManage,
+  global,
 }))
 @Form.create()
 class TableList extends PureComponent {
@@ -66,16 +67,16 @@ class TableList extends PureComponent {
     super(props);
 
     // 列配置相关方法
-    ColumnConfig.profileModalVisibleCallback = record =>
-      this.handleProfileModalVisible(true, record);
-    ColumnConfig.flowModalVisibleCallback = record =>
-      this.handleModalVisible({ key: 'update', flag: true }, record);
-    ColumnConfig.deleteCallback = record => this.handleDelete(record);
+    // ColumnConfig.profileModalVisibleCallback = record =>
+    //   this.handleProfileModalVisible(true, record);
+    // ColumnConfig.flowModalVisibleCallback = record =>
+    //   this.handleModalVisible({ key: 'genFlow', flag: true }, record);
+    // ColumnConfig.deleteCallback = record => this.handleDelete(record);
 
     this.state = {
       // 界面是否可见
       modalVisible: {
-        update: false,
+        genFlow: false,
         batchFlow: false,
         genFlowSuccess: false,
         sync: false,
@@ -98,7 +99,7 @@ class TableList extends PureComponent {
     this.columnConfigKey = 'mission';
   }
 
-  componentDidMount() {
+  componentDidMount () {
     const { dispatch } = this.props;
     dispatch({
       type: 'missionManage/fetch',
@@ -111,6 +112,9 @@ class TableList extends PureComponent {
     }
     dispatch({
       type: 'columnManage/getFields',
+    });
+    dispatch({
+      type: 'global/fetchProdBusinessConfig',
     });
 
     // 检查同步状态
@@ -408,7 +412,7 @@ class TableList extends PureComponent {
   };
 
   // 应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
-  webapp_start(templateId, interIds, type) {
+  webapp_start (templateId, interIds, type) {
     // var option = {
     //   baseurl: 'http://' + window.location.host,
     //   report: '/api/PrintTemplate/grf?id=' + templateId,
@@ -454,18 +458,25 @@ class TableList extends PureComponent {
 
   handleGenFlowSuccess = model => {
     const {
+      dispatch,
       missionManage: { queryResult: status, message },
     } = this.props;
 
-    if (model.length > 0) {
-      this.setState({ successFlows: model });
-      this.handleModalVisible({ key: 'genFlowSuccess', flag: true });
+    if (model) {
+      console.log(model);
+      dispatch({
+        type: 'missionManage/fetchFlows',
+        payload: { id: model.id }
+      }).then(flows => {
+        this.setState({ successFlows: flows });
+        this.handleModalVisible({ key: 'genFlowSuccess', flag: true });
+      })
     }
 
     this.search();
   };
 
-  renderSimpleForm() {
+  renderSimpleForm () {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -502,7 +513,7 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm() {
+  renderAdvancedForm () {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -598,12 +609,12 @@ class TableList extends PureComponent {
     );
   }
 
-  renderForm() {
+  renderForm () {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  renderOperator() {
+  renderOperator () {
     const { selectedRows } = this.state;
     const {
       missionManage: { queryResult, printTemplates },
@@ -665,12 +676,70 @@ class TableList extends PureComponent {
     );
   }
 
-  render() {
+  getColumns = () => {
+    const {
+      handleRowOperator = () => { },
+      columnManage: { fields },
+    } = this.props;
+    const columnOps = [
+      {
+        dataIndex: 'fMoBillNo',
+        render: (val, record) => (
+          <a onClick={() => this.handleProfileModalVisible(true, record)}>{val}</a>
+        ),
+      },
+      {
+        dataIndex: 'operators',
+        autoFixed: 'right',
+        width: 250,
+        render: (text, record) => this.renderRowOperation(record),
+      },
+    ];
+    // 合并操作列
+    let columns = mergeColumns({
+      columns: ColumnConfig.columns,
+      columnOps,
+    });
+    // 自定义字段处理
+    columns = mergeFields(columns, fields);
+
+    return columns;
+  };
+
+  renderRowOperation = record => {
+    const {
+      global: {
+        prodBusinessConfig: { canMoreThanPlan },
+      }, } = this.props;
+    const bCanMoreThanPlan = canMoreThanPlan && canMoreThanPlan.toUpperCase() == 'TRUE';
+    return (
+      <Fragment>
+        <Authorized authority="Mission_Read">
+          <a onClick={() => this.handleProfileModalVisible(true, record)}>详情</a>
+        </Authorized>
+        {
+          // 投产数量小于最大投产数量或者设置可超计划投产
+          (bCanMoreThanPlan || record.fAuxInHighLimitQty - record.fInputQty > 0) &&
+          <Authorized authority="Flow_Create">
+            <Divider type="vertical" />
+            <a onClick={() => this.handleModalVisible({ key: 'genFlow', flag: true }, record)}>开流程单</a>
+          </Authorized>
+        }
+        <Authorized authority="Mission_Delete">
+          <Divider type="vertical" />
+          <Popconfirm title="是否要删除此行？" onConfirm={() => this.handleDelete(record)}>
+            <a>删除</a>
+          </Popconfirm>
+        </Authorized>
+      </Fragment>
+    );
+  }
+
+  render () {
     const {
       missionManage: { data, queryResult, printTemplates },
       missionSync: { isSyncing, totalCount, currentCount },
       loading,
-      columnManage: { fields },
     } = this.props;
     const {
       selectedRows,
@@ -680,9 +749,6 @@ class TableList extends PureComponent {
       authorizeUserModalVisible,
       successFlows,
     } = this.state;
-
-    // 自定义字段处理
-    const columns = mergeFields(ColumnConfig.columns, fields);
 
     return (
       <div style={{ margin: '-24px -24px 0' }}>
@@ -696,7 +762,7 @@ class TableList extends PureComponent {
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
-                columns={columns}
+                columns={this.getColumns()}
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
                 // 以下属性与列配置相关
@@ -712,9 +778,9 @@ class TableList extends PureComponent {
               dispatch={this.props.dispatch}
               handleSuccess={this.handleGenFlowSuccess}
               handleModalVisible={(flag, record) =>
-                this.handleModalVisible({ key: 'update', flag }, record)
+                this.handleModalVisible({ key: 'genFlow', flag }, record)
               }
-              modalVisible={modalVisible.update}
+              modalVisible={modalVisible.genFlow}
               values={currentFormValues}
             />
           ) : null}

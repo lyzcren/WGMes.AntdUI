@@ -9,9 +9,11 @@ class ColumnConfig {
       title: '生产任务单号',
       dataIndex: 'fMoBillNo',
       width: 180,
-      render: (val, record) => (
-        <a onClick={() => this.profileModalVisibleCallback(record)}>{val}</a>
-      ),
+    },
+    {
+      title: '订单号',
+      dataIndex: 'fSoBillNo',
+      width: 180,
     },
     {
       title: '日期',
@@ -26,11 +28,6 @@ class ColumnConfig {
       sorter: true,
       width: 140,
       render: val => moment(val).format('YYYY-MM-DD'),
-    },
-    {
-      title: '订单号',
-      dataIndex: 'fSoBillNo',
-      width: 180,
     },
     {
       title: '任务单数量',
@@ -69,19 +66,19 @@ class ColumnConfig {
       width: 220,
     },
     {
-      title: '底色编号',
+      title: '自定义字段1',
       dataIndex: 'fMesSelf001',
       sorter: true,
       width: 120,
     },
     {
-      title: '父件型号',
+      title: '自定义字段2',
       dataIndex: 'fMesSelf002',
       sorter: true,
       width: 120,
     },
     {
-      title: '内部订单号',
+      title: '自定义字段3',
       dataIndex: 'fMesSelf003',
       sorter: true,
       width: 140,
@@ -248,39 +245,12 @@ class ColumnConfig {
     },
     {
       title: '操作',
+      dataIndex: 'operators',
       // fixed: 'right',
       autoFixed: 'right',
       width: 250,
-      render: (text, record) => (
-        <Fragment>
-          <Authorized authority="Mission_Read">
-            <a onClick={() => this.profileModalVisibleCallback(record)}>详情</a>
-          </Authorized>
-          {
-            // record.fAuxInHighLimitQty - record.fInputQty > 0 &&
-            <Authorized authority="Flow_Create">
-              <Divider type="vertical" />
-              <a onClick={() => this.flowModalVisibleCallback(record)}>开流程单</a>
-            </Authorized>
-          }
-          <Authorized authority="Mission_Delete">
-            <Divider type="vertical" />
-            <Popconfirm title="是否要删除此行？" onConfirm={() => this.deleteCallback(record)}>
-              <a>删除</a>
-            </Popconfirm>
-          </Authorized>
-        </Fragment>
-      ),
     },
   ];
-
-  // 详情方法
-  profileModalVisibleCallback = record => {};
-
-  // 流程单方法
-  flowModalVisibleCallback = record => {};
-
-  deleteCallback = record => {};
 }
 
 const columnConfig = new ColumnConfig();

@@ -35,24 +35,25 @@ const { Description } = DescriptionList;
 const ButtonGroup = Button.Group;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ missionManage, missionProfile, loading, menu }) => ({
+@connect(({ missionManage, missionProfile, loading, menu, columnManage }) => ({
   missionManage,
   missionProfile,
   loading: loading.models.missionProfile,
   menu,
+  columnManage,
 }))
 @Form.create()
 class Profile extends PureComponent {
   state = {};
 
-  componentDidMount() {
+  componentDidMount () {
     const {
       data: { fInterID },
     } = this.props;
     this.loadData(fInterID);
   }
 
-  componentDidUpdate(preProps) {
+  componentDidUpdate (preProps) {
     const {
       dispatch,
       data: { fInterID },
@@ -62,15 +63,18 @@ class Profile extends PureComponent {
     }
   }
 
-  loadData(fInterID) {
+  loadData (fInterID) {
     const { dispatch } = this.props;
     dispatch({
       type: 'missionProfile/initModel',
       payload: { fInterID },
     });
+    dispatch({
+      type: 'columnManage/getFields',
+    });
   }
 
-  close() {
+  close () {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
@@ -78,11 +82,12 @@ class Profile extends PureComponent {
     });
   }
 
-  render() {
+  render () {
     const {
       missionProfile: { data, steps, currentStep },
       loading,
       form: { getFieldDecorator },
+      columnManage: { fields },
     } = this.props;
 
     const description = (
@@ -136,15 +141,22 @@ class Profile extends PureComponent {
             <Description term="编码">{data.fProductNumber}</Description>
             <Description term="规格型号">{data.fModel}</Description>
             <Description term="分类">{data.fErpClsName}</Description>
-            <Description term="父件型号">{data.fMesSelf002}</Description>
-            <Description term="底色编号">{data.fMesSelf001}</Description>
-            <Description term="内部订单号">{data.fMesSelf003}</Description>
+            <Description term="工艺路线">{data.fRoutingName}</Description>
+            <Description term="工艺路线编码">{data.fRoutingNumber}</Description>
+            {fields.filter(f => f.fIsShow).map(f => {
+              // 因WebApi中属性使用大驼峰命名法，而当前项目中属性使用小驼峰命名法，故而字段名需要做转换
+              const fieldName = f.fField.substring(0, 1).toLowerCase() + f.fField.substring(1);
+              return <Description key={f.fField} term={f.fName}>{data[fieldName]}</Description>
+            }
+            )}
           </DescriptionList>
         </Card>
         <Card title="数量信息" style={{ marginBottom: 24 }} bordered={false}>
           <DescriptionList style={{ marginBottom: 24 }}>
             <Description term="单位">{data.fUnitName}</Description>
             <Description term="计划">{data.fPlanQty}</Description>
+            <Description term="完工上限">{data.fAuxInHighLimitQty}</Description>
+            <Description term="完工下限">{data.fAuxInLowLimitQty}</Description>
             <Description term="投入">{data.fInputQty}</Description>
             <Description term="完工">{data.fFinishQty}</Description>
             <Description term="合格">{data.fPassQty}</Description>
