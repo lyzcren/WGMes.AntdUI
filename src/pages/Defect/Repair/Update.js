@@ -19,8 +19,6 @@ import {
 import { connect } from 'dva';
 import numeral from 'numeral';
 import React, { Fragment, PureComponent } from 'react';
-import { ChooseForm } from './components/ChooseForm';
-import { ScanForm } from './components/ScanForm';
 import styles from './Update.less';
 
 const FormItem = Form.Item;
@@ -31,12 +29,11 @@ const { Description } = DescriptionList;
 const ButtonGroup = Button.Group;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ reportManage, reportUpdate, reportScan, loading, menu, basicData }) => ({
-  reportManage,
-  reportUpdate,
-  reportScan,
-  loading: loading.models.reportUpdate,
-  loadingDetail: loading.effects['reportUpdate/scan'],
+@connect(({ repairManage, repairUpdate, loading, menu, basicData }) => ({
+  repairManage,
+  repairUpdate,
+  loading: loading.models.repairUpdate,
+  loadingDetail: loading.effects['repairUpdate/scan'],
   menu,
   basicData,
 }))
@@ -58,7 +55,7 @@ class Update extends PureComponent {
   loadData = () => {
     const { dispatch, id } = this.props;
     dispatch({
-      type: 'reportUpdate/init',
+      type: 'repairUpdate/init',
       payload: { id },
     });
   };
@@ -66,13 +63,13 @@ class Update extends PureComponent {
   handleDetailRowChange({ fEntryID }, field, value) {
     const {
       dispatch,
-      reportUpdate: { details },
+      repairUpdate: { details },
     } = this.props;
     const findItem = details.find(x => x.fEntryID === fEntryID);
     findItem[field] = value;
 
     dispatch({
-      type: 'reportUpdate/changeDetails',
+      type: 'repairUpdate/changeDetails',
       payload: { details },
     });
   }
@@ -80,12 +77,12 @@ class Update extends PureComponent {
   handleDeleteRow(record) {
     const {
       dispatch,
-      reportUpdate: { details },
+      repairUpdate: { details },
     } = this.props;
     const newDetails = details.filter(x => x.fInterID !== record.fInterID);
 
     dispatch({
-      type: 'reportUpdate/changeDetails',
+      type: 'repairUpdate/changeDetails',
       payload: { details: newDetails },
     });
   }
@@ -117,7 +114,7 @@ class Update extends PureComponent {
     } = this.props;
     const deptId = getFieldValue('fDeptID');
     dispatch({
-      type: 'reportUpdate/scan',
+      type: 'repairUpdate/scan',
       payload: {
         deptId,
         batchNo,
@@ -135,12 +132,12 @@ class Update extends PureComponent {
       id,
       dispatch,
       handleChange,
-      reportUpdate: { details },
+      repairUpdate: { details },
     } = this.props;
     form.validateFieldsAndScroll((err, fieldsValue) => {
       if (err) return;
       if (details.length <= 0) {
-        message.warning(`未录入汇报明细，无法保存.`);
+        message.warning(`未录入明细，无法保存.`);
         return;
       }
 
@@ -150,7 +147,7 @@ class Update extends PureComponent {
       };
 
       dispatch({
-        type: 'reportUpdate/submit',
+        type: 'repairUpdate/submit',
         payload: { ...payload, id, check: bCheck },
       }).then(queryResult => {
         const { status } = queryResult;
@@ -177,7 +174,7 @@ class Update extends PureComponent {
     const { id, dispatch, handleChange } = this.props;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/report/profile', id, handleChange: this.search },
+      payload: { path: '/Defect/repair/profile', id, handleChange: this.search },
     });
   };
 
@@ -185,13 +182,13 @@ class Update extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
-      payload: { path: '/prod/report/update' },
+      payload: { path: '/Defect/repair/update' },
     });
   }
 
   handleDeptChange = value => {
     const {
-      reportUpdate: { details },
+      repairUpdate: { details },
     } = this.props;
     if (details.length > 0) {
       Modal.confirm({
@@ -214,7 +211,7 @@ class Update extends PureComponent {
       form: { getFieldValue },
     } = this.props;
     dispatch({
-      type: 'reportUpdate/changeDetails',
+      type: 'DefectUpdate/changeDetails',
       payload: { details: [] },
     });
     setTimeout(() => {
@@ -228,17 +225,16 @@ class Update extends PureComponent {
   handleSelectRows = (rows, rowsUnSelect) => {
     const {
       dispatch,
-      reportUpdate: { details },
+      repairUpdate: { details },
     } = this.props;
     rows.forEach(row => {
       if (!details.find(d => d.fInterID === row.fInterID)) {
-        // 设置默认汇报数量为可汇报数量
-        details.push({ ...row, fReportingQty: row.fUnReportQty });
+        details.push({ ...row });
       }
     });
     const newDetails = details.filter(d => !rowsUnSelect.find(r => r.fInterID === d.fInterID));
     dispatch({
-      type: 'reportUpdate/changeDetails',
+      type: 'repairUpdate/changeDetails',
       payload: { details: newDetails },
     });
   };
@@ -292,23 +288,19 @@ class Update extends PureComponent {
         dataIndex: 'fProductModel',
       },
       {
-        title: '可汇报数量',
-        dataIndex: 'fUnReportQty',
-      },
-      {
-        title: '汇报数量',
-        dataIndex: 'fReportingQty',
+        title: '数量',
+        dataIndex: 'fQty',
         render: (val, record) => (
           <FormItem style={{ marginBottom: 0 }}>
-            {getFieldDecorator(`fReportingQty_${record.fInvID}`, {
+            {getFieldDecorator(`fQty_${record.fInvID}`, {
               rules: [{ required: true, message: '请输入投入数量' }],
-              initialValue: record.fReportingQty,
+              initialValue: record.fQty,
             })(
               <InputNumber
-                max={record.fUnReportQty}
+                max={record.fUnrepairQty}
                 min={0}
                 onChange={value => {
-                  this.handleDetailRowChange(record, 'fReportingQty', value);
+                  this.handleDetailRowChange(record, 'fQty', value);
                 }}
               />
             )}
@@ -354,7 +346,7 @@ class Update extends PureComponent {
     const {
       basicData: { authorizeProcessTree },
       form: { getFieldDecorator },
-      reportUpdate: { fDeptID },
+      repairUpdate: { fDeptID },
     } = this.props;
     return (
       <Card title="基本信息" bordered={false}>
@@ -384,14 +376,14 @@ class Update extends PureComponent {
   renderDetailsCard = () => {
     const {
       loadingDetail,
-      reportUpdate: { details },
+      repairUpdate: { details },
     } = this.props;
-    const sum = details.reduce((acc, cur) => acc.add(cur.fReportingQty), numeral());
+    const sum = details.reduce((acc, cur) => acc.add(cur.fQty), numeral());
 
     return (
       <Card title="明细信息" bordered={false}>
         <Table
-          rowKey="fInvID"
+          rowKey="fEntryID"
           bordered
           loading={loadingDetail}
           columns={this.getColumns()}
@@ -406,7 +398,7 @@ class Update extends PureComponent {
   renderCommentsCard = () => {
     const {
       form: { getFieldDecorator },
-      reportUpdate: { fComments },
+      repairUpdate: { fComments },
     } = this.props;
     return (
       <Card title="备注信息" bordered={false}>
@@ -425,7 +417,7 @@ class Update extends PureComponent {
 
   renderOtherCard = () => {
     const {
-      reportUpdate: {
+      repairUpdate: {
         fCreatorName,
         fCreatorNumber,
         fCreateDate,
@@ -445,46 +437,15 @@ class Update extends PureComponent {
     );
   };
 
-  renderScanForm = () => {
-    const { loadingDetail } = this.props;
-    return (
-      <ScanForm
-        handleModalVisible={flag => this.showScan(flag)}
-        modalVisible={this.state.scanVisible}
-        handleScan={this.handleScan}
-        loading={loadingDetail}
-      />
-    );
-  };
-
-  renderChooseForm = () => {
-    const {
-      loading,
-      reportUpdate: { details },
-      form: { getFieldValue },
-    } = this.props;
-    const deptId = getFieldValue('fDeptID');
-    return deptId ? (
-      <ChooseForm
-        handleModalVisible={flag => this.showAdd(flag)}
-        modalVisible={this.state.addVisible}
-        deptId={deptId}
-        selectedRowKeys={details.map(d => d.fInterID)}
-        handleSelectRows={this.handleSelectRows}
-        loading={loading}
-      />
-    ) : null;
-  };
-
   render() {
     const {
-      reportUpdate: { fBillNo },
+      repairUpdate: { fBillNo },
       loading,
     } = this.props;
 
     return (
       <WgPageHeaderWrapper
-        title={`生产任务汇报：${fBillNo}`}
+        title={`单据：${fBillNo}`}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }
@@ -498,8 +459,6 @@ class Update extends PureComponent {
         {this.renderDetailsCard()}
         {this.renderCommentsCard()}
         {this.renderOtherCard()}
-        {this.renderScanForm()}
-        {this.renderChooseForm()}
       </WgPageHeaderWrapper>
     );
   }

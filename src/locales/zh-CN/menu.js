@@ -59,6 +59,13 @@ export default {
   'menu.prod.report.create': '新增生产任务汇报',
   'menu.prod.report.update': '修改生产任务汇报',
   'menu.prod.report.profile': '查看生产任务汇报',
+  // 不良管理
+  'menu.defect': '不良管理',
+  'menu.defect.inv': '不良库存',
+  'menu.defect.repair': '不良返修',
+  'menu.defect.repair.create': '新增不良返修',
+  'menu.defect.repair.update': '修改不良返修',
+  'menu.defect.repair.profile': '查看不良返修',
   // 过程查询
   'menu.record': '过程查询',
   'menu.record.record': '生产记录',

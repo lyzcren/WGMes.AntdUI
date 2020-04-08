@@ -183,8 +183,8 @@ class Create extends PureComponent {
     } = this.props;
     if (details.length > 0) {
       Modal.confirm({
-        title: '变更岗位',
-        content: '变更岗位将清空明细信息，是否继续？',
+        title: '更换岗位',
+        content: '更换岗位将清空明细信息，是否继续？',
         okText: '确认',
         cancelText: '取消',
         onOk: this.clearDetails,

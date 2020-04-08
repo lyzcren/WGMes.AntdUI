@@ -303,6 +303,44 @@ export default [
         ],
       },
       {
+        path: '/defect',
+        name: 'defect',
+        icon: 'file-excel',
+        authority: [
+          'Repair_Read',
+        ],
+        routes: [
+          {
+            path: '/defect/repair',
+            name: 'repair',
+            component: './Defect/Repair/List',
+            authority: ['Repair_Read'],
+            routes: [
+              {
+                path: '/defect/repair/profile',
+                name: 'profile',
+                component: './Defect/Repair/Profile',
+                authority: ['Repair_Read'],
+                hideInMenu: true,
+              },
+              {
+                path: '/defect/repair/create',
+                name: 'create',
+                component: './Defect/Repair/Create',
+                authority: ['Repair_Create'],
+                hideInMenu: true,
+              },
+              {
+                path: '/defect/repair/update',
+                name: 'update',
+                component: './Defect/Repair/Update',
+                authority: ['Repair_Update'],
+                hideInMenu: true,
+              },
+            ],
+          },]
+      },
+      {
         path: '/report',
         name: 'report',
         icon: 'area-chart',
