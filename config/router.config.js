@@ -289,12 +289,6 @@ export default [
             authority: ['BatchSplit_Read'],
           },
           {
-            path: '/record/defectRepair',
-            name: 'defectRepair',
-            component: './Record/DefectRepair/List',
-            authority: ['DefectRepair_Read'],
-          },
-          {
             path: '/record/defectScrap',
             name: 'defectScrap',
             component: './Record/DefectScrap/List',
@@ -306,9 +300,7 @@ export default [
         path: '/defect',
         name: 'defect',
         icon: 'file-excel',
-        authority: [
-          'Repair_Read',
-        ],
+        authority: ['Repair_Read'],
         routes: [
           {
             path: '/defect/repair',
@@ -338,7 +330,8 @@ export default [
                 hideInMenu: true,
               },
             ],
-          },]
+          },
+        ],
       },
       {
         path: '/report',

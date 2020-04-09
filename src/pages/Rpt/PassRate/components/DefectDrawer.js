@@ -3,7 +3,6 @@ import { connect } from 'dva';
 import React, { PureComponent } from 'react';
 import numeral from 'numeral';
 
-
 class DefectDrawer extends PureComponent {
   open = () => {
     const { handleVisible } = this.props;
@@ -19,7 +18,7 @@ class DefectDrawer extends PureComponent {
     }
   };
 
-  render () {
+  render() {
     const { loading, visible, defectData, currentRecord } = this.props;
     const columns = [
       {
@@ -36,7 +35,8 @@ class DefectDrawer extends PureComponent {
         title: '不良比例',
         dataIndex: 'fRate',
         width: 100,
-        render: (value, record) => `${numeral(record.fQty * 100 / currentRecord.fInputQty).format('0.00')}%`,
+        render: (value, record) =>
+          `${numeral((record.fQty * 100) / currentRecord.fInputQty).format('0.00')}%`,
       },
     ];
 

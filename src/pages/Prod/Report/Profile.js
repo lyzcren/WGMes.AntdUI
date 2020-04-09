@@ -26,7 +26,7 @@ const ButtonGroup = Button.Group;
 class Profile extends PureComponent {
   state = {};
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch, id } = this.props;
     dispatch({
       type: 'reportProfile/init',
@@ -34,7 +34,7 @@ class Profile extends PureComponent {
     });
   }
 
-  update () {
+  update() {
     const { dispatch, id, handleChange } = this.props;
 
     dispatch({
@@ -45,7 +45,7 @@ class Profile extends PureComponent {
     });
   }
 
-  check () {
+  check() {
     const { dispatch, id, handleChange } = this.props;
 
     dispatch({
@@ -62,7 +62,7 @@ class Profile extends PureComponent {
     });
   }
 
-  uncheck () {
+  uncheck() {
     const { dispatch, id, handleChange } = this.props;
 
     dispatch({
@@ -79,7 +79,7 @@ class Profile extends PureComponent {
     });
   }
 
-  showResult (queryResult) {
+  showResult(queryResult) {
     const { status, message, model } = queryResult;
 
     if (status === 'ok') {
@@ -91,7 +91,7 @@ class Profile extends PureComponent {
     }
   }
 
-  close () {
+  close() {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
@@ -243,7 +243,7 @@ class Profile extends PureComponent {
     );
   };
 
-  render () {
+  render() {
     const {
       reportProfile: { fBillNo },
       loading,

@@ -51,7 +51,7 @@ class Transfer extends PureComponent {
     unitConverterVisible: false,
   };
 
-  componentDidMount () {
+  componentDidMount() {
     // ReactDOM.findDOMNode(this.refs.select).click();
     const {
       location: {
@@ -65,7 +65,7 @@ class Transfer extends PureComponent {
     this.setState({ fMachineID, fWorkTimeID });
   }
 
-  componentDidUpdate (preProps) {
+  componentDidUpdate(preProps) {
     const {
       location: {
         data: { fInterID, fCurrentDeptID },
@@ -76,7 +76,7 @@ class Transfer extends PureComponent {
     }
   }
 
-  loadData (fInterID) {
+  loadData(fInterID) {
     const { dispatch } = this.props;
 
     dispatch({
@@ -94,7 +94,7 @@ class Transfer extends PureComponent {
     });
   }
 
-  transfer () {
+  transfer() {
     const {
       form,
       dispatch,
@@ -134,7 +134,7 @@ class Transfer extends PureComponent {
     });
   }
 
-  close () {
+  close() {
     const {
       dispatch,
       location: { tabMode },
@@ -162,7 +162,7 @@ class Transfer extends PureComponent {
     }
   };
 
-  handleFieldChange (fDefectID, fQty = 0) {
+  handleFieldChange(fDefectID, fQty = 0) {
     const { dispatch } = this.props;
     dispatch({
       type: 'flowTransfer/changeDefect',
@@ -170,7 +170,7 @@ class Transfer extends PureComponent {
     });
   }
 
-  handleOtherDefectKeyPress (e) {
+  handleOtherDefectKeyPress(e) {
     if (e.key === 'Enter') {
       const { form, dispatch } = this.props;
       const fieldsValue = form.getFieldsValue();
@@ -246,7 +246,7 @@ class Transfer extends PureComponent {
                 （
                 {`${numeral(data.fConvertInputQty).format(data.fConvertQtyFormat)} ${
                   data.fConvertUnitName
-                  }`}
+                }`}
                 ）
               </a>
             ) : null}
@@ -258,7 +258,7 @@ class Transfer extends PureComponent {
                 （
                 {`${numeral(data.fConvertPassQty).format(data.fConvertQtyFormat)} ${
                   data.fConvertUnitName
-                  }`}
+                }`}
                 ）
               </a>
             ) : null}
@@ -268,12 +268,17 @@ class Transfer extends PureComponent {
           <Description term="产品名称">{data.fProductName}</Description>
           <Description term="规格型号">{data.fModel}</Description>
 
-          {fields.filter(f => f.fIsShow).map(f => {
-            // 因WebApi中属性使用大驼峰命名法，而当前项目中属性使用小驼峰命名法，故而字段名需要做转换
-            const fieldName = f.fField.substring(0, 1).toLowerCase() + f.fField.substring(1);
-            return <Description key={f.fField} term={f.fName}>{data[fieldName]}</Description>
-          }
-          )}
+          {fields
+            .filter(f => f.fIsShow)
+            .map(f => {
+              // 因WebApi中属性使用大驼峰命名法，而当前项目中属性使用小驼峰命名法，故而字段名需要做转换
+              const fieldName = f.fField.substring(0, 1).toLowerCase() + f.fField.substring(1);
+              return (
+                <Description key={f.fField} term={f.fName}>
+                  {data[fieldName]}
+                </Description>
+              );
+            })}
           {/* <Description term="父件型号">{data.fMesSelf002}</Description>
           <Description term="底色编号">{data.fMesSelf001}</Description>
           <Description term="内部订单号">{data.fMesSelf003}</Description> */}
@@ -322,7 +327,7 @@ class Transfer extends PureComponent {
     this.setState({ unitConverterVisible: !!flag });
   };
 
-  render () {
+  render() {
     const {
       flowTransfer: { data, machineData, workTimes, matchConverter },
       loading,
@@ -344,14 +349,14 @@ class Transfer extends PureComponent {
     const defaultMachineID = data.fMachineID
       ? data.fMachineID
       : machineData && machineData.find(x => x.fItemID === this.state.fMachineID)
-        ? this.state.fMachineID
-        : null;
+      ? this.state.fMachineID
+      : null;
     // 默认班次
     const defaultWorkTimeID = data.fWorkTimeID
       ? data.fWorkTimeID
       : workTimes && workTimes.find(x => x.fWorkTimeID === this.state.fWorkTimeID)
-        ? this.state.fWorkTimeID
-        : null;
+      ? this.state.fWorkTimeID
+      : null;
     const currentTime = new Date();
     // 根据当前时间推算班次信息
     const currentWorkTime =

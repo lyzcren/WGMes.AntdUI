@@ -14,7 +14,7 @@ export default {
   },
 
   effects: {
-    *fetch ({ payload }, { call, put, select }) {
+    *fetch({ payload }, { call, put, select }) {
       const repairChooseForm = yield select(state => state.repairChooseForm);
       const { pagination } = repairChooseForm;
       const filtersAndSorter = getFiltersAndSorter(payload);
@@ -25,14 +25,14 @@ export default {
         type: 'save',
         payload: {
           pagination: currentPagination,
-          ...response
+          ...response,
         },
       });
     },
   },
 
   reducers: {
-    save (state, action) {
+    save(state, action) {
       return {
         ...state,
         ...action.payload,

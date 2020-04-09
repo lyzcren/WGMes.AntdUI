@@ -20,7 +20,7 @@ class ProdView extends PureComponent {
     invTypes: [],
   };
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
       type: 'businessConfig/getInvTypes',
@@ -31,7 +31,11 @@ class ProdView extends PureComponent {
       type: 'global/fetchProdBusinessConfig',
     }).then(config => {
       const { canMoreThanPlan, invType, reportUserName } = config;
-      this.setState({ canMoreThanPlan: canMoreThanPlan.toUpperCase() === 'TRUE', invType, reportUserName });
+      this.setState({
+        canMoreThanPlan: canMoreThanPlan.toUpperCase() === 'TRUE',
+        invType,
+        reportUserName,
+      });
     });
   }
 
@@ -57,7 +61,7 @@ class ProdView extends PureComponent {
     });
   };
 
-  render () {
+  render() {
     const {
       form: { getFieldDecorator },
     } = this.props;

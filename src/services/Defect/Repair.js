@@ -1,9 +1,8 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
 
-
-export async function fakePage (params) {
-  return request('/api/repair/getPage', {
+export async function fakePage(params) {
+  return request('/api/repair/page', {
     method: 'POST',
     body: {
       ...params,
@@ -12,7 +11,11 @@ export async function fakePage (params) {
   });
 }
 
-export async function fakeRemove (id) {
+export async function fakeGet(id) {
+  return request(`/api/repair/${id}`);
+}
+
+export async function fakeRemove(id) {
   return request('/api/repair/' + id, {
     method: 'DELETE',
     body: {
@@ -21,7 +24,7 @@ export async function fakeRemove (id) {
   });
 }
 
-export async function fakeAdd (params) {
+export async function fakeAdd(params) {
   return request('/api/repair', {
     method: 'POST',
     body: {
@@ -31,7 +34,7 @@ export async function fakeAdd (params) {
   });
 }
 
-export async function fakeUpdate (id, params) {
+export async function fakeUpdate(id, params) {
   return request('/api/repair/' + id, {
     method: 'PUT',
     body: {

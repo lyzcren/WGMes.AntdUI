@@ -16,14 +16,14 @@ export default {
   },
 
   effects: {
-    *fetch ({ payload }, { call, put }) {
+    *fetch({ payload }, { call, put }) {
       const response = yield call(fakeQuery, payload);
       yield put({
         type: 'save',
         payload: { data: response },
       });
     },
-    *fetchDetails ({ payload }, { call, put }) {
+    *fetchDetails({ payload }, { call, put }) {
       const response = yield call(fakeQueryDetails, payload);
       const head = yield call(fakeGet, payload);
       console.log(head);
@@ -35,7 +35,7 @@ export default {
   },
 
   reducers: {
-    save (state, action) {
+    save(state, action) {
       return {
         ...state,
         ...action.payload,

@@ -32,7 +32,7 @@ const { Description } = DescriptionList;
   basicData,
   loading: loading.models.flowProfile,
   menu,
-  columnManage
+  columnManage,
 }))
 @Form.create()
 class Profile extends PureComponent {
@@ -41,7 +41,7 @@ class Profile extends PureComponent {
     fTransferDateTime: '',
   };
 
-  componentDidMount () {
+  componentDidMount() {
     // ReactDOM.findDOMNode(this.refs.select).click();
     const {
       data: { fInterID },
@@ -49,7 +49,7 @@ class Profile extends PureComponent {
     this.loadData(fInterID);
   }
 
-  componentDidUpdate (preProps) {
+  componentDidUpdate(preProps) {
     const {
       data: { fInterID },
     } = this.props;
@@ -58,7 +58,7 @@ class Profile extends PureComponent {
     }
   }
 
-  loadData (fInterID) {
+  loadData(fInterID) {
     const { dispatch } = this.props;
 
     dispatch({
@@ -70,7 +70,7 @@ class Profile extends PureComponent {
     });
   }
 
-  close () {
+  close() {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
@@ -81,9 +81,7 @@ class Profile extends PureComponent {
   renderDescription = () => {
     const {
       columnManage: { fields },
-      flowProfile: {
-        data
-      }
+      flowProfile: { data },
     } = this.props;
     const {
       defectList,
@@ -146,12 +144,17 @@ class Profile extends PureComponent {
           <Description term="产品名称">{fProductName}</Description>
           <Description term="规格型号">{fProductModel}</Description>
 
-          {fields.filter(f => f.fIsShow).map(f => {
-            // 因WebApi中属性使用大驼峰命名法，而当前项目中属性使用小驼峰命名法，故而字段名需要做转换
-            const fieldName = f.fField.substring(0, 1).toLowerCase() + f.fField.substring(1);
-            return <Description key={f.fField} term={f.fName}>{data[fieldName]}</Description>
-          }
-          )}
+          {fields
+            .filter(f => f.fIsShow)
+            .map(f => {
+              // 因WebApi中属性使用大驼峰命名法，而当前项目中属性使用小驼峰命名法，故而字段名需要做转换
+              const fieldName = f.fField.substring(0, 1).toLowerCase() + f.fField.substring(1);
+              return (
+                <Description key={f.fField} term={f.fName}>
+                  {data[fieldName]}
+                </Description>
+              );
+            })}
           <Description term="车间">{fWorkShopName}</Description>
 
           <Description term="投入数量">
@@ -174,7 +177,7 @@ class Profile extends PureComponent {
     );
   };
 
-  render () {
+  render() {
     const {
       flowProfile: { data },
       loading,
@@ -248,8 +251,8 @@ class Profile extends PureComponent {
               {fCurrentDeptName ? (
                 <span style={{ color: fCurrentRecordStatusColor }}>{fCurrentRecordStatusName}</span>
               ) : (
-                  ''
-                )}
+                ''
+              )}
             </Description>
             {/* <Description term="操作员">{fOperatorName}</Description>
             <Description term="操作员编码">{fOperatorNumber}</Description>

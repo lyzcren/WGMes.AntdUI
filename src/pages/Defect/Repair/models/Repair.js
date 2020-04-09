@@ -40,7 +40,7 @@ export default {
       });
     },
     *remove({ payload }, { call, put }) {
-      const response = yield call(fakeRemove, payload.fInterID);      
+      const response = yield call(fakeRemove, payload.fInterID);
       yield put({
         type: 'save',
         payload: {

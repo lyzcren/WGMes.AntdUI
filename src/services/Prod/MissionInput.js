@@ -1,6 +1,6 @@
 import request from '@/utils/request';
 
-export async function fakeQuery (params) {
+export async function fakeQuery(params) {
   return request('/api/missionInput/getList', {
     method: 'POST',
     body: {
@@ -10,7 +10,7 @@ export async function fakeQuery (params) {
   });
 }
 
-export async function fakeRemove (id) {
+export async function fakeRemove(id) {
   return request(`/api/missionInput/${id}`, {
     method: 'DELETE',
     body: {
@@ -20,7 +20,7 @@ export async function fakeRemove (id) {
   });
 }
 
-export async function fakeAdd (params) {
+export async function fakeAdd(params) {
   return request('/api/missionInput', {
     method: 'POST',
     body: {
@@ -29,7 +29,7 @@ export async function fakeAdd (params) {
   });
 }
 
-export async function fakeUpdate (params) {
+export async function fakeUpdate(params) {
   return request(`/api/missionInput/${params.id}`, {
     method: 'PUT',
     body: {
@@ -39,7 +39,7 @@ export async function fakeUpdate (params) {
   });
 }
 
-export async function fakeRollback (params) {
+export async function fakeRollback(params) {
   return request(`/api/missionInput/rollback/${params.id}`, {
     method: 'PUT',
     body: {
@@ -49,7 +49,6 @@ export async function fakeRollback (params) {
   });
 }
 
-
-export async function fakeFetchFlows (id) {
+export async function fakeFetchFlows(id) {
   return request(`/api/missionInput/flow/${id}`);
 }

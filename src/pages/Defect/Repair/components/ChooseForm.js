@@ -7,7 +7,6 @@ import styles from './ChooseForm.less';
 
 const FormItem = Form.Item;
 
-
 @Form.create()
 export class ChooseForm extends PureComponent {
   static defaultProps = {};
@@ -18,16 +17,12 @@ export class ChooseForm extends PureComponent {
     this.state = {};
   }
 
-  componentDidMount () { }
+  componentDidMount() {}
 
-  componentDidUpdate (preProps) {
-  }
+  componentDidUpdate(preProps) {}
 
   handleSelectRows = rowKeys => {
-    const {
-      handleSelectRows,
-      dataSource,
-    } = this.props;
+    const { handleSelectRows, dataSource } = this.props;
     const rows = dataSource.filter(d => rowKeys.find(r => r === d.fInterID));
     const rowsUnSelect = dataSource.filter(d => !rowKeys.find(r => r === d.fInterID));
     if (handleSelectRows) {
@@ -64,11 +59,7 @@ export class ChooseForm extends PureComponent {
   };
 
   renderTable = () => {
-    const {
-      dataSource,
-      loading,
-      selectedRowKeys,
-    } = this.props;
+    const { dataSource, loading, selectedRowKeys } = this.props;
 
     const rowSelection = {
       selectedRowKeys,
@@ -80,7 +71,7 @@ export class ChooseForm extends PureComponent {
     return (
       <Table
         bordered
-        size={"middle"}
+        size={'middle'}
         rowKey="fInterID"
         loading={loading}
         dataSource={dataSource}
@@ -90,7 +81,7 @@ export class ChooseForm extends PureComponent {
     );
   };
 
-  render () {
+  render() {
     const { loading, modalVisible, handleModalVisible } = this.props;
 
     const footer = (

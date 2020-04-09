@@ -46,14 +46,14 @@ const ButtonGroup = Button.Group;
 class Profile extends PureComponent {
   state = {};
 
-  componentDidMount () {
+  componentDidMount() {
     const {
       data: { fInterID },
     } = this.props;
     this.loadData(fInterID);
   }
 
-  componentDidUpdate (preProps) {
+  componentDidUpdate(preProps) {
     const {
       dispatch,
       data: { fInterID },
@@ -63,7 +63,7 @@ class Profile extends PureComponent {
     }
   }
 
-  loadData (fInterID) {
+  loadData(fInterID) {
     const { dispatch } = this.props;
     dispatch({
       type: 'missionProfile/initModel',
@@ -74,7 +74,7 @@ class Profile extends PureComponent {
     });
   }
 
-  close () {
+  close() {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
@@ -82,7 +82,7 @@ class Profile extends PureComponent {
     });
   }
 
-  render () {
+  render() {
     const {
       missionProfile: { data, steps, currentStep },
       loading,
@@ -143,12 +143,17 @@ class Profile extends PureComponent {
             <Description term="分类">{data.fErpClsName}</Description>
             <Description term="工艺路线">{data.fRoutingName}</Description>
             <Description term="工艺路线编码">{data.fRoutingNumber}</Description>
-            {fields.filter(f => f.fIsShow).map(f => {
-              // 因WebApi中属性使用大驼峰命名法，而当前项目中属性使用小驼峰命名法，故而字段名需要做转换
-              const fieldName = f.fField.substring(0, 1).toLowerCase() + f.fField.substring(1);
-              return <Description key={f.fField} term={f.fName}>{data[fieldName]}</Description>
-            }
-            )}
+            {fields
+              .filter(f => f.fIsShow)
+              .map(f => {
+                // 因WebApi中属性使用大驼峰命名法，而当前项目中属性使用小驼峰命名法，故而字段名需要做转换
+                const fieldName = f.fField.substring(0, 1).toLowerCase() + f.fField.substring(1);
+                return (
+                  <Description key={f.fField} term={f.fName}>
+                    {data[fieldName]}
+                  </Description>
+                );
+              })}
           </DescriptionList>
         </Card>
         <Card title="数量信息" style={{ marginBottom: 24 }} bordered={false}>

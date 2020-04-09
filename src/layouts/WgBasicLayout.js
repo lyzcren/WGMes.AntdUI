@@ -62,7 +62,7 @@ class WgBasicLayout extends React.PureComponent {
     this.state = {};
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const {
       dispatch,
       route: { routes, authority },
@@ -90,7 +90,7 @@ class WgBasicLayout extends React.PureComponent {
     }).then(this.reloadIndexPage);
   }
 
-  componentDidUpdate (preProps) {
+  componentDidUpdate(preProps) {
     // After changing to phone mode,
     // if collapsed is true, you need to click twice to display
     const { collapsed, isMobile } = this.props;
@@ -154,11 +154,10 @@ class WgBasicLayout extends React.PureComponent {
         type: 'menu/openMenu',
         payload: { path: defaultPath, closable: false },
       });
-
     }
   };
 
-  getContext () {
+  getContext() {
     const { location, breadcrumbNameMap } = this.props;
     return {
       location,
@@ -252,7 +251,7 @@ class WgBasicLayout extends React.PureComponent {
     });
   };
 
-  closeAll () {
+  closeAll() {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeAllMenu',
@@ -279,14 +278,14 @@ class WgBasicLayout extends React.PureComponent {
     }
   };
 
-  closeOther () {
+  closeOther() {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeOtherMenu',
     });
   }
 
-  render () {
+  render() {
     const {
       navTheme,
       layout: PropsLayout,

@@ -98,7 +98,7 @@ export class CreateForm extends PureComponent {
       </div>
     ) : null;
   };
-  render () {
+  render() {
     const {
       form: { getFieldDecorator, getFieldValue },
       modalVisible,

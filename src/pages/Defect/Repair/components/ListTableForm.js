@@ -1,6 +1,18 @@
 import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
-import { Form, Card, Button, Icon, List, Menu, Divider, Table, Popconfirm, Dropdown } from 'antd';
+import {
+  Form,
+  Card,
+  Button,
+  Icon,
+  List,
+  Menu,
+  Divider,
+  Table,
+  Popconfirm,
+  Dropdown,
+  Badge,
+} from 'antd';
 import { mergeColumns } from '@/utils/wgUtils';
 import WgStandardTable from '@/wg_components/WgStandardTable';
 import Authorized from '@/utils/Authorized';
@@ -8,39 +20,48 @@ import { columns } from '@/columns/Defect/Repair';
 
 import styles from './ListTableForm.less';
 
-@connect(({ repairManage, loading }) => ({
+@connect(({ repairManage, loading, basicData }) => ({
   repairManage,
   loading: loading.models.repairManage,
+  basicData,
 }))
 class ListTableForm extends PureComponent {
   state = {};
+
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'basicData/getStatus',
+      payload: { number: 'repairStatus' },
+    });
+  }
 
   expandedRowRender = record => {
     const columns = [
       {
         title: '不良类型',
         dataIndex: 'fDefectName',
-        width: 100
+        width: 100,
       },
       {
         title: '不良编码',
         dataIndex: 'fDefectNumber',
-        width: 100
+        width: 100,
       },
       {
         title: '数量',
         dataIndex: 'fQty',
-        width: 100
+        width: 100,
       },
       {
         title: '单位',
         dataIndex: 'fUnitName',
-        width: 100
+        width: 100,
       },
       {
         title: '备注',
         dataIndex: 'fRowComments',
-        width: 100
+        width: 100,
       },
     ];
     return (
@@ -57,13 +78,25 @@ class ListTableForm extends PureComponent {
   };
 
   getColumns = () => {
-    const { handleRowOperator = () => {} } = this.props;
+    const {
+      handleRowOperator = () => {},
+      basicData: {
+        status: { repairStatus = [] },
+      },
+    } = this.props;
     const columnOps = [
       {
         dataIndex: 'fBillNo',
         render: (val, record) => (
           <a onClick={() => handleRowOperator({ record, type: 'profile' })}>{val}</a>
         ),
+      },
+      {
+        dataIndex: 'fStatusNumber',
+        filters: repairStatus.map(x => ({
+          text: <Badge color={x.fColor} text={x.fValue} />,
+          value: x.fKeyName,
+        })),
       },
       {
         dataIndex: 'operators',

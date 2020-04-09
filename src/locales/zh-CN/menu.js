@@ -70,7 +70,6 @@ export default {
   'menu.record': '过程查询',
   'menu.record.record': '生产记录',
   'menu.record.record.profile': '生产记录详情',
-  'menu.record.defectRepair': '返修记录',
   'menu.record.defectScrap': '报废记录',
   'menu.record.missionInput': '开流程单记录',
   'menu.record.take': '取走记录',

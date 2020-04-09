@@ -1,7 +1,7 @@
-import { fakeGet, fakeCheck, fakeUncheck } from '@/services/Prod/Report';
+import { fakeGet, fakeCheck, fakeUncheck } from '@/services/Defect/Repair';
 
 export default {
-  namespace: 'reportProfile',
+  namespace: 'repairProfile',
 
   state: {
     details: [],

@@ -306,9 +306,6 @@ class TableList extends PureComponent {
         </Authorized>
         {selectedRows.length > 0 && (
           <span>
-            <Authorized authority="ProdDefect_Repair">
-              <Button onClick={() => this.handleRepair()}>返修</Button>
-            </Authorized>
             <Authorized authority="ProdDefect_Divert">
               <Button onClick={() => this.handleDivert()}>转移</Button>
             </Authorized>
@@ -319,16 +316,6 @@ class TableList extends PureComponent {
         )}
       </div>
     );
-  }
-
-  handleRepair() {
-    const { selectedRows } = this.state;
-    const filterRows = Array.from(new Set(selectedRows.map(row => row.fMoBillNo)));
-    if (filterRows.length > 1) {
-      message.warning('不同任务单无法同时返修.');
-      return;
-    }
-    this.handleModalVisible({ key: 'repair', flag: true }, selectedRows);
   }
 
   handleDivert() {

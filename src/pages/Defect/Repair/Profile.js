@@ -16,9 +16,9 @@ const { Description } = DescriptionList;
 const ButtonGroup = Button.Group;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ reportProfile, loading, menu, basicData }) => ({
-  reportProfile,
-  loading: loading.models.reportProfile,
+@connect(({ repairProfile, loading, menu, basicData }) => ({
+  repairProfile,
+  loading: loading.models.repairProfile,
   menu,
   basicData,
 }))
@@ -26,35 +26,46 @@ const ButtonGroup = Button.Group;
 class Profile extends PureComponent {
   state = {};
 
-  componentDidMount () {
-    const { dispatch, id } = this.props;
+  componentDidMount() {
+    const {
+      dispatch,
+      location: { id },
+    } = this.props;
     dispatch({
-      type: 'reportProfile/init',
+      type: 'repairProfile/init',
       payload: { id },
     });
   }
 
-  update () {
-    const { dispatch, id, handleChange } = this.props;
+  update() {
+    const {
+      dispatch,
+      location: { id },
+      handleChange,
+    } = this.props;
 
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/report/update', id, handleChange },
+      payload: { path: '/defect/repair/update', location: { id }, handleChange },
     }).then(() => {
       this.close();
     });
   }
 
-  check () {
-    const { dispatch, id, handleChange } = this.props;
+  check() {
+    const {
+      dispatch,
+      location: { id },
+      handleChange,
+    } = this.props;
 
     dispatch({
-      type: 'reportProfile/check',
+      type: 'repairProfile/check',
       payload: { id },
     }).then(queryResult => {
       this.showResult(queryResult);
       dispatch({
-        type: 'reportProfile/init',
+        type: 'repairProfile/init',
         payload: { id },
       });
       // 成功后再次刷新列表
@@ -62,16 +73,20 @@ class Profile extends PureComponent {
     });
   }
 
-  uncheck () {
-    const { dispatch, id, handleChange } = this.props;
+  uncheck() {
+    const {
+      dispatch,
+      location: { id },
+      handleChange,
+    } = this.props;
 
     dispatch({
-      type: 'reportProfile/uncheck',
+      type: 'repairProfile/uncheck',
       payload: { id },
     }).then(queryResult => {
       this.showResult(queryResult);
       dispatch({
-        type: 'reportProfile/init',
+        type: 'repairProfile/init',
         payload: { id },
       });
       // 成功后再次刷新列表
@@ -79,7 +94,7 @@ class Profile extends PureComponent {
     });
   }
 
-  showResult (queryResult) {
+  showResult(queryResult) {
     const { status, message, model } = queryResult;
 
     if (status === 'ok') {
@@ -91,30 +106,30 @@ class Profile extends PureComponent {
     }
   }
 
-  close () {
+  close() {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
-      payload: { path: '/prod/report/profile' },
+      payload: { path: '/defect/repair/profile' },
     });
   }
 
   renderActions = () => {
     const {
-      reportProfile: { fStatusNumber },
+      repairProfile: { fStatusNumber },
     } = this.props;
     return (
       <Fragment>
         <ButtonGroup>
-          {fStatusNumber === 'Created' && hasAuthority('Report_Update') ? (
+          {fStatusNumber === 'Created' && hasAuthority('Repair_Update') ? (
             <Button type="primary" onClickCapture={() => this.update()}>
               修改
             </Button>
           ) : null}
-          {fStatusNumber === 'Created' && hasAuthority('Report_Check') ? (
+          {fStatusNumber === 'Created' && hasAuthority('Repair_Check') ? (
             <Button onClickCapture={() => this.check()}>审核</Button>
           ) : null}
-          {fStatusNumber === 'Checked' && hasAuthority('Report_Check') ? (
+          {fStatusNumber === 'Checked' && hasAuthority('Repair_Check') ? (
             <Button type="danger" onClickCapture={() => this.uncheck()}>
               反审核
             </Button>
@@ -131,28 +146,16 @@ class Profile extends PureComponent {
     } = this.props;
     const columns = [
       {
-        title: '任务单号',
-        dataIndex: 'fMoBillNo',
+        title: '不良类型',
+        dataIndex: 'fDefectName',
       },
       {
-        title: '批号',
-        dataIndex: 'fFullBatchNo',
+        title: '不良编码',
+        dataIndex: 'fDefectNumber',
       },
       {
-        title: '产品',
-        dataIndex: 'fProductName',
-      },
-      {
-        title: '产品编码',
-        dataIndex: 'fProductNumber',
-      },
-      {
-        title: '规格型号',
-        dataIndex: 'fProductModel',
-      },
-      {
-        title: '汇报数量',
-        dataIndex: 'fReportingQty',
+        title: '返修数量',
+        dataIndex: 'fQty',
       },
       {
         title: '单位',
@@ -167,15 +170,28 @@ class Profile extends PureComponent {
     return columns;
   };
 
+  renderDescription = () => {
+    const { repairProfile } = this.props;
+    return (
+      <DescriptionList className={styles.headerList} size="small" col="3" style={{ flex: 'auto' }}>
+        <Description term="任务单号">{repairProfile.fMoBillNo}</Description>
+        <Description term="订单号">{repairProfile.fSoBillNo}</Description>
+        <Description term="物料名称">{repairProfile.fProductName}</Description>
+        <Description term="物料编码">{repairProfile.fProductNumber}</Description>
+        <Description term="规格型号">{repairProfile.fProductModel}</Description>
+      </DescriptionList>
+    );
+  };
+
   renderBaseCard = () => {
-    const {
-      reportProfile: { fDeptName, fDeptNumber },
-    } = this.props;
+    const { repairProfile } = this.props;
     return (
       <Card title="基本信息" bordered={false}>
         <DescriptionList className={styles.headerList} size="small" col="4">
-          <Description term="岗位">{fDeptName}</Description>
-          <Description term="岗位编码">{fDeptNumber}</Description>
+          <Description term="岗位">{repairProfile.fDeptName}</Description>
+          <Description term="岗位编码">{repairProfile.fDeptNumber}</Description>
+          <Description term="工艺路线">{repairProfile.fRouteName}</Description>
+          <Description term="工艺路线编码">{repairProfile.fRouteNumber}</Description>
         </DescriptionList>
       </Card>
     );
@@ -184,19 +200,19 @@ class Profile extends PureComponent {
   renderDetailsCard = () => {
     const {
       loading,
-      reportProfile: { details },
+      repairProfile: { details },
     } = this.props;
-    const sum = details.reduce((acc, cur) => acc.add(cur.fReportingQty), numeral());
+    const sum = details.reduce((acc, cur) => acc.add(cur.fQty), numeral());
 
     return (
       <Card title="明细信息" bordered={false}>
         <Table
-          rowKey="fInvID"
+          rowKey="fEntryID"
           bordered
           loading={loading}
           columns={this.getColumns()}
           dataSource={details}
-          footer={() => `总汇报数量：${sum ? sum.value() : 0}`}
+          footer={() => `总数量：${sum ? sum.value() : 0}`}
           pagination={false}
         />
       </Card>
@@ -205,7 +221,7 @@ class Profile extends PureComponent {
 
   renderCommentsCard = () => {
     const {
-      reportProfile: { fComments },
+      repairProfile: { fComments },
     } = this.props;
     return (
       <Card title="备注信息" bordered={false}>
@@ -218,10 +234,13 @@ class Profile extends PureComponent {
 
   renderOtherCard = () => {
     const {
-      reportProfile: {
+      repairProfile: {
         fCreatorName,
         fCreatorNumber,
         fCreateDate,
+        fEditorName,
+        fEditorNumber,
+        fEditDate,
         fCheckerName,
         fCheckerNumber,
         fCheckDate,
@@ -235,6 +254,11 @@ class Profile extends PureComponent {
           <Description term="创建日期">{defaultDateTimeFormat(fCreateDate)}</Description>
         </DescriptionList>
         <DescriptionList className={styles.headerList} size="small" col={4}>
+          <Description term="修改人">{fEditorName}</Description>
+          <Description term="修改人编码">{fEditorNumber}</Description>
+          <Description term="修改日期">{defaultDateTimeFormat(fEditDate)}</Description>
+        </DescriptionList>
+        <DescriptionList className={styles.headerList} size="small" col={4}>
           <Description term="审核人">{fCheckerName}</Description>
           <Description term="审核人编码">{fCheckerNumber}</Description>
           <Description term="审核日期">{defaultDateTimeFormat(fCheckDate)}</Description>
@@ -243,9 +267,9 @@ class Profile extends PureComponent {
     );
   };
 
-  render () {
+  render() {
     const {
-      reportProfile: { fBillNo },
+      repairProfile: { fBillNo },
       loading,
     } = this.props;
 
@@ -256,7 +280,7 @@ class Profile extends PureComponent {
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }
         action={this.renderActions()}
-        // content={description}
+        content={this.renderDescription()}
         // extraContent={extra}
         wrapperClassName={styles.main}
         loading={loading}

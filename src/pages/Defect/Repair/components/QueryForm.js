@@ -74,8 +74,8 @@ class QueryForm extends PureComponent {
       queryFilters.push({ name: 'fDeptID', compare: '=', value: fieldsValue.fDeptID });
     if (fieldsValue.fBillNo)
       queryFilters.push({ name: 'fBillNo', compare: '%*%', value: fieldsValue.fBillNo });
-    if (fieldsValue.fMoRptBillNo)
-      queryFilters.push({ name: 'fMoRptBillNo', compare: '%*%', value: fieldsValue.fMoRptBillNo });
+    if (fieldsValue.fMoBillNo)
+      queryFilters.push({ name: 'fMoBillNo', compare: '%*%', value: fieldsValue.fMoBillNo });
     if (fieldsValue.fCreatorName)
       queryFilters.push({ name: 'fCreatorName', compare: '%*%', value: fieldsValue.fCreatorName });
     if (fieldsValue.fCreatorNumber)
@@ -198,8 +198,8 @@ class QueryForm extends PureComponent {
             </FormItem>
           </Col>
           <Col md={6} sm={24}>
-            <FormItem label="ERP汇报单号">
-              {getFieldDecorator('fMoRptBillNo')(<Input placeholder="请输入" />)}
+            <FormItem label="任务单号">
+              {getFieldDecorator('fMoBillNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={6} sm={24}>
@@ -254,11 +254,6 @@ class QueryForm extends PureComponent {
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem label="ERP汇报单号">
-              {getFieldDecorator('fMoRptBillNo')(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
             <FormItem label="创建人">
               {getFieldDecorator('fCreatorName')(<Input placeholder="请输入" />)}
             </FormItem>
@@ -297,11 +292,6 @@ class QueryForm extends PureComponent {
           <Col md={8} sm={24}>
             <FormItem label="任务单号">
               {getFieldDecorator('fMoBillNo')(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="批号">
-              {getFieldDecorator('fFullBatchNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>

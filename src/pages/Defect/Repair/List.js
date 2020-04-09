@@ -18,7 +18,12 @@ import {
   message,
   Badge,
   Divider,
-  Radio, Popover, Switch, Progress, notification, Popconfirm,
+  Radio,
+  Popover,
+  Switch,
+  Progress,
+  notification,
+  Popconfirm,
 } from 'antd';
 import { connect } from 'dva';
 import React, { PureComponent } from 'react';
@@ -44,7 +49,7 @@ class RepairList extends PureComponent {
     this.state = {};
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props;
     if (hasAuthority('Repair_Print')) {
       dispatch({
@@ -170,23 +175,31 @@ class RepairList extends PureComponent {
     });
   };
 
-  handleProfile (record) {
+  handleProfile(record) {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/defect/repair/profile', id: record.fInterID, handleChange: this.search },
+      payload: {
+        path: '/defect/repair/profile',
+        location: { id: record.fInterID },
+        handleChange: this.search,
+      },
     });
   }
 
-  handleUpdate (record) {
+  handleUpdate(record) {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/defect/repair/update', id: record.fInterID, handleChange: this.search },
+      payload: {
+        path: '/defect/repair/update',
+        location: { id: record.fInterID },
+        handleChange: this.search,
+      },
     });
   }
 
-  render () {
+  render() {
     const { dispatch, repairManage, loading } = this.props;
     const { selectedRows } = repairManage;
 

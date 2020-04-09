@@ -14,8 +14,7 @@ import styles from './OperatorForm.less';
   loading: loading.models.repairManage,
 }))
 class OperatorForm extends PureComponent {
-  state = {
-  };
+  state = {};
 
   handleMenuClick = e => {
     const {
@@ -58,7 +57,7 @@ class OperatorForm extends PureComponent {
     });
   };
 
-  handleAdd () {
+  handleAdd() {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
@@ -85,7 +84,7 @@ class OperatorForm extends PureComponent {
     }
   };
 
-  renderOperator () {
+  renderOperator() {
     const {
       repairManage: { selectedRows },
     } = this.props;
@@ -136,7 +135,7 @@ class OperatorForm extends PureComponent {
     );
   }
 
-  render () {
+  render() {
     return <div className={styles.tableListOperator}>{this.renderOperator()}</div>;
   }
 }

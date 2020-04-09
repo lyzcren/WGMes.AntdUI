@@ -12,13 +12,13 @@ export default {
   },
 
   effects: {
-    *init ({ _ }, { call, put }) {
+    *init({ _ }, { call, put }) {
       yield put({
         type: 'save',
         payload: { details: [] },
       });
     },
-    *submit ({ payload }, { call, put }) {
+    *submit({ payload }, { call, put }) {
       const { check } = payload;
       let response = yield call(fakeAdd, payload);
       if (check && response.model) {
@@ -27,14 +27,14 @@ export default {
 
       return response;
     },
-    *changeDetails ({ payload }, { call, put }) {
+    *changeDetails({ payload }, { call, put }) {
       const { details } = payload;
       yield put({
         type: 'save',
         payload: { details },
       });
     },
-    *scan ({ payload }, { call, put, select }) {
+    *scan({ payload }, { call, put, select }) {
       const response = yield call(fakeScan, payload);
       const details = yield select(state => state.repairCreate.details);
       if (response) {
@@ -51,11 +51,11 @@ export default {
       }
       return { success: false, message: '未找到明细' };
     },
-    *fetchMoBill ({ payload }, { call, put, select }) {
+    *fetchMoBill({ payload }, { call, put, select }) {
       const currentPagination = {
         current: 1,
         pageSize: 50,
-        ...payload
+        ...payload,
       };
       const response = yield call(queryDefect, currentPagination);
       const moBillNoList = [];
@@ -67,18 +67,18 @@ export default {
             fSoBillNo: item.fSoBillNo,
             fProductName: item.fProductName,
             fProductNumber: item.fProductNumber,
-            fProductModel: item.fProductModel
+            fProductModel: item.fProductModel,
           });
         }
       });
       yield put({
         type: 'save',
         payload: {
-          moBillNoList
+          moBillNoList,
         },
       });
     },
-    *moBillNoChange ({ payload }, { call, put, select }) {
+    *moBillNoChange({ payload }, { call, put, select }) {
       const repairCreate = yield select(state => state.repairCreate);
       const { missionId } = payload;
       const currentMo = repairCreate.moBillNoList.find(x => x.fMissionID === missionId);
@@ -88,9 +88,9 @@ export default {
         return {
           ...d,
           fEntryID: i + 1,
-          fRepairQty: d.fCurrentQty,
-          fDefectInvID: d.fInterID
-        }
+          fQty: d.fCurrentQty,
+          fDefectInvID: d.fInterID,
+        };
       });
 
       yield put({
@@ -98,14 +98,14 @@ export default {
         payload: {
           currentMo,
           defectInv,
-          details
+          details,
         },
       });
     },
   },
 
   reducers: {
-    save (state, action) {
+    save(state, action) {
       return {
         ...state,
         ...action.payload,

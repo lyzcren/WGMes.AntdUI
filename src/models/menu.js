@@ -11,7 +11,7 @@ import { getComponentMaps } from '@/utils/utils';
 const { check } = Authorized;
 
 // Conversion router to menu.
-function formatter (data, parentAuthority, parentName) {
+function formatter(data, parentAuthority, parentName) {
   return data
     .map(item => {
       if (!item.name || !item.path) {
@@ -163,7 +163,7 @@ export default {
   },
 
   effects: {
-    *getMenuData ({ payload }, { put }) {
+    *getMenuData({ payload }, { put }) {
       const { routes, authority, defaultActiveKey } = payload;
       const menuData = filterMenuData(memoizeOneFormatter(routes, authority));
       const routeData = filterRouteData(memoizeOneFormatter(routes, authority));
@@ -181,7 +181,7 @@ export default {
         payload: response,
       });
     },
-    *openMenu ({ payload }, { put, call, select }) {
+    *openMenu({ payload }, { put, call, select }) {
       const { path, closable, withoutRefresh } = payload;
       const { menuData, routeData, routeHistory, panes } = yield select(state => state.menu);
       const activeKey = path;
@@ -192,7 +192,12 @@ export default {
         if (componentMap) {
           pane = componentMap;
           // 打开Tab页
-          panes.push({ ...componentMap, key: activeKey, closable, timeStamp: new Date().valueOf() });
+          panes.push({
+            ...componentMap,
+            key: activeKey,
+            closable,
+            timeStamp: new Date().valueOf(),
+          });
         } else {
           // TODO: 未找到路由时进行特殊处理
           notification.error({
@@ -211,7 +216,7 @@ export default {
             ...p,
             ...payload,
             key: activeKey,
-            timeStamp: (withoutRefresh ? p.timeStamp : (new Date()).valueOf())
+            timeStamp: withoutRefresh ? p.timeStamp : new Date().valueOf(),
           };
         }
         return p;
@@ -232,7 +237,7 @@ export default {
         },
       });
     },
-    *refreshMenu ({ payload }, { put, call, select }) {
+    *refreshMenu({ payload }, { put, call, select }) {
       const { path } = payload;
       const { menuData, routeData, routeHistory, panes, activeKey } = yield select(
         state => state.menu
@@ -251,7 +256,7 @@ export default {
         },
       });
     },
-    *closeMenu ({ payload }, { put, call, select }) {
+    *closeMenu({ payload }, { put, call, select }) {
       const { path, closable } = payload;
       const { menuData, routeData, routeHistory, panes, activeKey } = yield select(
         state => state.menu
@@ -277,7 +282,7 @@ export default {
         },
       });
     },
-    *closeAllMenu ({ payload }, { put, call, select }) {
+    *closeAllMenu({ payload }, { put, call, select }) {
       const { menuData, routeData, routeHistory, panes, activeKey } = yield select(
         state => state.menu
       );
@@ -302,7 +307,7 @@ export default {
         },
       });
     },
-    *closeOtherMenu ({ payload }, { put, call, select }) {
+    *closeOtherMenu({ payload }, { put, call, select }) {
       const { menuData, routeData, routeHistory, panes, activeKey } = yield select(
         state => state.menu
       );
@@ -324,7 +329,7 @@ export default {
         },
       });
     },
-    *disposeMenu ({ payload }, { put }) {
+    *disposeMenu({ payload }, { put }) {
       yield put({
         type: 'save',
         payload: {
@@ -342,7 +347,7 @@ export default {
   },
 
   reducers: {
-    save (state, action) {
+    save(state, action) {
       return {
         ...state,
         ...action.payload,

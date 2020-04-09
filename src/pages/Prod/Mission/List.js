@@ -99,7 +99,7 @@ class TableList extends PureComponent {
     this.columnConfigKey = 'mission';
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
       type: 'missionManage/fetch',
@@ -412,7 +412,7 @@ class TableList extends PureComponent {
   };
 
   // 应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
-  webapp_start (templateId, interIds, type) {
+  webapp_start(templateId, interIds, type) {
     // var option = {
     //   baseurl: 'http://' + window.location.host,
     //   report: '/api/PrintTemplate/grf?id=' + templateId,
@@ -466,17 +466,17 @@ class TableList extends PureComponent {
       console.log(model);
       dispatch({
         type: 'missionManage/fetchFlows',
-        payload: { id: model.id }
+        payload: { id: model.id },
       }).then(flows => {
         this.setState({ successFlows: flows });
         this.handleModalVisible({ key: 'genFlowSuccess', flag: true });
-      })
+      });
     }
 
     this.search();
   };
 
-  renderSimpleForm () {
+  renderSimpleForm() {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -513,7 +513,7 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm () {
+  renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -609,12 +609,12 @@ class TableList extends PureComponent {
     );
   }
 
-  renderForm () {
+  renderForm() {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  renderOperator () {
+  renderOperator() {
     const { selectedRows } = this.state;
     const {
       missionManage: { queryResult, printTemplates },
@@ -678,7 +678,7 @@ class TableList extends PureComponent {
 
   getColumns = () => {
     const {
-      handleRowOperator = () => { },
+      handleRowOperator = () => {},
       columnManage: { fields },
     } = this.props;
     const columnOps = [
@@ -710,21 +710,23 @@ class TableList extends PureComponent {
     const {
       global: {
         prodBusinessConfig: { canMoreThanPlan },
-      }, } = this.props;
+      },
+    } = this.props;
     const bCanMoreThanPlan = canMoreThanPlan && canMoreThanPlan.toUpperCase() == 'TRUE';
     return (
       <Fragment>
         <Authorized authority="Mission_Read">
           <a onClick={() => this.handleProfileModalVisible(true, record)}>详情</a>
         </Authorized>
-        {
-          // 投产数量小于最大投产数量或者设置可超计划投产
-          (bCanMoreThanPlan || record.fAuxInHighLimitQty - record.fInputQty > 0) &&
+        {// 投产数量小于最大投产数量或者设置可超计划投产
+        (bCanMoreThanPlan || record.fAuxInHighLimitQty - record.fInputQty > 0) && (
           <Authorized authority="Flow_Create">
             <Divider type="vertical" />
-            <a onClick={() => this.handleModalVisible({ key: 'genFlow', flag: true }, record)}>开流程单</a>
+            <a onClick={() => this.handleModalVisible({ key: 'genFlow', flag: true }, record)}>
+              开流程单
+            </a>
           </Authorized>
-        }
+        )}
         <Authorized authority="Mission_Delete">
           <Divider type="vertical" />
           <Popconfirm title="是否要删除此行？" onConfirm={() => this.handleDelete(record)}>
@@ -733,9 +735,9 @@ class TableList extends PureComponent {
         </Authorized>
       </Fragment>
     );
-  }
+  };
 
-  render () {
+  render() {
     const {
       missionManage: { data, queryResult, printTemplates },
       missionSync: { isSyncing, totalCount, currentCount },

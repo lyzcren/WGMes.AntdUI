@@ -52,7 +52,7 @@ const getValue = obj =>
   recordManage,
   loading: loading.models.recordManage,
   basicData,
-  columnManage
+  columnManage,
 }))
 @Form.create()
 class TableList extends PureComponent {
@@ -87,7 +87,7 @@ class TableList extends PureComponent {
     this.columnConfigKey = 'record';
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
       type: 'columnManage/getFields',
@@ -114,9 +114,9 @@ class TableList extends PureComponent {
     const badgeStatus = !recordStatus
       ? []
       : recordStatus.map(x => ({
-        text: <Badge color={x.fColor} text={x.fValue} />,
-        value: x.fKeyName,
-      }));
+          text: <Badge color={x.fColor} text={x.fValue} />,
+          value: x.fKeyName,
+        }));
     return badgeStatus;
   };
 
@@ -327,7 +327,7 @@ class TableList extends PureComponent {
     });
   };
 
-  renderSimpleForm () {
+  renderSimpleForm() {
     const {
       form: { getFieldDecorator },
       basicData: {
@@ -402,7 +402,7 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm () {
+  renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
       basicData: {
@@ -516,12 +516,12 @@ class TableList extends PureComponent {
     );
   }
 
-  renderForm () {
+  renderForm() {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  renderOperator () {
+  renderOperator() {
     const { selectedRows } = this.state;
 
     return (
@@ -544,7 +544,7 @@ class TableList extends PureComponent {
     );
   }
 
-  render () {
+  render() {
     const {
       dispatch,
       recordManage: { data, queryResult },

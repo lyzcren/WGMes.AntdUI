@@ -19,7 +19,6 @@ export async function fakeGet(params) {
   });
 }
 
-
 export async function fakeQueryDetails(params) {
   return request('/api/passRate/details', {
     method: 'POST',

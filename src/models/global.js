@@ -15,12 +15,12 @@ export default {
     syncBusinessConfig: {},
     prodBusinessConfig: {
       canMoreThanPlan: '',
-      invType: ''
+      invType: '',
     },
   },
 
   effects: {
-    *fetchNotices (_, { call, put, select }) {
+    *fetchNotices(_, { call, put, select }) {
       const data = yield call(queryNotices);
       const loadedAllNotices = data && data.length && data[data.length - 1] === null;
       yield put({
@@ -42,7 +42,7 @@ export default {
         },
       });
     },
-    *fetchMoreNotices ({ payload }, { call, put, select }) {
+    *fetchMoreNotices({ payload }, { call, put, select }) {
       const data = yield call(queryNotices, payload);
       const loadedAllNotices = data && data.length && data[data.length - 1] === null;
       yield put({
@@ -64,7 +64,7 @@ export default {
         },
       });
     },
-    *clearNotices ({ payload }, { put, select }) {
+    *clearNotices({ payload }, { put, select }) {
       yield put({
         type: 'saveClearedNotices',
         payload,
@@ -81,7 +81,7 @@ export default {
         },
       });
     },
-    *changeNoticeReadState ({ payload }, { put, select }) {
+    *changeNoticeReadState({ payload }, { put, select }) {
       const notices = yield select(state =>
         state.global.notices.map(item => {
           const notice = { ...item };
@@ -103,7 +103,7 @@ export default {
         },
       });
     },
-    *fetchBasicBusinessConfig ({ }, { call, put }) {
+    *fetchBasicBusinessConfig({}, { call, put }) {
       const response = yield call(fakeFetchBasic);
       const configs = {};
       response.forEach(item => {
@@ -122,7 +122,7 @@ export default {
       });
       return configs;
     },
-    *fetchSyncBusinessConfig ({ }, { call, put }) {
+    *fetchSyncBusinessConfig({}, { call, put }) {
       const response = yield call(fakeFetchSync);
       const configs = {};
       response.forEach(item => {
@@ -135,7 +135,7 @@ export default {
       });
       return configs;
     },
-    *fetchProdBusinessConfig (_, { call, put }) {
+    *fetchProdBusinessConfig(_, { call, put }) {
       const response = yield call(fakeFetchProd);
       const configs = {};
       response.forEach(item => {
@@ -148,71 +148,71 @@ export default {
       });
       return configs;
     },
-    *fullScreen ({ payload }, { put }) {
+    *fullScreen({ payload }, { put }) {
       const { isFullScreen } = payload;
       yield put({
         type: 'changeFullScreen',
         payload: { isFullScreen },
       });
     },
-    *quickOps ({ }, { put }) {
+    *quickOps({}, { put }) {
       yield put(routerRedux.replace('/quickOps'));
     },
-    *moreOps ({ }, { put }) {
+    *moreOps({}, { put }) {
       yield put(routerRedux.replace('/'));
     },
   },
 
   reducers: {
-    saveBasicBusinessConfig (state, { payload }) {
+    saveBasicBusinessConfig(state, { payload }) {
       return {
         ...state,
         basicBusinessConfig: payload,
       };
     },
-    saveSyncBusinessConfig (state, { payload }) {
+    saveSyncBusinessConfig(state, { payload }) {
       return {
         ...state,
         syncBusinessConfig: payload,
       };
     },
-    saveProdBusinessConfig (state, { payload }) {
+    saveProdBusinessConfig(state, { payload }) {
       return {
         ...state,
         prodBusinessConfig: payload,
       };
     },
-    changeLayoutCollapsed (state, { payload }) {
+    changeLayoutCollapsed(state, { payload }) {
       return {
         ...state,
         collapsed: payload,
       };
     },
-    saveNotices (state, { payload }) {
+    saveNotices(state, { payload }) {
       return {
         ...state,
         notices: payload,
       };
     },
-    saveClearedNotices (state, { payload }) {
+    saveClearedNotices(state, { payload }) {
       return {
         ...state,
         notices: state.notices.filter(item => item.type !== payload),
       };
     },
-    pushNotices (state, { payload }) {
+    pushNotices(state, { payload }) {
       return {
         ...state,
         notices: [...state.notices, ...payload],
       };
     },
-    setLoadedStatus (state, { payload }) {
+    setLoadedStatus(state, { payload }) {
       return {
         ...state,
         loadedAllNotices: payload,
       };
     },
-    changeFullScreen (state, { payload }) {
+    changeFullScreen(state, { payload }) {
       return {
         ...state,
         ...payload,
@@ -221,7 +221,7 @@ export default {
   },
 
   subscriptions: {
-    setup ({ history }) {
+    setup({ history }) {
       // Subscribe history(url) change, trigger `load` action if pathname is `/`
       return history.listen(({ pathname, search }) => {
         if (typeof window.ga !== 'undefined') {

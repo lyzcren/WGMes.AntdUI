@@ -70,7 +70,7 @@ class TableList extends PureComponent {
     groupByProduct: !!this.state.groupByProduct,
   };
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
       type: 'basicData/getProcessDeptTree',
@@ -206,7 +206,7 @@ class TableList extends PureComponent {
     });
   };
 
-  showResult (queryResult, successCallback) {
+  showResult(queryResult, successCallback) {
     const { status, message, model } = queryResult;
 
     if (status === 'ok') {
@@ -221,13 +221,13 @@ class TableList extends PureComponent {
     }
   }
 
-  changeGroupBy (group, checked) {
+  changeGroupBy(group, checked) {
     const { state } = this;
     state[group] = checked;
     this.setState({ ...state });
   }
 
-  changeGroupByDate (e) {
+  changeGroupByDate(e) {
     const {
       target: { value },
     } = e;
@@ -249,7 +249,7 @@ class TableList extends PureComponent {
     this.setState({ fBeginDate: value[0], fEndDate: value[1] });
   };
 
-  renderSimpleForm () {
+  renderSimpleForm() {
     const {
       form: { getFieldDecorator },
       basicData: { processDeptTree },
@@ -328,11 +328,11 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm () {
+  renderAdvancedForm() {
     return renderSimpleForm;
   }
 
-  renderForm () {
+  renderForm() {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
@@ -496,7 +496,7 @@ class TableList extends PureComponent {
     );
   };
 
-  render () {
+  render() {
     return (
       <div style={{ margin: '-24px -24px 0' }}>
         <GridContent>

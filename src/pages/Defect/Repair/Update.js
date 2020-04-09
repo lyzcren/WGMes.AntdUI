@@ -19,6 +19,9 @@ import {
 import { connect } from 'dva';
 import numeral from 'numeral';
 import React, { Fragment, PureComponent } from 'react';
+import DetailCard from './components/DetailCard';
+import { UpdateBaseCard } from './components/BaseCard';
+import { ChooseForm } from './components/ChooseForm';
 import styles from './Update.less';
 
 const FormItem = Form.Item;
@@ -32,15 +35,14 @@ const ButtonGroup = Button.Group;
 @connect(({ repairManage, repairUpdate, loading, menu, basicData }) => ({
   repairManage,
   repairUpdate,
-  loading: loading.models.repairUpdate,
-  loadingDetail: loading.effects['repairUpdate/scan'],
+  loading: loading.effects['repairUpdate/init'] || loading.effects['repairUpdate/submit'],
+  loadingDetail: loading.effects['repairUpdate/moBillNoChange'],
   menu,
   basicData,
 }))
 @Form.create()
 class Update extends PureComponent {
   state = {
-    scanVisible: false,
     addVisible: false,
   };
 
@@ -53,43 +55,22 @@ class Update extends PureComponent {
   }
 
   loadData = () => {
-    const { dispatch, id } = this.props;
+    const {
+      dispatch,
+      location: { id },
+    } = this.props;
     dispatch({
       type: 'repairUpdate/init',
       payload: { id },
     });
   };
 
-  handleDetailRowChange({ fEntryID }, field, value) {
-    const {
-      dispatch,
-      repairUpdate: { details },
-    } = this.props;
-    const findItem = details.find(x => x.fEntryID === fEntryID);
-    findItem[field] = value;
+  handleDetailChange(records) {
+    const { dispatch } = this.props;
 
     dispatch({
       type: 'repairUpdate/changeDetails',
-      payload: { details },
-    });
-  }
-
-  handleDeleteRow(record) {
-    const {
-      dispatch,
-      repairUpdate: { details },
-    } = this.props;
-    const newDetails = details.filter(x => x.fInterID !== record.fInterID);
-
-    dispatch({
-      type: 'repairUpdate/changeDetails',
-      payload: { details: newDetails },
-    });
-  }
-
-  showScan(flag) {
-    this.setState({
-      scanVisible: !!flag,
+      payload: { details: records },
     });
   }
 
@@ -107,29 +88,10 @@ class Update extends PureComponent {
     });
   }
 
-  handleScan = batchNo => {
-    const {
-      dispatch,
-      form: { getFieldValue },
-    } = this.props;
-    const deptId = getFieldValue('fDeptID');
-    dispatch({
-      type: 'repairUpdate/scan',
-      payload: {
-        deptId,
-        batchNo,
-      },
-    }).then(result => {
-      if (!result.success) {
-        message.warning(result.message);
-      }
-    });
-  };
-
   save(bCheck) {
     const {
       form,
-      id,
+      location: { id },
       dispatch,
       handleChange,
       repairUpdate: { details },
@@ -171,10 +133,14 @@ class Update extends PureComponent {
   }
 
   openProfile = () => {
-    const { id, dispatch, handleChange } = this.props;
+    const {
+      location: { id },
+      dispatch,
+      handleChange,
+    } = this.props;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/Defect/repair/profile', id, handleChange: this.search },
+      payload: { path: '/defect/repair/profile', location: { id }, handleChange: this.search },
     });
   };
 
@@ -182,54 +148,28 @@ class Update extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
-      payload: { path: '/Defect/repair/update' },
+      payload: { path: '/defect/repair/update' },
     });
   }
-
-  handleDeptChange = value => {
-    const {
-      repairUpdate: { details },
-    } = this.props;
-    if (details.length > 0) {
-      Modal.confirm({
-        title: '更换岗位',
-        content: '更换岗位将清空明细信息，是否继续？',
-        okText: '确认',
-        cancelText: '取消',
-        onOk: this.clearDetails,
-      });
-    } else if (value) {
-      setTimeout(() => {
-        this.showAdd(true);
-      }, 100);
-    }
-  };
-
-  clearDetails = () => {
-    const {
-      dispatch,
-      form: { getFieldValue },
-    } = this.props;
-    dispatch({
-      type: 'DefectUpdate/changeDetails',
-      payload: { details: [] },
-    });
-    setTimeout(() => {
-      const deptId = getFieldValue('fDeptID');
-      if (deptId) {
-        this.showAdd(true);
-      }
-    }, 100);
-  };
 
   handleSelectRows = (rows, rowsUnSelect) => {
     const {
       dispatch,
       repairUpdate: { details },
     } = this.props;
+    let maxEntryID = details
+      .map(x => x.fEntryID)
+      .reduce((acc, cur) => {
+        return cur > acc ? cur : acc;
+      }, 0);
     rows.forEach(row => {
-      if (!details.find(d => d.fInterID === row.fInterID)) {
-        details.push({ ...row });
+      if (!details.find(d => d.fDefectInvID === row.fInterID)) {
+        details.push({
+          ...row,
+          fEntryID: ++maxEntryID,
+          fQty: row.fCurrentQty,
+          fDefectInvID: row.fInterID,
+        });
       }
     });
     const newDetails = details.filter(d => !rowsUnSelect.find(r => r.fInterID === d.fInterID));
@@ -242,12 +182,6 @@ class Update extends PureComponent {
   renderActions = () => (
     <Fragment>
       <ButtonGroup>
-        <Button icon="add_manually" onClickCapture={() => this.showAdd(true)}>
-          手动添加
-        </Button>
-        <Button icon="scan" onClickCapture={() => this.showScan(true)}>
-          扫码
-        </Button>
         <Button type="primary" onClickCapture={() => this.save()}>
           保存
         </Button>
@@ -262,115 +196,9 @@ class Update extends PureComponent {
     </Fragment>
   );
 
-  getColumns = () => {
-    const {
-      form: { getFieldDecorator },
-    } = this.props;
-    const columns = [
-      {
-        title: '任务单号',
-        dataIndex: 'fMoBillNo',
-      },
-      {
-        title: '批号',
-        dataIndex: 'fFullBatchNo',
-      },
-      {
-        title: '产品',
-        dataIndex: 'fProductName',
-      },
-      {
-        title: '产品编码',
-        dataIndex: 'fProductNumber',
-      },
-      {
-        title: '规格型号',
-        dataIndex: 'fProductModel',
-      },
-      {
-        title: '数量',
-        dataIndex: 'fQty',
-        render: (val, record) => (
-          <FormItem style={{ marginBottom: 0 }}>
-            {getFieldDecorator(`fQty_${record.fInvID}`, {
-              rules: [{ required: true, message: '请输入投入数量' }],
-              initialValue: record.fQty,
-            })(
-              <InputNumber
-                max={record.fUnrepairQty}
-                min={0}
-                onChange={value => {
-                  this.handleDetailRowChange(record, 'fQty', value);
-                }}
-              />
-            )}
-          </FormItem>
-        ),
-      },
-      {
-        title: '单位',
-        dataIndex: 'fUnitName',
-      },
-      {
-        title: '备注',
-        dataIndex: 'fRowComments',
-        render: (val, record) => (
-          <FormItem style={{ marginBottom: 0 }}>
-            {getFieldDecorator(`fRowComments_${record.fInvID}`, {
-              initialValue: record.fRowComments,
-            })(
-              <Input
-                onChange={e => {
-                  const { value } = e.target;
-                  this.handleDetailRowChange(record, 'fRowComments', value);
-                }}
-              />
-            )}
-          </FormItem>
-        ),
-      },
-      {
-        title: '操作',
-        render: (text, record) => (
-          <Fragment>
-            <a onClick={() => this.handleDeleteRow(record)}>删除</a>
-          </Fragment>
-        ),
-      },
-    ];
-
-    return columns;
-  };
-
   renderBaseCard = () => {
-    const {
-      basicData: { authorizeProcessTree },
-      form: { getFieldDecorator },
-      repairUpdate: { fDeptID },
-    } = this.props;
-    return (
-      <Card title="基本信息" bordered={false}>
-        <Form layout="vertical">
-          <Row gutter={16}>
-            <Col lg={8} md={8} sm={24}>
-              <FormItem label="岗位">
-                {getFieldDecorator('fDeptID', {
-                  rules: [{ required: true, message: '请输入岗位' }],
-                  initialValue: fDeptID,
-                })(
-                  <TreeSelect
-                    treeData={authorizeProcessTree}
-                    treeDefaultExpandAll
-                    dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                    onChange={this.handleDeptChange}
-                  />
-                )}
-              </FormItem>
-            </Col>
-          </Row>
-        </Form>
-      </Card>
-    );
+    const { form } = this.props;
+    return <UpdateBaseCard form={form} />;
   };
 
   renderDetailsCard = () => {
@@ -378,20 +206,14 @@ class Update extends PureComponent {
       loadingDetail,
       repairUpdate: { details },
     } = this.props;
-    const sum = details.reduce((acc, cur) => acc.add(cur.fQty), numeral());
 
     return (
-      <Card title="明细信息" bordered={false}>
-        <Table
-          rowKey="fEntryID"
-          bordered
-          loading={loadingDetail}
-          columns={this.getColumns()}
-          dataSource={details}
-          footer={() => `总汇报数量：${sum ? sum.value() : 0}`}
-          pagination={false}
-        />
-      </Card>
+      <DetailCard
+        loading={loadingDetail}
+        dataSource={details}
+        onChange={records => this.handleDetailChange(records)}
+        onAdd={() => this.showAdd(true)}
+      />
     );
   };
 
@@ -437,6 +259,25 @@ class Update extends PureComponent {
     );
   };
 
+  renderChooseForm = () => {
+    const {
+      loading,
+      repairUpdate: { details, defectInv },
+      form: { getFieldValue },
+    } = this.props;
+
+    return (
+      <ChooseForm
+        handleModalVisible={flag => this.showAdd(flag)}
+        modalVisible={this.state.addVisible}
+        dataSource={defectInv}
+        selectedRowKeys={details.map(d => d.fDefectInvID)}
+        handleSelectRows={this.handleSelectRows}
+        loading={loading}
+      />
+    );
+  };
+
   render() {
     const {
       repairUpdate: { fBillNo },
@@ -459,6 +300,7 @@ class Update extends PureComponent {
         {this.renderDetailsCard()}
         {this.renderCommentsCard()}
         {this.renderOtherCard()}
+        {this.renderChooseForm()}
       </WgPageHeaderWrapper>
     );
   }

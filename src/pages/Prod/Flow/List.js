@@ -108,7 +108,7 @@ class TableList extends PureComponent {
     this.columnConfigKey = 'flow';
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { form, dispatch, fBatchNo } = this.props;
 
     dispatch({
@@ -135,7 +135,7 @@ class TableList extends PureComponent {
     this.searchWhereInit();
   }
 
-  componentDidUpdate (preProps) {
+  componentDidUpdate(preProps) {
     const { fBatchNo } = this.props;
     if (preProps.fBatchNo !== fBatchNo) {
       this.searchWhereInit();
@@ -385,22 +385,22 @@ class TableList extends PureComponent {
       const badgeStatus = !recordStatus
         ? []
         : recordStatus.map(x => ({
-          text: <Badge color={x.fColor} text={x.fValue} />,
-          value: x.fKeyName,
-        }));
+            text: <Badge color={x.fColor} text={x.fValue} />,
+            value: x.fKeyName,
+          }));
       return badgeStatus;
     }
     const badgeStatus = !flowStatus
       ? []
       : flowStatus.map(x => ({
-        text: <Badge color={x.fColor} text={x.fValue} />,
-        value: x.fKeyName,
-      }));
+          text: <Badge color={x.fColor} text={x.fValue} />,
+          value: x.fKeyName,
+        }));
     return badgeStatus;
   };
 
   // 应用URL协议启动WEB报表客户端程序，根据参数 option 调用对应的功能
-  webapp_start (templateId, interIds, type) {
+  webapp_start(templateId, interIds, type) {
     // var option = {
     //   baseurl: 'http://' + window.location.host,
     //   report: '/api/PrintTemplate/grf?id=' + templateId,
@@ -567,8 +567,8 @@ class TableList extends PureComponent {
         const filterDepts = currentUser.fIsAdmin
           ? nextDepts
           : nextDepts.filter(x =>
-            currentUser.authorizedDeptList.find(y => x.fDeptID === y.fItemID)
-          );
+              currentUser.authorizedDeptList.find(y => x.fDeptID === y.fItemID)
+            );
         if (!nextDepts || nextDepts.length <= 0) {
           message.warning('无可签收岗位.');
         } else if (!filterDepts || filterDepts.length <= 0) {
@@ -866,7 +866,7 @@ class TableList extends PureComponent {
     );
   };
 
-  renderSimpleForm () {
+  renderSimpleForm() {
     const {
       form: { getFieldDecorator },
       basicData: {
@@ -917,29 +917,28 @@ class TableList extends PureComponent {
                 )}
               </FormItem>
             ) : (
-                <FormItem label="状态">
-                  {getFieldDecorator('queryStatus')(
-                    <Select
-                      placeholder="请选择"
-                      style={{ width: '100%' }}
-                      allowClear
-                      onChange={this.selectChange}
-                    >
-                      {flowStatus &&
-                        flowStatus.map(x => (
-                          <Option key={x.fKey} value={x.fKey}>
-                            <Badge color={x.fColor} text={x.fValue} />
-                          </Option>
-                        ))}
-                    </Select>
-                  )}
-                </FormItem>
-              )}
+              <FormItem label="状态">
+                {getFieldDecorator('queryStatus')(
+                  <Select
+                    placeholder="请选择"
+                    style={{ width: '100%' }}
+                    allowClear
+                    onChange={this.selectChange}
+                  >
+                    {flowStatus &&
+                      flowStatus.map(x => (
+                        <Option key={x.fKey} value={x.fKey}>
+                          <Badge color={x.fColor} text={x.fValue} />
+                        </Option>
+                      ))}
+                  </Select>
+                )}
+              </FormItem>
+            )}
           </Col>
           <Col md={6} sm={24}>
             <FormItem label="批号">
-              {getFieldDecorator('queryBatchNo', {
-              })(<Input placeholder="请输入" />)}
+              {getFieldDecorator('queryBatchNo', {})(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={4} sm={24}>
@@ -960,7 +959,7 @@ class TableList extends PureComponent {
     );
   }
 
-  renderAdvancedForm () {
+  renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
       basicData: {
@@ -1011,24 +1010,24 @@ class TableList extends PureComponent {
                 )}
               </FormItem>
             ) : (
-                <FormItem label="状态">
-                  {getFieldDecorator('queryStatus')(
-                    <Select
-                      placeholder="请选择"
-                      style={{ width: '100%' }}
-                      allowClear
-                      onChange={this.selectChange}
-                    >
-                      {flowStatus &&
-                        flowStatus.map(x => (
-                          <Option key={x.fKey} value={x.fKey}>
-                            <Badge color={x.fColor} text={x.fValue} />
-                          </Option>
-                        ))}
-                    </Select>
-                  )}
-                </FormItem>
-              )}
+              <FormItem label="状态">
+                {getFieldDecorator('queryStatus')(
+                  <Select
+                    placeholder="请选择"
+                    style={{ width: '100%' }}
+                    allowClear
+                    onChange={this.selectChange}
+                  >
+                    {flowStatus &&
+                      flowStatus.map(x => (
+                        <Option key={x.fKey} value={x.fKey}>
+                          <Badge color={x.fColor} text={x.fValue} />
+                        </Option>
+                      ))}
+                  </Select>
+                )}
+              </FormItem>
+            )}
           </Col>
           <Col md={8} sm={24}>
             <FormItem label="批号">
@@ -1118,12 +1117,12 @@ class TableList extends PureComponent {
     );
   }
 
-  renderForm () {
+  renderForm() {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
-  reanderOperator () {
+  reanderOperator() {
     const { selectedRows, queryDeptID } = this.state;
     const {
       flowManage: { data, queryResult, printTemplates },
@@ -1182,7 +1181,7 @@ class TableList extends PureComponent {
     );
   }
 
-  render () {
+  render() {
     const {
       dispatch,
       flowManage: { data, queryResult },
