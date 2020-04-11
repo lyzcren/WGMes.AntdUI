@@ -47,9 +47,9 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ prodDefectManage, loading, basicData }) => ({
-  prodDefectManage,
-  loading: loading.models.prodDefectManage,
+@connect(({ defectInvManage, loading, basicData }) => ({
+  defectInvManage,
+  loading: loading.models.defectInvManage,
   basicData,
 }))
 @Form.create()
@@ -76,13 +76,13 @@ class TableList extends PureComponent {
       current: 1,
       pageSize: 10,
     };
-    this.columnConfigKey = 'prodDefect';
+    this.columnConfigKey = 'defectInv';
   }
 
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'prodDefectManage/fetch',
+      type: 'defectInvManage/fetch',
       payload: this.currentPagination,
     });
     dispatch({
@@ -114,7 +114,7 @@ class TableList extends PureComponent {
     }
 
     dispatch({
-      type: 'prodDefectManage/fetch',
+      type: 'defectInvManage/fetch',
       payload: this.currentPagination,
     });
   };
@@ -157,7 +157,7 @@ class TableList extends PureComponent {
 
       const pagination = this.getSearchParam(fieldsValue);
       dispatch({
-        type: 'prodDefectManage/fetch',
+        type: 'defectInvManage/fetch',
         payload: pagination,
       });
       this.handleSelectRows([]);
@@ -179,7 +179,7 @@ class TableList extends PureComponent {
     };
 
     dispatch({
-      type: 'prodDefectManage/fetch',
+      type: 'defectInvManage/fetch',
       payload: this.currentPagination,
     });
     this.handleSelectRows([]);
@@ -196,11 +196,11 @@ class TableList extends PureComponent {
         case 'currentPage':
           pagination.exportPage = true;
           const fileName = `不良-第${pagination.current}页.xls`;
-          exportExcel('/api/prodDefect/export', pagination, fileName);
+          exportExcel('/api/defectInv/export', pagination, fileName);
           break;
         case 'allPage':
           pagination.exportPage = false;
-          exportExcel('/api/prodDefect/export', pagination, '不良.xls');
+          exportExcel('/api/defectInv/export', pagination, '不良.xls');
           break;
         default:
           break;
@@ -290,7 +290,7 @@ class TableList extends PureComponent {
 
     return (
       <div style={{ overflow: 'hidden' }}>
-        <Authorized authority="ProdDefect_Export">
+        <Authorized authority="DefectInv_Export">
           <Dropdown
             overlay={
               <Menu onClick={this.handleExport} selectedKeys={[]}>
@@ -306,10 +306,10 @@ class TableList extends PureComponent {
         </Authorized>
         {selectedRows.length > 0 && (
           <span>
-            <Authorized authority="ProdDefect_Divert">
+            <Authorized authority="DefectInv_Divert">
               <Button onClick={() => this.handleDivert()}>转移</Button>
             </Authorized>
-            <Authorized authority="ProdDefect_Scrap">
+            <Authorized authority="DefectInv_Scrap">
               <Button onClick={() => this.handleScrap()}>报废</Button>
             </Authorized>
           </span>
@@ -352,11 +352,11 @@ class TableList extends PureComponent {
   scrap = submitData => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'prodDefectManage/scrap',
+      type: 'defectInvManage/scrap',
       payload: submitData,
     }).then(() => {
       const {
-        prodDefectManage: {
+        defectInvManage: {
           queryResult: { status, message },
         },
       } = this.props;
@@ -374,7 +374,7 @@ class TableList extends PureComponent {
   render() {
     const {
       dispatch,
-      prodDefectManage: { data, queryResult },
+      defectInvManage: { data, queryResult },
       loading,
     } = this.props;
     const { selectedRows, modalVisible, repairModalVisible, currentFormValues } = this.state;

@@ -118,12 +118,12 @@ class WgBasicLayout extends React.PureComponent {
       defaultPath = '/prod/inv';
     } else if (hasAuthority('PassInv_Read')) {
       defaultPath = '/prod/passInv';
-    } else if (hasAuthority('ProdDefect_Read')) {
-      defaultPath = '/prod/defect';
+    } else if (hasAuthority('DefectInv_Read')) {
+      defaultPath = '/defect/inv';
     } else if (hasAuthority('InvCheck_Read')) {
       defaultPath = '/prod/invCheck';
     } else if (hasAuthority('DefectCheck_Read')) {
-      defaultPath = '/prod/defectCheck';
+      defaultPath = '/defect/check';
     } else if (hasAuthority('Report_Read')) {
       defaultPath = '/prod/report';
     } else if (hasAuthority('MissionInput_Read')) {

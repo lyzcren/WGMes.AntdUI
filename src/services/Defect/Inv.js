@@ -2,11 +2,11 @@ import request from '@/utils/request';
 import { stringify } from 'qs';
 
 export async function fakeFetch(params) {
-  return request(`/api/prodDefect?${stringify(params)}`);
+  return request(`/api/defectInv?${stringify(params)}`);
 }
 
 export async function fakeQuery(params) {
-  return request('/api/ProdDefect/getList', {
+  return request('/api/DefectInv/getList', {
     method: 'POST',
     body: {
       ...params,
@@ -16,7 +16,7 @@ export async function fakeQuery(params) {
 }
 
 export async function fakeRepair(params) {
-  return request('/api/ProdDefect/repair', {
+  return request('/api/DefectInv/repair', {
     method: 'POST',
     body: {
       ...params,
@@ -26,7 +26,7 @@ export async function fakeRepair(params) {
 }
 
 export async function fakeScrap(params) {
-  return request('/api/ProdDefect/scrap', {
+  return request('/api/DefectInv/scrap', {
     method: 'POST',
     body: {
       ...params,

@@ -1,4 +1,4 @@
-import { fakeGet, fakeInvByDept } from '@/services/Prod/DefectCheck';
+import { fakeGet, fakeInvByDept } from '@/services/Defect/Check';
 
 export default {
   namespace: 'defectCheckProfile',

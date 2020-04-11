@@ -1,5 +1,5 @@
 import { fakeGet, fakeUpdate, fakeCheck, fakeScan } from '@/services/Defect/Repair';
-import { fakeQuery as queryDefect, fakeFetch } from '@/services/Prod/ProdDefect';
+import { fakeQuery as queryDefect, fakeFetch } from '@/services/Defect/Inv';
 
 export default {
   namespace: 'repairUpdate',

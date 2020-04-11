@@ -557,7 +557,7 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/defectCheck/create', handleSuccess: this.search },
+      payload: { path: '/defect/check/create', handleSuccess: this.search },
     });
   }
 
@@ -565,7 +565,7 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/defectCheck/profile', record, handleSuccess: this.search },
+      payload: { path: '/defect/check/profile', record, handleSuccess: this.search },
     });
   }
 
@@ -573,7 +573,7 @@ class TableList extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/defectCheck/update', record, handleSuccess: this.search },
+      payload: { path: '/defect/check/update', record, handleSuccess: this.search },
     });
   }
 

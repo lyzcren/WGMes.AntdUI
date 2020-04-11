@@ -1,5 +1,5 @@
 import { fakeAdd, fakeCheck, fakeScan } from '@/services/Defect/Repair';
-import { fakeQuery as queryDefect, fakeFetch } from '@/services/Prod/ProdDefect';
+import { fakeQuery as queryDefect, fakeFetch } from '@/services/Defect/Inv';
 
 export default {
   namespace: 'repairCreate',
@@ -20,9 +20,14 @@ export default {
     },
     *submit({ payload }, { call, put }) {
       const { check } = payload;
-      let response = yield call(fakeAdd, payload);
+      const response = yield call(fakeAdd, payload);
       if (check && response.model) {
-        response = yield call(fakeCheck, response.model.fInterID);
+        const responseCheck = yield call(fakeCheck, response.model.fInterID);
+        if (responseCheck.status === 'ok') {
+          return { ...response, message: '审核成功.' };
+        } else {
+          return { ...response, message: '新增成功,' + responseCheck.message };
+        }
       }
 
       return response;

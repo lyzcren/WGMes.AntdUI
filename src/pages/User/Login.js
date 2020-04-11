@@ -6,7 +6,7 @@ import { Checkbox, Alert } from 'antd';
 import Login from '@/components/Login';
 import styles from './Login.less';
 
-const { Tab, UserName, Password, IdCard, Submit } = Login;
+const { Tab, UserName, Password, Submit } = Login;
 
 @connect(({ global, user, loading, menu }) => ({
   global,
@@ -134,7 +134,7 @@ class LoginPage extends Component {
                   user.type === 'idcard' &&
                   !submitting &&
                   this.renderMessage('卡号错误')}
-                <IdCard
+                <Password
                   name="idcard"
                   autoFocus
                   placeholder={formatMessage({ id: 'form.idcard-number.placeholder' })}

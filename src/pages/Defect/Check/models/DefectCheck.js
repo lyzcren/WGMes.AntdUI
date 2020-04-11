@@ -5,7 +5,7 @@ import {
   fakeUpdate,
   fakeCheck,
   fakeUnCheck,
-} from '@/services/Prod/DefectCheck';
+} from '@/services/Defect/Check';
 import { fakeQueryPrintTemplate } from '@/services/Sys/PrintTemplate';
 
 export default {
@@ -68,7 +68,7 @@ export default {
       });
     },
     *getPrintTemplates({ payload }, { call, put }) {
-      const response = yield call(fakeQueryPrintTemplate, { number: 'prodDefectCheck' });
+      const response = yield call(fakeQueryPrintTemplate, { number: 'defectCheck' });
       yield put({
         type: 'save',
         payload: { printTemplates: response },

@@ -2,11 +2,13 @@ import React, { PureComponent, Fragment } from 'react';
 import moment from 'moment';
 import { connect } from 'dva';
 import {
+  Layout,
   Row,
   Col,
   Card,
   Form,
   Button,
+  TreeSelect,
   DatePicker,
   Table,
   Input,
@@ -16,27 +18,32 @@ import {
   Dropdown,
   Icon,
 } from 'antd';
+import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
+import DescriptionList from '@/components/DescriptionList';
+import Authorized from '@/utils/Authorized';
+import { hasAuthority } from '@/utils/authority';
 
 import styles from './List.less';
 
 const FormItem = Form.Item;
 // const { Option } = Select;
 const { TextArea } = Input;
+const { Header, Footer, Sider, Content } = Layout;
+const { Description } = DescriptionList;
 const ButtonGroup = Button.Group;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ defectCheckManage, defectCheckUpdate, loading, menu, basicData }) => ({
+@connect(({ defectCheckManage, defectCheckCreate, loading, menu, basicData }) => ({
   defectCheckManage,
-  defectCheckUpdate,
-  loading: loading.models.defectCheckUpdate,
+  defectCheckCreate,
+  loading: loading.models.defectCheckCreate,
   menu,
   basicData,
 }))
 @Form.create()
-class Update extends PureComponent {
+class Create extends PureComponent {
   state = {
-    fInterID: null,
     fBillNo: '',
     fDate: Date.now(),
     fTotalDeltaQty: 0,
@@ -46,45 +53,47 @@ class Update extends PureComponent {
   };
 
   componentDidMount() {
-    const { record } = this.props;
-    this.setState({ ...record });
     this.loadData();
   }
 
-  componentDidUpdate(preProps) {
-    const preRecord = preProps.record;
-    const { record } = this.props;
-    if (preRecord.fInterID !== record.fInterID) {
-      this.setState({ ...record });
-    }
-  }
+  componentDidUpdate(preProps) {}
 
-  loadData() {}
+  loadData() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'basicData/getBillNo',
+      payload: { fNumber: 'DefectCheck' },
+    });
+    dispatch({
+      type: 'basicData/getProcessDeptTree',
+    });
+  }
 
   handleDeptChange(val) {
     const { form, dispatch } = this.props;
     dispatch({
-      type: 'defectCheckUpdate/getInvByDept',
+      type: 'defectCheckCreate/getInvByDept',
       payload: { id: val },
     }).then(() => {
       const {
-        defectCheckUpdate: { details },
+        defectCheckCreate: { details },
       } = this.props;
       if (details) {
         let entryId = 1;
         const currentDetail = details.map(x => {
           const fQty = form.getFieldValue(`fQty_${x.fInterID}`);
-          const fRowComments = form.getFieldValue(`fRowComments_${x.fInterID}`);
+          const fRowComments = form.getFieldValue(`fRowComments${x.fInterID}`);
           return {
             fDefectInvID: x.fInterID,
             fProductName: x.fProductName,
             fProductNumber: x.fProductNumber,
             fProductModel: x.fProductModel,
-            fFullBatchNo: x.fFullBatchNo,
+            fDefectName: x.fDefectName,
+            fMoBillNo: x.fMoBillNo,
             fUnitName: x.fUnitName,
-            fQty: fQty !== undefined ? fQty : '',
-            fInvQty: x.fInputQty,
-            fDeltaQty: fQty !== undefined ? fQty - x.fInputQty : '',
+            fQty: fQty !== undefined ? fQty : x.fQty,
+            fInvQty: x.fQty,
+            fDeltaQty: fQty !== undefined ? fQty - x.fQty : 0,
             fRowComments,
             fEntryID: entryId++,
           };
@@ -114,8 +123,12 @@ class Update extends PureComponent {
   }
 
   reloadDetails = () => {
-    const { fDeptID } = this.state;
-    this.handleDeptChange(fDeptID);
+    const { form } = this.props;
+    form.validateFields(['fDeptID'], (err, fieldsValue) => {
+      if (err) return;
+
+      this.handleDeptChange(fieldsValue.fDeptID);
+    });
   };
 
   deleteNonQtyDetails = () => {
@@ -125,35 +138,37 @@ class Update extends PureComponent {
 
   save(bCheck) {
     const { form, dispatch, handleSuccess } = this.props;
-    const { fInterID, fBillNo, details } = this.state;
+    const { details } = this.state;
     form.validateFieldsAndScroll((err, fieldsValue) => {
       if (err) return;
 
       const payload = {
-        fInterID,
+        fDeptID: fieldsValue.fDeptID,
+        fBillNo: fieldsValue.fBillNo,
         fDate: fieldsValue.fDate,
         fComments: fieldsValue.fComments,
         details,
       };
 
       dispatch({
-        type: 'defectCheckUpdate/update',
+        type: 'defectCheckCreate/add',
         payload,
       }).then(() => {
         const {
-          defectCheckUpdate: { queryResult },
+          defectCheckCreate: { queryResult },
         } = this.props;
+        const { model } = queryResult;
 
         this.showResult(queryResult, model => {
-          message.success(`修改盘点单成功，单号：${fBillNo}`);
+          message.success(`新建盘点单成功，单号：${model.fBillNo}`);
           if (bCheck) {
             dispatch({
               type: 'defectCheckManage/check',
-              payload: { fInterID },
+              payload: { fInterID: model.fInterID },
             }).then(() => {
               const checkResult = this.props.defectCheckManage.queryResult;
               this.showResult(checkResult, () => {
-                message.success(`【${fBillNo}】` + `审核成功`);
+                message.success(`【${model.fBillNo}】` + `审核成功`);
               });
             });
           }
@@ -184,17 +199,18 @@ class Update extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
-      payload: { path: '/prod/defectCheck/update' },
+      payload: { path: '/defect/check/create' },
     });
   }
 
   render() {
     const {
+      basicData: { billNo, processDeptTree },
       loading,
       form: { getFieldDecorator },
     } = this.props;
 
-    const { fBillNo, fDeptName, fDate, fComments, details } = this.state;
+    const { fDeptID, fDate, fComments, details } = this.state;
 
     const menu = (
       <Menu>
@@ -303,7 +319,7 @@ class Update extends PureComponent {
 
     return (
       <WgPageHeaderWrapper
-        title={`不良盘点单：${fBillNo}`}
+        title={`不良盘点单：${billNo.DefectCheck}`}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }
@@ -317,21 +333,32 @@ class Update extends PureComponent {
           <Form layout="vertical">
             <Row gutter={16}>
               <Col lg={6} md={12} sm={24}>
-                <FormItem label="单号">
+                <FormItem key="fBillNo" label="单号">
                   {getFieldDecorator('fBillNo', {
-                    initialValue: fBillNo,
+                    initialValue: billNo.DefectCheck,
                   })(<Input readOnly />)}
                 </FormItem>
               </Col>
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-                <FormItem label="岗位">
-                  {getFieldDecorator('fDeptName', {
-                    initialValue: fDeptName,
-                  })(<Input readOnly />)}
+                <FormItem key="fDeptID" label="岗位">
+                  {getFieldDecorator('fDeptID', {
+                    rules: [{ required: true, message: '请选择岗位' }],
+                  })(
+                    <TreeSelect
+                      placeholder="请选择"
+                      style={{ width: 300 }}
+                      treeDefaultExpandAll
+                      dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                      treeData={processDeptTree}
+                      onChange={val => {
+                        this.handleDeptChange(val);
+                      }}
+                    />
+                  )}
                 </FormItem>
               </Col>
               <Col xl={{ span: 6, offset: 2 }} lg={{ span: 8 }} md={{ span: 12 }} sm={24}>
-                <FormItem label="日期">
+                <FormItem key="fDate" label="日期">
                   {getFieldDecorator('fDate', {
                     rules: [{ required: false, message: '请选择' }],
                     initialValue: moment(fDate),
@@ -348,9 +375,9 @@ class Update extends PureComponent {
           <Form layout="vertical">
             <Row gutter={16}>
               <Col lg={12} md={12} sm={24}>
-                {getFieldDecorator('fComments', {
-                  initialValue: fComments,
-                })(<TextArea style={{ minHeight: 32 }} placeholder="请输入备注" rows={4} />)}
+                {getFieldDecorator('fComments', {})(
+                  <TextArea style={{ minHeight: 32 }} placeholder="请输入备注" rows={4} />
+                )}
               </Col>
             </Row>
           </Form>
@@ -360,4 +387,4 @@ class Update extends PureComponent {
   }
 }
 
-export default Update;
+export default Create;

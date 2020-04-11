@@ -1,4 +1,4 @@
-import { fakeQuery } from '@/services/Prod/ProdDefect';
+import { fakeQuery } from '@/services/Defect/Inv';
 import { getFiltersAndSorter } from '@/utils/wgUtils';
 
 export default {

@@ -73,7 +73,7 @@ class Profile extends PureComponent {
     const { handleSuccess } = this.state;
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/defectCheck/update', record: this.state, handleSuccess },
+      payload: { path: '/defect/check/update', record: this.state, handleSuccess },
     });
     this.close();
   }
@@ -139,7 +139,7 @@ class Profile extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
-      payload: { path: '/prod/defectCheck/profile' },
+      payload: { path: '/defect/check/profile' },
     });
   }
 
