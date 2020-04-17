@@ -1,7 +1,8 @@
 import React, { PureComponent, Fragment } from 'react';
-import { Switch, Popconfirm, Divider } from 'antd';
+import { Switch, Popconfirm, Divider, Badge } from 'antd';
 import moment from 'moment';
 import Authorized from '@/utils/Authorized';
+import { MissionStatusArray } from '@/utils/GlobalConst';
 
 class ColumnConfig {
   columns = [
@@ -153,6 +154,15 @@ class ColumnConfig {
       dataIndex: 'fPriority',
       sorter: true,
       width: 120,
+    },
+    {
+      title: '状态',
+      dataIndex: 'fStatus',
+      width: 100,
+      render: (val, record) => {
+        const findItem = MissionStatusArray.find((item, index) => item.value == record.fStatus);
+        return <Badge status={findItem.badgeStatus} text={findItem.text} />;
+      },
     },
     {
       title: '计划生产数量',

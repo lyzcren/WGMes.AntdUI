@@ -40,6 +40,7 @@ import { GenFlowSuccess } from './GenFlowSuccess';
 import { print } from '@/utils/wgUtils';
 import { mergeFields, mergeColumns } from '@/utils/wgUtils';
 import WgStandardTable from '@/wg_components/WgStandardTable';
+import { MissionStatusArray } from '@/utils/GlobalConst';
 
 import styles from './List.less';
 
@@ -100,11 +101,15 @@ class TableList extends PureComponent {
   }
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'missionManage/fetch',
-      payload: this.currentPagination,
-    });
+    const {
+      dispatch,
+      location: { fMoBillNo } = {},
+      form: { setFieldsValue },
+    } = this.props;
+    if (fMoBillNo) {
+      setFieldsValue({ queryMOBillNo: fMoBillNo });
+    }
+
     if (hasAuthority('Mission_Print')) {
       dispatch({
         type: 'missionManage/getPrintTemplates',
@@ -116,6 +121,7 @@ class TableList extends PureComponent {
     dispatch({
       type: 'global/fetchProdBusinessConfig',
     });
+    this.search();
 
     // 检查同步状态
     this.Checkk3Syncing();
@@ -161,6 +167,8 @@ class TableList extends PureComponent {
     };
     // 查询条件处理
     const queryFilters = [];
+    if (fieldsValue.fStatus !== undefined)
+      queryFilters.push({ name: 'fStatus', compare: '=', value: fieldsValue.fStatus });
     if (fieldsValue.fDate && fieldsValue.fDate[0] && fieldsValue.fDate[1]) {
       queryFilters.push({
         name: 'fDate',
@@ -480,22 +488,44 @@ class TableList extends PureComponent {
     const {
       form: { getFieldDecorator },
     } = this.props;
+
     return (
       <Form onSubmit={this.handleSearch} layout="inline" style={{ marginRight: '30px' }}>
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={8} sm={24}>
+          <Col md={6} sm={24}>
+            <FormItem label="状态">
+              {getFieldDecorator('fStatus', {
+                // valuePropName: ''
+              })(
+                <Select
+                  placeholder="请选择"
+                  style={{ width: '100%' }}
+                  allowClear
+                  // onChange={this.selectChange}
+                >
+                  {MissionStatusArray &&
+                    MissionStatusArray.map(x => (
+                      <Option key={x.value} value={x.value}>
+                        <Badge status={x.badgeStatus} text={x.text} />
+                      </Option>
+                    ))}
+                </Select>
+              )}
+            </FormItem>
+          </Col>
+          <Col md={6} sm={24}>
             <FormItem label="任务单日期">
               {getFieldDecorator('fDate', {
                 // initialValue: [moment().add(-1, 'months'), moment()],
               })(<RangePicker format="YYYY-MM-DD" placeholder={['开始时间', '结束时间']} />)}
             </FormItem>
           </Col>
-          <Col md={8} sm={24}>
+          <Col md={6} sm={24}>
             <FormItem label="生产任务单号">
               {getFieldDecorator('queryMOBillNo')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
-          <Col md={8} sm={24}>
+          <Col md={6} sm={24}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
                 查询
@@ -719,7 +749,8 @@ class TableList extends PureComponent {
           <a onClick={() => this.handleProfileModalVisible(true, record)}>详情</a>
         </Authorized>
         {// 投产数量小于最大投产数量或者设置可超计划投产
-        (bCanMoreThanPlan || record.fAuxInHighLimitQty - record.fInputQty > 0) && (
+        (bCanMoreThanPlan ||
+          (record.fAuxInHighLimitQty - record.fInputQty > 0 && !record.fCancellation)) && (
           <Authorized authority="Flow_Create">
             <Divider type="vertical" />
             <a onClick={() => this.handleModalVisible({ key: 'genFlow', flag: true }, record)}>
@@ -727,12 +758,14 @@ class TableList extends PureComponent {
             </a>
           </Authorized>
         )}
-        <Authorized authority="Mission_Delete">
-          <Divider type="vertical" />
-          <Popconfirm title="是否要删除此行？" onConfirm={() => this.handleDelete(record)}>
-            <a>删除</a>
-          </Popconfirm>
-        </Authorized>
+        {record.fInputQty <= 0 && !record.fCancellation && (
+          <Authorized authority="Mission_Delete">
+            <Divider type="vertical" />
+            <Popconfirm title="是否要删除此行？" onConfirm={() => this.handleDelete(record)}>
+              <a>删除</a>
+            </Popconfirm>
+          </Authorized>
+        )}
       </Fragment>
     );
   };

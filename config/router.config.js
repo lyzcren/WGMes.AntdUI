@@ -73,6 +73,7 @@ export default [
         icon: 'tool',
         authority: [
           'Mission_Read',
+          'MergeMission_Read',
           'Flow_Read',
           'Inv_Read',
           'PassInv_Read',
@@ -93,6 +94,35 @@ export default [
                 name: 'profile',
                 component: './Prod/Mission/Profile',
                 authority: ['Mission_Read'],
+                hideInMenu: true,
+              },
+            ],
+          },
+          {
+            path: '/prod/mergeMission',
+            name: 'mergeMission',
+            component: './Prod/MergeMission/List',
+            authority: ['MergeMission_Read'],
+            routes: [
+              {
+                path: '/prod/mergeMission/create',
+                name: 'create',
+                component: './Prod/MergeMission/Create',
+                authority: ['MergeMission_Create'],
+                hideInMenu: true,
+              },
+              {
+                path: '/prod/mergeMission/update',
+                name: 'update',
+                component: './Prod/MergeMission/Update',
+                authority: ['MergeMission_Update'],
+                hideInMenu: true,
+              },
+              {
+                path: '/prod/mergeMission/profile',
+                name: 'profile',
+                component: './Prod/MergeMission/Profile',
+                authority: ['MergeMission_Read'],
                 hideInMenu: true,
               },
             ],

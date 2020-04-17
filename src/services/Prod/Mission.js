@@ -1,4 +1,5 @@
 import request from '@/utils/request';
+import { stringify } from 'qs';
 
 export async function fakeQuery(params) {
   return request('/api/Mission/page', {
@@ -12,6 +13,10 @@ export async function fakeQuery(params) {
 
 export async function fakeGet(params) {
   return request(`/api/Mission/${params.fInterID}`);
+}
+
+export async function fakeGetByBillNo(params) {
+  return request(`/api/Mission?` + stringify(params));
 }
 
 export async function fakeRemove(params) {

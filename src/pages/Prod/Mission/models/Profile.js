@@ -1,5 +1,5 @@
 import { fakeGet } from '@/services/Prod/Mission';
-import { GlobalConst } from '@/utils/GlobalConst';
+import { MissionStatusArray } from '@/utils/GlobalConst';
 
 export default {
   namespace: 'missionProfile',
@@ -16,7 +16,7 @@ export default {
   effects: {
     *initModel({ payload, callback }, { call, put }) {
       const data = yield call(fakeGet, payload);
-      const fStatus = GlobalConst.PlanStatusData.find((item, index) => item.value == data.fStatus);
+      const fStatus = MissionStatusArray.find((item, index) => item.value == data.fStatus);
       data.fStatusName = fStatus ? fStatus.text : '';
 
       yield put({

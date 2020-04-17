@@ -134,4 +134,27 @@ export const erpTypeMaps = {
   other: '其他 ERP',
 };
 
+export const MissionStatusArray = [
+  {
+    text: '未投产',
+    value: 0,
+    badgeStatus: 'default',
+  },
+  {
+    text: '已投产',
+    value: 1,
+    badgeStatus: 'processing',
+  },
+  {
+    text: '已结案',
+    value: 3,
+    badgeStatus: 'success',
+  },
+  {
+    text: '作废',
+    value: 6,
+    badgeStatus: 'error',
+  },
+];
+
 export const logoUrl = '/api/businessConfig/logo.png';
