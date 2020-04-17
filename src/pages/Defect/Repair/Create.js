@@ -75,25 +75,6 @@ class Create extends PureComponent {
     });
   }
 
-  handleScan = batchNo => {
-    const {
-      dispatch,
-      form: { getFieldValue },
-    } = this.props;
-    const deptId = getFieldValue('fDeptID');
-    dispatch({
-      type: 'repairCreate/scan',
-      payload: {
-        deptId,
-        batchNo,
-      },
-    }).then(result => {
-      if (!result.success) {
-        message.warning(result.message);
-      }
-    });
-  };
-
   save(bCheck) {
     const {
       form,

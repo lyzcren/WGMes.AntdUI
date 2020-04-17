@@ -1,4 +1,4 @@
-import { fakeAdd, fakeCheck, fakeScan } from '@/services/Defect/Repair';
+import { fakeAdd, fakeCheck } from '@/services/Defect/Repair';
 import { fakeQuery as queryDefect, fakeFetch } from '@/services/Defect/Inv';
 
 export default {
@@ -38,23 +38,6 @@ export default {
         type: 'save',
         payload: { details },
       });
-    },
-    *scan({ payload }, { call, put, select }) {
-      const response = yield call(fakeScan, payload);
-      const details = yield select(state => state.repairCreate.details);
-      if (response) {
-        if (!details.find(x => x.fInterID === response.fInterID)) {
-          details.push(response);
-        }
-        yield put({
-          type: 'save',
-          payload: { details },
-        });
-      }
-      if (response) {
-        return { success: true };
-      }
-      return { success: false, message: '未找到明细' };
     },
     *fetchMoBill({ payload }, { call, put, select }) {
       const currentPagination = {
