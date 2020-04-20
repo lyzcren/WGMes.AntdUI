@@ -1,6 +1,6 @@
 import DescriptionList from '@/components/DescriptionList';
 import { hasAuthority } from '@/utils/authority';
-import { defaultDateTimeFormat } from '@/utils/GlobalConst';
+import { defaultDateTime, defaultDateTimeFormat } from '@/utils/GlobalConst';
 import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import { Button, Card, Form, Input, Layout, Select, Table, message } from 'antd';
 import { connect } from 'dva';
@@ -16,9 +16,9 @@ const { Description } = DescriptionList;
 const ButtonGroup = Button.Group;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ mergeMissionProfile, loading, menu, basicData }) => ({
-  mergeMissionProfile,
-  loading: loading.models.mergeMissionProfile,
+@connect(({ transferProfile, loading, menu, basicData }) => ({
+  transferProfile,
+  loading: loading.models.transferProfile,
   menu,
   basicData,
 }))
@@ -32,7 +32,7 @@ class Profile extends PureComponent {
       location: { id },
     } = this.props;
     dispatch({
-      type: 'mergeMissionProfile/init',
+      type: 'transferProfile/init',
       payload: { id },
     });
   }
@@ -46,13 +46,13 @@ class Profile extends PureComponent {
 
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/mergeMission/update', location: { id }, handleChange },
+      payload: { path: '/defect/transfer/update', location: { id }, handleChange },
     }).then(() => {
       this.close();
     });
   }
 
-  check() {
+  sign() {
     const {
       dispatch,
       location: { id },
@@ -60,12 +60,12 @@ class Profile extends PureComponent {
     } = this.props;
 
     dispatch({
-      type: 'mergeMissionProfile/check',
+      type: 'transferProfile/sign',
       payload: { id },
     }).then(queryResult => {
       this.showResult(queryResult);
       dispatch({
-        type: 'mergeMissionProfile/init',
+        type: 'transferProfile/init',
         payload: { id },
       });
       // 成功后再次刷新列表
@@ -73,7 +73,7 @@ class Profile extends PureComponent {
     });
   }
 
-  uncheck() {
+  antiSign() {
     const {
       dispatch,
       location: { id },
@@ -81,12 +81,12 @@ class Profile extends PureComponent {
     } = this.props;
 
     dispatch({
-      type: 'mergeMissionProfile/uncheck',
+      type: 'transferProfile/antiSign',
       payload: { id },
     }).then(queryResult => {
       this.showResult(queryResult);
       dispatch({
-        type: 'mergeMissionProfile/init',
+        type: 'transferProfile/init',
         payload: { id },
       });
       // 成功后再次刷新列表
@@ -110,28 +110,28 @@ class Profile extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
-      payload: { path: '/prod/mergeMission/profile' },
+      payload: { path: '/defect/transfer/profile' },
     });
   }
 
   renderActions = () => {
     const {
-      mergeMissionProfile: { fStatusNumber },
+      transferProfile: { fStatusNumber },
     } = this.props;
     return (
       <Fragment>
         <ButtonGroup>
-          {fStatusNumber === 'Created' && hasAuthority('MergeMission_Update') ? (
+          {fStatusNumber === 'Created' && hasAuthority('DefectTransfer_Update') ? (
             <Button type="primary" onClickCapture={() => this.update()}>
               修改
             </Button>
           ) : null}
-          {fStatusNumber === 'Created' && hasAuthority('MergeMission_Check') ? (
-            <Button onClickCapture={() => this.check()}>审核</Button>
+          {fStatusNumber === 'Created' && hasAuthority('DefectTransfer_Sign') ? (
+            <Button onClickCapture={() => this.sign()}>签收</Button>
           ) : null}
-          {fStatusNumber === 'Checked' && hasAuthority('MergeMission_Check') ? (
-            <Button type="danger" onClickCapture={() => this.uncheck()}>
-              反审核
+          {fStatusNumber === 'Signed' && hasAuthority('DefectTransfer_Sign') ? (
+            <Button type="danger" onClickCapture={() => this.antiSign()}>
+              退回
             </Button>
           ) : null}
         </ButtonGroup>
@@ -146,32 +146,28 @@ class Profile extends PureComponent {
     } = this.props;
     const columns = [
       {
-        title: '任务单号',
-        dataIndex: 'fMoBillNo',
+        title: '不良类型',
+        dataIndex: 'fDefectName',
       },
       {
-        title: '产品',
-        dataIndex: 'fProductName',
+        title: '不良编码',
+        dataIndex: 'fDefectNumber',
       },
       {
-        title: '产品编码',
-        dataIndex: 'fProductNumber',
+        title: '库存数量',
+        dataIndex: 'fCurrentQty',
       },
       {
-        title: '规格型号',
-        dataIndex: 'fModel',
-      },
-      {
-        title: '计划数量',
-        dataIndex: 'fPlanQty',
-      },
-      {
-        title: '计划上限',
-        dataIndex: 'fAuxInHighLimitQty',
+        title: '转移数量',
+        dataIndex: 'fQty',
       },
       {
         title: '单位',
         dataIndex: 'fUnitName',
+      },
+      {
+        title: '备注',
+        dataIndex: 'fRowComments',
       },
     ];
 
@@ -179,13 +175,25 @@ class Profile extends PureComponent {
   };
 
   renderBaseCard = () => {
-    const { mergeMissionProfile } = this.props;
+    const {
+      transferProfile: {
+        fOutDeptName,
+        fOutDeptNumber,
+        fInDeptName,
+        fInDeptNumber,
+        fDate,
+        fStatusName,
+      },
+    } = this.props;
     return (
       <Card title="基本信息" bordered={false}>
         <DescriptionList className={styles.headerList} size="small" col="4">
-          <Description term="物料名称">{mergeMissionProfile.fProductName}</Description>
-          <Description term="物料编码">{mergeMissionProfile.fProductNumber}</Description>
-          <Description term="规格型号">{mergeMissionProfile.fModel}</Description>
+          <Description term="转出岗位">{fOutDeptName}</Description>
+          <Description term="转出岗位编码">{fOutDeptNumber}</Description>
+          <Description term="转入岗位">{fInDeptName}</Description>
+          <Description term="转入岗位编码">{fInDeptNumber}</Description>
+          <Description term="日期">{defaultDateTime(fDate)}</Description>
+          <Description term="状态">{fStatusName}</Description>
         </DescriptionList>
       </Card>
     );
@@ -194,9 +202,9 @@ class Profile extends PureComponent {
   renderDetailsCard = () => {
     const {
       loading,
-      mergeMissionProfile: { details },
+      transferProfile: { details },
     } = this.props;
-    const sum = details.reduce((acc, cur) => acc.add(cur.fPlanQty), numeral());
+    const sum = details.reduce((acc, cur) => acc.add(cur.fQty), numeral());
 
     return (
       <Card title="明细信息" bordered={false}>
@@ -215,7 +223,7 @@ class Profile extends PureComponent {
 
   renderCommentsCard = () => {
     const {
-      mergeMissionProfile: { fComments },
+      transferProfile: { fComments },
     } = this.props;
     return (
       <Card title="备注信息" bordered={false}>
@@ -228,16 +236,16 @@ class Profile extends PureComponent {
 
   renderOtherCard = () => {
     const {
-      mergeMissionProfile: {
+      transferProfile: {
         fCreatorName,
         fCreatorNumber,
         fCreateDate,
         fEditorName,
         fEditorNumber,
         fEditDate,
-        fCheckerName,
-        fCheckerNumber,
-        fCheckDate,
+        fSignerName,
+        fSignerNumber,
+        fSignDate,
       },
     } = this.props;
     return (
@@ -253,9 +261,9 @@ class Profile extends PureComponent {
           <Description term="修改日期">{defaultDateTimeFormat(fEditDate)}</Description>
         </DescriptionList>
         <DescriptionList className={styles.headerList} size="small" col={4}>
-          <Description term="审核人">{fCheckerName}</Description>
-          <Description term="审核人编码">{fCheckerNumber}</Description>
-          <Description term="审核日期">{defaultDateTimeFormat(fCheckDate)}</Description>
+          <Description term="签收人">{fSignerName}</Description>
+          <Description term="签收人编码">{fSignerNumber}</Description>
+          <Description term="签收日期">{defaultDateTimeFormat(fSignDate)}</Description>
         </DescriptionList>
       </Card>
     );
@@ -263,13 +271,13 @@ class Profile extends PureComponent {
 
   render() {
     const {
-      mergeMissionProfile: { fMoBillNo },
+      transferProfile: { fBillNo },
       loading,
     } = this.props;
 
     return (
       <WgPageHeaderWrapper
-        title={`合并任务单：${fMoBillNo}`}
+        title={`不良转移单：${fBillNo}`}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }

@@ -5,6 +5,10 @@ export const defaultDateTimeFormat = datetime => {
   if (!datetime || !moment(datetime).isValid()) return '';
   return moment(datetime).format('YYYY-MM-DD HH:mm:ss');
 };
+export const defaultDateTime = datetime => {
+  if (!datetime || !moment(datetime).isValid()) return '';
+  return moment(datetime).format('YYYY-MM-DD');
+};
 
 export const GlobalConst = {
   passwordProgressMap: {

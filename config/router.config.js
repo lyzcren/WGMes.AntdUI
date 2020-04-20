@@ -286,7 +286,7 @@ export default [
         path: '/defect',
         name: 'defect',
         icon: 'file-excel',
-        authority: ['DefectInv_Read', 'Repair_Read'],
+        authority: ['DefectInv_Read', 'Repair_Read', 'DefectTransfer_Read', 'DefectCheck_Read'],
         routes: [
           {
             path: '/defect/inv',
@@ -319,6 +319,35 @@ export default [
                 name: 'update',
                 component: './Defect/Repair/Update',
                 authority: ['Repair_Update'],
+                hideInMenu: true,
+              },
+            ],
+          },
+          {
+            path: '/defect/transfer',
+            name: 'transfer',
+            component: './Defect/Transfer/List',
+            authority: ['DefectTransfer_Read'],
+            routes: [
+              {
+                path: '/defect/transfer/profile',
+                name: 'profile',
+                component: './Defect/Transfer/Profile',
+                authority: ['DefectTransfer_Read'],
+                hideInMenu: true,
+              },
+              {
+                path: '/defect/transfer/create',
+                name: 'create',
+                component: './Defect/Transfer/Create',
+                authority: ['DefectTransfer_Create'],
+                hideInMenu: true,
+              },
+              {
+                path: '/defect/transfer/update',
+                name: 'update',
+                component: './Defect/Transfer/Update',
+                authority: ['DefectTransfer_Update'],
                 hideInMenu: true,
               },
             ],

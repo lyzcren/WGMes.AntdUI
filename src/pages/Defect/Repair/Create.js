@@ -272,7 +272,7 @@ class Create extends PureComponent {
 
     return (
       <WgPageHeaderWrapper
-        title={`单据：${billNo.Defect_Repair}`}
+        title={`不良返修单：${billNo.Defect_Repair}`}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }

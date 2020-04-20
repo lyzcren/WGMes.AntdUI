@@ -323,7 +323,7 @@ class Create extends PureComponent {
 
     return (
       <WgPageHeaderWrapper
-        title={`单据：${billNo.Prod_MergeMission}`}
+        title={`合并任务单：${billNo.Prod_MergeMission}`}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }

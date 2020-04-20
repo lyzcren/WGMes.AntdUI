@@ -452,7 +452,7 @@ class Update extends PureComponent {
 
     return (
       <WgPageHeaderWrapper
-        title={`单据：${fBillNo}`}
+        title={`合并任务单：${fBillNo}`}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }

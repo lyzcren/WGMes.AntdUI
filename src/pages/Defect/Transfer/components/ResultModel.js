@@ -27,51 +27,44 @@ const { Description } = DescriptionList;
 
 /* eslint react/no-multi-comp:0 */
 @Form.create()
-@connect(({ mergeMissionCreate, menu }) => ({
-  mergeMissionCreate,
-  menu,
-}))
-export class CreateResult extends PureComponent {
+class BaseResult extends PureComponent {
+  static defaultProps = {
+    closeCurrent: () => {},
+  };
   constructor(props) {
     super(props);
 
     this.state = {};
   }
 
-  handleViewMission = () => {
+  handleRefreshList = () => {
     const {
       dispatch,
       handleModalVisible,
-      mergeMissionCreate: {
-        newBill: { fMoBillNo },
+      model: {
+        newBill: { fBillNo },
       },
+      closeCurrent,
     } = this.props;
     handleModalVisible(false);
 
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/mission', location: { fMoBillNo } },
+      payload: { path: '/defect/transfer', location: { fBillNo } },
     });
-    dispatch({
-      type: 'menu/closeMenu',
-      payload: { path: '/prod/mergeMission/create' },
-    });
+    closeCurrent();
   };
 
   handleViewProfile = () => {
     const {
       dispatch,
       handleModalVisible,
-      mergeMissionCreate: { newBill },
+      model: { newBill },
     } = this.props;
     handleModalVisible(false);
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/prod/mergeMission/profile', location: { id: newBill.fInterID } },
-    });
-    dispatch({
-      type: 'menu/closeMenu',
-      payload: { path: '/prod/mergeMission/create' },
+      payload: { path: '/defect/transfer/profile', location: { id: newBill.fInterID } },
     });
   };
 
@@ -83,13 +76,13 @@ export class CreateResult extends PureComponent {
   renderDescription = () => {
     const {
       queryResult: { status },
-      mergeMissionCreate: { newBill },
+      model: { newBill },
     } = this.props;
 
     if (status === 'ok') {
       return (
         <DescriptionList col="1">
-          <Description term="任务单号">{newBill.fMoBillNo}</Description>
+          <Description term="不良转移单号">{newBill.fBillNo}</Description>
         </DescriptionList>
       );
     } else {
@@ -106,10 +99,10 @@ export class CreateResult extends PureComponent {
     if (status === 'ok') {
       return (
         <Fragment>
-          <Button type="primary" onClick={() => this.handleViewMission()}>
-            查看任务单
+          <Button type="primary" onClick={() => this.handleRefreshList()}>
+            刷新列表
           </Button>
-          <Button onClick={() => this.handleViewProfile()}>查看合单详情</Button>
+          <Button onClick={() => this.handleViewProfile()}>查看详情</Button>
         </Fragment>
       );
     } else {
@@ -137,7 +130,7 @@ export class CreateResult extends PureComponent {
       <Modal
         destroyOnClose
         maskClosable={false}
-        title={<div>合并任务单结果</div>}
+        title={<div>不良转移结果</div>}
         visible={modalVisible}
         onCancel={() => handleModalVisible(false)}
         afterClose={() => handleModalVisible()}
@@ -155,4 +148,46 @@ export class CreateResult extends PureComponent {
       </Modal>
     );
   }
+}
+
+@connect(({ transferCreate, menu }) => ({
+  model: transferCreate,
+  menu,
+}))
+export class CreateResult extends BaseResult {
+  static defaultProps = { closeCurrent: this.closeCurrent };
+
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
+  closeCurrent = () => {
+    const dispatch = this.props;
+    dispatch({
+      type: 'menu/closeMenu',
+      payload: { path: '/defect/transfer/create' },
+    });
+  };
+}
+
+@connect(({ transferUpdate, menu }) => ({
+  model: transferUpdate,
+  menu,
+}))
+export class UpdateResult extends BaseResult {
+  static defaultProps = { closeCurrent: this.closeCurrent };
+
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
+  closeCurrent = () => {
+    const dispatch = this.props;
+    dispatch({
+      type: 'menu/closeMenu',
+      payload: { path: '/defect/transfer/create' },
+    });
+  };
 }

@@ -36,34 +36,34 @@ const FormItem = Form.Item;
 const { Option } = Select;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ mergeMissionManage, loading, menu }) => ({
-  mergeMissionManage,
-  loading: loading.models.mergeMissionManage,
+@connect(({ transferManage, loading, menu }) => ({
+  transferManage,
+  loading: loading.models.transferManage,
   menu,
 }))
 @Form.create()
-class MergeMissionList extends PureComponent {
+class TransferList extends PureComponent {
   constructor(props) {
     super(props);
 
     this.state = {};
   }
+  static defaultProps = {};
 
   componentDidMount() {
     const { dispatch } = this.props;
-    if (hasAuthority('MergeMission_Print')) {
+    if (hasAuthority('DefectTransfer_Print')) {
       dispatch({
-        type: 'mergeMissionManage/getPrintTemplates',
+        type: 'transferManage/getPrintTemplates',
       });
     }
-    this.search();
   }
 
   search = pagination => {
     const { dispatch } = this.props;
 
     dispatch({
-      type: 'mergeMissionManage/fetch',
+      type: 'transferManage/fetch',
       payload: pagination,
     });
     this.handleSelectRows([]);
@@ -80,16 +80,16 @@ class MergeMissionList extends PureComponent {
       case 'update':
         this.handleUpdate(record);
         break;
-      case 'check':
-        this.handleCheck(record);
+      case 'sign':
+        this.handleSign(record);
         break;
-      case 'uncheck':
-        this.handleUnCheck(record);
+      case 'antiSign':
+        this.handleAntiSign(record);
         break;
       case 'print':
         {
           const { key } = extra;
-          this.handlePrint(record, key);
+          this.handlePrint(key, record);
         }
         break;
       default:
@@ -101,17 +101,17 @@ class MergeMissionList extends PureComponent {
     const {
       dispatch,
       form,
-      mergeMissionManage: { selectedRows },
+      transferManage: { selectedRows },
     } = this.props;
 
     const templateId = key;
-    print('mergeMission', templateId, record.fInterID);
+    print('DefectTransfer', templateId, record.fInterID);
   };
 
   handleSelectRows = (rows = []) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'mergeMissionManage/selectedRows',
+      type: 'transferManage/selectedRows',
       payload: rows,
     });
   };
@@ -119,34 +119,34 @@ class MergeMissionList extends PureComponent {
   handleDelete = record => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'mergeMissionManage/remove',
+      type: 'transferManage/remove',
       payload: {
         id: record.fInterID,
       },
     }).then(queryResult => {
       this.handleSelectRows();
       if (queryResult.status === 'ok') {
-        message.success(`【${record.fMoBillNo}】` + `删除成功`);
+        message.success(`【${record.fBillNo}】` + `删除成功`);
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
-        message.warning(`【${record.fMoBillNo}】${queryResult.message}`);
+        message.warning(`【${record.fBillNo}】${queryResult.message}`);
       } else {
-        message.error(`【${record.fMoBillNo}】${queryResult.message}`);
+        message.error(`【${record.fBillNo}】${queryResult.message}`);
       }
     });
   };
 
-  handleCheck = record => {
+  handleSign = record => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'mergeMissionManage/check',
+      type: 'transferManage/sign',
       payload: {
         id: record.fInterID,
       },
     }).then(queryResult => {
       if (queryResult.status === 'ok') {
-        message.success(`【${record.fMoBillNo}】` + `审核成功`);
+        message.success(`【${record.fBillNo}】` + `签收成功`);
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
@@ -157,16 +157,16 @@ class MergeMissionList extends PureComponent {
     });
   };
 
-  handleUnCheck = record => {
+  handleAntiSign = record => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'mergeMissionManage/uncheck',
+      type: 'transferManage/antiSign',
       payload: {
         id: record.fInterID,
       },
     }).then(queryResult => {
       if (queryResult.status === 'ok') {
-        message.success(`【${record.fMoBillNo}】` + `反审核成功`);
+        message.success(`【${record.fBillNo}】` + `退回成功`);
         // 成功后再次刷新列表
         this.search();
       } else if (queryResult.status === 'warning') {
@@ -182,7 +182,7 @@ class MergeMissionList extends PureComponent {
     dispatch({
       type: 'menu/openMenu',
       payload: {
-        path: '/prod/mergeMission/profile',
+        path: '/defect/transfer/profile',
         location: { id: record.fInterID },
         handleChange: this.search,
       },
@@ -194,7 +194,7 @@ class MergeMissionList extends PureComponent {
     dispatch({
       type: 'menu/openMenu',
       payload: {
-        path: '/prod/mergeMission/update',
+        path: '/defect/transfer/update',
         location: { id: record.fInterID },
         handleChange: this.search,
       },
@@ -202,16 +202,16 @@ class MergeMissionList extends PureComponent {
   }
 
   render() {
-    const { dispatch, mergeMissionManage, loading } = this.props;
-    const { selectedRows } = mergeMissionManage;
+    const { dispatch, transferManage, loading, location } = this.props;
+    const { selectedRows } = transferManage;
 
     return (
       <div style={{ margin: '-24px -24px 0' }}>
         <GridContent>
           <Card bordered={false}>
             <div className={styles.tableList}>
-              <QueryForm handleSubmit={this.search} />
-              <OperatorForm handleDelete={this.handleDelete} />
+              <QueryForm handleSubmit={this.search} location={location} />
+              <OperatorForm handleSign={this.handleSign} handlePrint={this.handlePrint} />
               <ListTableForm handleRowOperator={this.handleRowOperator} />
             </div>
           </Card>
@@ -221,4 +221,4 @@ class MergeMissionList extends PureComponent {
   }
 }
 
-export default MergeMissionList;
+export default TransferList;
