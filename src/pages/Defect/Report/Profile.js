@@ -6,6 +6,8 @@ import { Button, Card, Form, Input, Layout, Select, Table, message } from 'antd'
 import { connect } from 'dva';
 import numeral from 'numeral';
 import React, { Fragment, PureComponent } from 'react';
+import { ProfileResult } from './components/ResultModel';
+
 import styles from './Profile.less';
 
 const FormItem = Form.Item;
@@ -16,15 +18,17 @@ const { Description } = DescriptionList;
 const ButtonGroup = Button.Group;
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ transferProfile, loading, menu, basicData }) => ({
-  transferProfile,
-  loading: loading.models.transferProfile,
+@connect(({ reportProfile, loading, menu, basicData }) => ({
+  reportProfile,
+  loading: loading.models.reportProfile,
   menu,
   basicData,
 }))
 @Form.create()
 class Profile extends PureComponent {
-  state = {};
+  state = {
+    resultVisible: false,
+  };
 
   componentDidMount() {
     const {
@@ -32,7 +36,7 @@ class Profile extends PureComponent {
       location: { id },
     } = this.props;
     dispatch({
-      type: 'transferProfile/init',
+      type: 'reportProfile/init',
       payload: { id },
     });
   }
@@ -46,13 +50,13 @@ class Profile extends PureComponent {
 
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/defect/transfer/update', location: { id }, handleChange },
+      payload: { path: '/defect/report/update', location: { id }, handleChange },
     }).then(() => {
       this.close();
     });
   }
 
-  sign() {
+  check() {
     const {
       dispatch,
       location: { id },
@@ -60,20 +64,14 @@ class Profile extends PureComponent {
     } = this.props;
 
     dispatch({
-      type: 'transferProfile/sign',
+      type: 'reportProfile/check',
       payload: { id },
     }).then(queryResult => {
-      this.showResult(queryResult);
-      dispatch({
-        type: 'transferProfile/init',
-        payload: { id },
-      });
-      // 成功后再次刷新列表
-      if (handleChange) handleChange();
+      this.showResult(true, queryResult);
     });
   }
 
-  antiSign() {
+  uncheck() {
     const {
       dispatch,
       location: { id },
@@ -81,57 +79,43 @@ class Profile extends PureComponent {
     } = this.props;
 
     dispatch({
-      type: 'transferProfile/antiSign',
+      type: 'reportProfile/uncheck',
       payload: { id },
     }).then(queryResult => {
-      this.showResult(queryResult);
-      dispatch({
-        type: 'transferProfile/init',
-        payload: { id },
-      });
-      // 成功后再次刷新列表
-      if (handleChange) handleChange();
+      this.showResult(true, queryResult);
     });
   }
 
-  showResult(queryResult) {
-    const { status, message, model } = queryResult;
-
-    if (status === 'ok') {
-      message.success(queryResult.message);
-    } else if (status === 'warning') {
-      message.warning(queryResult.message);
-    } else {
-      message.error(queryResult.message);
-    }
+  showResult(flag, queryResult) {
+    this.setState({ resultVisible: !!flag, queryResult });
   }
 
   close() {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
-      payload: { path: '/defect/transfer/profile' },
+      payload: { path: '/defect/report/profile' },
     });
   }
 
   renderActions = () => {
     const {
-      transferProfile: { fStatusNumber },
+      reportProfile: { fStatusNumber },
     } = this.props;
     return (
       <Fragment>
         <ButtonGroup>
-          {fStatusNumber === 'Created' && hasAuthority('DefectTransfer_Update') ? (
+          {fStatusNumber === 'Created' && hasAuthority('DefectReport_Update') ? (
             <Button type="primary" onClickCapture={() => this.update()}>
               修改
             </Button>
           ) : null}
-          {fStatusNumber === 'Created' && hasAuthority('DefectTransfer_Sign') ? (
-            <Button onClickCapture={() => this.sign()}>签收</Button>
+          {fStatusNumber === 'Created' && hasAuthority('DefectReport_Check') ? (
+            <Button onClickCapture={() => this.check()}>审核</Button>
           ) : null}
-          {fStatusNumber === 'Signed' && hasAuthority('DefectTransfer_Sign') ? (
-            <Button type="danger" onClickCapture={() => this.antiSign()}>
-              退回
+          {fStatusNumber === 'Checked' && hasAuthority('DefectReport_Check') ? (
+            <Button type="danger" onClickCapture={() => this.uncheck()}>
+              反审核
             </Button>
           ) : null}
         </ButtonGroup>
@@ -154,11 +138,7 @@ class Profile extends PureComponent {
         dataIndex: 'fDefectNumber',
       },
       {
-        title: '库存数量',
-        dataIndex: 'fCurrentQty',
-      },
-      {
-        title: '转移数量',
+        title: '报废数量',
         dataIndex: 'fQty',
       },
       {
@@ -190,26 +170,16 @@ class Profile extends PureComponent {
     return columns;
   };
 
+  renderDescription = () => {};
+
   renderBaseCard = () => {
-    const {
-      transferProfile: {
-        fOutDeptName,
-        fOutDeptNumber,
-        fInDeptName,
-        fInDeptNumber,
-        fDate,
-        fStatusName,
-      },
-    } = this.props;
+    const { reportProfile } = this.props;
     return (
       <Card title="基本信息" bordered={false}>
         <DescriptionList className={styles.headerList} size="small" col="4">
-          <Description term="转出岗位">{fOutDeptName}</Description>
-          <Description term="转出岗位编码">{fOutDeptNumber}</Description>
-          <Description term="转入岗位">{fInDeptName}</Description>
-          <Description term="转入岗位编码">{fInDeptNumber}</Description>
-          <Description term="日期">{defaultDateFormat(fDate)}</Description>
-          <Description term="状态">{fStatusName}</Description>
+          <Description term="岗位">{reportProfile.fDeptName}</Description>
+          <Description term="岗位编码">{reportProfile.fDeptNumber}</Description>
+          <Description term="日期">{defaultDateFormat(reportProfile.fDate)}</Description>
         </DescriptionList>
       </Card>
     );
@@ -218,7 +188,7 @@ class Profile extends PureComponent {
   renderDetailsCard = () => {
     const {
       loading,
-      transferProfile: { details },
+      reportProfile: { details },
     } = this.props;
     const sum = details.reduce((acc, cur) => acc.add(cur.fQty), numeral());
 
@@ -239,7 +209,7 @@ class Profile extends PureComponent {
 
   renderCommentsCard = () => {
     const {
-      transferProfile: { fComments },
+      reportProfile: { fComments },
     } = this.props;
     return (
       <Card title="备注信息" bordered={false}>
@@ -252,16 +222,16 @@ class Profile extends PureComponent {
 
   renderOtherCard = () => {
     const {
-      transferProfile: {
+      reportProfile: {
         fCreatorName,
         fCreatorNumber,
         fCreateDate,
         fEditorName,
         fEditorNumber,
         fEditDate,
-        fSignerName,
-        fSignerNumber,
-        fSignDate,
+        fCheckerName,
+        fCheckerNumber,
+        fCheckDate,
       },
     } = this.props;
     return (
@@ -277,28 +247,42 @@ class Profile extends PureComponent {
           <Description term="修改日期">{defaultDateTimeFormat(fEditDate)}</Description>
         </DescriptionList>
         <DescriptionList className={styles.headerList} size="small" col={4}>
-          <Description term="签收人">{fSignerName}</Description>
-          <Description term="签收人编码">{fSignerNumber}</Description>
-          <Description term="签收日期">{defaultDateTimeFormat(fSignDate)}</Description>
+          <Description term="审核人">{fCheckerName}</Description>
+          <Description term="审核人编码">{fCheckerNumber}</Description>
+          <Description term="审核日期">{defaultDateTimeFormat(fCheckDate)}</Description>
         </DescriptionList>
       </Card>
     );
   };
 
+  renderResult = () => {
+    const { dispatch } = this.props;
+    const { queryResult = {}, resultVisible } = this.state;
+
+    return (
+      <ProfileResult
+        dispatch={dispatch}
+        modalVisible={resultVisible}
+        queryResult={queryResult}
+        handleModalVisible={flag => this.showResult(flag)}
+      />
+    );
+  };
+
   render() {
     const {
-      transferProfile: { fBillNo },
+      reportProfile: { fBillNo },
       loading,
     } = this.props;
 
     return (
       <WgPageHeaderWrapper
-        title={`不良转移单：${fBillNo}`}
+        title={`不良报废：${fBillNo}`}
         logo={
           <img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />
         }
         action={this.renderActions()}
-        // content={description}
+        // content={this.renderDescription()}
         // extraContent={extra}
         wrapperClassName={styles.main}
         loading={loading}
@@ -307,6 +291,7 @@ class Profile extends PureComponent {
         {this.renderDetailsCard()}
         {this.renderCommentsCard()}
         {this.renderOtherCard()}
+        {this.renderResult()}
       </WgPageHeaderWrapper>
     );
   }

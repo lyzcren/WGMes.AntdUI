@@ -231,7 +231,6 @@ export default [
           'RecordTake_Read',
           'ChangeRoute_Read',
           'BatchSplit_Read',
-          'DefectRepair_Read',
           'DefectScrap_Read',
         ],
         routes: [
@@ -286,7 +285,13 @@ export default [
         path: '/defect',
         name: 'defect',
         icon: 'file-excel',
-        authority: ['DefectInv_Read', 'Repair_Read', 'DefectTransfer_Read', 'DefectCheck_Read'],
+        authority: [
+          'DefectInv_Read',
+          'Repair_Read',
+          'DefectTransfer_Read',
+          'DefectCheck_Read',
+          'DefectReport_Read',
+        ],
         routes: [
           {
             path: '/defect/inv',
@@ -377,6 +382,35 @@ export default [
                 name: 'profile',
                 component: './Defect/Check/Profile',
                 authority: ['DefectCheck_Read'],
+                hideInMenu: true,
+              },
+            ],
+          },
+          {
+            path: '/defect/report',
+            name: 'report',
+            component: './Defect/Report/List',
+            authority: ['Report_Read'],
+            routes: [
+              {
+                path: '/defect/report/profile',
+                name: 'profile',
+                component: './Defect/Report/Profile',
+                authority: ['Report_Read'],
+                hideInMenu: true,
+              },
+              {
+                path: '/defect/report/create',
+                name: 'create',
+                component: './Defect/Report/Create',
+                authority: ['Report_Create'],
+                hideInMenu: true,
+              },
+              {
+                path: '/defect/report/update',
+                name: 'update',
+                component: './Defect/Report/Update',
+                authority: ['Report_Update'],
                 hideInMenu: true,
               },
             ],

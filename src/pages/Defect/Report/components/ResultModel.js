@@ -45,12 +45,12 @@ class BaseResult extends PureComponent {
       closeCurrent,
     } = this.props;
     handleModalVisible(false);
+    closeCurrent();
 
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/defect/transfer', location: { fBillNo } },
+      payload: { path: '/defect/report', location: { fBillNo } },
     });
-    closeCurrent();
   };
 
   handleViewProfile = () => {
@@ -61,11 +61,12 @@ class BaseResult extends PureComponent {
       closeCurrent,
     } = this.props;
     handleModalVisible(false);
+    closeCurrent();
+
     dispatch({
       type: 'menu/openMenu',
-      payload: { path: '/defect/transfer/profile', location: { id: newBill.fInterID } },
+      payload: { path: '/defect/report/profile', location: { id: newBill.fInterID } },
     });
-    closeCurrent();
   };
 
   handleIWillRetry = () => {
@@ -82,7 +83,7 @@ class BaseResult extends PureComponent {
     if (status === 'ok') {
       return (
         <DescriptionList col="1">
-          <Description term="不良转移单号">{newBill.fBillNo}</Description>
+          <Description term="不良报废单号">{newBill.fBillNo}</Description>
         </DescriptionList>
       );
     } else {
@@ -130,7 +131,7 @@ class BaseResult extends PureComponent {
       <Modal
         destroyOnClose
         maskClosable={false}
-        title={<div>不良转移结果</div>}
+        title={<div>不良报废结果</div>}
         visible={modalVisible}
         onCancel={() => handleModalVisible(false)}
         afterClose={() => handleModalVisible()}
@@ -150,8 +151,8 @@ class BaseResult extends PureComponent {
   }
 }
 
-@connect(({ transferCreate, menu }) => ({
-  model: transferCreate,
+@connect(({ reportCreate, menu }) => ({
+  model: reportCreate,
   menu,
 }))
 export class CreateResult extends BaseResult {
@@ -164,7 +165,7 @@ export class CreateResult extends BaseResult {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
-      payload: { path: '/defect/transfer/create' },
+      payload: { path: '/defect/report/create' },
     });
   };
 
@@ -173,8 +174,8 @@ export class CreateResult extends BaseResult {
   }
 }
 
-@connect(({ transferUpdate, menu }) => ({
-  model: transferUpdate,
+@connect(({ reportUpdate, menu }) => ({
+  model: reportUpdate,
   menu,
 }))
 export class UpdateResult extends BaseResult {
@@ -187,7 +188,30 @@ export class UpdateResult extends BaseResult {
     const { dispatch } = this.props;
     dispatch({
       type: 'menu/closeMenu',
-      payload: { path: '/defect/transfer/create' },
+      payload: { path: '/defect/report/update' },
+    });
+  };
+
+  render() {
+    return <BaseResult {...this.props} closeCurrent={this.closeCurrent} />;
+  }
+}
+
+@connect(({ reportProfile, menu }) => ({
+  model: reportProfile,
+  menu,
+}))
+export class ProfileResult extends BaseResult {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
+  closeCurrent = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'menu/closeMenu',
+      payload: { path: '/defect/report/profile' },
     });
   };
 

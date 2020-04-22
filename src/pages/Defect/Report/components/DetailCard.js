@@ -48,12 +48,12 @@ class DetailCard extends PureComponent {
         dataIndex: 'fCurrentQty',
       },
       {
-        title: '转移数量',
+        title: '返修数量',
         dataIndex: 'fQty',
         render: (val, record) => (
           <FormItem style={{ marginBottom: 0 }}>
-            {getFieldDecorator(`fQty_${record.fEntryID}`, {
-              rules: [{ required: true, message: '请输入转移数量' }],
+            {getFieldDecorator(`fQty_${record.fInterID}`, {
+              rules: [{ required: true, message: '请输入投入数量' }],
               initialValue: record.fQty,
             })(
               <InputNumber
@@ -110,7 +110,7 @@ class DetailCard extends PureComponent {
 
   handleDeleteRow(record) {
     const { dispatch, dataSource, onChange } = this.props;
-    const newDetails = dataSource.filter(x => x.fEntryID !== record.fEntryID);
+    const newDetails = dataSource.filter(x => x.fInterID !== record.fInterID);
 
     if (onChange) onChange(newDetails);
   }
