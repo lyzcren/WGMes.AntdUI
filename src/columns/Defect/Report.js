@@ -47,7 +47,7 @@ export const columns = [
   {
     title: '创建日期',
     dataIndex: 'fCreateDate',
-    width: 160,
+    width: 200,
     sorter: true,
     render: (text, record) => defaultDateTimeFormat(text),
   },
@@ -66,7 +66,7 @@ export const columns = [
   {
     title: '修改日期',
     dataIndex: 'fEditDate',
-    width: 160,
+    width: 200,
     sorter: true,
     render: (text, record) => defaultDateTimeFormat(text),
   },
@@ -85,7 +85,7 @@ export const columns = [
   {
     title: '审核日期',
     dataIndex: 'fCheckDate',
-    width: 160,
+    width: 200,
     sorter: true,
     render: (text, record) => defaultDateTimeFormat(text),
   },

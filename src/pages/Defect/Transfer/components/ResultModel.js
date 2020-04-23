@@ -45,12 +45,12 @@ class BaseResult extends PureComponent {
       closeCurrent,
     } = this.props;
     handleModalVisible(false);
+    closeCurrent();
 
     dispatch({
       type: 'menu/openMenu',
       payload: { path: '/defect/transfer', location: { fBillNo } },
     });
-    closeCurrent();
   };
 
   handleViewProfile = () => {
@@ -61,11 +61,12 @@ class BaseResult extends PureComponent {
       closeCurrent,
     } = this.props;
     handleModalVisible(false);
+    closeCurrent();
+
     dispatch({
       type: 'menu/openMenu',
       payload: { path: '/defect/transfer/profile', location: { id: newBill.fInterID } },
     });
-    closeCurrent();
   };
 
   handleIWillRetry = () => {
@@ -116,6 +117,15 @@ class BaseResult extends PureComponent {
     }
   };
 
+  onCancel = () => {
+    const { queryResult, handleModalVisible, closeCurrent } = this.props;
+    const { status, message } = queryResult;
+    handleModalVisible(false);
+    if (status === 'ok') {
+      closeCurrent();
+    }
+  }
+
   render() {
     const { queryResult, modalVisible, handleModalVisible } = this.props;
     const { status, message } = queryResult;
@@ -132,7 +142,7 @@ class BaseResult extends PureComponent {
         maskClosable={false}
         title={<div>不良转移结果</div>}
         visible={modalVisible}
-        onCancel={() => handleModalVisible(false)}
+        onCancel={this.onCancel}
         afterClose={() => handleModalVisible()}
         footer={null}
       >

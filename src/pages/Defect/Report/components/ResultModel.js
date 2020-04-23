@@ -42,7 +42,7 @@ class BaseResult extends PureComponent {
       model: {
         newBill: { fBillNo },
       },
-      closeCurrent,
+      closeCurrent
     } = this.props;
     handleModalVisible(false);
     closeCurrent();
@@ -58,7 +58,7 @@ class BaseResult extends PureComponent {
       dispatch,
       handleModalVisible,
       model: { newBill },
-      closeCurrent,
+      closeCurrent
     } = this.props;
     handleModalVisible(false);
     closeCurrent();
@@ -117,7 +117,16 @@ class BaseResult extends PureComponent {
     }
   };
 
-  render() {
+  onCancel = () => {
+    const { queryResult, handleModalVisible, closeCurrent } = this.props;
+    const { status, message } = queryResult;
+    handleModalVisible(false);
+    if (status === 'ok') {
+      closeCurrent();
+    }
+  }
+
+  render () {
     const { queryResult, modalVisible, handleModalVisible } = this.props;
     const { status, message } = queryResult;
     let type = '';
@@ -133,7 +142,7 @@ class BaseResult extends PureComponent {
         maskClosable={false}
         title={<div>不良报废结果</div>}
         visible={modalVisible}
-        onCancel={() => handleModalVisible(false)}
+        onCancel={this.onCancel}
         afterClose={() => handleModalVisible()}
         footer={null}
       >
@@ -169,7 +178,7 @@ export class CreateResult extends BaseResult {
     });
   };
 
-  render() {
+  render () {
     return <BaseResult {...this.props} closeCurrent={this.closeCurrent} />;
   }
 }
@@ -192,7 +201,7 @@ export class UpdateResult extends BaseResult {
     });
   };
 
-  render() {
+  render () {
     return <BaseResult {...this.props} closeCurrent={this.closeCurrent} />;
   }
 }
@@ -215,7 +224,7 @@ export class ProfileResult extends BaseResult {
     });
   };
 
-  render() {
+  render () {
     return <BaseResult {...this.props} closeCurrent={this.closeCurrent} />;
   }
 }
