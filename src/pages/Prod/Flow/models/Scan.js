@@ -29,17 +29,17 @@ export default {
       let messageType = '';
       const nextDepts = yield call(fakeGetDepts, { fInterID: data.fInterID });
       if (!data) {
-        message = `未找到流程单【${fFullBatchNo}】.`;
+        message = `未找到流程单【${payload.fFullBatchNo}】.`;
         messageType = 'error';
       } else {
-        const { fStatusNumber, fRecordStatusNumber } = data;
+        const { fStatusNumber, fCurrentRecordStatusNumber } = data;
         // 判断是否可签收
         if (fStatusNumber === 'EndProduce' || fStatusNumber === 'NonProduced') {
           messageType = 'warning';
           message = '当前流程单已结束生产.';
-        } else if (fRecordStatusNumber !== 'ManufProducing') {
+        } else if (fCurrentRecordStatusNumber !== 'ManufProducing') {
           showSign = true;
-        } else if (fRecordStatusNumber === 'ManufProducing') {
+        } else if (fCurrentRecordStatusNumber === 'ManufProducing') {
           showTransfer = true;
         }
       }

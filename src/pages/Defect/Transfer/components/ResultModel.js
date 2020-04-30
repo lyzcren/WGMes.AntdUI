@@ -124,7 +124,7 @@ class BaseResult extends PureComponent {
     if (status === 'ok') {
       closeCurrent();
     }
-  }
+  };
 
   render() {
     const { queryResult, modalVisible, handleModalVisible } = this.props;

@@ -34,12 +34,15 @@ import { SignForm } from './SignForm';
 import { ViewStepForm } from './ViewStepForm';
 import { ViewRecordForm } from './ViewRecordForm';
 import { ScanForm } from './ScanForm';
+import { ScanSignForm } from './ScanSign';
+import { ScanTransferForm } from './ScanTransfer';
 import { TakeForm } from './TakeForm';
 import { ViewTakeForm } from './ViewTakeForm';
 import { SplitForm } from './SplitForm';
 import { RefundForm } from './RefundForm';
 import { RejectForm } from './RejectForm';
 import { ChangeRouteForm } from './ChangeRouteForm';
+import { DeptSelector } from '@/wg_components/DeptSelector';
 import ColumnConfig from './ColumnConfig';
 import { exportExcel } from '@/utils/getExcel';
 import { hasAuthority } from '@/utils/authority';
@@ -90,6 +93,10 @@ class TableList extends PureComponent {
         changeRoute: false,
         split: false,
         scan: false,
+        scanSign: false,
+        scanTransfer: false,
+        selectSignDept: false,
+        selectTransferDept: false,
       },
       formValues: {},
       // 当前操作选中列的数据
@@ -99,6 +106,8 @@ class TableList extends PureComponent {
       selectedRows: [],
       queryFilters: [],
       queryDeptID: null,
+      renderScanSign: false,
+      renderScanTransfer: false,
     };
     // 列表查询参数
     this.currentPagination = {
@@ -1117,6 +1126,30 @@ class TableList extends PureComponent {
     );
   }
 
+  showScanSign = dept => {
+    if (dept) {
+      this.setState({
+        renderScanSign: true,
+        signDept: dept,
+      });
+      this.handleModalVisible({ key: 'scanSign', flag: true });
+    } else {
+      this.handleModalVisible({ key: 'selectSignDept', flag: true });
+    }
+  };
+
+  showScanTransfer = dept => {
+    if (dept) {
+      this.setState({
+        renderScanTransfer: true,
+        transferDept: dept,
+      });
+      this.handleModalVisible({ key: 'scanTransfer', flag: true });
+    } else {
+      this.handleModalVisible({ key: 'selectTransferDept', flag: true });
+    }
+  };
+
   renderForm() {
     const { expandForm } = this.state;
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
@@ -1130,7 +1163,7 @@ class TableList extends PureComponent {
     return (
       <div style={{ overflow: 'hidden' }}>
         <Button
-          type="primary"
+          type="default"
           icon="scan"
           onClick={() => {
             this.handleModalVisible({ key: 'scan', flag: true });
@@ -1138,6 +1171,16 @@ class TableList extends PureComponent {
         >
           扫描
         </Button>
+        {hasAuthority('Flow_Sign') && (
+          <Button type="primary" icon="scan" onClick={() => this.showScanSign()}>
+            批量签收
+          </Button>
+        )}
+        {hasAuthority('Flow_Transfer') && (
+          <Button type="primary" icon="scan" onClick={() => this.showScanTransfer()}>
+            批量转序
+          </Button>
+        )}
         <Authorized authority="Flow_Export">
           <Dropdown
             overlay={
@@ -1191,7 +1234,16 @@ class TableList extends PureComponent {
       },
       columnManage: { fields },
     } = this.props;
-    const { queryDeptID, selectedRows, modalVisible, currentFormValues } = this.state;
+    const {
+      queryDeptID,
+      selectedRows,
+      modalVisible,
+      currentFormValues,
+      renderScanSign,
+      renderScanTransfer,
+      signDept,
+      transferDept,
+    } = this.state;
 
     let columns = ColumnConfig.getColumns({
       columnOps: [
@@ -1353,6 +1405,50 @@ class TableList extends PureComponent {
             handleScanTransfer={this.handleScanTransfer}
             handleModalVisible={flag => this.handleModalVisible({ key: 'scan', flag })}
             modalVisible={modalVisible.scan}
+          />
+          {renderScanSign && (
+            <ScanSignForm
+              dispatch
+              deptId={queryDeptID}
+              handleModalVisible={flag => this.handleModalVisible({ key: 'scanSign', flag })}
+              modalVisible={modalVisible.scanSign}
+              afterClose={() => {
+                this.setState({ renderScanSign: false });
+              }}
+              dept={signDept}
+            />
+          )}
+          {renderScanTransfer && (
+            <ScanTransferForm
+              dispatch
+              deptId={queryDeptID}
+              handleModalVisible={flag => this.handleModalVisible({ key: 'scanTransfer', flag })}
+              modalVisible={modalVisible.scanTransfer}
+              afterClose={() => {
+                this.setState({ renderScanTransfer: false });
+              }}
+              dept={transferDept}
+            />
+          )}
+          <DeptSelector
+            handleModalVisible={flag => this.handleModalVisible({ key: 'selectSignDept', flag })}
+            modalVisible={modalVisible.selectSignDept}
+            selected={(dept = {}) => {
+              this.handleModalVisible({ key: 'selectSignDept', flag: false });
+              this.showScanSign(dept);
+            }}
+            afterClose={() => {}}
+          />
+          <DeptSelector
+            handleModalVisible={flag =>
+              this.handleModalVisible({ key: 'selectTransferDept', flag })
+            }
+            modalVisible={modalVisible.selectTransferDept}
+            selected={(dept = {}) => {
+              this.handleModalVisible({ key: 'selectTransferDept', flag: false });
+              this.showScanTransfer(dept);
+            }}
+            afterClose={() => {}}
           />
         </GridContent>
       </div>

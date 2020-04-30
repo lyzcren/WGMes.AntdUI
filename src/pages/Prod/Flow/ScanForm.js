@@ -226,7 +226,9 @@ export class ScanForm extends PureComponent {
               initialValue:
                 queryDeptID && filterDepts.find(x => x.fDeptID == queryDeptID)
                   ? queryDeptID
-                  : filterDepts[0].fDeptID,
+                  : filterDepts[0]
+                  ? filterDepts[0].fDeptID
+                  : null,
             })(
               <Select
                 style={{ width: '100%' }}
