@@ -27,10 +27,19 @@ class Analysis extends Component {
   };
 
   componentDidMount() {
+    const { rangePickerValue } = this.state;
+    this.loadCard(rangePickerValue);
+  }
+
+  loadCard = rangePickerValue => {
     const { dispatch } = this.props;
     this.reqRef = requestAnimationFrame(() => {
       dispatch({
         type: 'chart/fetch',
+        payload: {
+          beginDate: rangePickerValue[0],
+          endDate: rangePickerValue[1],
+        },
       }).then(() => {
         const {
           chart: { workshops },
@@ -44,7 +53,7 @@ class Analysis extends Component {
         }
       });
     });
-  }
+  };
 
   componentWillUnmount() {
     const { dispatch } = this.props;
@@ -62,8 +71,9 @@ class Analysis extends Component {
       rangePickerValue,
     });
 
+    this.loadCard(rangePickerValue);
     dispatch({
-      type: 'chart/fetchSalesData',
+      type: 'chart/fetchWorkshopData',
       payload: { deptId, beginDate: rangePickerValue[0], endDate: rangePickerValue[1] },
     });
   };
@@ -82,7 +92,7 @@ class Analysis extends Component {
     const { rangePickerValue } = this.state;
     this.setState({ deptId });
     dispatch({
-      type: 'chart/fetchSalesData',
+      type: 'chart/fetchWorkshopData',
       payload: { deptId, beginDate: rangePickerValue[0], endDate: rangePickerValue[1] },
     });
   };
@@ -95,8 +105,9 @@ class Analysis extends Component {
       rangePickerValue,
     });
 
+    this.loadCard(rangePickerValue);
     dispatch({
-      type: 'chart/fetchSalesData',
+      type: 'chart/fetchWorkshopData',
       payload: { deptId, beginDate: rangePickerValue[0], endDate: rangePickerValue[1] },
     });
   };
@@ -119,32 +130,36 @@ class Analysis extends Component {
   render() {
     const { workshop, processes, rangePickerValue } = this.state;
     const { chart, loading } = this.props;
-    const { workshops, produceData, passRateData, topProduces } = chart;
+    const { workshops, produceData, passRateData, topProduces, topMachineProduces } = chart;
+    console.log(topMachineProduces);
 
     return (
-      <GridContent>
-        <Suspense fallback={<PageLoading />}>
-          <IntroduceRow
-            loading={loading}
-            workshops={workshops}
-            onTabChange={this.handleWorkShopChange}
-          />
-        </Suspense>
-        <Suspense fallback={null}>
-          <ProduceCard
-            processes={processes}
-            rangePickerValue={rangePickerValue}
-            produceData={produceData}
-            passRateData={passRateData}
-            topProduces={topProduces}
-            isActive={this.isActive}
-            handleRangePickerChange={this.handleRangePickerChange}
-            loading={loading}
-            selectDate={this.selectDate}
-            onTabChange={this.handleProcessChange}
-          />
-        </Suspense>
-      </GridContent>
+      <div style={{ margin: '-24px 0 0 -24px' }}>
+        <GridContent>
+          <Suspense fallback={<PageLoading />}>
+            <IntroduceRow
+              loading={loading}
+              rangePickerValue={rangePickerValue}
+              isActive={this.isActive}
+              selectDate={this.selectDate}
+              handleRangePickerChange={this.handleRangePickerChange}
+              workshops={workshops}
+              onTabChange={this.handleWorkShopChange}
+            />
+          </Suspense>
+          <Suspense fallback={null}>
+            <ProduceCard
+              processes={processes}
+              produceData={produceData}
+              passRateData={passRateData}
+              topProduces={topProduces}
+              topMachineProduces={topMachineProduces}
+              loading={loading}
+              onTabChange={this.handleProcessChange}
+            />
+          </Suspense>
+        </GridContent>
+      </div>
     );
   }
 }

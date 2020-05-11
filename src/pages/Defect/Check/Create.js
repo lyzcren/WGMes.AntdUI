@@ -56,7 +56,7 @@ class Create extends PureComponent {
     this.loadData();
   }
 
-  componentDidUpdate(preProps) { }
+  componentDidUpdate(preProps) {}
 
   loadData() {
     const { dispatch } = this.props;
@@ -375,7 +375,8 @@ class Create extends PureComponent {
             pagination={false}
             loading={loading}
             columns={columns}
-            dataSource={details} />
+            dataSource={details}
+          />
         </Card>
         <Card title="备注信息" bordered={false}>
           <Form layout="vertical">

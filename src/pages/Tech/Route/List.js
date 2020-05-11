@@ -578,7 +578,7 @@ class TableList extends PureComponent {
       handleModalVisible: (flag, record) => this.handleModalVisible({ key: 'param', flag }, record),
     };
     return (
-      <div style={{ margin: '-24px -24px 0' }}>
+      <div style={{ margin: '-24px 0 0 -24px' }}>
         <GridContent>
           <Card bordered={false}>
             <div className={styles.tableList}>

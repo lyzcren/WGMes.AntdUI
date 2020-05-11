@@ -417,10 +417,7 @@ class TableList extends PureComponent {
         roleId,
         checkedAuthority,
       },
-    }).then(() => {
-      const {
-        roleManage: { queryResult },
-      } = this.props;
+    }).then(queryResult => {
       if (queryResult.status === 'ok') {
         message.success('修改成功');
         this.handleUpdateModalVisible();
@@ -622,7 +619,7 @@ class TableList extends PureComponent {
       handleModalVisible: this.handleAuthorizeUserModalVisible,
     };
     return (
-      <div style={{ margin: '-24px -24px 0' }}>
+      <div style={{ margin: '-24px 0 0 -24px' }}>
         <GridContent>
           <Card bordered={false}>
             <div className={styles.tableList}>

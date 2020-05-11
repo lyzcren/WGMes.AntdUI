@@ -59,12 +59,12 @@ class ErpView extends PureComponent {
       payload: {
         host,
         userName,
-        password
+        password,
       },
     }).then(response => {
       this.setState({ dbNames: response });
     });
-  }
+  };
 
   handleSubmit = event => {
     event.preventDefault();
@@ -93,8 +93,15 @@ class ErpView extends PureComponent {
       form: { getFieldDecorator },
       erpTypes,
     } = this.props;
-    const { erpType, erpDbHost, erpDbUser, erpDbPwd, erpDbCatalog, moSyncSql,
-      dbNames } = this.state;
+    const {
+      erpType,
+      erpDbHost,
+      erpDbUser,
+      erpDbPwd,
+      erpDbCatalog,
+      moSyncSql,
+      dbNames,
+    } = this.state;
 
     return (
       <div className={styles.baseView} ref={this.getViewDom}>
@@ -135,24 +142,23 @@ class ErpView extends PureComponent {
             <FormItem label="ERP数据库名称">
               <Row>
                 <Col md={10} sm={24}>
-                  {dbNames ?
-                    getFieldDecorator('erpDbCatalog', {
-                      rules: [{ required: true, message: '请输入ERP数据库名称' }],
-                      initialValue: erpDbCatalog,
-                    })(
-                      <Select style={{ maxWidth: '224px' }} placeholder="请输入ERP数据库名称">
-                        {dbNames.map(item => (
-                          <Select.Option key={item} value={item}>
-                            {item}
-                          </Select.Option>
-                        ))}
-                      </Select>)
-                    :
-                    getFieldDecorator('erpDbCatalog', {
-                      rules: [{ required: true, message: '请输入ERP数据库名称' }],
-                      initialValue: erpDbCatalog,
-                    })(<Input style={{ maxWidth: '224px' }} placeholder="请输入ERP数据库名称" />)
-                  }
+                  {dbNames
+                    ? getFieldDecorator('erpDbCatalog', {
+                        rules: [{ required: true, message: '请输入ERP数据库名称' }],
+                        initialValue: erpDbCatalog,
+                      })(
+                        <Select style={{ maxWidth: '224px' }} placeholder="请输入ERP数据库名称">
+                          {dbNames.map(item => (
+                            <Select.Option key={item} value={item}>
+                              {item}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      )
+                    : getFieldDecorator('erpDbCatalog', {
+                        rules: [{ required: true, message: '请输入ERP数据库名称' }],
+                        initialValue: erpDbCatalog,
+                      })(<Input style={{ maxWidth: '224px' }} placeholder="请输入ERP数据库名称" />)}
                 </Col>
                 <Col md={10} sm={24}>
                   <Button onClick={this.getDatabases}>载入数据库</Button>

@@ -438,7 +438,7 @@ class TableList extends PureComponent {
     // console.log(data);
 
     return (
-      <div style={{ margin: '-24px -24px 0' }}>
+      <div style={{ margin: '-24px 0 0 -24px' }}>
         <GridContent>
           <Card bordered={false}>
             <div className={styles.tableList}>

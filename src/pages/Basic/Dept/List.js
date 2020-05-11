@@ -836,7 +836,7 @@ class TableList extends PureComponent {
     const columns = getColumns({ key: 'dept', columnOps: this.getColumnOps() });
 
     return (
-      <div style={{ margin: '-24px -24px 0' }}>
+      <div style={{ margin: '-24px 0 0 -24px' }}>
         <GridContent>
           <Card bordered={false}>
             <div className={styles.tableList}>
@@ -861,26 +861,28 @@ class TableList extends PureComponent {
                   }}
                 />
               ) : (
-                  <StandardTable
-                    rowKey="fItemID"
-                    bordered
-                    selectedRows={[]}
-                    columns={columns}
-                    loading={loading || deptUnitConverterLoading}
-                  />
-                )}
+                <StandardTable
+                  rowKey="fItemID"
+                  bordered
+                  selectedRows={[]}
+                  columns={columns}
+                  loading={loading || deptUnitConverterLoading}
+                />
+              )}
             </div>
           </Card>
-          {renderAddForm &&
+          {renderAddForm && (
             <CreateForm
               handleSubmit={this.handleAdd}
               handleModalVisible={this.handleModalVisible}
-              afterClose={() => { this.setState({ renderAddForm: false }) }}
+              afterClose={() => {
+                this.setState({ renderAddForm: false });
+              }}
               modalVisible={modalVisible.add}
               treeData={treeData}
               typeData={typeData}
             />
-          }
+          )}
           {currentFormValues && Object.keys(currentFormValues).length ? (
             <UpdateForm
               {...updateMethods}

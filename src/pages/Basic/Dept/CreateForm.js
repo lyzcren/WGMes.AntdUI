@@ -50,7 +50,7 @@ export class CreateForm extends PureComponent {
       handleModalVisible,
       typeData,
       basicData: { billNo, workTimes },
-      afterClose
+      afterClose,
     } = this.props;
 
     return (

@@ -91,13 +91,14 @@ export default {
       });
       if (callback) callback();
     },
-    *setAuthority({ payload, callback }, { call, put }) {
+    *setAuthority({ payload }, { call, put }) {
       const response = yield call(setAuth, payload);
       yield put({
         type: 'saveCurrentAuthority',
         payload: response,
       });
-      if (callback) callback();
+
+      return response;
     },
     // 角色绑定用户
     *getAuthorizeUser({ payload, callback }, { call, put }) {

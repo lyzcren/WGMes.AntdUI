@@ -22,19 +22,10 @@ export class ScanRefundForm extends PureComponent {
   constructor(props) {
     super(props);
 
-    const { queryDeptID } = props;
     this.state = {
-      queryDeptID,
       modalVisible: {
         refund: false,
       },
-    };
-  }
-
-  componentDidMount() {
-    const { queryDeptID } = this.props;
-    this.state = {
-      queryDeptID,
     };
   }
 

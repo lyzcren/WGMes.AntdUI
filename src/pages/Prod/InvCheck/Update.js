@@ -209,7 +209,7 @@ class Update extends PureComponent {
   }
 
   showResult(queryResult, successCallback) {
-    const { status,  model } = queryResult;
+    const { status, model } = queryResult;
 
     if (status === 'ok') {
       if (successCallback) successCallback(model);

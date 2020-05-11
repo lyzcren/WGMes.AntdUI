@@ -21,19 +21,10 @@ export class ScanTakeForm extends PureComponent {
   constructor(props) {
     super(props);
 
-    const { queryDeptID } = props;
     this.state = {
-      queryDeptID,
       modalVisible: {
         take: false,
       },
-    };
-  }
-
-  componentDidMount() {
-    const { queryDeptID } = this.props;
-    this.state = {
-      queryDeptID,
     };
   }
 

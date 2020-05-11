@@ -59,7 +59,7 @@ class Update extends PureComponent {
     }
   }
 
-  loadData() { }
+  loadData() {}
 
   handleDeptChange(val) {
     const { form, dispatch } = this.props;
@@ -348,7 +348,8 @@ class Update extends PureComponent {
             rowKey="fEntryID"
             loading={loading}
             columns={columns}
-            dataSource={details} />
+            dataSource={details}
+          />
         </Card>
         <Card title="备注信息" bordered={false}>
           <Form layout="vertical">

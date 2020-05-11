@@ -11,11 +11,17 @@ export default {
     produceData: [],
     passRateData: [],
     topProduces: [],
+    topMachineProduces: [],
   },
 
   effects: {
-    *fetch(_, { call, put }) {
-      const workshops = yield call(fakeAnalysis);
+    *fetch({ payload }, { call, put }) {
+      const { beginDate, endDate } = payload;
+      const workshops = yield call(fakeAnalysis, {
+        ...payload,
+        beginDate: beginDate.format('YYYY-MM-DD'),
+        endDate: endDate.format('YYYY-MM-DD'),
+      });
       const response = {
         workshops: workshops.workshops,
         processes: workshops.processes,
@@ -26,7 +32,7 @@ export default {
         payload: response,
       });
     },
-    *fetchSalesData({ payload }, { call, put }) {
+    *fetchWorkshopData({ payload }, { call, put }) {
       const { beginDate, endDate } = payload;
       const response = yield call(fakeChartData, {
         ...payload,
@@ -40,6 +46,7 @@ export default {
           produceData: response.produceData,
           passRateData: response.passRateData,
           topProduces: response.topProduces,
+          topMachineProduces: response.topMachineProduces,
         },
       });
     },
@@ -61,6 +68,7 @@ export default {
         produceData: [],
         passRateData: [],
         topProduces: [],
+        topMachineProduces: [],
       };
     },
   },

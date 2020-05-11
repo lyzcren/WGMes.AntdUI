@@ -207,7 +207,7 @@ class TableList extends PureComponent {
   };
 
   showResult(queryResult, successCallback) {
-    const { status,  model } = queryResult;
+    const { status, model } = queryResult;
 
     if (status === 'ok') {
       if (successCallback) successCallback(model);
@@ -498,7 +498,7 @@ class TableList extends PureComponent {
 
   render() {
     return (
-      <div style={{ margin: '-24px -24px 0' }}>
+      <div style={{ margin: '-24px 0 0 -24px' }}>
         <GridContent>
           <Card bordered={false}>
             <div className={styles.tableList}>
