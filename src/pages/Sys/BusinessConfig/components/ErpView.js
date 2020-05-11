@@ -1,6 +1,6 @@
 import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
-import { Form, Icon, Button, Checkbox, Input, message, Select } from 'antd';
+import { Form, Icon, Button, Checkbox, Input, message, Select, Row, Col } from 'antd';
 import WgPageHeaderWrapper from '@/wg_components/WgPageHeaderWrapper';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import { erpTypeMaps } from '@/utils/GlobalConst';
@@ -8,7 +8,7 @@ import { erpTypeMaps } from '@/utils/GlobalConst';
 import styles from './ErpView.less';
 
 const FormItem = Form.Item;
-const { TextArea } = Input;
+const { TextArea, Password } = Input;
 
 class ErpView extends PureComponent {
   static defaultProps = {
@@ -20,7 +20,10 @@ class ErpView extends PureComponent {
 
   state = {
     erpType: 'k3',
-    erpConnectionString: '',
+    erpDbHost: '',
+    erpDbUser: '',
+    erpDbPwd: '',
+    erpDbCatalog: '',
   };
 
   componentDidMount() {
@@ -28,8 +31,38 @@ class ErpView extends PureComponent {
     dispatch({
       type: 'global/fetchSyncBusinessConfig',
     }).then(config => {
-      const { erpType, erpConnectionString, moSyncSql } = config;
-      this.setState({ erpType, erpConnectionString, moSyncSql });
+      const { erpType, erpDbHost, erpDbUser, erpDbPwd, erpDbCatalog, moSyncSql } = config;
+      this.setState({ erpType, erpDbHost, erpDbUser, erpDbPwd, erpDbCatalog, moSyncSql });
+    });
+  }
+
+  getDatabases = () => {
+    const { form, dispatch } = this.props;
+
+    const host = form.getFieldValue('erpDbHost');
+    const userName = form.getFieldValue('erpDbUser');
+    const password = form.getFieldValue('erpDbPwd');
+    if (!host) {
+      message.warning('请先填写ERP数据库服务器IP');
+      return;
+    }
+    if (!userName) {
+      message.warning('请先填写ERP数据库用户名');
+      return;
+    }
+    if (!password) {
+      message.warning('请先填写ERP数据库密码');
+      return;
+    }
+    dispatch({
+      type: 'businessConfig/getDbNames',
+      payload: {
+        host,
+        userName,
+        password
+      },
+    }).then(response => {
+      this.setState({ dbNames: response });
     });
   }
 
@@ -60,7 +93,8 @@ class ErpView extends PureComponent {
       form: { getFieldDecorator },
       erpTypes,
     } = this.props;
-    const { erpType, erpConnectionString, moSyncSql } = this.state;
+    const { erpType, erpDbHost, erpDbUser, erpDbPwd, erpDbCatalog, moSyncSql,
+      dbNames } = this.state;
 
     return (
       <div className={styles.baseView} ref={this.getViewDom}>
@@ -80,11 +114,50 @@ class ErpView extends PureComponent {
                 </Select>
               )}
             </FormItem>
-            <FormItem label="ERP连接字符串">
-              {getFieldDecorator('erpConnectionString', {
-                rules: [{ required: true, message: '请输入ERP连接字符串' }],
-                initialValue: erpConnectionString,
-              })(<TextArea style={{ minHeight: 32 }} placeholder="请输入ERP连接字符串" />)}
+            <FormItem label="ERP数据库服务器IP">
+              {getFieldDecorator('erpDbHost', {
+                rules: [{ required: true, message: '请输入ERP数据库服务器IP' }],
+                initialValue: erpDbHost,
+              })(<Input style={{ maxWidth: '224px' }} placeholder="请输入ERP数据库服务器IP" />)}
+            </FormItem>
+            <FormItem label="ERP数据库用户名">
+              {getFieldDecorator('erpDbUser', {
+                rules: [{ required: true, message: '请输入ERP数据库用户名' }],
+                initialValue: erpDbUser,
+              })(<Input style={{ maxWidth: '224px' }} placeholder="请输入ERP数据库用户名" />)}
+            </FormItem>
+            <FormItem label="ERP数据库密码">
+              {getFieldDecorator('erpDbPwd', {
+                rules: [{ required: true, message: '请输入ERP数据库密码' }],
+                initialValue: erpDbPwd,
+              })(<Password style={{ maxWidth: '224px' }} placeholder="请输入ERP数据库密码" />)}
+            </FormItem>
+            <FormItem label="ERP数据库名称">
+              <Row>
+                <Col md={10} sm={24}>
+                  {dbNames ?
+                    getFieldDecorator('erpDbCatalog', {
+                      rules: [{ required: true, message: '请输入ERP数据库名称' }],
+                      initialValue: erpDbCatalog,
+                    })(
+                      <Select style={{ maxWidth: '224px' }} placeholder="请输入ERP数据库名称">
+                        {dbNames.map(item => (
+                          <Select.Option key={item} value={item}>
+                            {item}
+                          </Select.Option>
+                        ))}
+                      </Select>)
+                    :
+                    getFieldDecorator('erpDbCatalog', {
+                      rules: [{ required: true, message: '请输入ERP数据库名称' }],
+                      initialValue: erpDbCatalog,
+                    })(<Input style={{ maxWidth: '224px' }} placeholder="请输入ERP数据库名称" />)
+                  }
+                </Col>
+                <Col md={10} sm={24}>
+                  <Button onClick={this.getDatabases}>载入数据库</Button>
+                </Col>
+              </Row>
             </FormItem>
             <FormItem label="生产任务单同步SQL">
               {getFieldDecorator('moSyncSql', {

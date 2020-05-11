@@ -1,4 +1,5 @@
 import request from '@/utils/request';
+import { stringify } from 'qs';
 
 export async function fakeFetch() {
   return request('/api/BusinessConfig');
@@ -55,4 +56,8 @@ export async function fakeUpdateFields(params) {
     method: 'PUT',
     body: params,
   });
+}
+
+export async function fakeGetDbNames(params) {
+  return request(`/api/BusinessConfig/dbNames?${stringify(params)}`);
 }

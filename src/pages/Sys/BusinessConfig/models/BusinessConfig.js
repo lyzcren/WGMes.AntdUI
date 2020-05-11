@@ -4,6 +4,7 @@ import {
   fakeUpdateProd,
   fakeGetFields,
   fakeUpdateFields,
+  fakeGetDbNames,
 } from '@/services/Sys/BusinessConfig';
 import { fakeKeyValues } from '@/services/basicData';
 import { modeValueMaps } from '@/utils/GlobalConst';
@@ -15,6 +16,7 @@ export default {
     defaultLoginMode: 'idCard',
     invTypes: [],
     fields: [],
+    dbNames: [],
   },
 
   effects: {
@@ -58,6 +60,14 @@ export default {
       yield put({
         type: 'save',
         payload: { invTypes: response },
+      });
+      return response;
+    },
+    *getDbNames({ payload }, { call, put }) {
+      const response = yield call(fakeGetDbNames, payload);
+      yield put({
+        type: 'save',
+        payload: { dbNames: response },
       });
       return response;
     },

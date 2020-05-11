@@ -19,22 +19,7 @@ export class SyncForm extends PureComponent {
 
   constructor(props) {
     super(props);
-
-    const { queryDeptID } = props;
-    this.state = {
-      queryDeptID,
-      showSignField: false,
-    };
   }
-
-  componentDidMount() {
-    const { queryDeptID } = this.props;
-    this.state = {
-      queryDeptID,
-    };
-  }
-
-  componentDidUpdate() {}
 
   scanFlow = () => {
     const { form, dispatch } = this.props;

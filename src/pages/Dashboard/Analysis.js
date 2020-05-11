@@ -35,7 +35,7 @@ class Analysis extends Component {
         const {
           chart: { workshops },
         } = this.props;
-        const workshop = workshops ? workshops[0] : {};
+        const workshop = workshops && workshops[0] ? workshops[0] : {};
         const processes = workshop.processes || [];
         this.setState({ workshop, processes });
         // 统计行加载完成后，默认条件加载产量图表

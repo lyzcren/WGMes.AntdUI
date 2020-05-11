@@ -59,7 +59,7 @@ class Update extends PureComponent {
     }
   }
 
-  loadData() {}
+  loadData() { }
 
   handleDeptChange(val) {
     const { form, dispatch } = this.props;
@@ -166,7 +166,7 @@ class Update extends PureComponent {
   }
 
   showResult(queryResult, successCallback) {
-    const { status, message, model } = queryResult;
+    const { status, model } = queryResult;
 
     if (status === 'ok') {
       if (successCallback) successCallback(model);
@@ -342,7 +342,13 @@ class Update extends PureComponent {
           </Form>
         </Card>
         <Card title="明细信息" style={{ marginBottom: 24 }} bordered={false}>
-          <Table rowKey="fEntryID" loading={loading} columns={columns} dataSource={details} />
+          <Table
+            bordered
+            pagination={false}
+            rowKey="fEntryID"
+            loading={loading}
+            columns={columns}
+            dataSource={details} />
         </Card>
         <Card title="备注信息" bordered={false}>
           <Form layout="vertical">

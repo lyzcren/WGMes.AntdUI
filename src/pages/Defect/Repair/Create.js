@@ -127,7 +127,7 @@ class Create extends PureComponent {
   };
 
   showResult(queryResult) {
-    const { status, message, model } = queryResult;
+    const { status, model } = queryResult;
 
     if (status === 'ok') {
       message.success(queryResult.message);

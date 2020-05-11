@@ -121,17 +121,17 @@ class Profile extends PureComponent {
   };
 
   showResult(queryResult, successCallback) {
-    const { status, message, model } = queryResult;
+    const { status, model } = queryResult;
 
     if (status === 'ok') {
       if (successCallback) successCallback(model);
       else {
-        message.success(message);
+        message.success(queryResult.message);
       }
     } else if (status === 'warning') {
-      message.warning(message);
+      message.warning(queryResult.message);
     } else {
-      message.error(message);
+      message.error(queryResult.message);
     }
   }
 

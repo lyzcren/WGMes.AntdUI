@@ -56,7 +56,7 @@ class Create extends PureComponent {
     this.loadData();
   }
 
-  componentDidUpdate(preProps) {}
+  componentDidUpdate(preProps) { }
 
   loadData() {
     const { dispatch } = this.props;
@@ -91,9 +91,9 @@ class Create extends PureComponent {
             fDefectName: x.fDefectName,
             fMoBillNo: x.fMoBillNo,
             fUnitName: x.fUnitName,
-            fQty: fQty !== undefined ? fQty : x.fQty,
-            fInvQty: x.fQty,
-            fDeltaQty: fQty !== undefined ? fQty - x.fQty : 0,
+            fQty: fQty !== undefined ? fQty : x.fCurrentQty,
+            fInvQty: x.fCurrentQty,
+            fDeltaQty: fQty !== undefined ? fQty - x.fCurrentQty : 0,
             fRowComments,
             fEntryID: entryId++,
           };
@@ -181,17 +181,17 @@ class Create extends PureComponent {
   }
 
   showResult(queryResult, successCallback) {
-    const { status, message, model } = queryResult;
+    const { status, model } = queryResult;
 
     if (status === 'ok') {
       if (successCallback) successCallback(model);
       else {
-        message.success(message);
+        message.success(queryResult.message);
       }
     } else if (status === 'warning') {
-      message.warning(message);
+      message.warning(queryResult.message);
     } else {
-      message.error(message);
+      message.error(queryResult.message);
     }
   }
 
@@ -369,7 +369,13 @@ class Create extends PureComponent {
           </Form>
         </Card>
         <Card title="明细信息" style={{ marginBottom: 24 }} bordered={false}>
-          <Table rowKey="fEntryID" loading={loading} columns={columns} dataSource={details} />
+          <Table
+            rowKey="fEntryID"
+            bordered
+            pagination={false}
+            loading={loading}
+            columns={columns}
+            dataSource={details} />
         </Card>
         <Card title="备注信息" bordered={false}>
           <Form layout="vertical">

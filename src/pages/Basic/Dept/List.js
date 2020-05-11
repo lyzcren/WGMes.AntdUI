@@ -75,6 +75,7 @@ class TableList extends PureComponent {
     expandForm: false,
     selectedRows: [],
     queryFilters: [],
+    renderAddForm: false,
   };
 
   columnConfigKey = 'dept';
@@ -279,6 +280,7 @@ class TableList extends PureComponent {
   handleModalVisible = flag => {
     const { modalVisible } = this.state;
     this.setState({
+      renderAddForm: true,
       modalVisible: { ...modalVisible, add: !!flag },
     });
   };
@@ -819,12 +821,9 @@ class TableList extends PureComponent {
       currentFormValues,
       authorityModalVisible,
       authorizeUserModalVisible,
+      renderAddForm,
     } = this.state;
 
-    const parentMethods = {
-      handleSubmit: this.handleAdd,
-      handleModalVisible: this.handleModalVisible,
-    };
     const updateMethods = {
       handleModalVisible: this.handleUpdateModalVisible,
       handleSubmit: this.handleUpdate,
@@ -862,22 +861,26 @@ class TableList extends PureComponent {
                   }}
                 />
               ) : (
-                <StandardTable
-                  rowKey="fItemID"
-                  bordered
-                  selectedRows={[]}
-                  columns={columns}
-                  loading={loading || deptUnitConverterLoading}
-                />
-              )}
+                  <StandardTable
+                    rowKey="fItemID"
+                    bordered
+                    selectedRows={[]}
+                    columns={columns}
+                    loading={loading || deptUnitConverterLoading}
+                  />
+                )}
             </div>
           </Card>
-          <CreateForm
-            {...parentMethods}
-            modalVisible={modalVisible.add}
-            treeData={treeData}
-            typeData={typeData}
-          />
+          {renderAddForm &&
+            <CreateForm
+              handleSubmit={this.handleAdd}
+              handleModalVisible={this.handleModalVisible}
+              afterClose={() => { this.setState({ renderAddForm: false }) }}
+              modalVisible={modalVisible.add}
+              treeData={treeData}
+              typeData={typeData}
+            />
+          }
           {currentFormValues && Object.keys(currentFormValues).length ? (
             <UpdateForm
               {...updateMethods}
