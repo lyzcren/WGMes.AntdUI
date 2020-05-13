@@ -185,7 +185,7 @@ class WgStandardTable extends PureComponent {
     if (columnsConfig) {
       newColumns.forEach((column, index) => {
         const config = columnsConfig.find(x => x.dataIndex === column.dataIndex);
-        if (config) {
+        if (config && !column.autoFixed && !column.fixed) {
           column.entryID = config.entryID;
           column.isHidden = config.isHidden;
           column.width = config.width ? config.width : column.width;

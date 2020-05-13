@@ -314,9 +314,6 @@ class TableList extends PureComponent {
       message.warning('同步中，请稍后再试.');
     }
     dispatch({
-      type: 'missionSync/syncing',
-    });
-    dispatch({
       type: 'missionSync/sync',
       payload: {
         fBeginDate: fieldsValue.fBeginDate ? fieldsValue.fBeginDate.format('YYYY-MM-DD') : null,
@@ -325,6 +322,10 @@ class TableList extends PureComponent {
     }).then(result => {
       if (result.status === 'err') {
         message.error(result.message);
+      } else if (result.status === 'warning') {
+        message.warning(result.message);
+      } else {
+        message.success(result.message);
       }
     });
 
@@ -721,7 +722,6 @@ class TableList extends PureComponent {
       {
         dataIndex: 'operators',
         autoFixed: 'right',
-        width: 250,
         render: (text, record) => this.renderRowOperation(record),
       },
     ];

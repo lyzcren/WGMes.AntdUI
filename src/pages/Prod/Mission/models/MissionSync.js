@@ -19,15 +19,9 @@ export default {
       const response = yield call(fakeSync, payload);
       yield put({
         type: 'save',
-        payload: { queryResult: response, isSyncing: true },
+        payload: { queryResult: response, isSyncing: true, totalCount: 0, currentCount: 0 },
       });
       return response;
-    },
-    *syncing({ payload }, { call, put }) {
-      yield put({
-        type: 'save',
-        payload: { isSyncing: true, totalCount: 0, currentCount: 0 },
-      });
     },
     *isSyncing({ payload }, { call, put }) {
       const response = yield call(fakeCheckSyncing, payload);

@@ -43,53 +43,47 @@ export default {
         payload: response,
       });
     },
-    *add({ payload, callback }, { call, put }) {
+    *add({ payload }, { call, put }) {
       const response = yield call(fakeAdd, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
-      if (callback) callback();
     },
-    *sync({ payload, callback }, { call, put }) {
+    *sync({ payload }, { call, put }) {
       const response = yield call(fakeSync, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
-      if (callback) callback();
     },
-    *isSyncing({ payload, callback }, { call, put }) {
+    *isSyncing({ payload }, { call, put }) {
       const response = yield call(fakeIsSyncing, payload);
       yield put({
         type: 'saveSyncing',
         payload: response,
       });
-      if (callback) callback();
     },
-    *remove({ payload, callback }, { call, put }) {
+    *remove({ payload }, { call, put }) {
       const response = yield call(fakeRemove, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
-      if (callback) callback();
     },
-    *updateRoute({ payload, callback }, { call, put }) {
+    *updateRoute({ payload }, { call, put }) {
       const response = yield call(fakeUpdateRoute, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
-      if (callback) callback();
     },
-    *active({ payload, callback }, { call, put }) {
+    *active({ payload }, { call, put }) {
       const response = yield call(fakeActive, payload);
       yield put({
         type: 'saveData',
         payload: response,
       });
-      if (callback) callback();
     },
   },
 

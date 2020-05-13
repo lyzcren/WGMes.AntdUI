@@ -24,6 +24,7 @@ import {
   Progress,
   notification,
   Popconfirm,
+  Tag,
 } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 
@@ -65,7 +66,7 @@ class TableList extends PureComponent {
     expandForm: false,
     selectedRows: [],
     queryFilters: [],
-    isSyncing: false,
+    checkSyncSecond: 1,
   };
 
   columnConfigKey = 'productList';
@@ -82,7 +83,6 @@ class TableList extends PureComponent {
       type: 'productManage/fetch',
       payload: this.currentPagination,
     });
-    this.Checkk3Syncing();
     // 列配置相关方法
     ColumnConfig.UpdateModalVisibleCallback = record => this.handleUpdateModalVisible(true, record);
     ColumnConfig.DeleteCallback = record => this.handleDelete(record);
@@ -278,29 +278,26 @@ class TableList extends PureComponent {
       cancelText: '取消',
       onOk: () => {
         const { dispatch, form } = this.props;
-        this.setState({
-          isSyncing: true,
-        });
         dispatch({
           type: 'syncProductManage/sync',
+        }).then(queryResult => {
+          if (queryResult.status === 'ok') {
+            message.success(queryResult.message);
+          } else if (queryResult.status === 'warning') {
+            message.warning(queryResult.message);
+          } else {
+            message.error(queryResult.message);
+          }
         });
-        // .then(() => {
-        //   const { syncProductManage: { queryResult } } = this.props;
-        //   if (queryResult.status === 'ok') {
-        //     message.success('同步任务后台运行中');
-        //   } else {
-        //     message.warning(queryResult.message);
-        //   }
-        // });
         setTimeout(() => {
           // 检查同步状态
-          this.Checkk3Syncing();
-        }, 3000);
+          this.CheckSyncing();
+        }, this.state.checkSyncSecond);
       },
     });
   };
 
-  Checkk3Syncing = () => {
+  CheckSyncing = () => {
     const { dispatch, form } = this.props;
     dispatch({
       type: 'syncProductManage/isSyncing',
@@ -310,12 +307,11 @@ class TableList extends PureComponent {
       } = this.props;
       if (isSyncing) {
         setTimeout(() => {
-          this.Checkk3Syncing();
-        }, 3000);
-      } else if (this.state.isSyncing) message.success('从 ERP 同步物料已完成');
-      this.setState({
-        isSyncing,
-      });
+          this.CheckSyncing();
+        }, this.state.checkSyncSecond);
+      } else {
+        message.success('从 ERP 同步物料已完成');
+      }
     });
   };
 
@@ -392,23 +388,22 @@ class TableList extends PureComponent {
       payload: {
         fItemID: record.fItemID,
       },
-      callback: () => {
-        this.setState({
-          selectedRows: [],
-        });
-        const {
-          productManage: { queryResult },
-        } = this.props;
-        if (queryResult.status === 'ok') {
-          message.success(`【${record.fName}】` + `删除成功`);
-          // 成功后再次刷新列表
-          this.search();
-        } else if (queryResult.status === 'warning') {
-          message.warning(queryResult.message);
-        } else {
-          message.error(queryResult.message);
-        }
-      },
+    }).then(() => {
+      this.setState({
+        selectedRows: [],
+      });
+      const {
+        productManage: { queryResult },
+      } = this.props;
+      if (queryResult.status === 'ok') {
+        message.success(`【${record.fName}】` + `删除成功`);
+        // 成功后再次刷新列表
+        this.search();
+      } else if (queryResult.status === 'warning') {
+        message.warning(queryResult.message);
+      } else {
+        message.error(queryResult.message);
+      }
     });
   };
 
@@ -591,8 +586,10 @@ class TableList extends PureComponent {
       updateFormValues,
       authorityModalVisible,
       authorizeUserModalVisible,
-      isSyncing,
     } = this.state;
+    const {
+      syncProductManage: { isSyncing, totalCount, currentCount },
+    } = this.props;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove" disabled={!hasAuthority('Product_Delete')}>
@@ -625,24 +622,16 @@ class TableList extends PureComponent {
               <div className={styles.tableListForm}>{this.renderForm()}</div>
               <div className={styles.tableListOperator}>
                 <Authorized authority="Product_Create">
-                  <Dropdown
-                    overlay={
-                      <Menu>
-                        <Menu.Item key="k3" onClick={() => this.handleSync()}>
-                          金蝶 K3
-                        </Menu.Item>
-                        <Menu.Item key="k3Cloud">金蝶 K3 Cloud</Menu.Item>
-                        <Menu.Item key="digiwin">鼎捷 ERP</Menu.Item>
-                        <Menu.Item key="other">其他 ERP</Menu.Item>
-                      </Menu>
-                    }
+                  <Button
+                    icon="plus"
+                    type="primary"
+                    loading={isSyncing}
+                    onClick={() => this.handleSync()}
                   >
-                    <Button icon="plus" type="primary" loading={isSyncing}>
-                      从 ERP 同步
-                      <Icon type="down" />
-                    </Button>
-                  </Dropdown>
+                    从 ERP 同步
+                  </Button>
                 </Authorized>
+                {isSyncing && <Tag color="blue">{`${currentCount} / ${totalCount}`}</Tag>}
                 <Authorized authority="Product_Export">
                   <Dropdown
                     overlay={

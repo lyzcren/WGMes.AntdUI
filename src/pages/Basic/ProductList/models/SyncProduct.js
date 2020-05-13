@@ -13,6 +13,8 @@ export default {
       message: '',
     },
     isSyncing: false,
+    totalCount: 0,
+    currentCount: 0,
   },
 
   effects: {
@@ -31,25 +33,35 @@ export default {
       });
       if (callback) callback();
     },
-    *sync({ payload, callback }, { call, put }) {
+    *sync({ payload }, { call, put }) {
       const response = yield call(fakeSync, payload);
       yield put({
-        type: 'saveData',
-        payload: response,
+        type: 'save',
+        payload: { queryResult: response, isSyncing: true, totalCount: 0, currentCount: 0 },
       });
-      if (callback) callback();
+
+      return response;
     },
-    *isSyncing({ payload, callback }, { call, put }) {
+    *isSyncing({ payload }, { call, put }) {
       const response = yield call(fakeIsSyncing, payload);
       yield put({
-        type: 'saveSyncing',
-        payload: response,
+        type: 'save',
+        payload: {
+          isSyncing: response.isSyncing,
+          totalCount: response.totalCount,
+          currentCount: response.currentCount,
+        },
       });
-      if (callback) callback();
     },
   },
 
   reducers: {
+    save(state, action) {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
     saveQueryData(state, action) {
       return {
         ...state,
