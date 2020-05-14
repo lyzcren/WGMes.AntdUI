@@ -327,12 +327,8 @@ class TableList extends PureComponent {
       } else {
         message.success(result.message);
       }
-    });
-
-    setTimeout(() => {
-      // 检查同步状态
       this.Checkk3Syncing();
-    }, this.state.checkSyncSecond);
+    });
   };
 
   Checkk3Syncing = () => {

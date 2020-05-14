@@ -59,7 +59,7 @@ class DefectDrawer extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'flowTransfer/changeDefect',
-      payload: { fDefectID, fQty },
+      payload: { fDefectID, fQty: fQty ?? 0 },
     });
   }
 

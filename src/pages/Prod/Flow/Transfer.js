@@ -166,7 +166,7 @@ class Transfer extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'flowTransfer/changeDefect',
-      payload: { fDefectID, fQty },
+      payload: { fDefectID, fQty: fQty ?? 0 },
     });
   }
 
@@ -246,7 +246,7 @@ class Transfer extends PureComponent {
                 （
                 {`${numeral(data.fConvertInputQty).format(data.fConvertQtyFormat)} ${
                   data.fConvertUnitName
-                }`}
+                  }`}
                 ）
               </a>
             ) : null}
@@ -258,7 +258,7 @@ class Transfer extends PureComponent {
                 （
                 {`${numeral(data.fConvertPassQty).format(data.fConvertQtyFormat)} ${
                   data.fConvertUnitName
-                }`}
+                  }`}
                 ）
               </a>
             ) : null}
@@ -349,14 +349,14 @@ class Transfer extends PureComponent {
     const defaultMachineID = data.fMachineID
       ? data.fMachineID
       : machineData && machineData.find(x => x.fItemID === this.state.fMachineID)
-      ? this.state.fMachineID
-      : null;
+        ? this.state.fMachineID
+        : null;
     // 默认班次
     const defaultWorkTimeID = data.fWorkTimeID
       ? data.fWorkTimeID
       : workTimes && workTimes.find(x => x.fWorkTimeID === this.state.fWorkTimeID)
-      ? this.state.fWorkTimeID
-      : null;
+        ? this.state.fWorkTimeID
+        : null;
     const currentTime = new Date();
     // 根据当前时间推算班次信息
     const currentWorkTime =

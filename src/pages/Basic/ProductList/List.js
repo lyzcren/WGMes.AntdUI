@@ -288,11 +288,9 @@ class TableList extends PureComponent {
           } else {
             message.error(queryResult.message);
           }
-        });
-        setTimeout(() => {
           // 检查同步状态
           this.CheckSyncing();
-        }, this.state.checkSyncSecond);
+        });
       },
     });
   };
