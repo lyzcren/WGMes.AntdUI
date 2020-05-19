@@ -122,9 +122,6 @@ class TableList extends PureComponent {
       type: 'global/fetchProdBusinessConfig',
     });
     this.search();
-
-    // 检查同步状态
-    this.Checkk3Syncing();
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {

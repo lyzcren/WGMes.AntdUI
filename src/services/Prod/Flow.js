@@ -95,6 +95,16 @@ export async function fakeRefund(params) {
   });
 }
 
+export async function fakeComment(params) {
+  return request(`/api/flow/${params.fInterID}/comment`, {
+    method: 'PUT',
+    body: {
+      ...params,
+      method: 'comment',
+    },
+  });
+}
+
 export async function fakeReject(params) {
   return request(`/api/reject`, {
     method: 'POST',

@@ -35,6 +35,7 @@ import { ViewStepForm } from './ViewStepForm';
 import { ViewRecordForm } from './ViewRecordForm';
 import { ScanForm } from './ScanForm';
 import { ScanSignForm } from './ScanSign';
+import { CommentForm } from './CommentForm';
 import { ScanTransferForm } from './ScanTransfer';
 import { TakeForm } from './TakeForm';
 import { ViewTakeForm } from './ViewTakeForm';
@@ -97,6 +98,7 @@ class TableList extends PureComponent {
         scanTransfer: false,
         selectSignDept: false,
         selectTransferDept: false,
+        comment: false,
       },
       formValues: {},
       // 当前操作选中列的数据
@@ -107,6 +109,7 @@ class TableList extends PureComponent {
       queryFilters: [],
       queryDeptID: null,
       renderScanSign: false,
+      renderCommentForm: false,
       renderScanTransfer: false,
     };
     // 列表查询参数
@@ -478,6 +481,10 @@ class TableList extends PureComponent {
       case 'changeRoute':
         this.handleModalVisible({ key: 'changeRoute', flag: true }, record);
         break;
+      case 'comment':
+        this.setState({ renderCommentForm: true });
+        this.handleModalVisible({ key: 'comment', flag: true }, record);
+        break;
       default:
         break;
     }
@@ -798,6 +805,9 @@ class TableList extends PureComponent {
       menus.push(<Menu.Item key="split">分批</Menu.Item>);
     // 作废
     if (!record.fCancellation) menus.push(<Menu.Item key="cancel">作废</Menu.Item>);
+
+    menus.push(<Menu.Item key="comment">备注</Menu.Item>);
+    console.log(menus);
 
     const operators = [];
     if (
@@ -1449,6 +1459,15 @@ class TableList extends PureComponent {
               this.showScanTransfer(dept);
             }}
             afterClose={() => {}}
+          />
+          <CommentForm
+            dispatch
+            data={currentFormValues.comment}
+            handleModalVisible={flag => this.handleModalVisible({ key: 'comment', flag })}
+            modalVisible={modalVisible.comment}
+            afterClose={() => {
+              this.setState({ renderCommentForm: false });
+            }}
           />
         </GridContent>
       </div>

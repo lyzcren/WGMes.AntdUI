@@ -131,7 +131,6 @@ class Analysis extends Component {
     const { workshop, processes, rangePickerValue } = this.state;
     const { chart, loading } = this.props;
     const { workshops, produceData, passRateData, topProduces, topMachineProduces } = chart;
-    console.log(topMachineProduces);
 
     return (
       <div style={{ margin: '-24px 0 0 -24px' }}>
