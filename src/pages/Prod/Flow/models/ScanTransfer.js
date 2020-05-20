@@ -69,23 +69,33 @@ export default {
       });
     },
     *transfer({ payload }, { call, put, select }) {
-      const { fInterID } = payload;
-      const response = yield call(fakeTransfer, payload);
+      const {
+        fInterIDs,
+        fOperatorID,
+        fDebuggerID,
+        fMachineID
+      } = payload;
       const records = yield select(state => state.scanTransfer.records);
-      const record = records.find(x => x.fCurrentRecordID === fInterID);
-      if (record) {
-        record.result = response;
+      for (const fInterID of fInterIDs) {
+        const response = yield call(fakeTransfer, {
+          fInterID,
+          fOperatorID,
+          fDebuggerID,
+          fMachineID
+        });
+        const record = records.find(x => x.fCurrentRecordID === fInterID);
+        if (record) {
+          record.result = response;
+        }
       }
 
       yield put({
         type: 'save',
         payload: { records },
       });
-      if (response.status === 'ok') {
-        yield put({
-          type: 'flowManage/fetch',
-        });
-      }
+      yield put({
+        type: 'flowManage/fetch',
+      });
     },
   },
 

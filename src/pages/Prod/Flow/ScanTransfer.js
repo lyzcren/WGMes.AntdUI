@@ -108,16 +108,14 @@ export class ScanTransferForm extends PureComponent {
 
       const { fOperatorID, fDebuggerID, fMachineID } = fieldsValue;
 
-      records.forEach(record => {
-        dispatch({
-          type: 'scanTransfer/transfer',
-          payload: {
-            fInterID: record.fCurrentRecordID,
-            fOperatorID,
-            fDebuggerID,
-            fMachineID,
-          },
-        });
+      dispatch({
+        type: 'scanTransfer/transfer',
+        payload: {
+          fInterIDs: records.map(x => x.fCurrentRecordID),
+          fOperatorID,
+          fDebuggerID,
+          fMachineID,
+        },
       });
     });
   };
@@ -155,7 +153,7 @@ export class ScanTransferForm extends PureComponent {
           }
           else if (record.result && record.result.status === 'warning') {
             return <Badge status="warning" text={record.result.message} />;
-          } else if(record.result && record.result.status === 'err') {
+          } else if (record.result && record.result.status === 'err') {
             return <Badge status="error" text={record.result.message} />;
           }
         },
