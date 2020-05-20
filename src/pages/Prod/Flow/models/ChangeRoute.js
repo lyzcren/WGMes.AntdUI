@@ -39,7 +39,7 @@ export default {
           type: 'flowManage/fetch',
         });
       }
-      
+
       return response;
     },
   },

@@ -85,7 +85,7 @@ export class ChangeRouteForm extends PureComponent {
           fRecordID: values.fCurrentRecordID,
           ...fieldsValue,
         },
-      }).then((queryResult) => {
+      }).then(queryResult => {
         if (queryResult.status === 'ok') {
           message.success('变更工艺路线成功.');
           if (handleSucess) handleSucess();

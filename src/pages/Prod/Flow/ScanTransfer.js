@@ -36,7 +36,7 @@ const { Option } = Select;
 @Form.create()
 export class ScanTransferForm extends PureComponent {
   static defaultProps = {
-    handleModalVisible: () => { },
+    handleModalVisible: () => {},
   };
 
   constructor(props) {
@@ -150,8 +150,7 @@ export class ScanTransferForm extends PureComponent {
         render: (val, record) => {
           if (record.result && record.result.status === 'ok') {
             return <Badge status="success" text={'转序成功'} />;
-          }
-          else if (record.result && record.result.status === 'warning') {
+          } else if (record.result && record.result.status === 'warning') {
             return <Badge status="warning" text={record.result.message} />;
           } else if (record.result && record.result.status === 'err') {
             return <Badge status="error" text={record.result.message} />;

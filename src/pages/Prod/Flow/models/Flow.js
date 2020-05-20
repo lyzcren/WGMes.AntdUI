@@ -29,19 +29,17 @@ export default {
 
   effects: {
     *fetch({ payload }, { call, put, select }) {
-      let currentPagination = yield select(state =>
-        state.flowManage.currentPagination);
+      let currentPagination = yield select(state => state.flowManage.currentPagination);
       currentPagination = { ...currentPagination, ...payload };
 
       const response = yield call(fakeQuery, currentPagination);
-      const list = response.list.map(x =>
-        ({ ...x, key: `${x.fInterID}${x.fRecordID || 0}` }));
+      const list = response.list.map(x => ({ ...x, key: `${x.fInterID}${x.fRecordID || 0}` }));
 
       yield put({
         type: 'save',
         payload: {
           currentPagination,
-          data: { ...response, list }
+          data: { ...response, list },
         },
       });
     },
@@ -53,7 +51,7 @@ export default {
         });
       }
 
-      return signResult
+      return signResult;
     },
     *cancelTransfer({ payload }, { call, put }) {
       const response = yield call(fakeCancelTransfer, payload);

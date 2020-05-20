@@ -387,17 +387,17 @@ class TableList extends PureComponent {
       const badgeStatus = !recordStatus
         ? []
         : recordStatus.map(x => ({
-          text: <Badge color={x.fColor} text={x.fValue} />,
-          value: x.fKeyName,
-        }));
+            text: <Badge color={x.fColor} text={x.fValue} />,
+            value: x.fKeyName,
+          }));
       return badgeStatus;
     }
     const badgeStatus = !flowStatus
       ? []
       : flowStatus.map(x => ({
-        text: <Badge color={x.fColor} text={x.fValue} />,
-        value: x.fKeyName,
-      }));
+          text: <Badge color={x.fColor} text={x.fValue} />,
+          value: x.fKeyName,
+        }));
     return badgeStatus;
   };
 
@@ -511,7 +511,7 @@ class TableList extends PureComponent {
       payload: {
         path: '/prod/flow/transfer',
         location: { data: record, tabMode: true },
-        successCallback: () => { },
+        successCallback: () => {},
       },
     });
   };
@@ -573,8 +573,8 @@ class TableList extends PureComponent {
         const filterDepts = currentUser.fIsAdmin
           ? nextDepts
           : nextDepts.filter(x =>
-            currentUser.authorizedDeptList.find(y => x.fDeptID === y.fItemID)
-          );
+              currentUser.authorizedDeptList.find(y => x.fDeptID === y.fItemID)
+            );
         if (!nextDepts || nextDepts.length <= 0) {
           message.warning('无可签收岗位.');
         } else if (!filterDepts || filterDepts.length <= 0) {
@@ -619,7 +619,7 @@ class TableList extends PureComponent {
       payload: {
         id: fCurrentRecordID,
       },
-    }).then((queryResult) => {
+    }).then(queryResult => {
       if (queryResult.status === 'ok') {
         message.success(`【${record.fFullBatchNo}】已成功取消转序.`);
       } else if (queryResult.status === 'warning') {
@@ -638,7 +638,7 @@ class TableList extends PureComponent {
       payload: {
         id: fInterID,
       },
-    }).then((queryResult) => {
+    }).then(queryResult => {
       if (queryResult.status === 'ok') {
         message.success(`【${record.fFullBatchNo}】已作废.`);
       } else if (queryResult.status === 'warning') {
@@ -657,7 +657,7 @@ class TableList extends PureComponent {
       payload: {
         fRecordID: fCurrentRecordID,
       },
-    }).then((queryResult) => {
+    }).then(queryResult => {
       if (queryResult.status === 'ok') {
         message.success(`【${record.fFullBatchNo}】` + `签收成功`);
         this.handleModalVisible({ key: 'sign', flag: false });
@@ -674,7 +674,7 @@ class TableList extends PureComponent {
     dispatch({
       type: 'flowManage/take',
       payload: fields,
-    }).then((queryResult) => {
+    }).then(queryResult => {
       if (queryResult.status === 'ok') {
         message.success(`【${record.fFullBatchNo}】` + `取走成功`);
         this.handleModalVisible({ key: 'take', flag: false });
@@ -706,7 +706,7 @@ class TableList extends PureComponent {
       payload: {
         fInterIdList: records.map(row => row.fInterID),
       },
-    }).then((queryResult) => {
+    }).then(queryResult => {
       if (queryResult.status === 'ok') {
         message.success(queryResult.message);
       } else if (queryResult.status === 'warning') {
@@ -895,24 +895,24 @@ class TableList extends PureComponent {
                 )}
               </FormItem>
             ) : (
-                <FormItem label="状态">
-                  {getFieldDecorator('queryStatus')(
-                    <Select
-                      placeholder="请选择"
-                      style={{ width: '100%' }}
-                      allowClear
-                      onChange={this.selectChange}
-                    >
-                      {flowStatus &&
-                        flowStatus.map(x => (
-                          <Option key={x.fKey} value={x.fKey}>
-                            <Badge color={x.fColor} text={x.fValue} />
-                          </Option>
-                        ))}
-                    </Select>
-                  )}
-                </FormItem>
-              )}
+              <FormItem label="状态">
+                {getFieldDecorator('queryStatus')(
+                  <Select
+                    placeholder="请选择"
+                    style={{ width: '100%' }}
+                    allowClear
+                    onChange={this.selectChange}
+                  >
+                    {flowStatus &&
+                      flowStatus.map(x => (
+                        <Option key={x.fKey} value={x.fKey}>
+                          <Badge color={x.fColor} text={x.fValue} />
+                        </Option>
+                      ))}
+                  </Select>
+                )}
+              </FormItem>
+            )}
           </Col>
           <Col md={6} sm={24}>
             <FormItem label="批号">
@@ -988,24 +988,24 @@ class TableList extends PureComponent {
                 )}
               </FormItem>
             ) : (
-                <FormItem label="状态">
-                  {getFieldDecorator('queryStatus')(
-                    <Select
-                      placeholder="请选择"
-                      style={{ width: '100%' }}
-                      allowClear
-                      onChange={this.selectChange}
-                    >
-                      {flowStatus &&
-                        flowStatus.map(x => (
-                          <Option key={x.fKey} value={x.fKey}>
-                            <Badge color={x.fColor} text={x.fValue} />
-                          </Option>
-                        ))}
-                    </Select>
-                  )}
-                </FormItem>
-              )}
+              <FormItem label="状态">
+                {getFieldDecorator('queryStatus')(
+                  <Select
+                    placeholder="请选择"
+                    style={{ width: '100%' }}
+                    allowClear
+                    onChange={this.selectChange}
+                  >
+                    {flowStatus &&
+                      flowStatus.map(x => (
+                        <Option key={x.fKey} value={x.fKey}>
+                          <Badge color={x.fColor} text={x.fValue} />
+                        </Option>
+                      ))}
+                  </Select>
+                )}
+              </FormItem>
+            )}
           </Col>
           <Col md={8} sm={24}>
             <FormItem label="批号">
@@ -1398,7 +1398,7 @@ class TableList extends PureComponent {
               this.handleModalVisible({ key: 'selectSignDept', flag: false });
               this.showScanSign(dept);
             }}
-            afterClose={() => { }}
+            afterClose={() => {}}
           />
           <DeptSelector
             handleModalVisible={flag =>
@@ -1409,7 +1409,7 @@ class TableList extends PureComponent {
               this.handleModalVisible({ key: 'selectTransferDept', flag: false });
               this.showScanTransfer(dept);
             }}
-            afterClose={() => { }}
+            afterClose={() => {}}
           />
           <CommentForm
             dispatch

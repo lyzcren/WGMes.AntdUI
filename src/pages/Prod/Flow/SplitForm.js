@@ -86,7 +86,7 @@ export class SplitForm extends PureComponent {
           ...fieldsValue,
           details,
         },
-      }).then((queryResult) => {
+      }).then(queryResult => {
         if (queryResult.status === 'ok') {
           message.success('分批成功.');
           if (handleSucess) handleSucess();

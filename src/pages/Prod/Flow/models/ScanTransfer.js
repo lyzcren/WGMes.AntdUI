@@ -69,19 +69,14 @@ export default {
       });
     },
     *transfer({ payload }, { call, put, select }) {
-      const {
-        fInterIDs,
-        fOperatorID,
-        fDebuggerID,
-        fMachineID
-      } = payload;
+      const { fInterIDs, fOperatorID, fDebuggerID, fMachineID } = payload;
       const records = yield select(state => state.scanTransfer.records);
       for (const fInterID of fInterIDs) {
         const response = yield call(fakeTransfer, {
           fInterID,
           fOperatorID,
           fDebuggerID,
-          fMachineID
+          fMachineID,
         });
         const record = records.find(x => x.fCurrentRecordID === fInterID);
         if (record) {

@@ -127,7 +127,7 @@ export class RefundForm extends PureComponent {
           fReproduceRecordIds,
           ...fieldsValue,
         },
-      }).then((queryResult) => {
+      }).then(queryResult => {
         if (queryResult.status === 'ok') {
           message.success('退回成功.');
           if (handleSucess) handleSucess();
