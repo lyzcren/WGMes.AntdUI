@@ -5,20 +5,18 @@ export default {
 
   state: {
     rejectDepts: [],
-
-    queryResult: {
-      status: 'ok',
-      message: '',
-    },
   },
 
   effects: {
     *reject({ payload }, { call, put }) {
       const response = yield call(fakeReject, payload);
-      yield put({
-        type: 'save',
-        payload: { queryResult: response },
-      });
+      if (response.status === 'ok') {
+        yield put({
+          type: 'flowManage/fetch',
+        });
+      }
+
+      return response;
     },
     *getRejctDepts({ payload }, { call, put }) {
       const response = yield call(fakeGetDepts, payload);

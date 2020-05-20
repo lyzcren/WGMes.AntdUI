@@ -5,11 +5,6 @@ export default {
 
   state: {
     records: [],
-
-    queryResult: {
-      status: 'ok',
-      message: '',
-    },
   },
 
   effects: {
@@ -23,10 +18,13 @@ export default {
     },
     *refund({ payload }, { call, put }) {
       const response = yield call(fakeRefund, payload);
-      yield put({
-        type: 'save',
-        payload: { queryResult: response },
-      });
+      if (response.status === 'ok') {
+        yield put({
+          type: 'flowManage/fetch',
+        });
+      }
+
+      return response;
     },
   },
 

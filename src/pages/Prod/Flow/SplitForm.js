@@ -86,11 +86,7 @@ export class SplitForm extends PureComponent {
           ...fieldsValue,
           details,
         },
-      }).then(() => {
-        const {
-          flowSplit: { queryResult },
-        } = this.props;
-
+      }).then((queryResult) => {
         if (queryResult.status === 'ok') {
           message.success('分批成功.');
           if (handleSucess) handleSucess();

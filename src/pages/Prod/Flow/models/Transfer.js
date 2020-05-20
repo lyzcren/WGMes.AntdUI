@@ -21,11 +21,6 @@ export default {
     workTimes: [],
     unitConverters: [],
     matchConverter: {},
-
-    queryResult: {
-      status: 'ok',
-      message: '',
-    },
   },
 
   effects: {
@@ -173,10 +168,11 @@ export default {
     },
     *transfer({ payload }, { call, put }) {
       const response = yield call(fakeTransfer, payload);
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
+      if (response.status === 'ok') {
+        yield put({
+          type: 'flowManage/fetch',
+        });
+      }
 
       return response;
     },
@@ -187,13 +183,6 @@ export default {
       return {
         ...state,
         ...action.payload,
-      };
-    },
-    saveData(state, action) {
-      return {
-        ...state,
-        queryResult: action.payload ? action.payload : {},
-        // data: (action.payload && action.payload.model) ? action.payload.model : state.data
       };
     },
     changeDefectReducer(state, action) {

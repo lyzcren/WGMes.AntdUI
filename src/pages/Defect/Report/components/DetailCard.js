@@ -48,7 +48,7 @@ class DetailCard extends PureComponent {
         dataIndex: 'fCurrentQty',
       },
       {
-        title: '返修数量',
+        title: '报废数量',
         dataIndex: 'fQty',
         render: (val, record) => (
           <FormItem style={{ marginBottom: 0 }}>

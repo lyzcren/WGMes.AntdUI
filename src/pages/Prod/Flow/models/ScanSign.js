@@ -81,6 +81,11 @@ export default {
         type: 'save',
         payload: { records },
       });
+      if (response.status === 'ok') {
+        yield put({
+          type: 'flowManage/fetch',
+        });
+      }
     },
   },
 

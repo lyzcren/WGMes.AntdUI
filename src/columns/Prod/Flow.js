@@ -270,6 +270,13 @@ export const columns = [
     width: 140,
   },
   {
+    title: '备注',
+    dataIndex: 'fComments',
+    sorter: true,
+    isHidden: true,
+    width: 140,
+  },
+  {
     title: '操作',
     dataIndex: 'operators',
     // fixed: 'right',

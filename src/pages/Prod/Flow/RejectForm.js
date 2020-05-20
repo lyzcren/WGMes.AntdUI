@@ -68,11 +68,7 @@ export class RejectForm extends PureComponent {
           fFlowID: fInterID,
           ...fieldsValue,
         },
-      }).then(() => {
-        const {
-          flowReject: { queryResult },
-        } = this.props;
-
+      }).then((queryResult) => {
         if (queryResult.status === 'ok') {
           message.success('拒收成功.');
           if (handleSucess) handleSucess();

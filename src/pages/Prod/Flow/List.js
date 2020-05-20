@@ -112,11 +112,6 @@ class TableList extends PureComponent {
       renderCommentForm: false,
       renderScanTransfer: false,
     };
-    // 列表查询参数
-    this.currentPagination = {
-      current: 1,
-      pageSize: 10,
-    };
     this.columnConfigKey = 'flow';
   }
 
@@ -162,11 +157,10 @@ class TableList extends PureComponent {
       queryFilters.push({ name: 'fFullBatchNo', compare: '%*%', value: fBatchNo });
       this.setState({ queryBatchNo: this.props.fBatchNo });
     }
-    this.currentPagination = { ...this.currentPagination, queryFilters };
 
     dispatch({
       type: 'flowManage/fetch',
-      payload: this.currentPagination,
+      payload: { queryFilters },
     });
   };
 
@@ -181,7 +175,7 @@ class TableList extends PureComponent {
     }, {});
 
     const { current, pageSize } = pagination;
-    this.currentPagination = {
+    const currentPagination = {
       current,
       pageSize,
       filters,
@@ -189,13 +183,13 @@ class TableList extends PureComponent {
       queryFilters,
     };
     if (sorter.field) {
-      this.currentPagination.sorter = {};
-      this.currentPagination.sorter[sorter.field] = sorter.order.replace('end', '');
+      currentPagination.sorter = {};
+      currentPagination.sorter[sorter.field] = sorter.order.replace('end', '');
     }
 
     dispatch({
       type: 'flowManage/fetch',
-      payload: this.currentPagination,
+      payload: currentPagination,
     });
   };
 
@@ -292,14 +286,12 @@ class TableList extends PureComponent {
       queryFilters,
     });
 
-    const { pageSize, filters, sorter } = this.currentPagination;
-    this.currentPagination = {
-      ...this.currentPagination,
+    const currentPagination = {
       current: 1,
       queryFilters,
     };
 
-    return this.currentPagination;
+    return currentPagination;
   };
 
   search = () => {
@@ -323,16 +315,14 @@ class TableList extends PureComponent {
       queryFilters: [],
     });
 
-    const { pageSize, filters, sorter } = this.currentPagination;
-    this.currentPagination = {
-      ...this.currentPagination,
+    const currentPagination = {
       current: 1,
       queryFilters: [],
     };
 
     dispatch({
       type: 'flowManage/fetch',
-      payload: this.currentPagination,
+      payload: currentPagination,
     });
     this.setState({ queryDeptID: null });
     this.handleSelectRows([]);
@@ -397,17 +387,17 @@ class TableList extends PureComponent {
       const badgeStatus = !recordStatus
         ? []
         : recordStatus.map(x => ({
-            text: <Badge color={x.fColor} text={x.fValue} />,
-            value: x.fKeyName,
-          }));
+          text: <Badge color={x.fColor} text={x.fValue} />,
+          value: x.fKeyName,
+        }));
       return badgeStatus;
     }
     const badgeStatus = !flowStatus
       ? []
       : flowStatus.map(x => ({
-          text: <Badge color={x.fColor} text={x.fValue} />,
-          value: x.fKeyName,
-        }));
+        text: <Badge color={x.fColor} text={x.fValue} />,
+        value: x.fKeyName,
+      }));
     return badgeStatus;
   };
 
@@ -521,7 +511,7 @@ class TableList extends PureComponent {
       payload: {
         path: '/prod/flow/transfer',
         location: { data: record, tabMode: true },
-        successCallback: this.search,
+        successCallback: () => { },
       },
     });
   };
@@ -583,8 +573,8 @@ class TableList extends PureComponent {
         const filterDepts = currentUser.fIsAdmin
           ? nextDepts
           : nextDepts.filter(x =>
-              currentUser.authorizedDeptList.find(y => x.fDeptID === y.fItemID)
-            );
+            currentUser.authorizedDeptList.find(y => x.fDeptID === y.fItemID)
+          );
         if (!nextDepts || nextDepts.length <= 0) {
           message.warning('无可签收岗位.');
         } else if (!filterDepts || filterDepts.length <= 0) {
@@ -607,17 +597,12 @@ class TableList extends PureComponent {
         fInterID,
         fDeptID,
       },
-    }).then(() => {
-      const {
-        flowManage: { queryResult },
-      } = this.props;
+    }).then(queryResult => {
       if (queryResult.status === 'ok') {
         const msg =
           `【${record.fFullBatchNo}】` + `签收成功${fDeptName ? `，签收岗位【${fDeptName}】` : ''}`;
         message.success(msg);
         this.handleModalVisible({ key: 'sign', flag: false });
-        // 成功后再次刷新列表
-        this.search();
       } else if (queryResult.status === 'warning') {
         message.warning(`【${record.fFullBatchNo}】${queryResult.message}`);
       } else {
@@ -634,14 +619,9 @@ class TableList extends PureComponent {
       payload: {
         id: fCurrentRecordID,
       },
-    }).then(() => {
-      const {
-        flowManage: { queryResult },
-      } = this.props;
+    }).then((queryResult) => {
       if (queryResult.status === 'ok') {
         message.success(`【${record.fFullBatchNo}】已成功取消转序.`);
-        // 成功后再次刷新列表
-        this.search();
       } else if (queryResult.status === 'warning') {
         message.warning(`【${record.fFullBatchNo}】${queryResult.message}`);
       } else {
@@ -658,14 +638,9 @@ class TableList extends PureComponent {
       payload: {
         id: fInterID,
       },
-    }).then(() => {
-      const {
-        flowManage: { queryResult },
-      } = this.props;
+    }).then((queryResult) => {
       if (queryResult.status === 'ok') {
         message.success(`【${record.fFullBatchNo}】已作废.`);
-        // 成功后再次刷新列表
-        this.search();
       } else if (queryResult.status === 'warning') {
         message.warning(`【${record.fFullBatchNo}】${queryResult.message}`);
       } else {
@@ -682,15 +657,10 @@ class TableList extends PureComponent {
       payload: {
         fRecordID: fCurrentRecordID,
       },
-    }).then(() => {
-      const {
-        flowManage: { queryResult },
-      } = this.props;
+    }).then((queryResult) => {
       if (queryResult.status === 'ok') {
         message.success(`【${record.fFullBatchNo}】` + `签收成功`);
         this.handleModalVisible({ key: 'sign', flag: false });
-        // 成功后再次刷新列表
-        this.search();
       } else if (queryResult.status === 'warning') {
         message.warning(`【${record.fFullBatchNo}】${queryResult.message}`);
       } else {
@@ -704,15 +674,10 @@ class TableList extends PureComponent {
     dispatch({
       type: 'flowManage/take',
       payload: fields,
-    }).then(() => {
-      const {
-        flowManage: { queryResult },
-      } = this.props;
+    }).then((queryResult) => {
       if (queryResult.status === 'ok') {
         message.success(`【${record.fFullBatchNo}】` + `取走成功`);
         this.handleModalVisible({ key: 'take', flag: false });
-        // 成功后再次刷新列表
-        this.search();
       } else if (queryResult.status === 'warning') {
         message.warning(`【${record.fFullBatchNo}】${queryResult.message}`);
       } else {
@@ -741,14 +706,9 @@ class TableList extends PureComponent {
       payload: {
         fInterIdList: records.map(row => row.fInterID),
       },
-    }).then(() => {
-      const {
-        flowManage: { queryResult },
-      } = this.props;
+    }).then((queryResult) => {
       if (queryResult.status === 'ok') {
         message.success(queryResult.message);
-        // 成功后再次刷新列表
-        this.search();
       } else if (queryResult.status === 'warning') {
         message.warning(queryResult.message);
       } else {
@@ -807,7 +767,6 @@ class TableList extends PureComponent {
     if (!record.fCancellation) menus.push(<Menu.Item key="cancel">作废</Menu.Item>);
 
     menus.push(<Menu.Item key="comment">备注</Menu.Item>);
-    console.log(menus);
 
     const operators = [];
     if (
@@ -936,24 +895,24 @@ class TableList extends PureComponent {
                 )}
               </FormItem>
             ) : (
-              <FormItem label="状态">
-                {getFieldDecorator('queryStatus')(
-                  <Select
-                    placeholder="请选择"
-                    style={{ width: '100%' }}
-                    allowClear
-                    onChange={this.selectChange}
-                  >
-                    {flowStatus &&
-                      flowStatus.map(x => (
-                        <Option key={x.fKey} value={x.fKey}>
-                          <Badge color={x.fColor} text={x.fValue} />
-                        </Option>
-                      ))}
-                  </Select>
-                )}
-              </FormItem>
-            )}
+                <FormItem label="状态">
+                  {getFieldDecorator('queryStatus')(
+                    <Select
+                      placeholder="请选择"
+                      style={{ width: '100%' }}
+                      allowClear
+                      onChange={this.selectChange}
+                    >
+                      {flowStatus &&
+                        flowStatus.map(x => (
+                          <Option key={x.fKey} value={x.fKey}>
+                            <Badge color={x.fColor} text={x.fValue} />
+                          </Option>
+                        ))}
+                    </Select>
+                  )}
+                </FormItem>
+              )}
           </Col>
           <Col md={6} sm={24}>
             <FormItem label="批号">
@@ -1029,24 +988,24 @@ class TableList extends PureComponent {
                 )}
               </FormItem>
             ) : (
-              <FormItem label="状态">
-                {getFieldDecorator('queryStatus')(
-                  <Select
-                    placeholder="请选择"
-                    style={{ width: '100%' }}
-                    allowClear
-                    onChange={this.selectChange}
-                  >
-                    {flowStatus &&
-                      flowStatus.map(x => (
-                        <Option key={x.fKey} value={x.fKey}>
-                          <Badge color={x.fColor} text={x.fValue} />
-                        </Option>
-                      ))}
-                  </Select>
-                )}
-              </FormItem>
-            )}
+                <FormItem label="状态">
+                  {getFieldDecorator('queryStatus')(
+                    <Select
+                      placeholder="请选择"
+                      style={{ width: '100%' }}
+                      allowClear
+                      onChange={this.selectChange}
+                    >
+                      {flowStatus &&
+                        flowStatus.map(x => (
+                          <Option key={x.fKey} value={x.fKey}>
+                            <Badge color={x.fColor} text={x.fValue} />
+                          </Option>
+                        ))}
+                    </Select>
+                  )}
+                </FormItem>
+              )}
           </Col>
           <Col md={8} sm={24}>
             <FormItem label="批号">
@@ -1168,7 +1127,7 @@ class TableList extends PureComponent {
   reanderOperator() {
     const { selectedRows, queryDeptID } = this.state;
     const {
-      flowManage: { data, queryResult, printTemplates },
+      flowManage: { data, printTemplates },
     } = this.props;
     return (
       <div style={{ overflow: 'hidden' }}>
@@ -1237,7 +1196,7 @@ class TableList extends PureComponent {
   render() {
     const {
       dispatch,
-      flowManage: { data, queryResult },
+      flowManage: { data },
       loading,
       basicData: {
         status: { flowStatus, recordStatus },
@@ -1363,9 +1322,7 @@ class TableList extends PureComponent {
               }
               modalVisible={modalVisible.split}
               values={currentFormValues.split}
-              handleSucess={() => {
-                this.search();
-              }}
+              handleSucess={() => {}}
             />
           ) : null}
           {currentFormValues.refund && Object.keys(currentFormValues.refund).length ? (
@@ -1376,9 +1333,7 @@ class TableList extends PureComponent {
               }
               modalVisible={modalVisible.refund}
               values={currentFormValues.refund}
-              handleSucess={() => {
-                this.search();
-              }}
+              handleSucess={() => {}}
             />
           ) : null}
           {currentFormValues.reject && Object.keys(currentFormValues.reject).length ? (
@@ -1389,9 +1344,7 @@ class TableList extends PureComponent {
               }
               modalVisible={modalVisible.reject}
               values={currentFormValues.reject}
-              handleSucess={() => {
-                this.search();
-              }}
+              handleSucess={() => {}}
             />
           ) : null}
           {currentFormValues.changeRoute && Object.keys(currentFormValues.changeRoute).length ? (
@@ -1402,9 +1355,7 @@ class TableList extends PureComponent {
               }
               modalVisible={modalVisible.changeRoute}
               values={currentFormValues.changeRoute}
-              handleSucess={() => {
-                this.search();
-              }}
+              handleSucess={() => {}}
             />
           ) : null}
           <ScanForm
@@ -1447,7 +1398,7 @@ class TableList extends PureComponent {
               this.handleModalVisible({ key: 'selectSignDept', flag: false });
               this.showScanSign(dept);
             }}
-            afterClose={() => {}}
+            afterClose={() => { }}
           />
           <DeptSelector
             handleModalVisible={flag =>
@@ -1458,7 +1409,7 @@ class TableList extends PureComponent {
               this.handleModalVisible({ key: 'selectTransferDept', flag: false });
               this.showScanTransfer(dept);
             }}
-            afterClose={() => {}}
+            afterClose={() => { }}
           />
           <CommentForm
             dispatch

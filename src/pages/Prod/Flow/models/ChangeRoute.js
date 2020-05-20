@@ -34,10 +34,13 @@ export default {
     },
     *changeRoute({ payload }, { call, put }) {
       const response = yield call(fakeChangeRoute, payload);
-      yield put({
-        type: 'save',
-        payload: { queryResult: response },
-      });
+      if (response.status === 'ok') {
+        yield put({
+          type: 'flowManage/fetch',
+        });
+      }
+      
+      return response;
     },
   },
 

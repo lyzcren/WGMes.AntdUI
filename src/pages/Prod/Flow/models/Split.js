@@ -5,20 +5,18 @@ export default {
 
   state: {
     records: [],
-
-    queryResult: {
-      status: 'ok',
-      message: '',
-    },
   },
 
   effects: {
     *split({ payload }, { call, put }) {
       const response = yield call(fakeSplit, payload);
-      yield put({
-        type: 'save',
-        payload: { queryResult: response },
-      });
+      if (response.status === 'ok') {
+        yield put({
+          type: 'flowManage/fetch',
+        });
+      }
+
+      return response;
     },
   },
 

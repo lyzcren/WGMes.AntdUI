@@ -181,7 +181,7 @@ class WgStandardTable extends PureComponent {
     const { columns } = this.props;
     const newColumns = columns.map((col, i) => {
       return Object.assign(col);
-    });
+    }).sort((x, y) => x.autoFixed < y.autoFixed);
     if (columnsConfig) {
       newColumns.forEach((column, index) => {
         const config = columnsConfig.find(x => x.dataIndex === column.dataIndex);
@@ -260,14 +260,14 @@ class WgStandardTable extends PureComponent {
                 <Fragment>
                   已选择 <a style={{ fontWeight: 600 }}>{selectedRowKeys.length}</a> 项&nbsp;&nbsp;
                   {needTotalList.map(item => (
-                    <span style={{ marginLeft: 8 }} key={item.dataIndex}>
-                      {item.title}
+                  <span style={{ marginLeft: 8 }} key={item.dataIndex}>
+                    {item.title}
                       总计&nbsp;
-                      <span style={{ fontWeight: 600 }}>
-                        {item.render ? item.render(item.total) : item.total}
-                      </span>
+                    <span style={{ fontWeight: 600 }}>
+                      {item.render ? item.render(item.total) : item.total}
                     </span>
-                  ))}
+                  </span>
+                ))}
                   <a onClick={this.cleanSelectedKeys} style={{ marginLeft: 24 }}>
                     清空
                   </a>

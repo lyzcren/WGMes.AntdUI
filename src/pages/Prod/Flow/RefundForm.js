@@ -127,11 +127,7 @@ export class RefundForm extends PureComponent {
           fReproduceRecordIds,
           ...fieldsValue,
         },
-      }).then(() => {
-        const {
-          flowRefund: { queryResult },
-        } = this.props;
-
+      }).then((queryResult) => {
         if (queryResult.status === 'ok') {
           message.success('退回成功.');
           if (handleSucess) handleSucess();

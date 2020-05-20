@@ -15,71 +15,85 @@ export default {
   namespace: 'flowManage',
 
   state: {
+    currentPagination: {
+      current: 1,
+      pageSize: 10,
+    },
     data: {
       list: [],
       pagination: {},
-    },
-    queryResult: {
-      status: 'ok',
-      message: '',
     },
     nextDepts: [],
     printTemplates: [],
   },
 
   effects: {
-    *fetch({ payload }, { call, put }) {
-      const response = yield call(fakeQuery, payload);
-      const list = response.list.map(x => ({ ...x, key: `${x.fInterID}${x.fRecordID || 0}` }));
+    *fetch({ payload }, { call, put, select }) {
+      let currentPagination = yield select(state =>
+        state.flowManage.currentPagination);
+      currentPagination = { ...currentPagination, ...payload };
+
+      const response = yield call(fakeQuery, currentPagination);
+      const list = response.list.map(x =>
+        ({ ...x, key: `${x.fInterID}${x.fRecordID || 0}` }));
+
       yield put({
         type: 'save',
-        payload: { data: { ...response, list } },
+        payload: {
+          currentPagination,
+          data: { ...response, list }
+        },
       });
     },
-    *sign({ payload }, { call, put }) {
-      const response = yield call(fakeSign, payload);
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
+    *sign({ payload }, { call, put, select }) {
+      const signResult = yield call(fakeSign, payload);
+      if (signResult.status === 'ok') {
+        yield put({
+          type: 'fetch',
+        });
+      }
+
+      return signResult
     },
     *cancelTransfer({ payload }, { call, put }) {
       const response = yield call(fakeCancelTransfer, payload);
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
+      if (response.status === 'ok') {
+        yield put({
+          type: 'fetch',
+        });
+      }
+
+      return response;
     },
     *cancel({ payload }, { call, put }) {
       const response = yield call(fakeCancel, payload);
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
+      if (response.status === 'ok') {
+        yield put({
+          type: 'fetch',
+        });
+      }
+
+      return response;
     },
     *sign4Reject({ payload, callback }, { call, put }) {
       const response = yield call(fakeSign4Reject, payload);
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
-      if (callback) callback();
+      if (response.status === 'ok') {
+        yield put({
+          type: 'fetch',
+        });
+      }
+
+      return response;
     },
-    *report({ payload, callback }, { call, put }) {
+    *report({ payload }, { call, put }) {
       const response = yield call(fakeReport, payload);
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
-      if (callback) callback();
-    },
-    *update({ payload, callback }, { call, put }) {
-      const response = yield call(fakeUpdate, payload);
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
-      if (callback) callback();
+      if (response.status === 'ok') {
+        yield put({
+          type: 'fetch',
+        });
+      }
+
+      return response;
     },
     *getDepts({ payload }, { call, put }) {
       const response = yield call(fakeGetDepts, payload);
@@ -97,10 +111,13 @@ export default {
     },
     *take({ payload }, { call, put }) {
       const response = yield call(fakeTake, payload);
-      yield put({
-        type: 'saveData',
-        payload: response,
-      });
+      if (response.status === 'ok') {
+        yield put({
+          type: 'fetch',
+        });
+      }
+
+      return response;
     },
   },
 
@@ -109,12 +126,6 @@ export default {
       return {
         ...state,
         ...action.payload,
-      };
-    },
-    saveData(state, action) {
-      return {
-        ...state,
-        queryResult: action.payload ? action.payload : {},
       };
     },
     saveDepts(state, action) {
